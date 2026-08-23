@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dentro la sonda — Progetto COMETA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans+Condensed:wght@400;600;700&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --atmo:#37B6C4; --pos:#5B8FD9; --rad:#9B6BC4; --alim:#E8A33D; --kit:#94A3B2;
+  --bg:#0E1620; --panel:#141E2A; --line:#2A3947; --ink:#DDE4EA; --dim:#8FA0B0; --faint:#5C6B7A;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif}
+.disp{font-family:'IBM Plex Sans Condensed',system-ui,sans-serif}
+.mono{font-family:'IBM Plex Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums}
+.wrap{max-width:1200px;margin:0 auto;padding:20px 16px 40px}
+.eyebrow{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:var(--atmo)}
+h1{font-family:'IBM Plex Sans Condensed',sans-serif;font-size:34px;font-weight:700;line-height:1;margin:4px 0 6px}
+.sub{font-size:14px;color:var(--dim);margin:0}
+.head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:16px}
+.seg{display:flex;border:1px solid var(--line)}
+.seg button{font-family:'IBM Plex Sans Condensed',sans-serif;font-size:14px;font-weight:600;letter-spacing:.03em;
+  padding:9px 22px;background:none;border:0;color:var(--dim);cursor:pointer;transition:.15s}
+.seg button.on{background:var(--atmo);color:#08131A}
+.grid{display:grid;grid-template-columns:1fr 310px;gap:16px}
+.grid>*{min-width:0}
+@media(max-width:900px){.grid{grid-template-columns:1fr}h1{font-size:26px}}
+#stage{position:relative;width:100%;height:600px;border:1px solid var(--line);overflow:hidden;
+  background:linear-gradient(180deg,#141E2A,#0E1620)}
+@media(max-width:900px){#stage{height:440px}}
+#stage.volo{background:radial-gradient(120% 90% at 50% 118%,#4E8FD0 0%,#1E4D8C 22%,#123055 42%,#0A1626 68%,#05070D 100%);
+  background-size:cover;background-position:center}
+#stage canvas{display:block;width:100%;height:100%;touch-action:none}
+.pin{position:absolute;transform:translate(-50%,-50%);width:22px;height:22px;border-radius:50%;
+  border:1px solid;background:rgba(14,22,32,.88);font-family:'IBM Plex Mono',monospace;font-size:11px;
+  font-weight:600;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;transition:.12s}
+.caption{position:absolute;left:18px;right:18px;bottom:16px;pointer-events:none}
+.caption .sig{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;color:#9FD4E8;opacity:.8}
+.ctl{display:flex;flex-wrap:wrap;align-items:center;gap:8px 22px;margin-top:12px}
+.lbl{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
+input[type=range]{accent-color:var(--atmo);width:170px}
+.chip{font-family:'IBM Plex Mono',monospace;font-size:13px;width:32px;height:32px;border:1px solid var(--line);
+  background:none;color:var(--faint);cursor:pointer;transition:.15s}
+.chip.on{border-color:var(--atmo);background:rgba(55,182,196,.14);color:var(--atmo)}
+.tog{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  padding:7px 12px;border:1px solid var(--line);background:none;color:var(--faint);cursor:pointer}
+.tog.on{border-color:var(--atmo);color:var(--atmo)}
+.card{border:1px solid var(--line);margin-bottom:12px}
+.card h2{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--dim);margin:0;padding:12px 12px 8px;font-weight:400}
+.deck{padding:0 12px 12px}
+.deck .row{display:flex;justify-content:space-between;align-items:baseline}
+.deck .nm{font-family:'IBM Plex Sans Condensed',sans-serif;font-size:14px;font-weight:600}
+.deck .pc{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--atmo)}
+.bar{height:6px;background:#1B2733;margin-top:6px}.bar i{display:block;height:100%;background:var(--atmo)}
+.meta{font-family:'IBM Plex Mono',monospace;font-size:10px;color:#6E8092;margin-top:4px}
+.tot{border-top:1px solid var(--line);padding:10px 12px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--dim)}
+#detail{padding:12px;min-height:150px}
+#detail .hd{display:flex;gap:8px;align-items:flex-start}
+#detail .num{font-family:'IBM Plex Mono',monospace;font-size:11px;width:22px;height:22px;flex:0 0 22px;
+  border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;color:#08131A}
+#detail .ttl{font-family:'IBM Plex Sans Condensed',sans-serif;font-size:16px;font-weight:700;line-height:1.15;margin:0}
+#detail .dims{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--atmo);margin-top:8px}
+#detail p{font-size:13px;color:#A8B7C4;line-height:1.4;margin:8px 0 0}
+#detail .empty{font-size:13px;color:#6E8092;margin:0}
+.leg{display:grid;grid-template-columns:1fr 1fr;gap:6px 8px;padding:0 12px 12px}
+.leg div{display:flex;align-items:center;gap:8px;font-size:11px;color:#A8B7C4}
+.leg i{width:12px;height:12px;flex:0 0 12px}
+#list{max-height:250px;overflow-y:auto;padding-bottom:8px}
+#list button{width:100%;display:flex;align-items:center;gap:8px;padding:6px 12px;background:none;border:0;
+  color:var(--ink);cursor:pointer;text-align:left;font-family:inherit;transition:.12s}
+#list button:hover{background:#1B2733}
+#list button.on{background:rgba(55,182,196,.12)}
+#list .i{font-family:'IBM Plex Mono',monospace;font-size:10px;width:16px;text-align:right}
+#list .n{font-size:12px;flex:1;line-height:1.2}
+#list .g{font-family:'IBM Plex Mono',monospace;font-size:10px;color:#6E8092}
+.foot{font-size:11px;color:var(--faint);line-height:1.6;margin-top:16px}
+button:focus-visible,input:focus-visible{outline:2px solid var(--atmo);outline-offset:2px}
+</style>
+</head>
+<body>
+<a href="index.html" style="display:block;padding:10px 20px;border-bottom:1px solid rgba(255,255,255,.14);
+   font:600 12px/1 system-ui,sans-serif;letter-spacing:.16em;text-transform:uppercase;
+   color:#A8B7C4;text-decoration:none">&larr; Progetto COMETA</a>
+<div class="wrap">
+  <div class="head">
+    <div>
+      <div class="eyebrow">Fase 1 · 2026</div>
+      <h1>Dentro la sonda</h1>
+      <p class="sub">Modello in scala reale. Interno 160 × 160 × 130 mm, parete 30 mm di polistirolo. In modalità Banco le pareti frontali sono rese quasi trasparenti per vedere dentro: la scatola è chiusa su tutti i lati.</p>
+    </div>
+    <div class="seg">
+      <button id="mBanco" class="on">Banco</button>
+      <button id="mVolo">Volo</button>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div>
+      <div id="stage">
+        <div class="caption" id="caption" style="display:none">
+          <div class="sig">Progetto COMETA · Scuola Italiana di Montevideo · 2026</div>
+        </div>
+      </div>
+      <div class="ctl" id="ctlBanco">
+        <label style="display:flex;align-items:center;gap:10px">
+          <span class="lbl">Esplodi</span><input type="range" id="explode" min="0" max="1" step="0.01" value="0">
+        </label>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="lbl">Ripiani</span>
+          <button class="chip on" data-deck="0">1</button>
+          <button class="chip on" data-deck="1">2</button>
+          <button class="chip on" data-deck="2">3</button>
+        </div>
+        <button class="tog on" id="togPins">Numeri</button>
+      </div>
+      <p class="sub" id="ctlVolo" style="display:none;margin-top:12px">Sonda chiusa, con ali di stabilizzazione, braccetto e tubo aspirato.</p>
+    </div>
+
+    <div>
+      <div class="card" id="detail"><p class="empty">Tocca un componente nella scena o un numero nell'elenco per vederne misure, peso e funzione.</p></div>
+      <div class="card"><h2>Legenda</h2><div class="leg" id="leg"></div><div style="padding:0 12px 12px;font-size:11px;color:#A8B7C4;line-height:1.45">Il disco chiaro sul coperchio è la finestra in PTFE che lascia passare l'ultravioletto fino al sensore. Le fasce color sabbia sono la coibentazione: fuori fa fino a −60 °C. I componenti 24, 25 e 26 stanno all'esterno della sonda, perché devono misurare l'aria vera.</div></div>
+      <div class="card"><h2>Componenti</h2><div id="list"></div></div>
+    </div>
+  </div>
+
+  <p class="foot">
+    I 707 g indicati sono la somma dei soli componenti disegnati dentro la scatola, di cui 379 g sono apparati del
+    Kit 2000 già a bordo. Il payload completo è circa 1280 g: vanno aggiunti la scatola in polistirolo (200 g), il
+    paracadute (80 g), il cordame (80 g), i ripiani con i tiranti (~70 g), cablaggio e isolamento (~90 g), riflettore
+    radar ed etichette (~30 g). Il modello non sostituisce la prova di montaggio a secco né la pesata reale.
+  </p>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/* ==================================================================
+   DATI — modificare qui per aggiornare il modello.
+   x,y = pianta in mm dall'angolo interno · z = quota dal fondo
+================================================================== */
+const INT={w:160,d:160,h:130}, WALL=30;
+const PAL={alim:"#E8A33D",atmo:"#37B6C4",pos:"#5B8FD9",rad:"#9B6BC4",kit:"#94A3B2",eps:"#E6E4DC"};
+
+/* ------------------------------------------------------------------
+   FOTOGRAFIE REALI (facoltative)
+   Mettere le immagini in una cartella "img/" accanto a questo file e
+   indicarle qui: chiave = numero del componente.
+   Scatto dall'alto, sfondo bianco, luce diffusa, ritaglio esatto sul
+   contorno del pezzo. Vengono applicate alla faccia superiore.
+------------------------------------------------------------------ */
+const TEX = {
+  // 9:  "img/teensy41.jpg",
+  // 5:  "img/scd30.jpg",
+  // 13: "img/samm8q.jpg",
+};
+/* Fondale della modalita' Volo: una foto vera scattata in quota. */
+const SKY = ""; // es. "img/stratosfera.jpg"
+
+const PARTS=[
+{id:1, deck:1,n:"GGreg20_V3 + tubo J305",     cat:"rad", x:31, y:28,  z:0, w:126,d:30,h:12,g:40, note:"400 V a bordo: la sorgente di guasto più pericolosa. Optoaccoppiatore sulla linea impulsi e polyfuse sull'alimentazione. Tubo di vetro: imbottire su tutta la lunghezza."},
+ {id:2, deck:1,n:"Power bank Space Cam",       cat:"kit", x:21, y:60, z:0, w:103,d:41,h:28,g:126,note:"Misure reali. Cella 21700 Li-ion da 4500 mAh, 16,6 Wh. StratoFlights la fa volare in questa scatola: è un dato utile sulla temperatura interna."},
+ {id:3, deck:1,n:"PMS5003 particolato", cat:"atmo", x:-30, y:55, z:0, w:38, d:50,h:21,g:45, note:"INCASSATO NELLA PARETE −X, la stessa della staffa ma a quota diversa: la staffa esce a z≈80, il PMS sta sul ripiano 1 (z 0-21). Faccia a filo esterno, perimetro sigillato con silicone NEUTRO, bocche sulla faccia stretta 50 × 21 inclinate in basso con visiera anti-ghiaccio. Ruotato 90°. Le pareti ±Y restano libere per le alette centrate, la +X per la camera. Sporge 8 mm all'interno, da fasciare con un collare di XPS. Ponte termico ~0,3 W."},
+ {id:4, deck:1,n:"Pacco 6 × AA litio L91",     cat:"alim", x:33, y:103, z:0, w:60, d:48,h:18,g:90, note:"Massa pesante in basso. Fili saldati ai contatti e pile compresse con nastro: un micro-spostamento all'impatto riavvia il sistema."},
+ {id:5, deck:2,n:"Pacco 3 × AA (livello 2)",   cat:"alim", x:45, y:50, z:40, w:55, d:32,h:18,g:45, note:"Alimenta SOLO l'Adalogger. Nessun contatto elettrico con il pacco principale: è ciò che rende indipendente il livello 2."},
+ {id:6, deck:1,n:"SCD30 CO₂",                  cat:"atmo", x:110, y:3,z:0, w:35, d:23,h:7,  g:12, note:"Vicino a una presa d'aria ma FUORI dal flusso della ventola del PMS5003, che genera turbolenza e riscaldamento locale."},
+ {id:7, deck:2,n:"GPS STRATOfinder 4G",        cat:"kit", x:69, y:104,  z:40,w:75, d:45,h:21,g:96, note:"Misure reali. Livello 1: batteria propria, nessun cavo verso il resto."},
+ {id:8, deck:2,n:"Space Cam",                  cat:"kit", x:169, y:51,  z:40,w:21, d:59,h:41,g:69, note:"INCASSATA NELLA PARETE +X, la stessa del PMS ma a quota diversa: il PMS sta sul ripiano 1 (z 0-21), la camera sul 2 (z 40-81). Guardando in +X, le alette su ±Y restano a 90° dall\'asse ottico, fuori dal campo anche di un obiettivo grandangolare — così le alette possono restare CENTRATE e simmetriche. Profonda 21,4 mm contro 30 di parete: entra per intero, 9 mm di polistirolo dietro. Scavare la tasca dall\'interno per poter raggiungere batteria e microSD."},
+ {id:9, deck:2,n:"Teensy 4.1",                 cat:"pos", x:95, y:84, z:40,w:61, d:18,h:5, g:10, note:"Controllore principale, microSD integrata. Clock ridotto a 150-300 MHz per limitare la dissipazione: a bassa pressione il calore fatica a uscire."},
+ {id:10,deck:2,n:"Feather M0 Adalogger",       cat:"pos", x:105, y:23, z:40,w:51, d:23,h:8, g:12, note:"LIVELLO 2. Pile, microSD e GPS propri. Registra quota e traiettoria anche se il Teensy si blocca del tutto."},
+ {id:11,deck:2,n:"MAX31865 + PT1000",          cat:"atmo", x:6, y:15, z:40,w:25, d:18,h:3, g:4,  note:"SPI, non I²C: sta fuori dalla catena Qwiic ed è per questo l'unico pezzo da saldare. L'elemento sensibile è sul braccetto esterno."},
+ {id:12,deck:2,n:"Perfboard: optoacc. + polyfuse + MOSFET", cat:"alim", x:33, y:3,z:40,w:70,d:45,h:14,g:35, note:"Isolamento guasti concentrato su una sola scheda: optoaccoppiatore del Geiger, polyfuse, driver MOSFET e morsettiere."},
+ {id:13,deck:3,n:"SPOT Trace",                 cat:"kit", x:87, y:62,  z:80,w:68, d:51,h:21,g:88, note:"Misure reali, 87,9 g. Trasmette verso l'alto: niente sopra di lui. Copre la salita fino al limite COCOM."},
+ {id:14,deck:3,n:"GPS SAM-M8Q (principale)",   cat:"pos", x:17, y:3,  z:80,w:41, d:41,h:6, g:8,  note:"Antenna integrata verso il cielo. Il polistirolo è trasparente alle radiofrequenze: non serve forare. Modo Airborne <1g salvato in flash."},
+ {id:15,deck:3,n:"GPS SAM-M8Q (livello 2)",    cat:"pos", x:116, y:18, z:80,w:41, d:41,h:6, g:8,  note:"MONTATO, non di scorta: è il GPS dell'Adalogger. Quota e istante di scoppio registrati su due catene che non condividono nulla."},
+ {id:16,deck:3,n:"MS8607 p/T/RH",              cat:"atmo", x:61, y:3,  z:80,w:25, d:17,h:3, g:3,  note:"Fondo scala 10 hPa: dato valido fino a ~31 km. Sopra, l'altimetria è solo GPS."},
+ {id:17,deck:3,n:"LTR390 UV",                  cat:"rad", x:119, y:3, z:80,w:25, d:13,h:3, g:3,  note:"Sotto una finestra in quarzo o PTFE: policarbonato e acrilico assorbono l'UV-B."},
+ {id:18,deck:3,n:"ICM-20948 IMU",              cat:"pos", x:87, y:42, z:80,w:26, d:18,h:5, g:3,  note:"Il ripiano più lontano dai pacchi pile e dai cavi di potenza: il magnetometro va calibrato hard/soft iron a sonda chiusa."},
+ {id:19,deck:3,n:"MS8607 (ricambio a banco)",  cat:"atmo", x:89, y:3,z:80,w:25, d:17,h:3, g:3,  note:"Non vola: serve a confrontare due letture a terra e individuare un esemplare difettoso."},
+ {id:20,deck:3,n:"MPM3610 buck 5 V",           cat:"alim", x:75, y:22, z:80,w:18, d:18,h:8, g:5,  note:"Da 9-10,8 V a 5 V. Senza questo il Teensy, che accetta al massimo 5,5 V, si distrugge."},
+ {id:21,deck:3,n:"SHT45 + PTFE",               cat:"atmo", x:96, y:22, z:80,w:18, d:18,h:3, g:2,  note:"L'elemento sensibile va sul braccetto esterno insieme al PT1000. Membrana in PTFE contro polvere e condensa."},
+ {id:22,deck:1,n:"Pad riscaldante 5 V",       cat:"alim", x:95, y:103, z:0, w:50, d:50,h:3, g:12, note:"Avvolto attorno al pacco pile, non appeso in aria: scalda 90 g di batterie invece di 3 litri d'aria. Termostato ON sotto −15 °C, OFF sopra −5 °C, taglio di sicurezza in firmware a +40 °C. Ora si installa: il bilancio termico rifatto dà l'interno a circa −45 °C in tropopausa."},
+ {id:23,deck:2,n:"2° MAX31865 (PT1000 nel tubo)", cat:"atmo", x:119, y:3, z:40,w:25, d:18,h:3, g:4,  note:"ESPERIMENTO DI CONFRONTO: legge un secondo PT1000 alloggiato in un tubo passante, in parallelo a quello esposto sul braccetto. Le due curve dicono con i vostri dati quanto pesa la termalizzazione dell'aria nel tubo — è il punto su cui il metodo di Antolini e questa configurazione divergono."},
+ {id:24,deck:3,n:"Elemento PT1000 (braccetto esterno)", cat:"atmo", x:-175, y:95, z:76, w:6, d:10,h:8, g:1, note:"In punta al braccetto, in aria libera e senza schermatura completa: è il TERMINE DI PARAGONE del tubo aspirato. Da verniciare di BIANCO OPACO, non lasciare l\'acciaio lucido: il metallo riflette bene il sole ma irradia male, mentre il bianco opaco riflette e irradia. Il piattino ripara solo dall\'alto, perché la sonda ruota e il sole arriva da ogni azimut: il bias residuo si dichiara e il tubo dice quanto vale."},
+ {id:25,deck:3,n:"Elemento SHT45 (braccetto esterno)", cat:"atmo", x:-175, y:106, z:76, w:6, d:8, h:6, g:1, note:"FUORI DALLA SONDA, accanto al PT1000. L'umidità dentro una scatola tiepida non ha nulla a che vedere con quella dell'aria esterna. La membrana in PTFE protegge da polvere e condensa. Serve anche a marcare i minuti in cui si attraversa una nube e il PT1000 è impaccato di ghiaccio."},
+ {id:26,deck:3,n:"PT1000 nel tubo (confronto)", cat:"atmo", x:-57, y:55, z:76, w:6, d:10,h:8, g:1, note:"Condotto INTERAMENTE ESTERNO con CURVA A 90°. La curva è un separatore inerziale: l\'aria svolta, le goccioline sopraffuse no e impattano sulla parete esterna del gomito. Il sensore sta a valle, nel tratto verticale, e riceve aria priva delle gocce più grandi. Ingresso in basso, uscita in alto, foro di scarico sul fondo del gomito. Solo i fili entrano nella sonda, da un foro da 3 mm sigillato: nessun ponte termico. Concilia l\'obiezione termica con quella sul ghiaccio."},
+];
+const DECKS=[{n:1,label:"Ripiano 1 — masse e sensori d'aria",z:0,plate:null},
+             {n:2,label:"Ripiano 2 — controllo e ottica",z:40,plate:37},
+             {n:3,label:"Ripiano 3 — cielo",z:80,plate:77}];
+const CATS=[["atmo","Atmosfera"],["pos","Posizione e controllo"],["rad","Radiazione e luce"],
+            ["alim","Alimentazione"],["kit","Kit 2000 (già a bordo)"]];
+const FLOOR=(INT.w*INT.d)/100;
+
+/* ================= STATO ================= */
+const st={mode:"banco",explode:0,decks:[true,true,true],pins:true,sel:null,hover:null};
+
+/* ================= SCENA ================= */
+const stage=document.getElementById("stage");
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+const S=0.01, V=(x,y,z)=>new THREE.Vector3((x-INT.w/2)*S,z*S,(y-INT.d/2)*S);
+const scene=new THREE.Scene();
+const cam=new THREE.PerspectiveCamera(38,1,.1,100);
+const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,preserveDrawingBuffer:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+stage.appendChild(renderer.domElement);
+const root=new THREE.Group(); scene.add(root);
+
+const key=new THREE.DirectionalLight(0xffffff,1.15); key.position.set(2.2,3.4,2.0); scene.add(key);
+const rim=new THREE.DirectionalLight(0x9fd4e8,.5); rim.position.set(-2.4,.8,-1.8); scene.add(rim);
+scene.add(new THREE.HemisphereLight(0xffffff,0x394452,.65));
+
+/* guscio */
+const panels=[];
+const epsBase=new THREE.MeshStandardMaterial({color:PAL.eps,roughness:.95,metalness:0,transparent:true,opacity:.45,side:THREE.DoubleSide});
+function panel(w,h,d,pos,tag){
+  const m=new THREE.Mesh(new THREE.BoxGeometry(w*S,h*S,d*S),epsBase.clone());
+  m.position.copy(pos); m.userData.tag=tag; m.userData.y0=pos.y; root.add(m); panels.push(m);
+  const e=new THREE.LineSegments(new THREE.EdgesGeometry(m.geometry),
+    new THREE.LineBasicMaterial({color:0x8e9aa6,transparent:true,opacity:.55}));
+  e.position.copy(pos); e.userData.tag=tag; e.userData.y0=pos.y; root.add(e); panels.push(e);
+}
+const OW=INT.w+2*WALL, OD=INT.d+2*WALL;
+panel(OW,WALL,OD,V(INT.w/2,INT.d/2,-WALL/2),"base");
+panel(OW,WALL,OD,V(INT.w/2,INT.d/2,INT.h+WALL/2),"lid");
+panel(WALL,INT.h,OD,V(-WALL/2,INT.d/2,INT.h/2),"wx-");
+panel(WALL,INT.h,OD,V(INT.w+WALL/2,INT.d/2,INT.h/2),"wx+");
+panel(INT.w,INT.h,WALL,V(INT.w/2,-WALL/2,INT.h/2),"wy-");
+panel(INT.w,INT.h,WALL,V(INT.w/2,INT.d+WALL/2,INT.h/2),"wy+");
+
+/* ali */
+const wingMat=new THREE.MeshStandardMaterial({color:PAL.eps,roughness:.95,transparent:true,opacity:.85,side:THREE.DoubleSide});
+const wings=new THREE.Group();
+[-1,1].forEach(sg=>{
+  // 250 x 200 mm, sporgenti radialmente: è così che contrastano la rotazione
+  // alette CENTRATE: simmetriche rispetto all'asse, come devono essere
+  const XW = INT.w/2;
+  const w=new THREE.Mesh(new THREE.BoxGeometry(8*S,200*S,250*S),wingMat);
+  const yOut = sg>0 ? INT.d+WALL+125 : -WALL-125;
+  w.position.copy(V(XW,yOut,INT.h/2)); wings.add(w);
+  const rib=new THREE.Mesh(new THREE.BoxGeometry(14*S,30*S,20*S),wingMat);
+  rib.position.copy(V(XW,sg>0?INT.d+WALL+6:-WALL-6,INT.h/2)); wings.add(rib);
+});
+root.add(wings);
+
+/* braccetto esterno */
+const rod=new THREE.Mesh(new THREE.CylinderGeometry(3*S,3*S,150*S,12),
+  new THREE.MeshStandardMaterial({color:0x4a5560,roughness:.6}));
+rod.rotation.z=Math.PI/2; rod.position.copy(V(-WALL-75,100,INT.h*.62)); root.add(rod);
+const tip=new THREE.Mesh(new THREE.BoxGeometry(14*S,10*S,10*S),
+  new THREE.MeshStandardMaterial({color:0xF5F7F8,roughness:.92,metalness:.02}));
+tip.position.copy(V(-WALL-150,100,INT.h*.62)); root.add(tip);
+const shield=new THREE.Mesh(new THREE.BoxGeometry(30*S,2*S,24*S),
+  new THREE.MeshStandardMaterial({color:0xF5F7F8,metalness:.05,roughness:.9,side:THREE.DoubleSide}));
+shield.position.copy(V(-WALL-140,100,INT.h*.62+16)); root.add(shield);
+
+/* struttura di fissaggio, coibentazione, finestra UV, aperture */
+const vano=new THREE.Group();
+const holes=new THREE.Group();
+const lidKit=new THREE.Group();
+const extHW=new THREE.Group();
+let riser=null;
+(function(){
+  const RODS=[[9,9],[151,9],[9,151],[151,151]];
+  const steel=new THREE.MeshStandardMaterial({color:0xB8C2CC,metalness:.85,roughness:.3});
+  const nylon=new THREE.MeshStandardMaterial({color:0x6E8092,roughness:.7});
+  RODS.forEach(([rx,ry])=>{
+    const rod=new THREE.Mesh(new THREE.CylinderGeometry(1.5*S,1.5*S,124*S,10),steel);
+    rod.position.copy(V(rx,ry,62)); vano.add(rod);
+    [20,60,100].forEach(zz=>{
+      const sp=new THREE.Mesh(new THREE.CylinderGeometry(3*S,3*S,26*S,10),nylon);
+      sp.position.copy(V(rx,ry,zz)); vano.add(sp);
+    });
+  });
+  const xps=new THREE.MeshStandardMaterial({color:0xF0D9A8,roughness:.95,transparent:true,opacity:.4,side:THREE.DoubleSide});
+  // coibentazione in ovatta su coperchio e fondo (non sulle pareti: ruberebbe ripiano)
+  const wFloor=new THREE.Mesh(new THREE.BoxGeometry(150*S,10*S,150*S),xps);
+  wFloor.position.copy(V(80,80,-6)); vano.add(wFloor);
+  const wLid=new THREE.Mesh(new THREE.BoxGeometry(150*S,10*S,150*S),xps);
+  wLid.position.copy(V(80,80,136)); lidKit.add(wLid);
+  // collare del PMS
+  const pms=PARTS.find(q=>q.n.indexOf("PMS5003")===0);
+  if(pms){
+    const col=new THREE.Mesh(new THREE.BoxGeometry(12*S,(pms.h+16)*S,(pms.d+16)*S),xps);
+    col.position.copy(V(pms.x+pms.w/2,pms.y+pms.d/2,pms.z+pms.h/2)); vano.add(col);
+    const hm=new THREE.MeshStandardMaterial({color:0x2A3947,roughness:.8,side:THREE.DoubleSide});
+    // bocche inclinate verso il basso, con visiera anti-ghiaccio
+    [pms.y+12, pms.y+pms.d-12].forEach(yy=>{
+      const h=new THREE.Mesh(new THREE.CylinderGeometry(5*S,5*S,12*S,14),hm);
+      h.rotation.z=Math.PI/2; h.rotation.y=0.35;
+      h.position.copy(V(-WALL+4,yy,pms.z+pms.h/2)); holes.add(h);
+    });
+    const vis=new THREE.Mesh(new THREE.BoxGeometry(3*S,10*S,(pms.d+10)*S),
+      new THREE.MeshStandardMaterial({color:0xD8DDE2,metalness:.6,roughness:.4,side:THREE.DoubleSide}));
+    vis.position.copy(V(-WALL-3,pms.y+pms.d/2,pms.z+pms.h/2+15)); holes.add(vis);
+  }
+  // finestra UV in PTFE sul coperchio, sopra il LTR390
+  const uv=PARTS.find(q=>q.n.indexOf("LTR390")===0);
+  if(uv){
+    // foro passante nel coperchio (aria), reso quasi trasparente
+    const bore=new THREE.Mesh(new THREE.CylinderGeometry(11*S,11*S,WALL*S,24),
+      new THREE.MeshStandardMaterial({color:0x2A3947,transparent:true,opacity:.22,side:THREE.DoubleSide}));
+    bore.position.copy(V(uv.x+uv.w/2,uv.y+uv.d/2,INT.h+WALL/2)); lidKit.add(bore);
+    // membrana di PTFE: dischetto sottile a filo della superficie esterna
+    const memb=new THREE.Mesh(new THREE.CylinderGeometry(13*S,13*S,0.6*S,28),
+      new THREE.MeshStandardMaterial({color:0xF2F6F9,roughness:.55,transparent:true,opacity:.9,
+        emissive:0x9B6BC4,emissiveIntensity:.18,side:THREE.DoubleSide}));
+    memb.position.copy(V(uv.x+uv.w/2,uv.y+uv.d/2,INT.h+WALL+0.5)); lidKit.add(memb);
+    const rise=new THREE.Mesh(new THREE.BoxGeometry(uv.w*S,26*S,uv.d*S),nylon);
+    rise.position.copy(V(uv.x+uv.w/2,uv.y+uv.d/2,uv.z+uv.h+13));
+    rise.userData.y0=rise.position.y; riser=rise; vano.add(rise);
+  }
+  // staffa unica ancorata al blocco dei ripiani: esce dalla feritoia nella parete -X
+  const brk=new THREE.MeshStandardMaterial({color:0x8894A0,metalness:.5,roughness:.5});
+  const plate=new THREE.Mesh(new THREE.BoxGeometry((WALL+40)*S,4*S,50*S),brk);
+  plate.position.copy(V(-WALL-10,INT.d/2,INT.h*0.62)); extHW.add(plate);
+  const anchor=new THREE.Mesh(new THREE.BoxGeometry(30*S,4*S,50*S),brk);
+  anchor.position.copy(V(12,INT.d/2,INT.h*0.62)); extHW.add(anchor);
+
+  // tubo di confronto: INTERAMENTE ESTERNO, con curva a 90 gradi (separatore inerziale)
+  const tp=PARTS.find(q=>q.n.indexOf("PT1000 nel tubo")===0);
+  if(tp){
+    const tm=new THREE.MeshStandardMaterial({color:0x9FB0BF,roughness:.6,metalness:.2,
+      transparent:true,opacity:.55,side:THREE.DoubleSide});
+    const yy=tp.y+tp.d/2, zc=tp.z+4, XT=-WALL-24;
+    // tratto orizzontale di ingresso, bocca rivolta in avanti/basso
+    const th=new THREE.Mesh(new THREE.CylinderGeometry(6*S,6*S,40*S,16),tm);
+    th.rotation.z=Math.PI/2; th.position.copy(V(XT-20,yy,zc-34)); extHW.add(th);
+    // gomito
+    const el=new THREE.Mesh(new THREE.SphereGeometry(6.5*S,14,12),tm);
+    el.position.copy(V(XT,yy,zc-34)); extHW.add(el);
+    // tratto verticale: il sensore sta QUI, a valle della curva
+    const tv=new THREE.Mesh(new THREE.CylinderGeometry(6*S,6*S,72*S,16),tm);
+    tv.position.copy(V(XT,yy,zc)); extHW.add(tv);
+    const hm3=new THREE.MeshStandardMaterial({color:0x2A3947,roughness:.8,side:THREE.DoubleSide});
+    const inlet=new THREE.Mesh(new THREE.CylinderGeometry(6*S,6*S,3*S,16),hm3);
+    inlet.rotation.z=Math.PI/2; inlet.position.copy(V(XT-41,yy,zc-34)); holes.add(inlet);
+    const outlet=new THREE.Mesh(new THREE.CylinderGeometry(6*S,6*S,3*S,16),hm3);
+    outlet.position.copy(V(XT,yy,zc+36)); holes.add(outlet);
+    // scarico dell'acqua separata, sul fondo del gomito
+    const drain=new THREE.Mesh(new THREE.CylinderGeometry(1.6*S,1.6*S,4*S,10),hm3);
+    drain.position.copy(V(XT,yy,zc-41)); holes.add(drain);
+    const wire=new THREE.Mesh(new THREE.CylinderGeometry(1.5*S,1.5*S,WALL*S,10),hm3);
+    wire.rotation.z=Math.PI/2; wire.position.copy(V(-WALL/2,yy,zc)); holes.add(wire);
+  }
+  // obiettivo della camera, a filo della superficie esterna -Y
+  const camL=PARTS.find(q=>q.n.trim()==="Space Cam");
+  if(camL){
+    const glass=new THREE.MeshStandardMaterial({color:0x11181F,roughness:.15,metalness:.6});
+    const lens=new THREE.Mesh(new THREE.CylinderGeometry(9*S,9*S,2*S,24),glass);
+    lens.rotation.z=Math.PI/2;
+    lens.position.copy(V(INT.w+WALL+1,camL.y+camL.d/2,camL.z+camL.h/2)); holes.add(lens);
+    const bez=new THREE.Mesh(new THREE.BoxGeometry(1.5*S,camL.h*S,camL.d*S),
+      new THREE.MeshStandardMaterial({color:0x39434D,roughness:.7}));
+    bez.position.copy(V(INT.w+WALL+0.5,camL.y+camL.d/2,camL.z+camL.h/2)); holes.add(bez);
+  }
+  // passaggio cavo della camera
+  const cam=PARTS.find(q=>q.n.trim()==="Space Cam");
+  if(cam){
+    const hm2=new THREE.MeshStandardMaterial({color:0x2A3947,roughness:.8,side:THREE.DoubleSide});
+    const c=new THREE.Mesh(new THREE.CylinderGeometry(3*S,3*S,12*S,12),hm2);
+    c.rotation.z=Math.PI/2; c.position.copy(V(INT.w+WALL/2,cam.y+cam.d/2,cam.z-4)); holes.add(c);
+  }
+})();
+root.add(vano); root.add(holes); root.add(lidKit); root.add(extHW);
+
+/* ripiani */
+const plates=[];
+DECKS.forEach(d=>{ if(d.plate==null) return;
+  const p=new THREE.Mesh(new THREE.BoxGeometry(150*S,3*S,150*S),
+    new THREE.MeshStandardMaterial({color:0xb9c2cb,roughness:.75,transparent:true,opacity:.55}));
+  p.position.copy(V(INT.w/2,INT.d/2,d.plate+1.5)); p.userData.deck=d.n; p.userData.y0=p.position.y;
+  root.add(p); plates.push(p);
+});
+
+/* componenti */
+const loader=new THREE.TextureLoader();
+const groups=[];
+PARTS.forEach(p=>{
+  const g=new THREE.Group();
+  const base={color:new THREE.Color(PAL[p.cat]),roughness:.42,metalness:.12,transparent:true,opacity:.94};
+  const side=new THREE.MeshStandardMaterial(base);
+  let top=side;
+  if(TEX[p.id]){
+    top=new THREE.MeshStandardMaterial({map:loader.load(TEX[p.id]),roughness:.55,metalness:.05,transparent:true,opacity:1});
+  }
+  const mats=[side,side,top,side,side,side];   // +X −X +Y(alto) −Y +Z −Z
+  const box=new THREE.Mesh(new THREE.BoxGeometry(p.w*S,p.h*S,p.d*S),mats);
+  const edge=new THREE.LineSegments(new THREE.EdgesGeometry(box.geometry),
+    new THREE.LineBasicMaterial({color:0x121a22,transparent:true,opacity:.45}));
+  g.add(box); g.add(edge);
+  g.position.copy(V(p.x+p.w/2,p.y+p.d/2,p.z+p.h/2));
+  g.userData={part:p,side,top,box,y0:g.position.y};
+  root.add(g); groups.push(g);
+});
+
+/* orbita */
+let az=-.72,pol=1.02,dist=4.6,drag=false,lx=0,ly=0,pinch=0,moved=false,lastTouch=0;
+const tgt=new THREE.Vector3(0,.62,0);
+function place(){
+  pol=Math.max(.18,Math.min(Math.PI-.18,pol)); dist=Math.max(2.2,Math.min(11,dist));
+  cam.position.set(tgt.x+dist*Math.sin(pol)*Math.sin(az),tgt.y+dist*Math.cos(pol),tgt.z+dist*Math.sin(pol)*Math.cos(az));
+  cam.lookAt(tgt);
+}
+const cv=renderer.domElement;
+cv.addEventListener("pointerdown",e=>{drag=true;moved=false;lastTouch=performance.now();lx=e.clientX;ly=e.clientY});
+addEventListener("pointermove",e=>{ if(!drag)return; moved=true; lastTouch=performance.now();
+  az-=(e.clientX-lx)*.007; pol-=(e.clientY-ly)*.007; lx=e.clientX; ly=e.clientY; place(); });
+addEventListener("pointerup",()=>drag=false);
+cv.addEventListener("wheel",e=>{e.preventDefault();dist*=1+e.deltaY*.0011;place()},{passive:false});
+cv.addEventListener("touchstart",e=>{
+  lastTouch=performance.now();
+  if(e.touches.length===2){drag=false;
+    pinch=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);}
+},{passive:true});
+cv.addEventListener("touchmove",e=>{
+  lastTouch=performance.now();
+  if(e.touches.length===2){
+    const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+    if(pinch){dist*=pinch/d;place()} pinch=d;}
+},{passive:true});
+place();
+
+/* picking */
+const ray=new THREE.Raycaster(), ndc=new THREE.Vector2();
+function pick(e){
+  const r=cv.getBoundingClientRect();
+  ndc.x=((e.clientX-r.left)/r.width)*2-1; ndc.y=-((e.clientY-r.top)/r.height)*2+1;
+  ray.setFromCamera(ndc,cam);
+  const hits=ray.intersectObjects(groups.filter(g=>g.visible).map(g=>g.userData.box),false);
+  return hits.length?hits[0].object.parent.userData.part:null;
+}
+cv.addEventListener("click",e=>{ if(!moved){ st.sel=pick(e); renderDetail(); renderList(); } });
+cv.addEventListener("pointermove",e=>{ if(!drag){ st.hover=pick(e); renderDetail(); } });
+
+/* resize — con guardia contro il ciclo del ResizeObserver */
+let lastW=0,lastH=0,roPending=false;
+function resize(){
+  const w=Math.max(1,stage.clientWidth), h=Math.max(1,stage.clientHeight);
+  if(w===lastW&&h===lastH) return;
+  lastW=w; lastH=h;
+  renderer.setSize(w,h,false);          // le misure CSS le impone il foglio di stile
+  cam.aspect=w/h; cam.updateProjectionMatrix();
+}
+new ResizeObserver(()=>{
+  if(roPending) return;
+  roPending=true;
+  requestAnimationFrame(()=>{ roPending=false; resize(); });
+}).observe(stage);
+resize();
+addEventListener("resize",resize);
+
+/* loop */
+const pinEls={}; const proj=new THREE.Vector3(); let spin=0;
+(function loop(){
+  requestAnimationFrame(loop);
+  if(st.mode==="volo"&&!reduce&&!drag&&performance.now()-lastTouch>3000){ az+=.0022; place(); }
+  const banco=st.mode==="banco";
+  groups.forEach(g=>{
+    const p=g.userData.part;
+    g.position.y=g.userData.y0+(p.deck-1)*st.explode*.9;
+    g.visible=banco&&st.decks[p.deck-1];
+    const on=(st.sel&&st.sel.id===p.id)||(st.hover&&st.hover.id===p.id);
+    g.userData.side.opacity=st.sel?(st.sel.id===p.id?1:.3):(on?1:.94);
+    g.userData.side.emissive.set(on?PAL[p.cat]:0x000000);
+    g.userData.side.emissiveIntensity=on?.42:0;
+  });
+  plates.forEach(p=>{ p.position.y=p.userData.y0+(p.userData.deck-1)*st.explode*.9;
+    p.visible=banco&&st.decks[p.userData.deck-1]; });
+  panels.forEach(m=>{
+    const t=m.userData.tag;
+    if(t==="lid" && m.userData.y0!==undefined) m.position.y=m.userData.y0+st.explode*2.7;
+    m.visible=true;
+    if(m.type==="Mesh"){
+      const front = (t==="wx+"||t==="wy+"||t==="lid");
+      m.material.opacity = banco ? (front?.07:.30) : 1;
+      m.material.transparent = banco;
+      m.material.depthWrite = !banco;
+    } else {
+      m.material.opacity = banco ? (["wx+","wy+","lid"].indexOf(t)>=0?.25:.6) : .55;
+    }
+  });
+  lidKit.position.y = st.explode*2.7;
+  lidKit.visible = banco || st.mode!=="banco";
+  if(riser) riser.position.y = riser.userData.y0 + st.explode*1.8;
+  wings.visible = !banco;
+  vano.visible  = banco;
+  extHW.visible = true;
+  holes.visible = true;
+  /* numeri */
+  const r=cv.getBoundingClientRect();
+  groups.forEach(g=>{
+    const p=g.userData.part; let el=pinEls[p.id];
+    const show=banco&&st.pins&&g.visible;
+    if(show&&!el){
+      el=document.createElement("button"); el.className="pin"; el.textContent=p.id;
+      el.style.borderColor=PAL[p.cat];
+      el.onclick=()=>{st.sel=p;renderDetail();renderList();};
+      stage.appendChild(el); pinEls[p.id]=el;
+    }
+    if(!show){ if(el){el.remove();delete pinEls[p.id];} return; }
+    proj.copy(g.position).project(cam);
+    el.style.left=(proj.x*.5+.5)*r.width+"px"; el.style.top=(-proj.y*.5+.5)*r.height+"px";
+    const act=(st.sel&&st.sel.id===p.id)||(st.hover&&st.hover.id===p.id);
+    el.style.background=act?PAL[p.cat]:"rgba(14,22,32,.88)";
+    el.style.color=act?"#08131A":PAL[p.cat];
+  });
+  renderer.render(scene,cam);
+})();
+
+/* ================= INTERFACCIA ================= */
+const totMass=PARTS.reduce((s,p)=>s+p.g,0);
+const extIds=[24,25,26];
+const totArea=PARTS.filter(p=>p.id<24).reduce((s,p)=>s+p.w*p.d,0)/100;
+
+const _d=document.getElementById("decks"); if(_d) _d.innerHTML=DECKS.map(d=>{
+  const ps=PARTS.filter(p=>p.deck===d.n && p.id<24);
+  const a=ps.reduce((s,p)=>s+p.w*p.d,0)/100, m=ps.reduce((s,p)=>s+p.g,0), f=a/FLOOR;
+  return `<div class="deck"><div class="row"><span class="nm">${d.label}</span>
+    <span class="pc">${Math.round(f*100)}%</span></div>
+    <div class="bar"><i style="width:${Math.min(100,f*100)}%"></i></div>
+    <div class="meta">${a.toFixed(1)} cm² su ${FLOOR} · ${ps.length} pezzi · ${m} g</div></div>`;
+}).join("");
+const _t=document.getElementById("tot"); if(_t) _t.textContent=
+  `Totale ${totArea.toFixed(0)} cm² · ${totMass} g dei componenti disegnati · payload completo ≈ 1280 g`;
+document.getElementById("leg").innerHTML=CATS.map(([k,l])=>
+  `<div><i style="background:${PAL[k]}"></i>${l}</div>`).join("");
+
+function renderList(){
+  document.getElementById("list").innerHTML=PARTS.map(p=>
+    `<button data-id="${p.id}" class="${st.sel&&st.sel.id===p.id?"on":""}">
+      <span class="i" style="color:${PAL[p.cat]}">${p.id}</span>
+      <span class="n">${p.n}</span><span class="g">${p.g} g</span></button>`).join("");
+  document.querySelectorAll("#list button").forEach(b=>{
+    b.onclick=()=>{st.sel=PARTS.find(p=>p.id==b.dataset.id);renderDetail();renderList();};
+    b.onmouseenter=()=>{st.hover=PARTS.find(p=>p.id==b.dataset.id);renderDetail();};
+    b.onmouseleave=()=>{st.hover=null;renderDetail();};
+  });
+}
+function renderDetail(){
+  const p=st.sel||st.hover, el=document.getElementById("detail");
+  el.innerHTML=p?`<div class="hd"><span class="num" style="background:${PAL[p.cat]}">${p.id}</span>
+    <h3 class="ttl">${p.n}</h3></div>
+    <div class="dims">${p.w} × ${p.d} × ${p.h} mm · ${p.g} g · ${((p.w*p.d)/100).toFixed(1)} cm²</div>
+    <p>${p.note}</p>`
+   :`<p class="empty">Tocca un componente nella scena o un numero nell'elenco per vederne misure, peso e funzione.</p>`;
+}
+renderList(); renderDetail();
+
+function setMode(m){
+  st.mode=m; st.sel=null;
+  document.getElementById("mBanco").classList.toggle("on",m==="banco");
+  document.getElementById("mVolo").classList.toggle("on",m==="volo");
+  stage.classList.toggle("volo",m==="volo");
+  if(m==="volo"&&SKY) stage.style.backgroundImage=`url(${SKY})`; else stage.style.backgroundImage="";
+  document.getElementById("ctlBanco").style.display=m==="banco"?"flex":"none";
+  document.getElementById("ctlVolo").style.display=m==="volo"?"block":"none";
+  document.getElementById("caption").style.display=m==="volo"?"block":"none";
+  renderDetail(); renderList();
+}
+document.getElementById("mBanco").onclick=()=>setMode("banco");
+document.getElementById("mVolo").onclick=()=>setMode("volo");
+document.getElementById("explode").oninput=e=>st.explode=+e.target.value;
+document.querySelectorAll(".chip").forEach(c=>c.onclick=()=>{
+  const i=+c.dataset.deck; st.decks[i]=!st.decks[i]; c.classList.toggle("on",st.decks[i]); });
+document.getElementById("togPins").onclick=e=>{
+  st.pins=!st.pins; e.target.classList.toggle("on",st.pins); };
+</script>
+</body>
+</html>

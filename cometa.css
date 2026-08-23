@@ -1,0 +1,346 @@
+/* ============================================================
+   COMETA — foglio di stile comune
+   Impaginazione sobria, pensata per essere rivestita:
+   cambiando i valori qui sotto cambia tutto il sito.
+   ============================================================ */
+
+:root {
+  /* Colori */
+  --carta:      #EDF1F5;   /* fondo pagina */
+  --carta-alta: #FFFFFF;   /* riquadri */
+  --inchiostro: #0F1A24;   /* testo principale */
+  --grafite:    #52657A;   /* testo secondario */
+  --tratto:     #C6D2DC;   /* filetti */
+  --durazno:    #2C5FA8;   /* sito di lancio blu */
+  --mercedes:   #2C7A57;   /* sito di lancio verde */
+  --ambra:      #B8681B;   /* avvisi, quota di scoppio */
+
+  /* Caratteri */
+  --testo:   "IBM Plex Serif", Georgia, serif;
+  --titoli:  "IBM Plex Sans Condensed", "IBM Plex Sans", system-ui, sans-serif;
+  --dati:    "IBM Plex Mono", ui-monospace, monospace;
+
+  /* Misure */
+  --colonna: 40rem;
+  --largo:   68rem;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { animation: none !important; transition: none !important; }
+}
+
+body {
+  margin: 0;
+  background: var(--carta);
+  color: var(--inchiostro);
+  font-family: var(--testo);
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- Intestazione ---------- */
+
+.testata {
+  border-bottom: 1px solid var(--tratto);
+  background: var(--carta);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.testata-interno {
+  max-width: var(--largo);
+  margin: 0 auto;
+  padding: 0.75rem 1.5rem;
+  display: flex;
+  align-items: baseline;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.marchio {
+  font-family: var(--titoli);
+  font-weight: 700;
+  font-size: 1.125rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--inchiostro);
+  text-decoration: none;
+}
+
+.marchio span {
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  color: var(--grafite);
+  font-size: 0.8125rem;
+}
+
+.menu {
+  margin-left: auto;
+  display: flex;
+  gap: 1.25rem;
+  font-family: var(--titoli);
+  font-size: 0.9375rem;
+}
+
+.menu a { color: var(--grafite); text-decoration: none; }
+.menu a:hover, .menu a:focus-visible { color: var(--inchiostro); }
+.menu a[aria-current="page"] {
+  color: var(--inchiostro);
+  box-shadow: inset 0 -2px 0 var(--ambra);
+}
+
+/* ---------- Impaginazione ---------- */
+
+main { max-width: var(--largo); margin: 0 auto; padding: 0 1.5rem 5rem; }
+
+.colonna { max-width: var(--colonna); }
+
+.occhiello {
+  font-family: var(--titoli);
+  font-size: 0.8125rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--grafite);
+  margin: 3.5rem 0 0.75rem;
+}
+
+h1 {
+  font-family: var(--titoli);
+  font-weight: 600;
+  font-size: clamp(2rem, 5vw, 3rem);
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  margin: 0 0 1.25rem;
+  max-width: 20ch;
+}
+
+h2 {
+  font-family: var(--titoli);
+  font-weight: 600;
+  font-size: 1.5rem;
+  line-height: 1.2;
+  margin: 3rem 0 0.75rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--tratto);
+}
+
+h3 {
+  font-family: var(--titoli);
+  font-weight: 600;
+  font-size: 1.125rem;
+  margin: 2rem 0 0.5rem;
+}
+
+p { margin: 0 0 1.1rem; }
+
+.guida {
+  font-size: 1.1875rem;
+  line-height: 1.6;
+  color: var(--grafite);
+  max-width: 46rem;
+}
+
+a { color: var(--durazno); text-underline-offset: 2px; }
+a:focus-visible, button:focus-visible {
+  outline: 2px solid var(--ambra);
+  outline-offset: 2px;
+}
+
+strong { font-weight: 600; }
+
+/* ---------- Striscia dei dati ---------- */
+
+.dati {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: 1px;
+  background: var(--tratto);
+  border: 1px solid var(--tratto);
+  margin: 2rem 0 3rem;
+}
+
+.dati > div { background: var(--carta-alta); padding: 1rem 1.125rem; }
+
+.dati dt {
+  font-family: var(--titoli);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--grafite);
+  margin-bottom: 0.35rem;
+}
+
+.dati dd {
+  font-family: var(--dati);
+  font-size: 1.375rem;
+  font-weight: 500;
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.dati dd small {
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: var(--grafite);
+}
+
+/* ---------- Mappa ---------- */
+
+.mappa {
+  margin: 2rem 0 0.75rem;
+  border: 1px solid var(--tratto);
+  background: var(--carta-alta);
+}
+
+.mappa iframe {
+  display: block;
+  width: 100%;
+  height: min(72vh, 640px);
+  border: 0;
+}
+
+.legenda {
+  font-family: var(--titoli);
+  font-size: 0.875rem;
+  color: var(--grafite);
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 2.5rem;
+}
+
+.segno { display: inline-flex; align-items: center; gap: 0.4rem; }
+.segno::before {
+  content: "";
+  width: 0.7rem; height: 0.7rem;
+  border-radius: 50%;
+  background: currentColor;
+}
+.segno.blu   { color: var(--durazno); }
+.segno.verde { color: var(--mercedes); }
+
+/* ---------- Tabella ---------- */
+
+.tabella-wrap { overflow-x: auto; margin: 1.5rem 0; }
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-family: var(--dati);
+  font-size: 0.9375rem;
+  font-variant-numeric: tabular-nums;
+  background: var(--carta-alta);
+}
+
+th, td { padding: 0.65rem 0.9rem; text-align: right; border-bottom: 1px solid var(--tratto); }
+th:first-child, td:first-child { text-align: left; font-family: var(--testo); }
+
+thead th {
+  font-family: var(--titoli);
+  font-size: 0.8125rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--grafite);
+  border-bottom: 1px solid var(--inchiostro);
+}
+
+/* ---------- Riquadro di avvertenza ---------- */
+
+.nota {
+  border-left: 3px solid var(--ambra);
+  background: var(--carta-alta);
+  padding: 1.25rem 1.5rem;
+  margin: 2rem 0;
+}
+
+.nota p:last-child { margin-bottom: 0; }
+
+.nota-titolo {
+  font-family: var(--titoli);
+  font-weight: 600;
+  font-size: 0.8125rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ambra);
+  margin-bottom: 0.5rem;
+}
+
+/* ---------- Indice delle sezioni (pagina iniziale) ---------- */
+
+.indice { list-style: none; padding: 0; margin: 2rem 0 0; max-width: 46rem; }
+
+.indice li { border-top: 1px solid var(--tratto); }
+.indice li:last-child { border-bottom: 1px solid var(--tratto); }
+
+.voce {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  padding: 1rem 0.25rem;
+  text-decoration: none;
+  color: var(--inchiostro);
+}
+
+a.voce:hover, a.voce:focus-visible { background: var(--carta-alta); }
+
+.voce-titolo { font-family: var(--titoli); font-size: 1.125rem; font-weight: 600; }
+.voce-nota { color: var(--grafite); font-size: 0.9375rem; }
+
+.stato {
+  margin-left: auto;
+  font-family: var(--dati);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--grafite);
+  white-space: nowrap;
+}
+
+.stato.online { color: var(--mercedes); }
+
+li:has(.stato:not(.online)) .voce { color: var(--grafite); cursor: default; }
+
+/* ---------- Chiusura ---------- */
+
+.fonti {
+  margin-top: 3rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--tratto);
+  font-size: 0.875rem;
+  color: var(--grafite);
+  max-width: 46rem;
+}
+
+.fonti p { margin-bottom: 0.6rem; }
+
+.piede {
+  border-top: 1px solid var(--tratto);
+  margin-top: 4rem;
+  background: var(--carta);
+}
+
+.piede-interno {
+  max-width: var(--largo);
+  margin: 0 auto;
+  padding: 2rem 1.5rem 3rem;
+  font-family: var(--titoli);
+  font-size: 0.875rem;
+  color: var(--grafite);
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+@media (max-width: 40rem) {
+  .testata-interno { padding: 0.625rem 1rem; }
+  main { padding: 0 1rem 3rem; }
+  .menu { width: 100%; margin-left: 0; gap: 1rem; }
+}

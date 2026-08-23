@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Studio dei venti — Progetto COMETA</title>
+<meta name="description" content="Simulazione di 240 traiettorie di volo per scegliere il luogo di lancio della sonda stratosferica COMETA: deriva media 189 km verso est.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@400;600;700&family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/cometa.css">
+</head>
+<body>
+
+<header class="testata">
+  <div class="testata-interno">
+    <a class="marchio" href="index.html">COMETA <span>Scuola Italiana di Montevideo</span></a>
+    <nav class="menu">
+      <a href="index.html">Il progetto</a>
+      <a href="sonda.html">La sonda</a>
+      <a href="venti.html" aria-current="page">Studio dei venti</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <p class="occhiello">Fase 1 · Studio preliminare</p>
+  <h1>Dove va a finire la sonda</h1>
+
+  <p class="guida">Prima di scegliere da dove lanciare, abbiamo simulato 120 voli da due località diverse
+  usando i venti realmente previsti nello stesso periodo di quattro anni passati. Il risultato dice una cosa
+  sola, ma la dice con chiarezza: la sonda deriva verso est di circa 190 chilometri.</p>
+
+  <dl class="dati">
+    <div><dt>Traiettorie simulate</dt><dd>240</dd></div>
+    <div><dt>Deriva media</dt><dd>189 <small>km</small></dd></div>
+    <div><dt>Rotta media</dt><dd>95<small>°  (est)</small></dd></div>
+    <div><dt>Durata media</dt><dd>179 <small>min</small></dd></div>
+  </dl>
+
+  <h2>La simulazione</h2>
+
+  <div class="colonna">
+    <p>Abbiamo simulato il volo della sonda nel periodo <strong>15 settembre – 15 ottobre</strong>, un lancio
+    al giorno, per quattro anni diversi: <strong>[ANNI DA INSERIRE]</strong>. Centoventi date, ripetute per
+    due punti di partenza — <strong>Durazno</strong> e <strong>Mercedes</strong> — per un totale di 240 voli
+    simulati.</p>
+
+    <p>Ogni punto sulla mappa è l'atterraggio di uno di questi voli. Le ellissi riassumono la dispersione:
+    partendo dallo stesso luogo in quello stesso periodo dell'anno, un nuovo lancio avrebbe circa il
+    <strong>50% di probabilità di cadere nell'ellisse piccola</strong> e il <strong>90% nell'ellisse
+    grande</strong>.</p>
+  </div>
+
+  <div class="mappa">
+    <iframe src="mappe/uru2000_footprint.html"
+            title="Mappa interattiva dei 240 punti di atterraggio simulati con le ellissi di dispersione"
+            loading="lazy"></iframe>
+  </div>
+  <p class="legenda">
+    <span class="segno blu">Partenza da Durazno</span>
+    <span class="segno verde">Partenza da Mercedes</span>
+    <span>Cliccando un punto compaiono deriva, rotta e durata di quel volo.</span>
+  </p>
+
+  <h2>Le approssimazioni</h2>
+
+  <div class="colonna">
+    <p>Ogni simulazione è un modello, e ogni modello semplifica. Queste sono le tre semplificazioni che
+    abbiamo fatto, e quanto pesano.</p>
+
+    <h3>Il vento cambia anche in orizzontale</h3>
+    <p>La sonda non sale e scende nella stessa colonna d'aria: mentre vola, si sposta di quasi duecento
+    chilometri, dove il vento è diverso. Abbiamo tenuto conto della salita e della discesa in due colonne
+    distinte, e poi abbiamo misurato quanto pesa questa semplificazione rifacendo lo stesso calcolo con una
+    colonna sola. La differenza è in media di <strong>4 km su 190</strong>, con un massimo di 17: circa il
+    2%. Trascurabile per quello che ci serve.</p>
+
+    <h3>Il vento non è misurato, è ricostruito</h3>
+    <p>Sopra l'Uruguay, a venti chilometri di quota, non c'è nessuno strumento che misuri il vento ora per
+    ora. Quello che usiamo sono le previsioni archiviate di un modello meteorologico: com'era il vento
+    secondo il modello, non com'era davvero. È una ricostruzione affidabile, ma resta una ricostruzione.</p>
+
+    <h3>Le ellissi assumono una distribuzione gaussiana</h3>
+    <p>Le ellissi si basano su un modello gaussiano bidimensionale, che ha delle ipotesi — e le ipotesi
+    possono non essere verificate. Questa l'abbiamo controllata sui dati stessi, ed è il paragrafo qui
+    sotto.</p>
+  </div>
+
+  <h2>Verifica delle ellissi</h2>
+
+  <div class="colonna">
+    <p>Un'ellisse al 90% è utile solo se contiene davvero il 90% dei casi. Abbiamo contato quanti dei nostri
+    lanci simulati cadono effettivamente dentro ciascuna ellisse.</p>
+  </div>
+
+  <div class="tabella-wrap">
+    <table>
+      <caption class="visually-hidden">Copertura reale delle ellissi rispetto al valore nominale</caption>
+      <thead>
+        <tr><th scope="col">Ellisse</th><th scope="col">Nominale</th><th scope="col">Durazno</th><th scope="col">Mercedes</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Interna</td><td>50 %</td><td>52,5 %</td><td>50,8 %</td></tr>
+        <tr><td>Esterna</td><td>90 %</td><td>90,8 %</td><td>90,0 %</td></tr>
+        <tr><td>Casi oltre il contorno al 99 %</td><td>1 %</td><td>2,5 %</td><td>2,5 %</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="colonna">
+    <p>Nel corpo della distribuzione il modello regge: le due ellissi che mostriamo contengono esattamente
+    la frazione di lanci che promettono. Più in là sembra reggere meno — i casi estremi sono circa il doppio
+    di quelli che una gaussiana pura prevederebbe.</p>
+
+    <p>Va detto che questa verifica ha a sua volta un limite: i 120 lanci sono giorni consecutivi, e lo
+    stesso sistema meteorologico governa più giorni di fila. I casi realmente indipendenti sono qualche
+    decina, non centoventi. L'eccesso nelle code è quindi un indizio coerente su entrambi i siti, non un
+    risultato dimostrato.</p>
+  </div>
+
+  <h2>A cosa serve, e a cosa no</h2>
+
+  <div class="nota">
+    <p class="nota-titolo">Attenzione</p>
+    <p>Questa analisi serve a <strong>scegliere il luogo di partenza</strong>. Non dice dove cadrà la nostra
+    sonda.</p>
+    <p>Per quello useremo uno strumento previsionale molto più preciso, che però funziona solo pochi giorni
+    prima del lancio. E il luogo e la data effettivi del volo dipendono in ogni caso
+    dall'autorizzazione della <strong>DINACIA</strong>.</p>
+  </div>
+
+  <div class="fonti">
+    <p><strong>Dati meteorologici:</strong> previsioni archiviate dell'Historical Forecast API di
+    <a href="https://open-meteo.com/">Open-Meteo</a>, distribuite con licenza CC BY 4.0.</p>
+    <p><strong>Mappa:</strong> Leaflet su sfondo cartografico OpenStreetMap, © contributori OpenStreetMap.</p>
+    <p><strong>Calcolo:</strong> <code>cometa_venti.py</code>, sviluppato all'interno del progetto —
+    modello di atmosfera standard, integrazione della traiettoria strato per strato, ellissi da matrice
+    di covarianza. Il codice è pubblico.</p>
+    <p><strong>Sintesi aggiornata al:</strong> [DATA].</p>
+  </div>
+
+</main>
+
+<footer class="piede">
+  <div class="piede-interno">
+    <span>Progetto COMETA — Scuola Italiana di Montevideo</span>
+    <span>Testi e immagini CC BY 4.0</span>
+  </div>
+</footer>
+
+</body>
+</html>
