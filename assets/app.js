@@ -127,6 +127,7 @@ const pages = {
   fisica:   $("#page-fisica"),
   sonda:    $("#page-sonda"),
   venti:    $("#page-venti"),
+  legale:   $("#page-legale"),
   about:    $("#page-about")
 };
 
