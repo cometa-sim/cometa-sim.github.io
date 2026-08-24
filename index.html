@@ -23,7 +23,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@200;300;400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/cometa.css">
+<link rel="stylesheet" href="assets/cometa.css?v=3">
 </head>
 <body>
 
@@ -114,29 +114,27 @@
             <path d="M112,254 L128,254 L125,270 L115,270 Z" fill="#8a97a6"/>
           </g>
           <g id="chain">
-            <!-- cordame dal pallone al paracadute -->
-            <line x1="120" y1="270" x2="120" y2="300" stroke="#c7d0da" stroke-width="1.4"/>
-            <!-- paracadute: rosso, come quello vero -->
-            <path d="M84,322 C96,294 144,294 156,322 Q120,335 84,322 Z" fill="#D93B2B"/>
-            <path d="M84,322 C96,294 144,294 156,322" fill="none" stroke="#9E2418" stroke-width="1.1"/>
-            <path d="M104,318 C106,300 110,296 112,294" fill="none" stroke="rgba(255,255,255,.30)" stroke-width="1"/>
-            <path d="M136,318 C134,300 130,296 128,294" fill="none" stroke="rgba(0,0,0,.16)" stroke-width="1"/>
-            <path d="M84,322 Q120,335 156,322" fill="none" stroke="#7E1C12" stroke-width="1"/>
-            <!-- funi di sospensione -->
-            <g stroke="#aab4be" stroke-width=".8">
-              <line x1="88" y1="322" x2="120" y2="360"/><line x1="104" y1="328" x2="120" y2="360"/>
-              <line x1="120" y1="330" x2="120" y2="360"/><line x1="136" y1="328" x2="120" y2="360"/><line x1="152" y1="322" x2="120" y2="360"/>
+            <!-- durante la salita si vede solo il cordame -->
+            <g id="hCord"><line x1="120" y1="270" x2="120" y2="371" stroke="#c7d0da" stroke-width="1.4"/></g>
+            <!-- il paracadute compare allo scoppio -->
+            <g id="hChute" opacity="0">
+              <path d="M84,322 C96,294 144,294 156,322 Q120,335 84,322 Z" fill="#D93B2B"/>
+              <path d="M84,322 C96,294 144,294 156,322" fill="none" stroke="#9E2418" stroke-width="1.1"/>
+              <path d="M104,318 C106,300 110,296 112,294" fill="none" stroke="rgba(255,255,255,.30)" stroke-width="1"/>
+              <path d="M136,318 C134,300 130,296 128,294" fill="none" stroke="rgba(0,0,0,.16)" stroke-width="1"/>
+              <path d="M84,322 Q120,335 156,322" fill="none" stroke="#7E1C12" stroke-width="1"/>
+              <g stroke="#aab4be" stroke-width=".8">
+                <line x1="88" y1="322" x2="120" y2="360"/><line x1="104" y1="328" x2="120" y2="360"/>
+                <line x1="120" y1="330" x2="120" y2="360"/><line x1="136" y1="328" x2="120" y2="360"/><line x1="152" y1="322" x2="120" y2="360"/>
+              </g>
             </g>
-            <line x1="120" y1="360" x2="120" y2="371" stroke="#c7d0da" stroke-width="1.4"/>
-            <!-- sonda: scatola bianca con le ali di stabilizzazione -->
+            <!-- la sonda: c'e' sempre, prima e dopo lo scoppio -->
             <path d="M107,377 L92,371 L92,391 L107,388 Z" fill="#E4E9EE" stroke="#AFBAC5" stroke-width=".9" stroke-linejoin="round"/>
             <path d="M133,377 L148,371 L148,391 L133,388 Z" fill="#E4E9EE" stroke="#AFBAC5" stroke-width=".9" stroke-linejoin="round"/>
             <rect x="107" y="371" width="26" height="23" rx="3" fill="#F4F7FA" stroke="#AFBAC5" stroke-width="1"/>
             <rect x="107" y="371" width="26" height="4.5" rx="2" fill="#E7EDF2"/>
-            <!-- obiettivo della videocamera -->
             <circle cx="120" cy="384" r="3.4" fill="#0D1319"/>
             <circle cx="120" cy="384" r="1.3" fill="#2C3A47"/>
-            <!-- antenna -->
             <line x1="131" y1="371" x2="137" y2="361" stroke="#8a97a6" stroke-width="1"/>
           </g>
         </svg>
@@ -177,10 +175,10 @@
         <div class="stat-wrap reveal d2">
           <i class="bk tl"></i><i class="bk tr"></i><i class="bk bl"></i><i class="bk br"></i>
           <div class="stat-grid">
-            <div class="stat"><div class="sl" data-i18n="sAlt">Quota prevista</div><div class="sv"><span class="scr">38</span> <small>km</small></div></div>
+            <div class="stat"><div class="sl" data-i18n="sAlt">Quota prevista</div><div class="sv"><span class="scr">37+</span> <small>km</small></div></div>
             <div class="stat"><div class="sl" data-i18n="sDur">Durata del volo</div><div class="sv"><span class="scr">3</span> <small>h</small></div></div>
             <div class="stat"><div class="sl" data-i18n="sMass">Massa della sonda</div><div class="sv"><span class="scr">1,3</span> <small>kg</small></div></div>
-            <div class="stat"><div class="sl" data-i18n="sStudents">Studenti coinvolti</div><div class="sv"><span class="scr">38</span></div></div>
+            <div class="stat"><div class="sl" data-i18n="sStudents">Studenti coinvolti</div><div class="sv"><span class="scr">37+</span></div></div>
           </div>
         </div>
 
@@ -230,7 +228,7 @@
       <div class="stat-wrap reveal d1">
         <i class="bk tl"></i><i class="bk tr"></i><i class="bk bl"></i><i class="bk br"></i>
         <div class="stat-grid">
-          <div class="stat"><div class="sl" data-i18n="pAlt">Quota prevista</div><div class="sv"><span class="scr">38</span> <small>km</small></div></div>
+          <div class="stat"><div class="sl" data-i18n="pAlt">Quota prevista</div><div class="sv"><span class="scr">37+</span> <small>km</small></div></div>
           <div class="stat"><div class="sl" data-i18n="pTemp">Temperatura esterna</div><div class="sv"><span class="scr">−50 / −60</span> <small>°C</small></div></div>
           <div class="stat"><div class="sl" data-i18n="pPress">Pressione atmosferica</div><div class="sv"><span class="scr">~1</span><small>% <span data-i18n="pPressU">del livello del mare</span></small></div></div>
           <div class="stat"><div class="sl" data-i18n="pGas">Gas di riempimento</div><div class="sv"><span class="scr" data-i18n="pGasMain">Elio</span> <small>(He)</small></div></div>
@@ -282,6 +280,76 @@
     </div>
   </section>
 
+
+  <section class="section tight">
+    <div class="wrap">
+      <div class="kicker reveal" data-i18n="msKicker">Cosa misuriamo</div>
+      <h2 class="head reveal d1" data-i18n="msHead">Undici grandezze, e i loro limiti</h2>
+      <div class="body-col reveal d1"><p data-i18n-html="msIntro"></p></div>
+      <div class="table-wrap reveal d1">
+        <table>
+          <thead><tr>
+            <th scope="col" data-i18n="thVar">Grandezza</th>
+            <th scope="col" data-i18n="thSens">Strumento</th>
+            <th scope="col" data-i18n="thValid">Dato valido fino a</th>
+          </tr></thead>
+          <tbody>
+            <tr><td data-i18n="mv1">Quota, velocità, traiettoria</td><td class="mono">SAM-M8Q</td><td class="ok" data-i18n="mv1v">tutto il volo</td></tr>
+            <tr><td data-i18n="mv2">Pressione</td><td class="mono">MS8607</td><td class="ok">31 km</td></tr>
+            <tr><td data-i18n="mv3">Temperatura dell'aria</td><td class="mono">2 × PT1000</td><td class="ok" data-i18n="mv3v">tutto il volo</td></tr>
+            <tr><td data-i18n="mv4">Temperature interne</td><td class="mono">3 × DS18B20</td><td class="ok" data-i18n="mv4v">tutto il volo</td></tr>
+            <tr><td data-i18n="mv5">Umidità relativa</td><td class="mono">SHT45</td><td class="ok">11 km</td></tr>
+            <tr><td data-i18n="mv6">Anidride carbonica</td><td class="mono">SCD30</td><td class="ok">15 km</td></tr>
+            <tr><td data-i18n="mv7">Particolato</td><td class="mono">PMS5003</td><td class="ok" data-i18n="mv7v">4–5 km</td></tr>
+            <tr><td data-i18n="mv8">Radiazione ionizzante</td><td class="mono" data-i18n="mv8s">tubo Geiger</td><td class="ok" data-i18n="mv8v">tutto il volo</td></tr>
+            <tr><td data-i18n="mv9">Ultravioletto UV-A</td><td class="mono">LTR390</td><td class="ok" data-i18n="mv9v">tutto il volo</td></tr>
+            <tr><td data-i18n="mv10">Assetto e rotazione</td><td class="mono">ICM-20948</td><td class="ok" data-i18n="mv10v">tutto il volo</td></tr>
+            <tr><td data-i18n="mv11">Istante dello scoppio</td><td class="mono">ICM-20948</td><td class="ok" data-i18n="mv11v">un solo istante</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="body-col reveal d2"><p data-i18n-html="msAfter"></p></div>
+    </div>
+  </section>
+
+  <section class="section tight">
+    <div class="wrap">
+      <div class="kicker reveal" data-i18n="msNotKicker">Cosa non misuriamo</div>
+      <div class="body-col reveal d1"><p data-i18n-html="msNot1"></p><p data-i18n-html="msNot2"></p></div>
+    </div>
+  </section>
+
+  <section class="section tight">
+    <div class="wrap">
+      <div class="kicker reveal" data-i18n="msCamKicker">Le immagini e il ritrovamento</div>
+      <div class="body-col reveal d1"><p data-i18n-html="msCam1"></p><p data-i18n-html="msCam2"></p></div>
+    </div>
+  </section>
+
+  <section class="section tight">
+    <div class="wrap">
+      <div class="kicker reveal" data-i18n="msFwKicker">La scheda che programmiamo</div>
+      <div class="body-col reveal d1"><p data-i18n-html="msFw1"></p><p data-i18n-html="msFw2"></p><p data-i18n-html="msFw3"></p></div>
+    </div>
+  </section>
+
+  <section class="section tight">
+    <div class="wrap">
+      <div class="kicker reveal" data-i18n="msEngKicker">Cinque scelte di progetto</div>
+      <div class="body-col reveal d1">
+        <h3 data-i18n="msE1t"></h3><p data-i18n-html="msE1"></p>
+        <h3 data-i18n="msE2t"></h3><p data-i18n-html="msE2"></p>
+        <h3 data-i18n="msE3t"></h3><p data-i18n-html="msE3"></p>
+        <h3 data-i18n="msE4t"></h3><p data-i18n-html="msE4"></p>
+        <h3 data-i18n="msE5t"></h3><p data-i18n-html="msE5"></p>
+      </div>
+      <div class="note reveal d2">
+        <div class="nt" data-i18n="msWipTag">In lavorazione</div>
+        <p data-i18n-html="msWip"></p>
+      </div>
+    </div>
+  </section>
+
   <section class="burst">
     <div class="rings" aria-hidden="true"><span class="ring"></span><span class="ring"></span><span class="ring"></span></div>
     <div class="wrap">
@@ -327,12 +395,12 @@
               <path d="M100,295 C102,274 107,268 110,265" fill="none" stroke="rgba(255,255,255,.30)" stroke-width="1.2"/>
               <path d="M140,295 C138,274 133,268 130,265" fill="none" stroke="rgba(0,0,0,.16)" stroke-width="1.2"/>
               <path d="M76,300 Q120,316 164,300" fill="none" stroke="#7E1C12" stroke-width="1.1"/>
-            </g>
-            <g id="pRig">
-              <line x1="120" y1="258" x2="120" y2="302" stroke="#c7d0da" stroke-width="1.4"/>
               <g stroke="#aab4be" stroke-width=".8">
-                <line x1="80" y1="302" x2="120" y2="342"/><line x1="120" y1="304" x2="120" y2="342"/><line x1="160" y1="302" x2="120" y2="342"/>
+                <line x1="80" y1="302" x2="120" y2="342"/><line x1="120" y1="310" x2="120" y2="342"/><line x1="160" y1="302" x2="120" y2="342"/>
               </g>
+            </g>
+            <g id="pCord"><line x1="120" y1="258" x2="120" y2="342" stroke="#c7d0da" stroke-width="1.4"/></g>
+            <g id="pRig">
               <path d="M106,348 L90,342 L90,364 L106,360 Z" fill="#E4E9EE" stroke="#AFBAC5" stroke-width=".9" stroke-linejoin="round"/>
               <path d="M134,348 L150,342 L150,364 L134,360 Z" fill="#E4E9EE" stroke="#AFBAC5" stroke-width=".9" stroke-linejoin="round"/>
               <rect x="106" y="342" width="28" height="24" rx="3" fill="#F4F7FA" stroke="#AFBAC5" stroke-width="1"/>
@@ -584,7 +652,7 @@
           <tbody>
             <tr><td data-i18n="lc1">Massa complessiva del carico utile</td><td data-i18n="lc1t">≥ 6 kg</td><td class="ok">1,3 kg</td></tr>
             <tr><td data-i18n="lc2">Massa del singolo collo</td><td data-i18n="lc2t">≥ 3 kg</td><td class="ok">1,3 kg</td></tr>
-            <tr><td data-i18n="lc3">Densità del collo</td><td data-i18n="lc3t">≥ 2 kg e &gt; 13 g/cm²</td><td class="ok">≈ 3 g/cm²</td></tr>
+            <tr><td data-i18n="lc3">Densità del collo</td><td data-i18n="lc3t">≥ 2 kg e &gt; 13 g/cm²</td><td class="ok" data-i18n="lc3v">1,3 kg · ≈ 3 g/cm²</td></tr>
             <tr><td data-i18n="lc4">Forza per separare il carico</td><td data-i18n="lc4t">≥ 230 N</td><td class="ok" data-i18n="lc4v">sotto soglia</td></tr>
           </tbody>
         </table>
@@ -643,10 +711,7 @@
     <div class="wrap">
       <p class="about-body reveal" data-i18n="aboutBody">Siamo studentesse e studenti della Scuola Italiana di Montevideo.</p>
       <div class="motto-big reveal d1">#CarichiamoLaPalla</div>
-      <div class="crest-row reveal d3">
-        <img class="crest" src="assets/img/sim-logo.png" alt="Scuola Italiana di Montevideo" width="72" height="102" loading="lazy">
-        <span class="cr-txt" data-i18n="classesNote"></span>
-      </div>
+      <p class="cr-txt reveal d3" data-i18n="classesNote"></p>
     </div>
   </section>
 
@@ -661,11 +726,11 @@
           </div>
           <div class="socials">
             <a class="social" href="https://instagram.com/cometa.sim" target="_blank" rel="noopener">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none"/></svg>
+              <svg class="soc-ig" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none"/></svg>
               Instagram
             </a>
             <a class="social" href="https://www.tiktok.com/@cometa.sim" target="_blank" rel="noopener">
-              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.6 2h-3.1v13.3a2.6 2.6 0 1 1-2.2-2.57v-3.1a5.7 5.7 0 1 0 5.3 5.67V8.9a7.5 7.5 0 0 0 4.4 1.42V7.2a4.6 4.6 0 0 1-4.4-4.6V2Z"/></svg>
+              <svg class="soc-tt" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.6 2h-3.1v13.3a2.6 2.6 0 1 1-2.2-2.57v-3.1a5.7 5.7 0 1 0 5.3 5.67V8.9a7.5 7.5 0 0 0 4.4 1.42V7.2a4.6 4.6 0 0 1-4.4-4.6V2Z"/></svg>
               TikTok
             </a>
           </div>
@@ -725,8 +790,8 @@
 
 </div>
 
-<script src="assets/i18n.js"></script>
-<script src="assets/sonda.js"></script>
-<script src="assets/app.js"></script>
+<script src="assets/i18n.js?v=3"></script>
+<script src="assets/sonda.js?v=3"></script>
+<script src="assets/app.js?v=3"></script>
 </body>
 </html>
