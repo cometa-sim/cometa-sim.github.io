@@ -263,7 +263,7 @@ function sfDraw(){
    ========================================================== */
 const flight = $("#flight"), stage = $("#stage"), sky = $("#sky"), arc = $("#arc"),
       balloon = $("#balloon"), env = $("#env"), chainSvg = $("#chain"),
-      intro = $("#intro"), cue = $("#cue"), arrived = $("#arrived"),
+      intro = $("#intro"), cue = $("#cue"), homeBurst = $("#homeBurst"),
       altSide = $("#altSide"), altN = $("#altN"), altLay = $("#altLay"),
       altFill = $("#altFill"), altMark = $("#altMark");
 
@@ -376,7 +376,7 @@ function altFromP(p){
   return lerp(A[1], B[1], clamp(t, 0, 1));
 }
 
-let inflateT = 0, inflateStarted = false, confettiDone = false;
+let inflateT = 0, inflateStarted = false, burstDone = false;
 
 function progress(){
   const top = flight.offsetTop, h = flight.offsetHeight - innerHeight;
@@ -418,12 +418,28 @@ function updateFlight(){
   intro.style.pointerEvents = iv < 0.1 ? "none" : "auto";
   cue.classList.toggle("show", inflateStarted && p < 0.05);
 
-  const arr = alt >= 35;
-  arrived.classList.toggle("show", arr);
-  if(arr && !confettiDone){ confettiDone = true; spawnConfetti(); }
-  if(!arr) confettiDone = false;
+  /* Lo scoppio: il pallone si ferma, esplode, e la pagina continua.
+     Nessun cartello — l'evento si racconta da solo, come nella
+     sezione della fisica. */
+  const scoppiato = alt >= BURST_KM;
+  if(scoppiato && !burstDone){ burstDone = true; homeFlash(); }
+  if(!scoppiato) burstDone = false;
+  balloon.style.opacity = scoppiato ? "0" : "1";
 }
-function resetFlight(){ inflateStarted = false; inflateT = 0; confettiDone = false; updateFlight(); }
+
+const BURST_KM = 37.8;
+function homeFlash(){
+  if(!homeBurst || reduced) return;
+  homeBurst.style.transition = "none";
+  homeBurst.style.opacity = "1";
+  homeBurst.style.transform = "translate(-50%,-50%) scale(.22)";
+  requestAnimationFrame(function(){
+    homeBurst.style.transition = "opacity .95s ease-out, transform .95s cubic-bezier(.2,.7,.3,1)";
+    homeBurst.style.opacity = "0";
+    homeBurst.style.transform = "translate(-50%,-50%) scale(1.8)";
+  });
+}
+function resetFlight(){ inflateStarted = false; inflateT = 0; burstDone = false; updateFlight(); }
 
 function startInflate(dur){
   if(inflateStarted) return;
@@ -465,21 +481,6 @@ function smoothScrollTo(to, dur){
   })(performance.now());
 }
 
-function spawnConfetti(){
-  if(reduced) return;
-  const cols = ["#FFB84D","#5FE3FF","#ffffff","#7A6CFF"];
-  for(let i = 0; i < 18; i++){
-    const c = document.createElement("span");
-    c.className = "confetti"; c.style.background = cols[i % cols.length];
-    c.style.left = (Math.random()*100) + "%";
-    const dx = (Math.random()*2 - 1)*120, dy = -(80 + Math.random()*160), rot = Math.random()*360;
-    c.animate([{transform:"translate(0,0) rotate(0)", opacity:1},
-               {transform:"translate(" + dx + "px," + dy + "px) rotate(" + rot + "deg)", opacity:0}],
-              {duration:1100 + Math.random()*700, easing:"cubic-bezier(.2,.6,.3,1)"});
-    setTimeout(function(){ c.remove(); }, 1900);
-    arrived.appendChild(c);
-  }
-}
 
 /* ==========================================================
    Conto alla rovescia — data provvisoria, da confermare
@@ -570,7 +571,9 @@ const phys      = $("#phys"),      physStage = $("#physStage"),
 const PH_TOP = 37.8;              /* quota di scoppio, dal calcolo del progetto */
 const PH_BURST = 0.80;            /* dove cade lo scoppio lungo lo scorrimento */
 /* Confini delle sette tappe lungo lo scorrimento */
-const PH_BANDS = [0, 0.085, 0.255, 0.415, 0.575, 0.715, PH_BURST, 1.0001];
+/* Otto tappe. La sesta parte esattamente a PH_BURST, cosi' il testo
+   dello scoppio compare nell'istante in cui il lampo si vede. */
+const PH_BANDS = [0, 0.085, 0.255, 0.415, 0.575, PH_BURST, 0.87, 0.94, 1.0001];
 let physStep = -1, physFlashed = false;
 
 makeGores($("#pGores"), 13);

@@ -621,3 +621,11 @@ td.ok{color:var(--ice);font-variant-numeric:tabular-nums}
 /* «Aspetti legali» è lungo: il menù passa alla versione
    a scomparsa un po' prima, per non andare a capo. */
 @media(max-width:1180px){.nav-links,.cbadge{display:none}.menu-btn{display:flex}}
+
+/* Lo scoppio sulla pagina iniziale: stesso lampo della sezione
+   della fisica, centrato sul pallone. */
+.home-burst{position:absolute;left:50%;top:50%;width:min(320px,52vw);aspect-ratio:1;
+  transform:translate(-50%,-50%) scale(.2);border-radius:50%;pointer-events:none;opacity:0;z-index:12;
+  background:radial-gradient(circle,rgba(255,255,255,.95),rgba(207,228,245,.5) 34%,transparent 66%)}
+.balloon{transition:opacity .35s ease-out}
+@media(prefers-reduced-motion:reduce){.balloon{transition:none}}
