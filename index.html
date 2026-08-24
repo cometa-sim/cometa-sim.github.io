@@ -1,134 +1,724 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Progetto COMETA — Scuola Italiana di Montevideo</title>
-<meta name="description" content="COMETA è un programma di sonde stratosferiche della Scuola Italiana di Montevideo: misure atmosferiche fino a 38 km di quota, progettate e realizzate dagli studenti.">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COMETA · Sonda Klo-01 — Scuola Italiana di Montevideo</title>
+<meta name="description" id="metaDesc" content="COMETA è un programma di palloni stratosferici della Scuola Italiana di Montevideo: misure atmosferiche fino a oltre 37 km di quota, progettate e realizzate dagli studenti.">
+<meta name="theme-color" content="#010308">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='5' fill='%2302060f'/%3E%3Ccircle cx='12' cy='9' r='5.2' fill='none' stroke='%23EAF3FA' stroke-width='1.5'/%3E%3Cpath d='M10 14.4 12 16.8l2-2.4' fill='none' stroke='%23EAF3FA' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Crect x='10.3' y='18' width='3.4' height='3.4' rx='.8' fill='none' stroke='%23FFB84D' stroke-width='1.4'/%3E%3C/svg%3E">
+<meta property="og:title" content="COMETA · Sonda Klo-01">
+<meta property="og:description" content="Un pallone stratosferico della Scuola Italiana di Montevideo: 37,8 km di quota, 26 componenti, 240 voli simulati.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://cometa-sim.github.io/">
+<meta property="og:image" content="https://cometa-sim.github.io/assets/img/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:site_name" content="Progetto COMETA">
+<meta property="og:locale" content="it_IT">
+<meta property="og:locale:alternate" content="es_UY">
+<meta property="og:locale:alternate" content="en_GB">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://cometa-sim.github.io/assets/img/og.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@400;600;700&family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@200;300;400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/cometa.css">
 </head>
 <body>
 
-<header class="testata">
-  <div class="testata-interno">
-    <a class="marchio" href="index.html">COMETA <span>Scuola Italiana di Montevideo</span></a>
-    <nav class="menu">
-      <a href="sonda.html">La sonda</a>
-      <a href="venti.html">Studio dei venti</a>
-    </nav>
+<a class="skip" href="#app" data-i18n="skip">Vai al contenuto</a>
+
+<div class="aurora" aria-hidden="true"><span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span></div>
+<div class="stars-css" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+
+<!-- ======================= NAVIGAZIONE ======================= -->
+<nav id="nav">
+  <button class="brand" data-page="home" type="button">
+    <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 26 26"><defs><linearGradient id="tail" x1="1" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5FE3FF" stop-opacity="0"/><stop offset="1" stop-color="#EAF3FA"/></linearGradient></defs><path d="M21.5 4.5 12.4 13" stroke="url(#tail)" stroke-width="1.9" stroke-linecap="round" fill="none"/><circle cx="11" cy="14.6" r="2.4" fill="#fff"/><circle cx="11" cy="14.6" r="4.6" fill="none" stroke="rgba(207,228,245,.42)" stroke-width=".9"/></svg></span>
+    <span>COMETA<small>Scuola Italiana di Montevideo</small></span>
+  </button>
+  <div class="nav-links">
+    <a data-page="home" data-i18n="navHome" class="active" tabindex="0">Inizio</a>
+    <a data-page="missione" data-i18n="navMission" tabindex="0">Missione</a>
+    <a data-page="fisica" data-i18n="navPhysics" tabindex="0">La fisica</a>
+    <a data-page="sonda" data-i18n="navProbe" tabindex="0">La sonda</a>
+    <a data-page="venti" data-i18n="navWinds" tabindex="0">Studio dei venti</a>
+    <a data-page="legale" data-i18n="navLegal" tabindex="0">Aspetti legali</a>
+    <a data-page="about" data-i18n="navAbout" tabindex="0">Chi siamo</a>
   </div>
-</header>
+  <span class="cbadge" id="cbadge"></span>
+  <a class="ig" href="https://instagram.com/cometa.sim" target="_blank" rel="noopener" aria-label="Instagram @cometa.sim">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none"/></svg>
+  </a>
+  <a class="ig" href="https://www.tiktok.com/@cometa.sim" target="_blank" rel="noopener" aria-label="TikTok @cometa.sim">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.6 2h-3.1v13.3a2.6 2.6 0 1 1-2.2-2.57v-3.1a5.7 5.7 0 1 0 5.3 5.67V8.9a7.5 7.5 0 0 0 4.4 1.42V7.2a4.6 4.6 0 0 1-4.4-4.6V2Z"/></svg>
+  </a>
+  <div class="lang" role="group" aria-label="Lingua / Idioma / Language">
+    <span class="thumb" id="thumb" aria-hidden="true"></span>
+    <button data-lang="it" aria-pressed="true" type="button">IT</button>
+    <button data-lang="es" aria-pressed="false" type="button">ES</button>
+    <button data-lang="en" aria-pressed="false" type="button">EN</button>
+  </div>
+  <button class="menu-btn" id="menuBtn" aria-label="Menu" type="button"><span></span><span></span><span></span></button>
+</nav>
 
-<main>
+<div class="menu-overlay" id="menu">
+  <button class="menu-close" id="menuClose" aria-label="Close" type="button">×</button>
+  <a data-page="home" data-i18n="navHome" tabindex="0">Inizio</a>
+  <a data-page="missione" data-i18n="navMission" tabindex="0">Missione</a>
+  <a data-page="fisica" data-i18n="navPhysics" tabindex="0">La fisica</a>
+  <a data-page="sonda" data-i18n="navProbe" tabindex="0">La sonda</a>
+  <a data-page="venti" data-i18n="navWinds" tabindex="0">Studio dei venti</a>
+    <a data-page="legale" data-i18n="navLegal" tabindex="0">Aspetti legali</a>
+  <a data-page="about" data-i18n="navAbout" tabindex="0">Chi siamo</a>
+  <div class="menu-foot">
+    <a class="ig" href="https://instagram.com/cometa.sim" target="_blank" rel="noopener" style="font-family:var(--mono);font-size:13px">Instagram</a>
+    <a class="ig" href="https://www.tiktok.com/@cometa.sim" target="_blank" rel="noopener" style="font-family:var(--mono);font-size:13px">TikTok</a>
+    <a class="ig" href="mailto:cometa.sim.proyecto@gmail.com" style="font-family:var(--mono);font-size:13px">Mail</a>
+  </div>
+</div>
 
-  <p class="occhiello">Fase 1 · 2026</p>
-  <h1>Una sonda a 38 chilometri di quota</h1>
+<div id="app">
 
-  <p class="guida">COMETA è un programma di palloni stratosferici della Scuola Italiana di Montevideo.
-  Una sonda progettata, costruita e programmata dagli studenti sale fino al limite dell'atmosfera
-  misurando temperatura, pressione, umidità, anidride carbonica, particolato, ultravioletto e radiazione
-  ionizzante. Poi il pallone scoppia, la sonda torna giù col paracadute, e bisogna andarla a cercare.</p>
+<!-- ======================= INIZIO ======================= -->
+<section class="page active" id="page-home">
+  <div class="flight" id="flight">
+    <div class="stage" id="stage">
+      <div id="sky"></div>
+      <canvas id="sf" aria-hidden="true"></canvas>
+      <div id="arc"></div>
 
-  <dl class="dati">
-    <div><dt>Quota prevista</dt><dd>38 <small>km</small></dd></div>
-    <div><dt>Durata del volo</dt><dd>3 <small>ore</small></dd></div>
-    <div><dt>Massa della sonda</dt><dd>1,3 <small>kg</small></dd></div>
-    <div><dt>Studenti coinvolti</dt><dd>38</dd></div>
-  </dl>
+      <div class="layer" id="cloudsHigh"></div>
+      <div class="layer" id="planes"></div>
+      <div class="layer" id="cloudsLow"></div>
+      <div class="layer" id="birds"></div>
+      <div class="layer" id="ground"><span class="horizon"></span><span class="hill" style="left:-4vw;width:40vw"></span><span class="hill" style="right:-6vw;width:46vw;height:10vh"></span><span class="pad"></span></div>
 
-  <h2>Il sito</h2>
+      <div class="balloon" id="balloon" aria-hidden="true">
+        <svg viewBox="0 0 240 430" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="envg" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#dfe7ef"/><stop offset=".38" stop-color="#b7c4d3"/>
+              <stop offset=".62" stop-color="#9fb0c2"/><stop offset="1" stop-color="#c3ad94"/>
+            </linearGradient>
+            <radialGradient id="envh" cx=".36" cy=".28" r=".6">
+              <stop offset="0" stop-color="#ffffff" stop-opacity=".65"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+          <g id="env">
+            <path d="M120,20 C202,20 232,86 218,152 C208,204 168,244 120,258 C72,244 32,204 22,152 C8,86 38,20 120,20 Z" fill="url(#envg)"/>
+            <g id="gores" stroke="rgba(40,55,75,.24)" stroke-width="1" fill="none"></g>
+            <path d="M120,20 C202,20 232,86 218,152 C208,204 168,244 120,258 C72,244 32,204 22,152 C8,86 38,20 120,20 Z" fill="url(#envh)"/>
+            <path d="M112,254 L128,254 L125,270 L115,270 Z" fill="#8a97a6"/>
+          </g>
+          <g id="chain">
+            <!-- cordame dal pallone al paracadute -->
+            <line x1="120" y1="270" x2="120" y2="300" stroke="#c7d0da" stroke-width="1.4"/>
+            <!-- paracadute: rosso, come quello vero -->
+            <path d="M84,322 C96,294 144,294 156,322 Q120,335 84,322 Z" fill="#D93B2B"/>
+            <path d="M84,322 C96,294 144,294 156,322" fill="none" stroke="#9E2418" stroke-width="1.1"/>
+            <path d="M104,318 C106,300 110,296 112,294" fill="none" stroke="rgba(255,255,255,.30)" stroke-width="1"/>
+            <path d="M136,318 C134,300 130,296 128,294" fill="none" stroke="rgba(0,0,0,.16)" stroke-width="1"/>
+            <path d="M84,322 Q120,335 156,322" fill="none" stroke="#7E1C12" stroke-width="1"/>
+            <!-- funi di sospensione -->
+            <g stroke="#aab4be" stroke-width=".8">
+              <line x1="88" y1="322" x2="120" y2="360"/><line x1="104" y1="328" x2="120" y2="360"/>
+              <line x1="120" y1="330" x2="120" y2="360"/><line x1="136" y1="328" x2="120" y2="360"/><line x1="152" y1="322" x2="120" y2="360"/>
+            </g>
+            <line x1="120" y1="360" x2="120" y2="371" stroke="#c7d0da" stroke-width="1.4"/>
+            <!-- sonda: scatola bianca con le ali di stabilizzazione -->
+            <path d="M107,377 L92,371 L92,391 L107,388 Z" fill="#E4E9EE" stroke="#AFBAC5" stroke-width=".9" stroke-linejoin="round"/>
+            <path d="M133,377 L148,371 L148,391 L133,388 Z" fill="#E4E9EE" stroke="#AFBAC5" stroke-width=".9" stroke-linejoin="round"/>
+            <rect x="107" y="371" width="26" height="23" rx="3" fill="#F4F7FA" stroke="#AFBAC5" stroke-width="1"/>
+            <rect x="107" y="371" width="26" height="4.5" rx="2" fill="#E7EDF2"/>
+            <!-- obiettivo della videocamera -->
+            <circle cx="120" cy="384" r="3.4" fill="#0D1319"/>
+            <circle cx="120" cy="384" r="1.3" fill="#2C3A47"/>
+            <!-- antenna -->
+            <line x1="131" y1="371" x2="137" y2="361" stroke="#8a97a6" stroke-width="1"/>
+          </g>
+        </svg>
+      </div>
 
-  <div class="colonna">
-    <p>Stiamo pubblicando il progetto una sezione alla volta, man mano che il materiale è pronto.
-    Quello che segue è l'indice: le voci senza collegamento arriveranno nelle prossime settimane.</p>
+      <div class="intro" id="intro">
+        <div class="intro-eyebrow" data-i18n="heroEyebrow">Scuola Italiana di Montevideo · III e IV Liceo</div>
+        <div class="wordmark">COMETA</div>
+        <div class="motto"><b>#CarichiamoLaPalla</b></div>
+        <div class="sub" data-i18n="introSub">Sonda Klo-01 · un pallone stratosferico fino a oltre 37 chilometri di quota.</div>
+        <div class="count-head" data-i18n="countHead">Lancio tra</div>
+        <div class="count" id="count">
+          <div class="ctile"><div class="cn" id="cd">—</div><div class="cl" data-i18n="cDays">Giorni</div></div>
+          <div class="ctile"><div class="cn" id="ch">00</div><div class="cl" data-i18n="cHours">Ore</div></div>
+          <div class="ctile"><div class="cn" id="cm">00</div><div class="cl" data-i18n="cMins">Minuti</div></div>
+          <div class="ctile"><div class="cn" id="cs">00</div><div class="cl" data-i18n="cSecs">Secondi</div></div>
+        </div>
+        <div class="count-date"><span data-i18n="cTentative">Data provvisoria</span> · <b data-i18n="cLate">fine settembre 2026</b></div>
+      </div>
+
+      <div class="cue" id="cue"><span data-i18n="scrollCue">Scorri per salire</span><span class="a"></span></div>
+
+      <div class="arrived" id="arrived">
+        <div class="card">
+          <div class="tag" data-i18n="arrivedTag">Quota raggiunta</div>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <ul class="indice">
-    <li>
-      <a class="voce" href="venti.html">
-        <span>
-          <span class="voce-titolo">Studio dei venti</span><br>
-          <span class="voce-nota">240 voli simulati per scegliere da dove partire</span>
-        </span>
-        <span class="stato online">Online</span>
-      </a>
-    </li>
-    <li>
-      <a class="voce" href="sonda.html">
-        <span>
-          <span class="voce-titolo">La sonda</span><br>
-          <span class="voce-nota">Modello tridimensionale esplorabile, con tutti i componenti</span>
-        </span>
-        <span class="stato online">Online</span>
-      </a>
-    </li>
-    <li>
-      <div class="voce">
-        <span>
-          <span class="voce-titolo">La fisica del volo</span><br>
-          <span class="voce-nota">Perché sale, perché scoppia, perché fa così freddo</span>
-        </span>
-        <span class="stato">In preparazione</span>
-      </div>
-    </li>
-    <li>
-      <div class="voce">
-        <span>
-          <span class="voce-titolo">Come lavoriamo</span><br>
-          <span class="voce-nota">I gruppi di lavoro e l'organizzazione del progetto</span>
-        </span>
-        <span class="stato">In preparazione</span>
-      </div>
-    </li>
-    <li>
-      <div class="voce">
-        <span>
-          <span class="voce-titolo">Regole e autorizzazioni</span><br>
-          <span class="voce-nota">La normativa aeronautica e cosa comporta per noi</span>
-        </span>
-        <span class="stato">In preparazione</span>
-      </div>
-    </li>
-    <li>
-      <div class="voce">
-        <span>
-          <span class="voce-titolo">Documenti</span><br>
-          <span class="voce-nota">Manuale di assemblaggio, schemi, lista dei componenti</span>
-        </span>
-        <span class="stato">In preparazione</span>
-      </div>
-    </li>
-    <li>
-      <div class="voce">
-        <span>
-          <span class="voce-titolo">Domande frequenti</span><br>
-          <span class="voce-nota">No, non è un satellite. E sì, lo andiamo a recuperare.</span>
-        </span>
-        <span class="stato">In preparazione</span>
-      </div>
-    </li>
-    <li>
-      <div class="voce">
-        <span>
-          <span class="voce-titolo">Contatti</span><br>
-          <span class="voce-nota">Scuole, aziende, curiosi</span>
-        </span>
-        <span class="stato">In preparazione</span>
-      </div>
-    </li>
-  </ul>
+  <div class="alt-side" id="altSide" aria-hidden="true">
+    <div class="alt-read"><div class="n"><span id="altN">0.0</span><small>km</small></div><div class="lay" id="altLay">Suolo</div></div>
+    <div class="alt-track" id="altTrack"><div class="alt-fill" id="altFill"></div><div class="alt-mark" id="altMark"></div></div>
+  </div>
 
-</main>
+  <div class="home-after">
+    <section class="section">
+      <div class="wrap">
+        <div class="kicker reveal" data-i18n="afterKicker">Progetto COMETA</div>
+        <h2 class="head reveal d1" data-i18n="afterHead">Dalla pista al bordo dello spazio.</h2>
 
-<footer class="piede">
-  <div class="piede-interno">
-    <span>Progetto COMETA — Scuola Italiana di Montevideo</span>
-    <span>Testi e immagini CC BY 4.0</span>
+        <div class="stat-wrap reveal d2">
+          <i class="bk tl"></i><i class="bk tr"></i><i class="bk bl"></i><i class="bk br"></i>
+          <div class="stat-grid">
+            <div class="stat"><div class="sl" data-i18n="sAlt">Quota prevista</div><div class="sv"><span class="scr">38</span> <small>km</small></div></div>
+            <div class="stat"><div class="sl" data-i18n="sDur">Durata del volo</div><div class="sv"><span class="scr">3</span> <small>h</small></div></div>
+            <div class="stat"><div class="sl" data-i18n="sMass">Massa della sonda</div><div class="sv"><span class="scr">1,3</span> <small>kg</small></div></div>
+            <div class="stat"><div class="sl" data-i18n="sStudents">Studenti coinvolti</div><div class="sv"><span class="scr">38</span></div></div>
+          </div>
+        </div>
+
+        <div class="teasers">
+          <a class="teaser reveal d1" data-page="missione" tabindex="0"><div class="tn">01</div><h3 data-i18n="navMission">Missione</h3><p data-i18n="tzMission">Obiettivi, profilo di volo e catena di volo.</p><span class="go" data-i18n="teaserMore">Scopri →</span></a>
+          <a class="teaser reveal d2" data-page="fisica" tabindex="0"><div class="tn">02</div><h3 data-i18n="navPhysics">La fisica</h3><p data-i18n="ix3n">Perché sale, perché scoppia.</p><span class="go" data-i18n="teaserMore">Scopri →</span></a>
+          <a class="teaser reveal d3" data-page="sonda" tabindex="0"><div class="tn">03</div><h3 data-i18n="navProbe">La sonda</h3><p data-i18n="tzProbe">Modello tridimensionale esplorabile.</p><span class="go" data-i18n="teaserMore">Scopri →</span></a>
+          <a class="teaser reveal d4" data-page="venti" tabindex="0"><div class="tn">04</div><h3 data-i18n="navWinds">Studio dei venti</h3><p data-i18n="tzWinds">240 voli simulati per scegliere da dove partire.</p><span class="go" data-i18n="teaserMore">Scopri →</span></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section tight">
+      <div class="wrap">
+        <div class="kicker reveal" data-i18n="idxKicker">Il sito</div>
+        <h2 class="head reveal d1" data-i18n="idxHead">Una sezione alla volta.</h2>
+        <p class="lede reveal d2" data-i18n="idxIntro">Stiamo pubblicando il progetto man mano che il materiale è pronto.</p>
+        <ul class="index-list reveal d2">
+          <li><a class="entry" data-page="venti" tabindex="0"><span><span class="et" data-i18n="ix1t">Studio dei venti</span><span class="en" data-i18n="ix1n">240 voli simulati</span></span><span class="st on" data-i18n="stOnline">Online</span></a></li>
+          <li><a class="entry" data-page="sonda" tabindex="0"><span><span class="et" data-i18n="ix2t">La sonda</span><span class="en" data-i18n="ix2n">Modello tridimensionale</span></span><span class="st on" data-i18n="stOnline">Online</span></a></li>
+          <li><a class="entry" data-page="fisica" tabindex="0"><span><span class="et" data-i18n="ix3t">La fisica del volo</span><span class="en" data-i18n="ix3n">Perché sale, perché scoppia</span></span><span class="st on" data-i18n="stOnline">Online</span></a></li>
+          <li><div class="entry"><span><span class="et" data-i18n="ix4t">Come lavoriamo</span><span class="en" data-i18n="ix4n">I gruppi di lavoro</span></span><span class="st" data-i18n="stSoon">In preparazione</span></div></li>
+          <li><a class="entry" data-page="legale" tabindex="0"><span><span class="et" data-i18n="ix5t">Aspetti legali</span><span class="en" data-i18n="ix5n">La normativa aeronautica</span></span><span class="st on" data-i18n="stOnline">Online</span></a></li>
+          <li><div class="entry"><span><span class="et" data-i18n="ix7t">Domande frequenti</span><span class="en" data-i18n="ix7n">No, non è un satellite.</span></span><span class="st" data-i18n="stSoon">In preparazione</span></div></li>
+          <li><a class="entry" data-page="about" tabindex="0"><span><span class="et" data-i18n="ix8t">Contatti</span><span class="en" data-i18n="ix8n">Scuole, aziende, curiosi</span></span><span class="st on" data-i18n="stOnline">Online</span></a></li>
+        </ul>
+      </div>
+    </section>
+  </div>
+</section>
+
+<!-- ======================= MISSIONE ======================= -->
+<section class="page" id="page-missione">
+  <div class="wrap page-hero">
+    <div class="kicker reveal" data-i18n="pKicker">Profilo di volo</div>
+    <h1 class="ttl reveal d1" data-i18n="missionTitle">Missione</h1>
+    <p class="psub reveal d2" data-i18n="missionSub">Cosa studiamo e come sale la sonda.</p>
+  </div>
+
+  <section class="section" style="padding-top:20px">
+    <div class="wrap"><p class="lede reveal" data-i18n="mBody">Il progetto COMETA invia la sonda Klo-01 fino a circa 37,8 km di quota.</p></div>
+  </section>
+
+  <section class="section tight">
+    <div class="wrap">
+      <div class="kicker reveal" data-i18n="pHead2">Condizioni della salita</div>
+      <div class="stat-wrap reveal d1">
+        <i class="bk tl"></i><i class="bk tr"></i><i class="bk bl"></i><i class="bk br"></i>
+        <div class="stat-grid">
+          <div class="stat"><div class="sl" data-i18n="pAlt">Quota prevista</div><div class="sv"><span class="scr">38</span> <small>km</small></div></div>
+          <div class="stat"><div class="sl" data-i18n="pTemp">Temperatura esterna</div><div class="sv"><span class="scr">−50 / −60</span> <small>°C</small></div></div>
+          <div class="stat"><div class="sl" data-i18n="pPress">Pressione atmosferica</div><div class="sv"><span class="scr">~1</span><small>% <span data-i18n="pPressU">del livello del mare</span></small></div></div>
+          <div class="stat"><div class="sl" data-i18n="pGas">Gas di riempimento</div><div class="sv"><span class="scr" data-i18n="pGasMain">Elio</span> <small>(He)</small></div></div>
+          <div class="stat"><div class="sl" data-i18n="pVel">Velocità di salita</div><div class="sv"><span class="scr">5</span> <small>m/s</small></div></div>
+          <div class="stat"><div class="sl" data-i18n="pDur">Durata del volo</div><div class="sv"><span class="scr">3</span> <small>h</small></div></div>
+          <div class="stat"><div class="sl" data-i18n="pHe">Elio disponibile</div><div class="sv"><span class="scr">6,0</span> <small>m³</small></div></div>
+          <div class="stat"><div class="sl" data-i18n="pMass">Massa del payload</div><div class="sv"><span class="scr">≈ 1280</span> <small>g · <span data-i18n="pMassU">limite 2000 g</span></small></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section tight">
+    <div class="wrap">
+      <div class="spec">
+        <div class="spec-viz reveal" aria-hidden="true">
+          <svg viewBox="0 0 240 300" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="envg2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#dfe7ef"/><stop offset=".4" stop-color="#b7c4d3"/><stop offset=".65" stop-color="#9fb0c2"/><stop offset="1" stop-color="#c3ad94"/></linearGradient>
+              <radialGradient id="envh2" cx=".36" cy=".28" r=".6"><stop offset="0" stop-color="#fff" stop-opacity=".65"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+            </defs>
+            <path d="M120,20 C202,20 232,86 218,152 C208,204 168,244 120,258 C72,244 32,204 22,152 C8,86 38,20 120,20 Z" fill="url(#envg2)"/>
+            <g id="gores2" stroke="rgba(40,55,75,.24)" stroke-width="1" fill="none"></g>
+            <path d="M120,20 C202,20 232,86 218,152 C208,204 168,244 120,258 C72,244 32,204 22,152 C8,86 38,20 120,20 Z" fill="url(#envh2)"/>
+            <line x1="120" y1="266" x2="120" y2="288" stroke="#c7d0da" stroke-width="1.4"/>
+            <rect x="108" y="288" width="24" height="10" rx="3" fill="#2a3038"/>
+          </svg>
+        </div>
+        <div>
+          <div class="kicker reveal" data-i18n="bKicker">Il pallone</div>
+          <h2 class="head reveal d1" style="font-size:clamp(26px,3.4vw,38px)" data-i18n="bHead">Globo 2000</h2>
+          <p class="lede reveal d1" data-i18n="bBody">La missione utilizza il pallone da 2000 g.</p>
+          <div class="spec-rows reveal d2" style="margin-top:22px">
+            <div class="spec-row"><span class="k" data-i18n="specDiam">Diametro iniziale</span><span class="v">2,21 m</span></div>
+            <div class="spec-row"><span class="k" data-i18n="specBurst">Quota di scoppio</span><span class="v">37,8 km</span></div>
+            <div class="spec-row"><span class="k" data-i18n="specHe">Elio necessario</span><span class="v">4,5 m³</span></div>
+            <div class="spec-row"><span class="k" data-i18n="specMass">Massa del payload</span><span class="v">≤ 2000 g</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section tight">
+    <div class="wrap">
+      <div class="kicker reveal" data-i18n="cKicker">Catena di volo</div>
+      <h2 class="head reveal d1" data-i18n="cHead">Come è assemblata</h2>
+      <div class="chain reveal d2" id="chainList"></div>
+    </div>
+  </section>
+
+  <section class="burst">
+    <div class="rings" aria-hidden="true"><span class="ring"></span><span class="ring"></span><span class="ring"></span></div>
+    <div class="wrap">
+      <div class="bnum reveal"><span class="scr">37,8</span> km</div>
+      <div class="blbl reveal d1" data-i18n="burstLbl">Quota di scoppio prevista · Globo 2000</div>
+    </div>
+  </section>
+</section>
+
+<!-- ======================= LA FISICA DEL VOLO ======================= -->
+<section class="page" id="page-fisica">
+  <div class="wrap page-hero">
+    <div class="kicker reveal" data-i18n="physKicker">Fase 1 · Come funziona</div>
+    <h1 class="ttl reveal d1" data-i18n="physTitle">La fisica del volo</h1>
+    <p class="psub reveal d2" data-i18n="physSub">Perché sale, perché si gonfia, perché scoppia.</p>
+  </div>
+
+  <div class="phys" id="phys">
+    <div class="phys-stage" id="physStage">
+      <canvas id="physSf" aria-hidden="true"></canvas>
+      <div class="phys-ground" id="physGround" aria-hidden="true"></div>
+
+      <div class="phys-craft" id="physCraft" aria-hidden="true">
+          <svg viewBox="0 0 240 400" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="pgEnv" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#f2f6fa"/><stop offset=".42" stop-color="#c3d1de"/>
+                <stop offset=".7" stop-color="#a3b4c6"/><stop offset="1" stop-color="#c3ad94"/>
+              </linearGradient>
+              <radialGradient id="pgHi" cx=".36" cy=".28" r=".6">
+                <stop offset="0" stop-color="#fff" stop-opacity=".7"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>
+              </radialGradient>
+            </defs>
+            <g id="pEnv" style="transform-box:fill-box;transform-origin:50% 100%">
+              <path d="M120,24 C196,24 224,86 211,148 C202,196 165,233 120,246 C75,233 38,196 29,148 C16,86 44,24 120,24 Z" fill="url(#pgEnv)"/>
+              <g id="pGores" stroke="rgba(40,55,75,.22)" stroke-width="1" fill="none"></g>
+              <path d="M120,24 C196,24 224,86 211,148 C202,196 165,233 120,246 C75,233 38,196 29,148 C16,86 44,24 120,24 Z" fill="url(#pgHi)"/>
+              <path d="M113,242 L127,242 L124,258 L116,258 Z" fill="#8a97a6"/>
+            </g>
+            <g id="pChute" opacity="0">
+              <path d="M76,300 C88,268 152,268 164,300 Q120,315 76,300 Z" fill="#eef2f6" stroke="#c1cad4" stroke-width="1"/>
+              <path d="M120,274 Q105,290 109,305" stroke="#ff7a3c" stroke-width="4" fill="none" opacity=".85"/>
+              <path d="M120,274 Q135,290 131,305" stroke="#ff7a3c" stroke-width="4" fill="none" opacity=".85"/>
+            </g>
+            <g id="pRig">
+              <line x1="120" y1="258" x2="120" y2="302" stroke="#c7d0da" stroke-width="1.4"/>
+              <g stroke="#aab4be" stroke-width=".8">
+                <line x1="80" y1="302" x2="120" y2="342"/><line x1="120" y1="304" x2="120" y2="342"/><line x1="160" y1="302" x2="120" y2="342"/>
+              </g>
+              <rect x="106" y="342" width="28" height="24" rx="4" fill="#2a3038" stroke="#0c1420" stroke-width="1"/>
+              <circle cx="116" cy="355" r="3.4" fill="#5FE3FF"/>
+              <circle cx="127" cy="350" r="1.6" fill="#ff5a4d"/>
+            </g>
+          </svg>
+      </div>
+      <div class="phys-burst" id="physBurst" aria-hidden="true"></div>
+
+      <div class="phys-alt" aria-hidden="true">
+        <div class="pa-n"><span id="pAltN">0.0</span><small>km</small></div>
+        <div class="pa-l" id="pAltL">Suolo</div>
+      </div>
+
+      <div class="phys-rail" id="physRail" role="group" aria-label="Passi"></div>
+
+      <div class="phys-panel" id="physPanel">
+        <div class="pstep on" data-step="1">
+          <div class="pcard">
+            <div class="pn">01 · 0 km</div>
+            <h3 data-i18n="ph1t"></h3>
+            <p data-i18n-html="ph1p"></p>
+          </div>
+        </div>
+        <div class="pstep" data-step="2">
+          <div class="pcard">
+            <div class="pn">02 · 0 – 11 km</div>
+            <h3 data-i18n="ph2t"></h3>
+            <p data-i18n-html="ph2p"></p>
+          </div>
+        </div>
+        <div class="pstep" data-step="3">
+          <div class="pcard">
+            <div class="pn">03 · 11 – 17 km</div>
+            <h3 data-i18n="ph3t"></h3>
+            <p data-i18n-html="ph3p"></p>
+          </div>
+        </div>
+        <div class="pstep" data-step="4">
+          <div class="pcard">
+            <div class="pn">04 · 18 – 31 km</div>
+            <h3 data-i18n="ph4t"></h3>
+            <p data-i18n-html="ph4p"></p>
+          </div>
+        </div>
+        <div class="pstep" data-step="5">
+          <div class="pcard">
+            <div class="pn">05 · ≈ 34 km</div>
+            <h3 data-i18n="ph5t"></h3>
+            <p data-i18n-html="ph5p"></p>
+          </div>
+        </div>
+        <div class="pstep" data-step="6">
+          <div class="pcard">
+            <div class="pn">06 · 37,8 km</div>
+            <h3 data-i18n="ph6t"></h3>
+            <p data-i18n-html="ph6p"></p>
+          </div>
+        </div>
+        <div class="pstep" data-step="7">
+          <div class="pcard">
+            <div class="pn">07 · ↓ 0 km</div>
+            <h3 data-i18n="ph7t"></h3>
+            <p data-i18n-html="ph7p"></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="phys-cue" id="physCue" data-i18n="physScroll">Scorri per salire</div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= LA SONDA ======================= -->
+<section class="page" id="page-sonda">
+  <div class="wrap page-hero">
+    <div class="kicker reveal" data-i18n="probeKicker">Fase 1 · 2026</div>
+    <h1 class="ttl reveal d1" data-i18n="probeTitle">Dentro la sonda</h1>
+  </div>
+
+  <section class="section" style="padding-top:24px">
+    <div class="wrap">
+      <div class="sonda-top">
+        <p style="font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint)">KLO-01 · 160 × 160 × 130 mm · 26 <span data-i18n="uParts">pezzi</span></p>
+        <div class="seg" role="group" aria-label="Banco / Volo">
+          <button id="mBanco" class="on" aria-pressed="true" type="button" data-i18n="modeBench">Banco</button>
+          <button id="mVolo" aria-pressed="false" type="button" data-i18n="modeFlight">Volo</button>
+        </div>
+      </div>
+
+      <div class="sonda-grid">
+        <div>
+          <div id="stage3d">
+            <div class="stage-hint" id="stageHint" data-i18n="benchNote">Trascina per ruotare</div>
+            <div class="stage-loading" id="stageLoading">· · ·</div>
+            <div class="caption3d" id="caption3d" style="display:none">Progetto COMETA · Scuola Italiana di Montevideo · 2026</div>
+          </div>
+
+          <div class="ctl" id="ctlBanco">
+            <label>
+              <span class="lbl" data-i18n="ctlExplode">Esplodi</span>
+              <input type="range" id="explode" min="0" max="1" step="0.01" value="0" aria-label="Esplodi">
+            </label>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span class="lbl" data-i18n="ctlDecks">Ripiani</span>
+              <button class="chip on" data-deck="0" aria-pressed="true" type="button">1</button>
+              <button class="chip on" data-deck="1" aria-pressed="true" type="button">2</button>
+              <button class="chip on" data-deck="2" aria-pressed="true" type="button">3</button>
+            </div>
+            <button class="tog on" id="togPins" aria-pressed="true" type="button" data-i18n="ctlPins">Numeri</button>
+          </div>
+          <p id="ctlVolo" style="display:none;margin-top:14px;color:var(--muted);font-size:15px" data-i18n="flightNote">Sonda chiusa, con ali di stabilizzazione.</p>
+        </div>
+
+        <div>
+          <div class="card"><h3 data-i18n="cardDetail">Componente</h3><div id="detail"></div></div>
+          <div class="card"><h3 data-i18n="cardLegend">Legenda</h3><div class="leg" id="leg"></div><div class="leg-note" id="legNote"></div></div>
+          <div class="card"><h3 data-i18n="cardParts">Componenti</h3><div id="list"></div></div>
+        </div>
+      </div>
+
+      <p class="mass-note" id="massNote"></p>
+    </div>
+  </section>
+</section>
+
+<!-- ======================= STUDIO DEI VENTI ======================= -->
+<section class="page" id="page-venti">
+  <div class="wrap page-hero">
+    <div class="kicker reveal" data-i18n="wKicker">Fase 1 · Studio preliminare</div>
+    <h1 class="ttl reveal d1" data-i18n="windsTitle">Dove va a finire la sonda</h1>
+    <p class="psub reveal d2" data-i18n="windsSub">240 traiettorie simulate per scegliere da dove partire.</p>
+  </div>
+
+  <section class="section" style="padding-top:20px">
+    <div class="wrap">
+      <p class="lede reveal" data-i18n="wLede">Prima di scegliere il luogo di lancio abbiamo simulato 240 voli.</p>
+      <div class="stat-wrap reveal d1">
+        <i class="bk tl"></i><i class="bk tr"></i><i class="bk bl"></i><i class="bk br"></i>
+        <div class="stat-grid">
+          <div class="stat"><div class="sl" data-i18n="wTraj">Traiettorie simulate</div><div class="sv"><span class="scr">240</span></div></div>
+          <div class="stat"><div class="sl" data-i18n="wDrift">Deriva media</div><div class="sv"><span class="scr">189</span> <small>km</small></div></div>
+          <div class="stat"><div class="sl" data-i18n="wBearing">Rotta media</div><div class="sv"><span class="scr">95°</span> <small><span data-i18n="wBearingU">(est)</span></small></div></div>
+          <div class="stat"><div class="sl" data-i18n="wDur">Durata media</div><div class="sv"><span class="scr">179</span> <small>min</small></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section tight">
+    <div class="wrap">
+      <div class="kicker reveal" data-i18n="wSimHead">La simulazione</div>
+      <div class="body-col reveal d1">
+        <p data-i18n-html="wSimP1">Abbiamo simulato il volo della sonda.</p>
+        <p data-i18n-html="wSimP2">Ogni punto sulla mappa è l'atterraggio di uno di questi voli.</p>
+      </div>
+
+      <div class="map-frame reveal d1">
+        <iframe id="mapFrame" src="mappe/uru2000_footprint.html"
+                title="Mappa interattiva dei 240 punti di atterraggio simulati con le ellissi di dispersione"
+                loading="lazy"></iframe>
+      </div>
+      <div class="map-legend">
+        <span class="mark durazno" data-i18n="mDurazno">Partenza da Durazno</span>
+        <span class="mark mercedes" data-i18n="mMercedes">Partenza da Mercedes</span>
+        <span data-i18n="mapHint">Cliccando un punto compaiono deriva, rotta e durata di quel volo.</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="section tight">
+    <div class="wrap">
+      <div class="kicker reveal" data-i18n="wApproxHead">Le approssimazioni</div>
+      <div class="body-col reveal d1">
+        <p data-i18n="wApproxIntro">Ogni simulazione è un modello, e ogni modello semplifica.</p>
+        <h3 class="sub-head" data-i18n="wA1H">Il vento cambia anche in orizzontale</h3>
+        <p data-i18n-html="wA1P">La sonda non sale e scende nella stessa colonna d'aria.</p>
+        <h3 class="sub-head" data-i18n="wA2H">Il vento non è misurato, è ricostruito</h3>
+        <p data-i18n-html="wA2P">Sopra l'Uruguay non c'è nessuno strumento che misuri il vento ora per ora.</p>
+        <h3 class="sub-head" data-i18n="wA3H">Le ellissi assumono una distribuzione gaussiana</h3>
+        <p data-i18n-html="wA3P">Le ellissi si basano su un modello gaussiano bidimensionale.</p>
+      </div>
+    </div>
+  </section>
+
+
+  <section class="section tight">
+    <div class="wrap">
+      <div class="kicker reveal" data-i18n="wUseHead">A cosa serve, e a cosa no</div>
+      <div class="note reveal d1">
+        <div class="nt" data-i18n="wUseTag">Attenzione</div>
+        <p data-i18n-html="wUseP1">Questa analisi serve a scegliere il luogo di partenza.</p>
+        <p data-i18n-html="wUseP2">Il luogo e la data effettivi dipendono dall'autorizzazione della DINACIA.</p>
+      </div>
+
+      <div class="sources reveal d2">
+        <p data-i18n-html="srcMeteo"></p>
+        <p data-i18n-html="srcMap"></p>
+        <p data-i18n-html="srcCalc"></p>
+        <p data-i18n-html="srcExcl"></p>
+        <p data-i18n-html="srcUpdated"></p>
+      </div>
+    </div>
+  </section>
+</section>
+
+<!-- ======================= ASPETTI LEGALI ======================= -->
+<section class="page" id="page-legale">
+  <div class="wrap page-hero">
+    <div class="kicker reveal" data-i18n="lKicker">Fase 1 · Regole del volo</div>
+    <h1 class="ttl reveal d1" data-i18n="legalTitle">Aspetti legali</h1>
+    <p class="psub reveal d2" data-i18n="legalSub">Che cosa dice la norma aeronautica, e come ci si applica.</p>
+  </div>
+
+  <section class="section" style="padding-top:20px">
+    <div class="wrap">
+      <div class="note reveal">
+        <div class="nt" data-i18n="lWarnTag">Prima di leggere</div>
+        <p data-i18n-html="lWarn1">Questa pagina è un riassunto divulgativo. Fa fede il testo originale del regolamento.</p>
+        <p data-i18n-html="lWarn2">Ogni volo di pallone libero non pilotato deve essere autorizzato dalla DINACIA.</p>
+      </div>
+      <p class="lede reveal d1" data-i18n-html="lLede">Il riferimento è il LAR 91, Appendice P.</p>
+    </div>
+  </section>
+
+  <section class="section tight">
+    <div class="wrap">
+      <div class="kicker reveal" data-i18n="lClassHead">Come viene classificata la nostra sonda</div>
+      <div class="body-col reveal d1"><p data-i18n-html="lClassIntro">Il regolamento distingue tre categorie.</p></div>
+
+      <div class="table-wrap reveal d1">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col" data-i18n="thCriterion">Criterio</th>
+              <th scope="col" data-i18n="thThreshold">Soglia per «pesado»</th>
+              <th scope="col" data-i18n="thOurs">Klo-01</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td data-i18n="lc1">Massa complessiva del carico utile</td><td data-i18n="lc1t">≥ 6 kg</td><td class="ok">1,3 kg</td></tr>
+            <tr><td data-i18n="lc2">Massa del singolo collo</td><td data-i18n="lc2t">≥ 3 kg</td><td class="ok">1,3 kg</td></tr>
+            <tr><td data-i18n="lc3">Densità del collo</td><td data-i18n="lc3t">≥ 2 kg e &gt; 13 g/cm²</td><td class="ok">≈ 3 g/cm²</td></tr>
+            <tr><td data-i18n="lc4">Forza per separare il carico</td><td data-i18n="lc4t">≥ 230 N</td><td class="ok" data-i18n="lc4v">sotto soglia</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="body-col reveal d2"><p data-i18n-html="lClassOut">La sonda rientra quindi nella categoria «ligero».</p></div>
+    </div>
+  </section>
+
+  <section class="section tight">
+    <div class="wrap">
+      <div class="kicker reveal" data-i18n="lDutyHead">Che cosa comporta</div>
+      <div class="body-col reveal d1">
+        <p data-i18n-html="lDuty1"></p>
+        <p data-i18n-html="lDuty2"></p>
+        <p data-i18n-html="lDuty3"></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section tight">
+    <div class="wrap">
+      <div class="kicker reveal" data-i18n="lZoneHead">La zona di esclusione</div>
+      <div class="body-col reveal d1"><p data-i18n-html="lZone1"></p></div>
+      <figure class="figure reveal d1">
+        <img src="assets/img/zona-exclusion-dinacia.png" alt="" data-i18n-alt="lZoneAlt" loading="lazy" style="width:100%;height:auto;display:block;border-radius:10px">
+        <figcaption data-i18n-html="lZoneCap"></figcaption>
+      </figure>
+      <div class="body-col reveal d2"><p data-i18n-html="lZone2"></p></div>
+    </div>
+  </section>
+
+  <section class="section tight">
+    <div class="wrap">
+      <div class="note reveal">
+        <div class="nt" data-i18n="lDiscTag">Avvertenza</div>
+        <p data-i18n-html="lDisc1"></p>
+        <p data-i18n-html="lDisc2"></p>
+      </div>
+      <div class="sources reveal d1">
+        <p data-i18n-html="lSrc1"></p>
+        <p data-i18n-html="lSrc2"></p>
+      </div>
+    </div>
+  </section>
+</section>
+
+<!-- ======================= CHI SIAMO ======================= -->
+<section class="page" id="page-about">
+  <div class="wrap page-hero">
+    <div class="kicker reveal" data-i18n="aboutKicker">Chi siamo</div>
+    <h1 class="ttl reveal d1" data-i18n="aboutTitle">Chi siamo</h1>
+    <p class="psub reveal d2" data-i18n="aboutSub">Le persone dietro COMETA.</p>
+  </div>
+
+  <section class="section" style="padding-top:20px">
+    <div class="wrap">
+      <p class="about-body reveal" data-i18n="aboutBody">Siamo studentesse e studenti della Scuola Italiana di Montevideo.</p>
+      <div class="motto-big reveal d1">#CarichiamoLaPalla</div>
+      <div class="crest-row reveal d3">
+        <img class="crest" src="assets/img/sim-logo.png" alt="Scuola Italiana di Montevideo" width="72" height="102" loading="lazy">
+        <span class="cr-txt" data-i18n="classesNote"></span>
+      </div>
+    </div>
+  </section>
+
+  <section class="section tight">
+    <div class="wrap">
+      <div class="contact-grid">
+        <div class="contact-card reveal">
+          <div>
+            <h3 data-i18n="contactHead">Seguici</h3>
+            <p data-i18n="contactSub">Aggiornamenti sulla missione.</p>
+            <div class="ig-handle">@cometa.sim</div>
+          </div>
+          <div class="socials">
+            <a class="social" href="https://instagram.com/cometa.sim" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none"/></svg>
+              Instagram
+            </a>
+            <a class="social" href="https://www.tiktok.com/@cometa.sim" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.6 2h-3.1v13.3a2.6 2.6 0 1 1-2.2-2.57v-3.1a5.7 5.7 0 1 0 5.3 5.67V8.9a7.5 7.5 0 0 0 4.4 1.42V7.2a4.6 4.6 0 0 1-4.4-4.6V2Z"/></svg>
+              TikTok
+            </a>
+          </div>
+        </div>
+
+        <div class="contact-card reveal d1">
+          <div>
+            <h3 data-i18n="contactMailHead">Scrivici</h3>
+            <p data-i18n="contactMailSub">Per informazioni, collaborazioni, proposte.</p>
+            <a class="mail-link" href="mailto:cometa.sim.proyecto@gmail.com">cometa.sim.proyecto@gmail.com</a>
+          </div>
+          <a class="btn primary" href="mailto:cometa.sim.proyecto@gmail.com">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m3.6 6.6 8.4 6 8.4-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span data-i18n="mailCta">Manda una mail</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="signature reveal d2" style="margin-top:74px">
+        <img class="logo-cometa" src="assets/img/cometa-logo.png" alt="COMETA" width="968" height="470" loading="lazy">
+        <div class="sig-sub">Scuola Italiana di Montevideo</div>
+      </div>
+    </div>
+  </section>
+</section>
+
+<footer>
+  <div class="wrap foot-grid">
+    <div class="foot-col">
+      <div class="foot-school">Scuola Italiana di Montevideo</div>
+      <div class="foot-motto">#CarichiamoLaPalla</div>
+      <div class="crest-pair" style="margin-top:18px">
+        <img class="crest" src="assets/img/sim-logo.png" alt="Scuola Italiana di Montevideo" width="52" height="74" loading="lazy">
+        <img class="crest crest-cometa" src="assets/img/cometa-logo.png" alt="Progetto COMETA" width="132" height="64" loading="lazy">
+      </div>
+    </div>
+    <div class="foot-col">
+      <h4 data-i18n="footNav">Pagine</h4>
+      <a data-page="home" data-i18n="navHome" tabindex="0">Inizio</a>
+      <a data-page="missione" data-i18n="navMission" tabindex="0">Missione</a>
+      <a data-page="fisica" data-i18n="navPhysics" tabindex="0">La fisica</a>
+      <a data-page="sonda" data-i18n="navProbe" tabindex="0">La sonda</a>
+      <a data-page="venti" data-i18n="navWinds" tabindex="0">Studio dei venti</a>
+    <a data-page="legale" data-i18n="navLegal" tabindex="0">Aspetti legali</a>
+      <a data-page="about" data-i18n="navAbout" tabindex="0">Chi siamo</a>
+    </div>
+    <div class="foot-col">
+      <h4 data-i18n="footContact">Contatti</h4>
+      <a href="https://instagram.com/cometa.sim" target="_blank" rel="noopener">Instagram · @cometa.sim</a>
+      <a href="https://www.tiktok.com/@cometa.sim" target="_blank" rel="noopener">TikTok · @cometa.sim</a>
+      <a href="mailto:cometa.sim.proyecto@gmail.com">cometa.sim.proyecto@gmail.com</a>
+      <a href="https://github.com/cometa-sim/cometa-sim.github.io" target="_blank" rel="noopener">GitHub · cometa-sim</a>
+      <div class="foot-meta" style="margin-top:14px">COMETA · KLO-01<br><span data-i18n="footStatus">Stato: in corso</span><br>2026<br><span data-i18n="footRights">Testi e immagini CC BY 4.0</span></div>
+    </div>
   </div>
 </footer>
 
+</div>
+
+<script src="assets/i18n.js"></script>
+<script src="assets/sonda.js"></script>
+<script src="assets/app.js"></script>
 </body>
 </html>

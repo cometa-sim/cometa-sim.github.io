@@ -1,19 +1,69 @@
 Progetto COMETA — Scuola Italiana di Montevideo
+https://cometa-sim.github.io
 
-TESTI, IMMAGINI E DOCUMENTI
-Salvo diversa indicazione, i contenuti di questo sito sono pubblicati
-con licenza Creative Commons Attribuzione 4.0 Internazionale (CC BY 4.0).
+Questo repository contiene due tipi di materiale, con due licenze diverse.
 
-Sei libero di condividerli e adattarli, anche per fini commerciali,
-a condizione di citare la fonte:
-  "Progetto COMETA — Scuola Italiana di Montevideo"
 
-Testo integrale della licenza:
-https://creativecommons.org/licenses/by/4.0/legalcode.it
+═══════════════════════════════════════════════════════════════
+1. CODICE  —  Licenza MIT
+═══════════════════════════════════════════════════════════════
 
-MATERIALI DI TERZE PARTI
-Restano soggetti alle rispettive licenze:
-- Sfondo cartografico: © contributori OpenStreetMap (ODbL)
-- Libreria Leaflet: licenza BSD-2-Clause
-- Dati meteorologici: Open-Meteo (CC BY 4.0)
-- Caratteri IBM Plex: SIL Open Font License 1.1
+Si applica ai file sorgente del sito: index.html, sonda.html,
+venti.html, assets/cometa.css, assets/app.js, assets/i18n.js,
+assets/sonda.js.
+
+Copyright (c) 2026 Scuola Italiana di Montevideo
+
+Con la presente si concede gratuitamente a chiunque ottenga una copia
+di questo software e dei file di documentazione associati (il "Software")
+il permesso di utilizzare il Software senza restrizioni, inclusi senza
+limitazione i diritti di usare, copiare, modificare, unire, pubblicare,
+distribuire, concedere in sublicenza e/o vendere copie del Software, e di
+permettere alle persone a cui il Software e' fornito di farlo, alle
+seguenti condizioni:
+
+L'avviso di copyright di cui sopra e il presente avviso di permesso devono
+essere inclusi in tutte le copie o parti sostanziali del Software.
+
+IL SOFTWARE E' FORNITO "COSI' COM'E'", SENZA GARANZIA DI ALCUN TIPO,
+ESPRESSA O IMPLICITA, INCLUSE MA NON LIMITATE ALLE GARANZIE DI
+COMMERCIABILITA', IDONEITA' PER UN PARTICOLARE SCOPO E NON VIOLAZIONE.
+IN NESSUN CASO GLI AUTORI O I TITOLARI DEL COPYRIGHT SARANNO RESPONSABILI
+PER QUALSIASI RECLAMO, DANNO O ALTRA RESPONSABILITA', SIA IN UN'AZIONE
+CONTRATTUALE, ILLECITO O ALTRO, DERIVANTE DA O IN CONNESSIONE CON IL
+SOFTWARE O L'USO O ALTRE OPERAZIONI NEL SOFTWARE.
+
+
+═══════════════════════════════════════════════════════════════
+2. TESTI, IMMAGINI E DOCUMENTI  —  CC BY 4.0
+═══════════════════════════════════════════════════════════════
+
+Si applica ai contenuti: i testi del sito (assets/i18n.js, limitatamente
+alle stringhe), le fotografie, gli schemi, i documenti tecnici e la mappa
+dello studio dei venti.
+
+Licenza Creative Commons Attribuzione 4.0 Internazionale (CC BY 4.0).
+Sei libero di condividerli e adattarli, anche per fini commerciali, a
+condizione di citare la fonte:
+
+    "Progetto COMETA — Scuola Italiana di Montevideo"
+
+Testo integrale: https://creativecommons.org/licenses/by/4.0/legalcode.it
+
+
+═══════════════════════════════════════════════════════════════
+3. MATERIALI DI TERZE PARTI
+═══════════════════════════════════════════════════════════════
+
+Restano soggetti alle rispettive licenze e NON sono coperti da quanto
+sopra:
+
+- three.js r128 (assets/vendor/) ......... MIT — https://threejs.org
+- Leaflet, incluso nella mappa ........... BSD-2-Clause
+- Sfondo cartografico .................... (c) contributori OpenStreetMap, ODbL
+- Dati meteorologici ..................... Open-Meteo, CC BY 4.0
+- Caratteri Space Grotesk, Inter,
+  JetBrains Mono ......................... SIL Open Font License 1.1
+- Stemma della Scuola Italiana di
+  Montevideo (assets/img/sim-logo.png) ... marchio della Scuola,
+                                           tutti i diritti riservati
