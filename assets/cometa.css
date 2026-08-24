@@ -525,8 +525,8 @@ footer{border-top:1px solid var(--line-soft);padding:56px 0 66px;background:rgba
    8. La fisica del volo — salita a tappe
    ============================================================ */
 
-.phys{position:relative;height:640vh}
-@media(max-width:720px){.phys{height:700vh}}
+.phys{position:relative;height:730vh}
+@media(max-width:720px){.phys{height:800vh}}
 .phys-stage{position:sticky;top:0;height:100vh;overflow:hidden;
   background:linear-gradient(180deg,#7db4e0,#cfe6f5)}
 .phys-stage canvas{position:absolute;inset:0;opacity:0;pointer-events:none}

@@ -649,9 +649,9 @@ function updatePhys(){
 }
 function resetPhys(){ physStep = -1; physFlashed = false; updatePhys(); }
 
-/* Rotaia laterale: sette punti, uno per tappa */
+/* Rotaia laterale: un punto per tappa, quante che siano */
 if(physRail){
-  for(let i = 0; i < 7; i++){
+  for(let i = 0; i < PH_BANDS.length - 1; i++){
     const b = document.createElement("button");
     b.type = "button";
     b.setAttribute("aria-label", String(i + 1));
