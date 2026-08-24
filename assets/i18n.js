@@ -27,7 +27,7 @@ it:{
   countHead:"Lancio tra", cDays:"Giorni", cHours:"Ore", cMins:"Minuti", cSecs:"Secondi",
   cTentative:"Data provvisoria", cLate:"fine settembre 2026", cUnit:"g",
   afterKicker:"Progetto COMETA",
-  afterHead:"Dalla pista al bordo dello spazio.",
+  afterHead:"Da terra al bordo dello spazio.",
   sAlt:"Quota prevista", sDur:"Durata del volo", sMass:"Massa della sonda", sStudents:"Studenti coinvolti",
 
   tzMission:"Obiettivi, profilo di volo e catena di volo.",
@@ -188,8 +188,8 @@ it:{
   lSrc2:"<strong>Autorità:</strong> <a href=\"https://www.dinacia.gub.uy/\" target=\"_blank\" rel=\"noopener\">DINACIA</a> — Dirección Nacional de Aviación Civil e Infraestructura Aeronáutica, Uruguay.",
 
   /* — Missione: misure, scelte, limiti — */
-  msKicker:"Cosa misuriamo", msHead:"Undici grandezze, e i loro limiti",
-  msIntro:"Ogni sensore ha una quota oltre la quale il suo dato non è più difendibile. Dichiararlo prima è ciò che distingue una misura da un numero. Questa è la tabella dei limiti, non quella delle prestazioni.",
+  msKicker:"Cosa misuriamo", msHead:"Dieci sensori e i loro limiti",
+  msIntro:"Ogni sensore ha un intervallo di validità, e conoscerlo è ciò che permette, in fase di analisi, di distinguere una misura da un numero. Salendo e scendendo, la sonda percorre due volte le stesse quote: ogni grandezza diventa un profilo verticale, ed è in questo che consiste studiare l'atmosfera con un pallone.",
   thVar:"Grandezza", thSens:"Strumento", thValid:"Dato valido fino a",
   mv1:"Quota, velocità, traiettoria", mv1v:"tutto il volo",
   mv2:"Pressione",
@@ -199,24 +199,16 @@ it:{
   mv6:"Anidride carbonica",
   mv7:"Particolato", mv7v:"4–5 km",
   mv8:"Radiazione ionizzante", mv8s:"tubo Geiger", mv8v:"tutto il volo",
-  mv9:"Ultravioletto UV-A", mv9v:"tutto il volo",
-  mv10:"Assetto e rotazione", mv10v:"tutto il volo",
-  mv11:"Istante dello scoppio", mv11v:"un solo istante",
-  msAfter:"Alcuni limiti meritano una parola. Il barometro va a fondo scala a 10 hPa, un centesimo della pressione al suolo: sopra i 31 km la quota la dà il solo GPS. L'umidità esce dalle specifiche sotto i −40 °C, e da lì il dato va marcato come non valido invece che scartato in silenzio. La CO₂ è una misura <strong>troposferica</strong>, non stratosferica. Il particolato regge fino a −10 °C, cioè quattro o cinque chilometri: lo teniamo acceso finché la temperatura lo consente e lo spegniamo quando non serve più. Salendo e scendendo, la sonda percorre due volte la stessa colonna d'aria: ogni grandezza diventa un profilo verticale, ed è in questo che consiste studiare l'atmosfera con un pallone.",
-
+  mv9:"Ultravioletto", mv9v:"tutto il volo",
+  mv10:"Assetto, rotazione e scoppio", mv10v:"tutto il volo",
   msNotKicker:"Cosa non misuriamo",
-  msNot1:"<strong>L'ozono.</strong> Era nella prima lista, ed è stato tolto. I sensori disponibili a questo costo sono tarati per l'aria a livello del mare; a 5 hPa la loro risposta non è interpretabile, e non esiste un modo praticabile di calibrarli per quelle condizioni. Avremmo ottenuto numeri, non misure.",
-  msNot2:"Anche il sensore di UV-A ha un limite dichiarato: legge una banda sola, e da una banda sola l'ozono non si ricava. Preferiamo dirlo qui piuttosto che lasciarlo intuire dai dati.",
-
+  msNot1:"<strong>L'ozono e gli ossidi di azoto.</strong> I sensori disponibili a questo costo sono tarati per l'aria a livello del mare; alle pressioni della stratosfera la loro risposta non è interpretabile, e non esiste un modo praticabile di calibrarli per quelle condizioni. Avremmo ottenuto numeri, non misure.",
   msCamKicker:"Le immagini e il ritrovamento",
   msCam1:"La <strong>Space Cam</strong> di StratoFlights è montata in orizzontale e riprende per tutta la durata del volo. La posizione è vincolata: serviva una vista libera, senza alette né sonde nel campo inquadrato, e questo ha fissato la parete. Di conseguenza il sensore di particolato è stato spostato sulla parete anteriore, per non assottigliare due volte lo stesso lato della scatola.",
-  msCam2:"Per ritrovarla ci sono due apparati indipendenti: lo <strong>STRATOfinder 4G</strong>, che trasmette la posizione dove c'è copertura di rete, e uno <strong>SPOT Trace</strong>, che usa i satelliti e funziona anche dove la rete non arriva. Nessuno dei due è collegato al resto della sonda.",
+  msCam2:"Per ritrovarla ci sono due apparati indipendenti: lo <strong>STRATOfinder 4G</strong>, che trasmette la posizione dove c'è copertura di rete cellulare, e uno <strong>SPOT Trace</strong>, che usa i satelliti e funziona anche dove la rete non arriva. Nessuno dei due può comunicarci la posizione durante tutto il volo.",
 
   msFwKicker:"La scheda che programmiamo",
   msFw1:"Il calcolatore è un <strong>Teensy 4.1</strong>, e il programma che gira sopra lo scriviamo noi: legge i sensori, li interroga ciascuno al proprio ritmo, e scrive tutto su microSD. Accanto, un secondo registratore completamente separato — <strong>Feather M0 Adalogger</strong>, con il proprio GPS, le proprie pile e la propria memoria — registra quota e traiettoria senza condividere nulla con il primo.",
-  msFw2:"Due dettagli del programma valgono più di tutti gli altri. Il primo: i ricevitori GPS civili smettono di funzionare sopra i 18 km, per una regola internazionale nata perché non servissero a guidare missili. Si può uscire da quel blocco dichiarando al ricevitore che è a bordo di un velivolo, ma va fatto a ogni accensione e va verificato che il comando sia stato accettato. Se ce ne dimentichiamo, la sonda smette di dirci dov'è proprio quando diventa interessante.",
-  msFw3:"Il secondo: il file va chiuso e riscritto ogni pochi campioni. Il modo tipico di perdere i dati di un volo non è la scheda che si congela — è il file rimasto aperto quando l'alimentazione salta all'impatto.",
-
   msEngKicker:"Cinque scelte di progetto",
   msE1t:"Due termometri invece di uno",
   msE1:"Sulla misura della temperatura dell'aria esistono due scuole: elemento nudo in aria libera, come le radiosonde classiche, oppure elemento schermato dentro un condotto. La prima è più fedele ai cambiamenti rapidi ma prende il sole; la seconda è protetta ma più lenta. Invece di sceglierne una, montiamo <strong>entrambe</strong> e confrontiamo le due curve. La differenza fra loro misura direttamente l'errore da irraggiamento — con dati nostri, invece che per argomenti.",
@@ -225,11 +217,11 @@ it:{
   msE3t:"Una finestra di PTFE, non di quarzo",
   msE3:"Il polistirolo è opaco all'ultravioletto: senza un'apertura il sensore non leggerebbe nulla. Il quarzo sarebbe la scelta ovvia, ma il PTFE fa due cose meglio: <strong>diffonde</strong> la luce, il che conta molto su una sonda che ruota su sé stessa, e conduce circa sei volte meno calore, il che conta molto in una scatola che deve restare tiepida.",
   msE4t:"Quattrocento volt lontani dal calcolatore",
-  msE4:"Il tubo Geiger lavora a circa 400 volt. Fra il suo circuito e il piedino del calcolatore che conta gli impulsi abbiamo messo un <strong>optoisolatore</strong>: il segnale passa come luce, non come corrente, e i due lati restano elettricamente separati. È la protezione più importante di tutta la sonda e costa due dollari.",
+  msE4:"Il tubo Geiger lavora a circa 400 volt. Fra il suo circuito e il piedino del calcolatore che conta gli impulsi abbiamo messo un <strong>optoisolatore</strong>: il segnale passa come luce, non come corrente, e i due lati restano elettricamente separati.",
   msE5t:"Il baricentro sull'asse",
-  msE5:"Le masse pesanti — pacco pile e power bank — stanno sul ripiano più basso, e la disposizione di ogni componente è stata calcolata perché il centro di massa cada sull'asse di sospensione. Lo scarto residuo è di 3 millimetri su 780 grammi, che appesi tre metri sotto il paracadute danno un'inclinazione statica di <strong>0,74 gradi</strong>. Una sonda che pende storta riprende storto e misura storto.",
+  msE5:"Le masse pesanti — pacco pile e power bank — stanno sul ripiano più basso, e la disposizione di ogni componente è stata calcolata perché il centro di massa cada sull'<strong>asse di sospensione</strong>. Lo scarto residuo è di 3 millimetri su 780 grammi, che appesi tre metri sotto il paracadute danno un'inclinazione statica di appena 0,74 gradi. Una sonda che pende storta riprende storto e misura storto.",
   msWipTag:"In lavorazione",
-  msWip:"La lista dei componenti <strong>non è definitiva</strong>. Il progetto è ancora in corso, e cambierà sia prima delle prove a terra sia dopo, in funzione di quello che le prove mostreranno. Quello che leggete qui è lo stato attuale, non una configurazione congelata.",
+  msWip:"La lista dei componenti <strong>non è definitiva</strong>. Il progetto è ancora in corso, e cambierà sia prima delle prove a terra sia dopo.",
 },
 
 /* ==========================================================
@@ -247,7 +239,7 @@ es:{
   countHead:"Lanzamiento en", cDays:"Días", cHours:"Horas", cMins:"Minutos", cSecs:"Segundos",
   cTentative:"Fecha tentativa", cLate:"fines de setiembre de 2026", cUnit:"d",
   afterKicker:"Proyecto COMETA",
-  afterHead:"De la pista al borde del espacio.",
+  afterHead:"Desde tierra al borde del espacio.",
   sAlt:"Altura prevista", sDur:"Duración del vuelo", sMass:"Masa de la sonda", sStudents:"Estudiantes involucrados",
 
   tzMission:"Objetivos, perfil de vuelo y cadena de vuelo.",
@@ -403,8 +395,8 @@ es:{
   lSrc2:"<strong>Autoridad:</strong> <a href=\"https://www.dinacia.gub.uy/\" target=\"_blank\" rel=\"noopener\">DINACIA</a> — Dirección Nacional de Aviación Civil e Infraestructura Aeronáutica, Uruguay.",
 
   /* — Misión: medidas, decisiones, límites — */
-  msKicker:"Qué medimos", msHead:"Once magnitudes, y sus límites",
-  msIntro:"Cada sensor tiene una altura por encima de la cual su dato ya no es defendible. Declararlo antes es lo que distingue una medición de un número. Ésta es la tabla de los límites, no la de las prestaciones.",
+  msKicker:"Qué medimos", msHead:"Diez sensores y sus límites",
+  msIntro:"Cada sensor tiene un intervalo de validez, y conocerlo es lo que permite, en el análisis, distinguir una medición de un número. Subiendo y bajando, la sonda recorre dos veces las mismas alturas: cada magnitud se convierte en un perfil vertical, y en eso consiste estudiar la atmósfera con un globo.",
   thVar:"Magnitud", thSens:"Instrumento", thValid:"Dato válido hasta",
   mv1:"Altura, velocidad, trayectoria", mv1v:"todo el vuelo",
   mv2:"Presión",
@@ -414,24 +406,16 @@ es:{
   mv6:"Dióxido de carbono",
   mv7:"Material particulado", mv7v:"4–5 km",
   mv8:"Radiación ionizante", mv8s:"tubo Geiger", mv8v:"todo el vuelo",
-  mv9:"Ultravioleta UV-A", mv9v:"todo el vuelo",
-  mv10:"Actitud y rotación", mv10v:"todo el vuelo",
-  mv11:"Instante del estallido", mv11v:"un solo instante",
-  msAfter:"Algunos límites merecen una palabra. El barómetro llega al fondo de escala en 10 hPa, una centésima de la presión al nivel del suelo: por encima de 31 km la altura la da sólo el GPS. La humedad sale de especificación por debajo de −40 °C, y desde ahí el dato se marca como no válido en vez de descartarlo en silencio. El CO₂ es una medida <strong>troposférica</strong>, no estratosférica. El material particulado aguanta hasta −10 °C, es decir cuatro o cinco kilómetros: lo mantenemos encendido mientras la temperatura lo permita y lo apagamos cuando deja de servir. Subiendo y bajando, la sonda recorre dos veces la misma columna de aire: cada magnitud se convierte en un perfil vertical, y en eso consiste estudiar la atmósfera con un globo.",
-
+  mv9:"Ultravioleta", mv9v:"todo el vuelo",
+  mv10:"Actitud, rotación y estallido", mv10v:"todo el vuelo",
   msNotKicker:"Qué no medimos",
-  msNot1:"<strong>El ozono.</strong> Estaba en la primera lista, y se quitó. Los sensores disponibles a este costo están calibrados para aire a nivel del mar; a 5 hPa su respuesta no es interpretable, y no existe una forma practicable de calibrarlos para esas condiciones. Habríamos obtenido números, no mediciones.",
-  msNot2:"El sensor de UV-A también tiene un límite declarado: lee una sola banda, y de una sola banda no se deduce el ozono. Preferimos decirlo aquí antes que dejarlo adivinar en los datos.",
-
+  msNot1:"<strong>El ozono y los óxidos de nitrógeno.</strong> Los sensores disponibles a este costo están calibrados para aire a nivel del mar; a las presiones de la estratosfera su respuesta no es interpretable, y no existe una forma practicable de calibrarlos para esas condiciones. Habríamos obtenido números, no mediciones.",
   msCamKicker:"Las imágenes y el hallazgo",
   msCam1:"La <strong>Space Cam</strong> de StratoFlights va montada en horizontal y graba durante todo el vuelo. La posición está condicionada: hacía falta una vista libre, sin aletas ni sondas en el encuadre, y eso fijó la pared. En consecuencia el sensor de material particulado se pasó a la pared delantera, para no adelgazar dos veces el mismo lado de la caja.",
-  msCam2:"Para encontrarla hay dos aparatos independientes: el <strong>STRATOfinder 4G</strong>, que transmite la posición donde hay cobertura de red, y un <strong>SPOT Trace</strong>, que usa satélites y funciona también donde la red no llega. Ninguno de los dos está conectado al resto de la sonda.",
+  msCam2:"Para encontrarla hay dos aparatos independientes: el <strong>STRATOfinder 4G</strong>, que transmite la posición donde hay cobertura de red celular, y un <strong>SPOT Trace</strong>, que usa satélites y funciona también donde la red no llega. Ninguno de los dos puede comunicarnos la posición durante todo el vuelo.",
 
   msFwKicker:"La placa que programamos",
   msFw1:"El computador es un <strong>Teensy 4.1</strong>, y el programa que corre en él lo escribimos nosotros: lee los sensores, interroga a cada uno a su propio ritmo y escribe todo en una microSD. Al lado, un segundo registrador completamente separado — <strong>Feather M0 Adalogger</strong>, con su propio GPS, sus propias pilas y su propia memoria — registra altura y trayectoria sin compartir nada con el primero.",
-  msFw2:"Dos detalles del programa valen más que todos los demás. El primero: los receptores GPS civiles dejan de funcionar por encima de 18 km, por una regla internacional nacida para que no sirvieran para guiar misiles. Se puede salir de ese bloqueo declarándole al receptor que va a bordo de una aeronave, pero hay que hacerlo en cada encendido y verificar que el comando fue aceptado. Si nos olvidamos, la sonda deja de decirnos dónde está justo cuando se pone interesante.",
-  msFw3:"El segundo: el archivo hay que cerrarlo y reescribirlo cada pocas muestras. La forma típica de perder los datos de un vuelo no es que la tarjeta se congele — es el archivo que quedó abierto cuando la alimentación se cortó en el impacto.",
-
   msEngKicker:"Cinco decisiones de diseño",
   msE1t:"Dos termómetros en vez de uno",
   msE1:"Sobre la medición de la temperatura del aire hay dos escuelas: elemento desnudo al aire libre, como las radiosondas clásicas, o elemento protegido dentro de un conducto. La primera es más fiel a los cambios rápidos pero recibe el sol; la segunda está protegida pero es más lenta. En vez de elegir una, montamos <strong>las dos</strong> y comparamos las curvas. La diferencia entre ellas mide directamente el error por radiación solar — con datos propios, en vez de con argumentos.",
@@ -440,11 +424,11 @@ es:{
   msE3t:"Una ventana de PTFE, no de cuarzo",
   msE3:"El poliestireno es opaco al ultravioleta: sin una abertura el sensor no leería nada. El cuarzo sería la opción obvia, pero el PTFE hace dos cosas mejor: <strong>difunde</strong> la luz, lo que importa mucho en una sonda que gira sobre sí misma, y conduce unas seis veces menos calor, lo que importa mucho en una caja que debe mantenerse tibia.",
   msE4t:"Cuatrocientos voltios lejos del computador",
-  msE4:"El tubo Geiger trabaja a unos 400 voltios. Entre su circuito y el pin del computador que cuenta los pulsos pusimos un <strong>optoacoplador</strong>: la señal pasa como luz, no como corriente, y los dos lados quedan eléctricamente separados. Es la protección más importante de toda la sonda y cuesta dos dólares.",
+  msE4:"El tubo Geiger trabaja a unos 400 voltios. Entre su circuito y el pin del computador que cuenta los pulsos pusimos un <strong>optoacoplador</strong>: la señal pasa como luz, no como corriente, y los dos lados quedan eléctricamente separados.",
   msE5t:"El centro de masa sobre el eje",
-  msE5:"Las masas pesadas — el paquete de pilas y la batería externa — van en el estante más bajo, y la posición de cada componente se calculó para que el centro de masa caiga sobre el eje de suspensión. El desvío que queda es de 3 milímetros sobre 780 gramos, que colgados tres metros por debajo del paracaídas dan una inclinación estática de <strong>0,74 grados</strong>. Una sonda que cuelga torcida graba torcido y mide torcido.",
+  msE5:"Las masas pesadas — el paquete de pilas y la batería externa — van en el estante más bajo, y la posición de cada componente se calculó para que el centro de masa caiga sobre el <strong>eje de suspensión</strong>. El desvío que queda es de 3 milímetros sobre 780 gramos, que colgados tres metros por debajo del paracaídas dan una inclinación estática de apenas 0,74 grados. Una sonda que cuelga torcida graba torcido y mide torcido.",
   msWipTag:"En proceso",
-  msWip:"La lista de componentes <strong>no es definitiva</strong>. El proyecto sigue en curso y cambiará tanto antes de los ensayos en tierra como después, en función de lo que los ensayos muestren. Lo que se lee aquí es el estado actual, no una configuración congelada.",
+  msWip:"La lista de componentes <strong>no es definitiva</strong>. El proyecto sigue en curso y cambiará tanto antes de los ensayos en tierra como después.",
 },
 
 /* ==========================================================
@@ -462,7 +446,7 @@ en:{
   countHead:"Launch in", cDays:"Days", cHours:"Hours", cMins:"Minutes", cSecs:"Seconds",
   cTentative:"Tentative date", cLate:"late September 2026", cUnit:"d",
   afterKicker:"Project COMETA",
-  afterHead:"From the pad to the edge of space.",
+  afterHead:"From the ground to the edge of space.",
   sAlt:"Target altitude", sDur:"Flight duration", sMass:"Probe mass", sStudents:"Students involved",
 
   tzMission:"Objectives, flight profile and flight chain.",
@@ -618,8 +602,8 @@ en:{
   lSrc2:"<strong>Authority:</strong> <a href=\"https://www.dinacia.gub.uy/\" target=\"_blank\" rel=\"noopener\">DINACIA</a> — Dirección Nacional de Aviación Civil e Infraestructura Aeronáutica, Uruguay.",
 
   /* — Mission: measurements, decisions, limits — */
-  msKicker:"What we measure", msHead:"Eleven quantities, and their limits",
-  msIntro:"Every sensor has an altitude above which its reading is no longer defensible. Saying so in advance is what separates a measurement from a number. This is the table of limits, not the table of specifications.",
+  msKicker:"What we measure", msHead:"Ten sensors and their limits",
+  msIntro:"Every sensor has a range of validity, and knowing it is what allows you, when analysing the data, to tell a measurement from a number. Going up and coming down, the probe crosses the same altitudes twice: every quantity becomes a vertical profile, and that is what studying the atmosphere with a balloon consists of.",
   thVar:"Quantity", thSens:"Instrument", thValid:"Valid up to",
   mv1:"Altitude, speed, trajectory", mv1v:"whole flight",
   mv2:"Pressure",
@@ -629,24 +613,16 @@ en:{
   mv6:"Carbon dioxide",
   mv7:"Particulate matter", mv7v:"4–5 km",
   mv8:"Ionising radiation", mv8s:"Geiger tube", mv8v:"whole flight",
-  mv9:"UV-A", mv9v:"whole flight",
-  mv10:"Attitude and rotation", mv10v:"whole flight",
-  mv11:"Moment of burst", mv11v:"a single instant",
-  msAfter:"Some limits deserve a word. The barometer bottoms out at 10 hPa, one hundredth of ground pressure: above 31 km, altitude comes from GPS alone. Humidity falls outside specification below −40 °C, and from there the reading is flagged as invalid rather than quietly discarded. CO₂ is a <strong>tropospheric</strong> measurement, not a stratospheric one. Particulate matter holds to −10 °C, which is four or five kilometres: we keep it running while the temperature allows and switch it off when it stops being useful. Going up and coming down, the probe crosses the same column of air twice: every quantity becomes a vertical profile, and that is what studying the atmosphere with a balloon consists of.",
-
+  mv9:"Ultraviolet", mv9v:"whole flight",
+  mv10:"Attitude, rotation and burst", mv10v:"whole flight",
   msNotKicker:"What we do not measure",
-  msNot1:"<strong>Ozone.</strong> It was on the first list, and it was removed. The sensors available at this price are calibrated for air at sea level; at 5 hPa their response cannot be interpreted, and there is no practical way to calibrate them for those conditions. We would have obtained numbers, not measurements.",
-  msNot2:"The UV-A sensor has a declared limit too: it reads a single band, and ozone cannot be derived from a single band. We would rather say so here than let it be inferred from the data.",
-
+  msNot1:"<strong>Ozone and nitrogen oxides.</strong> The sensors available at this price are calibrated for air at sea level; at stratospheric pressures their response cannot be interpreted, and there is no practical way to calibrate them for those conditions. We would have obtained numbers, not measurements.",
   msCamKicker:"The footage and the recovery",
   msCam1:"The StratoFlights <strong>Space Cam</strong> is mounted horizontally and films for the whole flight. Its position was constrained: we needed a clear view, with no fins or probes in frame, and that fixed the wall. As a result the particulate sensor moved to the front wall, so as not to thin the same side of the box twice.",
-  msCam2:"Two independent devices are there to find it again: the <strong>STRATOfinder 4G</strong>, which transmits its position wherever there is mobile coverage, and a <strong>SPOT Trace</strong>, which uses satellites and works where the network does not reach. Neither is connected to the rest of the probe.",
+  msCam2:"Two independent devices are there to find it again: the <strong>STRATOfinder 4G</strong>, which transmits its position wherever there is mobile coverage, and a <strong>SPOT Trace</strong>, which uses satellites and works where the network does not reach. Neither can report its position for the whole flight.",
 
   msFwKicker:"The board we program",
   msFw1:"The computer is a <strong>Teensy 4.1</strong>, and we write the program that runs on it: it reads the sensors, polls each one at its own rate, and writes everything to a microSD card. Alongside it, a completely separate second logger — a <strong>Feather M0 Adalogger</strong> with its own GPS, its own batteries and its own memory — records altitude and trajectory while sharing nothing with the first.",
-  msFw2:"Two details of the program matter more than all the rest. First: civilian GPS receivers stop working above 18 km, because of an international rule created so that they could not guide missiles. That block can be lifted by telling the receiver it is aboard an aircraft, but it must be done at every power-up and the command must be confirmed. If we forget, the probe stops telling us where it is exactly when it becomes interesting.",
-  msFw3:"Second: the file must be closed and rewritten every few samples. The usual way to lose a flight's data is not the card freezing — it is the file left open when power is cut at impact.",
-
   msEngKicker:"Five design decisions",
   msE1t:"Two thermometers instead of one",
   msE1:"There are two schools of thought on measuring air temperature: a bare element in free air, as classic radiosondes use, or a shielded element inside a duct. The first follows rapid changes more faithfully but catches the sun; the second is protected but slower. Rather than choose, we fit <strong>both</strong> and compare the two curves. The difference between them measures the solar heating error directly — with our own data, rather than by argument.",
@@ -655,10 +631,10 @@ en:{
   msE3t:"A PTFE window, not quartz",
   msE3:"Polystyrene is opaque to ultraviolet: without an opening the sensor would read nothing. Quartz would be the obvious choice, but PTFE does two things better: it <strong>diffuses</strong> the light, which matters a great deal on a probe that spins, and it conducts about six times less heat, which matters a great deal in a box that has to stay warm.",
   msE4t:"Four hundred volts, kept away from the computer",
-  msE4:"The Geiger tube runs at about 400 volts. Between its circuit and the computer pin that counts the pulses we placed an <strong>optoisolator</strong>: the signal crosses as light rather than as current, and the two sides stay electrically separate. It is the single most important protection in the whole probe, and it costs two dollars.",
+  msE4:"The Geiger tube runs at about 400 volts. Between its circuit and the computer pin that counts the pulses we placed an <strong>optoisolator</strong>: the signal crosses as light rather than as current, and the two sides stay electrically separate.",
   msE5t:"The centre of mass on the axis",
-  msE5:"The heavy masses — battery pack and power bank — sit on the lowest deck, and every component's position was calculated so that the centre of mass falls on the suspension axis. The residual offset is 3 millimetres on 780 grams, which hanging three metres below the parachute gives a static tilt of <strong>0.74 degrees</strong>. A probe that hangs crooked films crooked and measures crooked.",
+  msE5:"The heavy masses — battery pack and power bank — sit on the lowest deck, and every component's position was calculated so that the centre of mass falls on the <strong>suspension axis</strong>. The residual offset is 3 millimetres on 780 grams, which hanging three metres below the parachute gives a static tilt of just 0.74 degrees. A probe that hangs crooked films crooked and measures crooked.",
   msWipTag:"Work in progress",
-  msWip:"The component list is <strong>not final</strong>. The project is still under way, and it will change both before the ground tests and after them, depending on what those tests show. What you read here is the current state, not a frozen configuration.",
+  msWip:"The component list is <strong>not final</strong>. The project is still under way, and it will change both before the ground tests and after them.",
 }
 };
