@@ -18,7 +18,7 @@ it:{
   code:"it", title:"COMETA · Sonda Klo-01 — Scuola Italiana di Montevideo",
   metaDesc:"COMETA è un programma di palloni stratosferici della Scuola Italiana di Montevideo: misure atmosferiche fino a oltre 37 km di quota, progettate e realizzate dagli studenti.",
 
-  navHome:"Inizio", navMission:"Missione", navPhysics:"La fisica", navProbe:"La sonda", navWinds:"Studio dei venti", navAbout:"Chi siamo",
+  navHome:"Inizio", navMission:"Missione", navPhysics:"La fisica", navProbe:"La sonda", navWinds:"Studio dei venti", navAbout:"Chi siamo e contatti",
 
   /* — Inizio — */
   heroEyebrow:"Scuola Italiana di Montevideo · 2EMS · IIIS · 3EMS · IVL · IVS",
@@ -46,7 +46,7 @@ it:{
   ix4t:"Come lavoriamo", ix4n:"I gruppi di lavoro e l'organizzazione del progetto",
   ix5t:"Aspetti legali", ix5n:"La normativa aeronautica e cosa comporta per noi",
   ix7t:"Domande frequenti", ix7n:"No, non è un satellite. E sì, lo andiamo a recuperare.",
-  ix8t:"Contatti", ix8n:"Scuole, aziende, curiosi",
+  ix8t:"Chi siamo e contatti", ix8n:"Vieni a conoscerci!",
 
   /* — Missione — */
   pKicker:"Profilo di volo", missionTitle:"Missione",
@@ -119,7 +119,7 @@ it:{
   /* — Chi siamo — */
   aboutKicker:"Chi siamo", aboutTitle:"Chi siamo", aboutSub:"Le persone dietro COMETA.",
   aboutBody:"Siamo studentesse e studenti di 2EMS, IIIS, 3EMS, IVL e IVS della Scuola Italiana di Montevideo.",
-  contactHead:"Seguici", contactSub:"Aggiornamenti sulla missione su Instagram.", igCta:"Seguici su Instagram",
+  contactHead:"Seguici", contactSub:"Per vedere i nostri contenuti e scoprire le novità sulla missione.", igCta:"Seguici su Instagram",
 
   /* — Pie di pagina e altimetro — */
   footNav:"Pagine", footFollow:"Seguici", footStatus:"Stato: in corso", footRights:"Testi e immagini CC BY 4.0",
@@ -147,7 +147,7 @@ it:{
   /* — Contatti — */
   contactMailHead:"Scrivici", contactMailSub:"Per informazioni, collaborazioni, proposte.",
   mailCta:"Manda una mail", tiktokCta:"Seguici su TikTok", footContact:"Contatti",
-  classesNote:"Cinque classi dei due sistemi che convivono nella scuola, quello italiano e quello uruguaiano: 2EMS, IIIS, 3EMS, IVL e IVS.",
+  classesNote:"Cinque classi dei due sistemi che convivono nella scuola, quello italiano e quello uruguaiano.",
 
   bands:["Suolo","Troposfera","Tropopausa","Stratosfera"],
   skip:"Vai al contenuto",
@@ -162,13 +162,13 @@ it:{
   lLede:"Il riferimento che ci è stato indicato dalla DINACIA è il <strong>LAR 91, Parte I, Appendice P — Globos libres no tripulados</strong>, il regolamento aeronautico latinoamericano sui palloni liberi non pilotati. Stabilisce come si classificano, quali obblighi porta ogni categoria, e che cosa si può e non si può fare.",
 
   lClassHead:"Come viene classificata la nostra sonda",
-  lClassIntro:"Il regolamento distingue tre categorie — <em>ligero</em>, <em>mediano</em> e <em>pesado</em> — in base a quattro criteri. Basta superarne uno per finire nella categoria più pesante, con tutti gli obblighi che comporta. Questi sono i quattro criteri e i nostri valori.",
-  thCriterion:"Criterio", thThreshold:"Soglia per «pesado»", thOurs:"Klo-01",
-  lc1:"Massa complessiva del carico utile", lc1t:"≥ 6 kg",
-  lc2:"Massa del singolo collo", lc2t:"≥ 3 kg",
-  lc3:"Densità del collo", lc3t:"≥ 2 kg e > 13 g/cm²",
-  lc4:"Forza per separare il carico dal pallone", lc4t:"≥ 230 N", lc4v:"sotto soglia",
-  lClassOut:"Sotto ogni soglia, e ampiamente. La sonda Klo-01 è quindi un pallone <strong>«ligero»</strong>. Il quarto criterio è quello meno intuitivo e vale la pena spiegarlo: se il cordame che unisce la sonda al pallone fosse troppo robusto — 230 N sono circa 23 chili di forza — la sonda diventerebbe «pesada» anche pesando un chilo e mezzo. Il nostro cordame si rompe sotto quella soglia, ed è una scelta di progetto, non un caso.",
+  lClassIntro:"Le categorie sono tre. <strong>Ligero</strong>: carico utile complessivo sotto i 4 kg. <strong>Mediano</strong>: da 4 a 6 kg, distribuiti su due o più colli. <strong>Pesado</strong>: 6 kg o più. Ma la massa non decide da sola — tre condizioni fanno scattare la categoria «pesado» a qualunque peso, e sono le ultime tre righe della tabella. Basta che una sia soddisfatta.",
+  thCriterion:"Criterio", thThreshold:"Per restare «ligero»", thOurs:"Klo-01",
+  lc1:"Massa complessiva del carico utile", lc1t:"sotto 4 kg",
+  lc2:"Massa del collo più pesante", lc2t:"sotto 3 kg",
+  lc3:"Colli da 2 kg o più con densità oltre 13 g/cm²", lc3t:"nessuno",
+  lc4:"Forza per separare il carico dal pallone", lc4t:"sotto 230 N", lc4v:"sotto soglia", lc3v:"1,3 kg · ≈ 3 g/cm²",
+  lClassOut:"Quattro criteri, quattro volte dentro. La sonda Klo-01 è un pallone <strong>«ligero»</strong>: pesa un terzo della soglia dei 4 kg, il collo è unico e ben sotto i 3 kg, la sua densità è quattro volte inferiore al limite, e il cordame cede prima dei 230 N. Quest'ultimo è il criterio meno intuitivo e vale la pena spiegarlo: 230 N sono circa 23 chili di forza, e un cordame più robusto renderebbe la sonda «pesada» anche pesando un chilo e mezzo. Il nostro cede sotto quella soglia, ed è una scelta di progetto, non un caso.",
 
   lDutyHead:"Che cosa comporta",
   lDuty1:"Quasi tutti gli obblighi operativi del regolamento — due sistemi indipendenti per interrompere il volo, il transponder radar, il riflettore radar, le notifiche al controllo del traffico aereo sette giorni prima, i rapporti di posizione ogni due ore — riguardano i palloni <em>mediani</em> e <em>pesados</em>. A un pallone leggero non si applicano.",
@@ -186,6 +186,50 @@ it:{
   lDisc2:"<strong>Chi volesse organizzare un proprio lancio deve rivolgersi direttamente alla DINACIA</strong> e attenersi al testo vigente del regolamento. Non ci assumiamo alcuna responsabilità per l'uso che altri facciano delle informazioni pubblicate qui.",
   lSrc1:"<strong>Norma:</strong> LAR 91 — Reglas de vuelo y operación general, Parte I, Apéndice P «Globos libres no tripulados». Seconda edizione, Emendamento 16, febbraio 2025 (il testo dell'Appendice P risale all'Emendamento 11).",
   lSrc2:"<strong>Autorità:</strong> <a href=\"https://www.dinacia.gub.uy/\" target=\"_blank\" rel=\"noopener\">DINACIA</a> — Dirección Nacional de Aviación Civil e Infraestructura Aeronáutica, Uruguay.",
+
+  /* — Missione: misure, scelte, limiti — */
+  msKicker:"Cosa misuriamo", msHead:"Undici grandezze, e i loro limiti",
+  msIntro:"Ogni sensore ha una quota oltre la quale il suo dato non è più difendibile. Dichiararlo prima è ciò che distingue una misura da un numero. Questa è la tabella dei limiti, non quella delle prestazioni.",
+  thVar:"Grandezza", thSens:"Strumento", thValid:"Dato valido fino a",
+  mv1:"Quota, velocità, traiettoria", mv1v:"tutto il volo",
+  mv2:"Pressione",
+  mv3:"Temperatura dell'aria", mv3v:"tutto il volo",
+  mv4:"Temperature interne", mv4v:"tutto il volo",
+  mv5:"Umidità relativa",
+  mv6:"Anidride carbonica",
+  mv7:"Particolato", mv7v:"4–5 km",
+  mv8:"Radiazione ionizzante", mv8s:"tubo Geiger", mv8v:"tutto il volo",
+  mv9:"Ultravioletto UV-A", mv9v:"tutto il volo",
+  mv10:"Assetto e rotazione", mv10v:"tutto il volo",
+  mv11:"Istante dello scoppio", mv11v:"un solo istante",
+  msAfter:"Alcuni limiti meritano una parola. Il barometro va a fondo scala a 10 hPa, un centesimo della pressione al suolo: sopra i 31 km la quota la dà il solo GPS. L'umidità esce dalle specifiche sotto i −40 °C, e da lì il dato va marcato come non valido invece che scartato in silenzio. La CO₂ è una misura <strong>troposferica</strong>, non stratosferica. Il particolato regge fino a −10 °C, cioè quattro o cinque chilometri: lo teniamo acceso finché la temperatura lo consente e lo spegniamo quando non serve più. Salendo e scendendo, la sonda percorre due volte la stessa colonna d'aria: ogni grandezza diventa un profilo verticale, ed è in questo che consiste studiare l'atmosfera con un pallone.",
+
+  msNotKicker:"Cosa non misuriamo",
+  msNot1:"<strong>L'ozono.</strong> Era nella prima lista, ed è stato tolto. I sensori disponibili a questo costo sono tarati per l'aria a livello del mare; a 5 hPa la loro risposta non è interpretabile, e non esiste un modo praticabile di calibrarli per quelle condizioni. Avremmo ottenuto numeri, non misure.",
+  msNot2:"Anche il sensore di UV-A ha un limite dichiarato: legge una banda sola, e da una banda sola l'ozono non si ricava. Preferiamo dirlo qui piuttosto che lasciarlo intuire dai dati.",
+
+  msCamKicker:"Le immagini e il ritrovamento",
+  msCam1:"La <strong>Space Cam</strong> di StratoFlights è montata in orizzontale e riprende per tutta la durata del volo. La posizione è vincolata: serviva una vista libera, senza alette né sonde nel campo inquadrato, e questo ha fissato la parete. Di conseguenza il sensore di particolato è stato spostato sulla parete anteriore, per non assottigliare due volte lo stesso lato della scatola.",
+  msCam2:"Per ritrovarla ci sono due apparati indipendenti: lo <strong>STRATOfinder 4G</strong>, che trasmette la posizione dove c'è copertura di rete, e uno <strong>SPOT Trace</strong>, che usa i satelliti e funziona anche dove la rete non arriva. Nessuno dei due è collegato al resto della sonda.",
+
+  msFwKicker:"La scheda che programmiamo",
+  msFw1:"Il calcolatore è un <strong>Teensy 4.1</strong>, e il programma che gira sopra lo scriviamo noi: legge i sensori, li interroga ciascuno al proprio ritmo, e scrive tutto su microSD. Accanto, un secondo registratore completamente separato — <strong>Feather M0 Adalogger</strong>, con il proprio GPS, le proprie pile e la propria memoria — registra quota e traiettoria senza condividere nulla con il primo.",
+  msFw2:"Due dettagli del programma valgono più di tutti gli altri. Il primo: i ricevitori GPS civili smettono di funzionare sopra i 18 km, per una regola internazionale nata perché non servissero a guidare missili. Si può uscire da quel blocco dichiarando al ricevitore che è a bordo di un velivolo, ma va fatto a ogni accensione e va verificato che il comando sia stato accettato. Se ce ne dimentichiamo, la sonda smette di dirci dov'è proprio quando diventa interessante.",
+  msFw3:"Il secondo: il file va chiuso e riscritto ogni pochi campioni. Il modo tipico di perdere i dati di un volo non è la scheda che si congela — è il file rimasto aperto quando l'alimentazione salta all'impatto.",
+
+  msEngKicker:"Cinque scelte di progetto",
+  msE1t:"Due termometri invece di uno",
+  msE1:"Sulla misura della temperatura dell'aria esistono due scuole: elemento nudo in aria libera, come le radiosonde classiche, oppure elemento schermato dentro un condotto. La prima è più fedele ai cambiamenti rapidi ma prende il sole; la seconda è protetta ma più lenta. Invece di sceglierne una, montiamo <strong>entrambe</strong> e confrontiamo le due curve. La differenza fra loro misura direttamente l'errore da irraggiamento — con dati nostri, invece che per argomenti.",
+  msE2t:"Una curva a 90° per togliere il ghiaccio",
+  msE2:"Il condotto del secondo termometro ha un gomito. Non serve a far scolare l'acqua: serve a <strong>separare le gocce</strong>. Attraversando le nubi, l'aria svolta l'angolo, ma le goccioline sopraffuse hanno troppa inerzia per seguirla e finiscono contro la parete esterna della curva. A valle il sensore riceve aria ripulita, e non si copre di ghiaccio. È lo stesso principio dei tubi di Pitot degli aerei.",
+  msE3t:"Una finestra di PTFE, non di quarzo",
+  msE3:"Il polistirolo è opaco all'ultravioletto: senza un'apertura il sensore non leggerebbe nulla. Il quarzo sarebbe la scelta ovvia, ma il PTFE fa due cose meglio: <strong>diffonde</strong> la luce, il che conta molto su una sonda che ruota su sé stessa, e conduce circa sei volte meno calore, il che conta molto in una scatola che deve restare tiepida.",
+  msE4t:"Quattrocento volt lontani dal calcolatore",
+  msE4:"Il tubo Geiger lavora a circa 400 volt. Fra il suo circuito e il piedino del calcolatore che conta gli impulsi abbiamo messo un <strong>optoisolatore</strong>: il segnale passa come luce, non come corrente, e i due lati restano elettricamente separati. È la protezione più importante di tutta la sonda e costa due dollari.",
+  msE5t:"Il baricentro sull'asse",
+  msE5:"Le masse pesanti — pacco pile e power bank — stanno sul ripiano più basso, e la disposizione di ogni componente è stata calcolata perché il centro di massa cada sull'asse di sospensione. Lo scarto residuo è di 3 millimetri su 780 grammi, che appesi tre metri sotto il paracadute danno un'inclinazione statica di <strong>0,74 gradi</strong>. Una sonda che pende storta riprende storto e misura storto.",
+  msWipTag:"In lavorazione",
+  msWip:"La lista dei componenti <strong>non è definitiva</strong>. Il progetto è ancora in corso, e cambierà sia prima delle prove a terra sia dopo, in funzione di quello che le prove mostreranno. Quello che leggete qui è lo stato attuale, non una configurazione congelata.",
 },
 
 /* ==========================================================
@@ -195,7 +239,7 @@ es:{
   code:"es", title:"COMETA · Sonda Klo-01 — Scuola Italiana di Montevideo",
   metaDesc:"COMETA es un programa de globos estratosféricos de la Scuola Italiana di Montevideo: mediciones atmosféricas hasta más de 37 km de altura, diseñadas y construidas por los estudiantes.",
 
-  navHome:"Inicio", navMission:"Misión", navPhysics:"La física", navProbe:"La sonda", navWinds:"Estudio de vientos", navAbout:"Nosotros",
+  navHome:"Inicio", navMission:"Misión", navPhysics:"La física", navProbe:"La sonda", navWinds:"Estudio de vientos", navAbout:"Quiénes somos y contacto",
 
   heroEyebrow:"Scuola Italiana di Montevideo · 2EMS · IIIS · 3EMS · IVL · IVS",
   introSub:"Sonda Klo-01 · un globo estratosférico hasta más de 37 kilómetros de altura.",
@@ -222,7 +266,7 @@ es:{
   ix4t:"Cómo trabajamos", ix4n:"Los grupos de trabajo y la organización del proyecto",
   ix5t:"Aspectos legales", ix5n:"La normativa aeronáutica y qué implica para nosotros",
   ix7t:"Preguntas frecuentes", ix7n:"No, no es un satélite. Y sí, la vamos a buscar.",
-  ix8t:"Contacto", ix8n:"Escuelas, empresas, curiosos",
+  ix8t:"Quiénes somos y contacto", ix8n:"¡Vení a conocernos!",
 
   pKicker:"Perfil de vuelo", missionTitle:"Misión",
   missionSub:"Qué estudiamos y cómo asciende la sonda.",
@@ -291,7 +335,7 @@ es:{
 
   aboutKicker:"Nosotros", aboutTitle:"Nosotros", aboutSub:"Las personas detrás de COMETA.",
   aboutBody:"Somos estudiantes de 2EMS, IIIS, 3EMS, IVL y IVS de la Scuola Italiana di Montevideo.",
-  contactHead:"Seguinos", contactSub:"Novedades de la misión en Instagram.", igCta:"Seguinos en Instagram",
+  contactHead:"Seguinos", contactSub:"Para ver nuestros contenidos y descubrir las novedades de la misión.", igCta:"Seguinos en Instagram",
 
   footNav:"Páginas", footFollow:"Seguinos", footStatus:"Estado: en curso", footRights:"Textos e imágenes CC BY 4.0",
 
@@ -318,7 +362,7 @@ es:{
   /* — Contacto — */
   contactMailHead:"Escribinos", contactMailSub:"Para información, colaboraciones, propuestas.",
   mailCta:"Mandanos un correo", tiktokCta:"Seguinos en TikTok", footContact:"Contacto",
-  classesNote:"Cinco clases de los dos sistemas que conviven en la escuela, el italiano y el uruguayo: 2EMS, IIIS, 3EMS, IVL y IVS.",
+  classesNote:"Cinco clases de los dos sistemas que conviven en la escuela, el italiano y el uruguayo.",
 
   bands:["Suelo","Troposfera","Tropopausa","Estratósfera"],
   skip:"Ir al contenido",
@@ -333,13 +377,13 @@ es:{
   lLede:"La referencia que nos indicó la DINACIA es el <strong>LAR 91, Parte I, Apéndice P — Globos libres no tripulados</strong>, el reglamento aeronáutico latinoamericano sobre globos libres no tripulados. Establece cómo se clasifican, qué obligaciones trae cada categoría y qué se puede y qué no se puede hacer.",
 
   lClassHead:"Cómo se clasifica nuestra sonda",
-  lClassIntro:"El reglamento distingue tres categorías — <em>ligero</em>, <em>mediano</em> y <em>pesado</em> — según cuatro criterios. Basta superar uno para caer en la categoría más pesada, con todas las obligaciones que eso implica. Estos son los cuatro criterios y nuestros valores.",
-  thCriterion:"Criterio", thThreshold:"Umbral para «pesado»", thOurs:"Klo-01",
-  lc1:"Masa combinada de la carga útil", lc1t:"≥ 6 kg",
-  lc2:"Masa de un solo bulto", lc2t:"≥ 3 kg",
-  lc3:"Densidad del bulto", lc3t:"≥ 2 kg y > 13 g/cm²",
-  lc4:"Fuerza para separar la carga del globo", lc4t:"≥ 230 N", lc4v:"bajo el umbral",
-  lClassOut:"Por debajo de todos los umbrales, y con holgura. La sonda Klo-01 es entonces un globo <strong>«ligero»</strong>. El cuarto criterio es el menos intuitivo y vale la pena explicarlo: si el cordaje que une la sonda al globo fuera demasiado resistente — 230 N son unos 23 kilos de fuerza — la sonda pasaría a ser «pesada» aun pesando kilo y medio. Nuestro cordaje se corta por debajo de ese umbral, y es una decisión de diseño, no una casualidad.",
+  lClassIntro:"Las categorías son tres. <strong>Ligero</strong>: carga útil combinada por debajo de 4 kg. <strong>Mediano</strong>: de 4 a 6 kg, repartidos en dos o más bultos. <strong>Pesado</strong>: 6 kg o más. Pero la masa no decide sola — tres condiciones hacen saltar la categoría «pesado» con cualquier peso, y son las tres últimas filas de la tabla. Basta con que se cumpla una.",
+  thCriterion:"Criterio", thThreshold:"Para seguir siendo «ligero»", thOurs:"Klo-01",
+  lc1:"Masa combinada de la carga útil", lc1t:"menos de 4 kg",
+  lc2:"Masa del bulto más pesado", lc2t:"menos de 3 kg",
+  lc3:"Bultos de 2 kg o más con densidad superior a 13 g/cm²", lc3t:"ninguno",
+  lc4:"Fuerza para separar la carga del globo", lc4t:"menos de 230 N", lc4v:"bajo el umbral", lc3v:"1,3 kg · ≈ 3 g/cm²",
+  lClassOut:"Cuatro criterios, cuatro veces dentro. La sonda Klo-01 es un globo <strong>«ligero»</strong>: pesa un tercio del umbral de 4 kg, el bulto es único y muy por debajo de 3 kg, su densidad es cuatro veces menor que el límite, y el cordaje se corta antes de los 230 N. Este último es el criterio menos intuitivo y vale la pena explicarlo: 230 N son unos 23 kilos de fuerza, y un cordaje más resistente haría «pesada» a la sonda aun pesando kilo y medio. El nuestro cede por debajo de ese umbral, y es una decisión de diseño, no una casualidad.",
 
   lDutyHead:"Qué implica",
   lDuty1:"Casi todas las obligaciones operativas del reglamento — dos sistemas independientes para interrumpir el vuelo, el transpondedor de radar, el reflector radar, la notificación al control de tránsito aéreo siete días antes, los informes de posición cada dos horas — corresponden a los globos <em>medianos</em> y <em>pesados</em>. A un globo ligero no se le aplican.",
@@ -357,6 +401,50 @@ es:{
   lDisc2:"<strong>Quien quiera organizar su propio lanzamiento debe dirigirse directamente a la DINACIA</strong> y atenerse al texto vigente del reglamento. No asumimos ninguna responsabilidad por el uso que terceros hagan de la información publicada aquí.",
   lSrc1:"<strong>Norma:</strong> LAR 91 — Reglas de vuelo y operación general, Parte I, Apéndice P «Globos libres no tripulados». Segunda edición, Enmienda 16, febrero 2025 (el texto del Apéndice P corresponde a la Enmienda 11).",
   lSrc2:"<strong>Autoridad:</strong> <a href=\"https://www.dinacia.gub.uy/\" target=\"_blank\" rel=\"noopener\">DINACIA</a> — Dirección Nacional de Aviación Civil e Infraestructura Aeronáutica, Uruguay.",
+
+  /* — Misión: medidas, decisiones, límites — */
+  msKicker:"Qué medimos", msHead:"Once magnitudes, y sus límites",
+  msIntro:"Cada sensor tiene una altura por encima de la cual su dato ya no es defendible. Declararlo antes es lo que distingue una medición de un número. Ésta es la tabla de los límites, no la de las prestaciones.",
+  thVar:"Magnitud", thSens:"Instrumento", thValid:"Dato válido hasta",
+  mv1:"Altura, velocidad, trayectoria", mv1v:"todo el vuelo",
+  mv2:"Presión",
+  mv3:"Temperatura del aire", mv3v:"todo el vuelo",
+  mv4:"Temperaturas internas", mv4v:"todo el vuelo",
+  mv5:"Humedad relativa",
+  mv6:"Dióxido de carbono",
+  mv7:"Material particulado", mv7v:"4–5 km",
+  mv8:"Radiación ionizante", mv8s:"tubo Geiger", mv8v:"todo el vuelo",
+  mv9:"Ultravioleta UV-A", mv9v:"todo el vuelo",
+  mv10:"Actitud y rotación", mv10v:"todo el vuelo",
+  mv11:"Instante del estallido", mv11v:"un solo instante",
+  msAfter:"Algunos límites merecen una palabra. El barómetro llega al fondo de escala en 10 hPa, una centésima de la presión al nivel del suelo: por encima de 31 km la altura la da sólo el GPS. La humedad sale de especificación por debajo de −40 °C, y desde ahí el dato se marca como no válido en vez de descartarlo en silencio. El CO₂ es una medida <strong>troposférica</strong>, no estratosférica. El material particulado aguanta hasta −10 °C, es decir cuatro o cinco kilómetros: lo mantenemos encendido mientras la temperatura lo permita y lo apagamos cuando deja de servir. Subiendo y bajando, la sonda recorre dos veces la misma columna de aire: cada magnitud se convierte en un perfil vertical, y en eso consiste estudiar la atmósfera con un globo.",
+
+  msNotKicker:"Qué no medimos",
+  msNot1:"<strong>El ozono.</strong> Estaba en la primera lista, y se quitó. Los sensores disponibles a este costo están calibrados para aire a nivel del mar; a 5 hPa su respuesta no es interpretable, y no existe una forma practicable de calibrarlos para esas condiciones. Habríamos obtenido números, no mediciones.",
+  msNot2:"El sensor de UV-A también tiene un límite declarado: lee una sola banda, y de una sola banda no se deduce el ozono. Preferimos decirlo aquí antes que dejarlo adivinar en los datos.",
+
+  msCamKicker:"Las imágenes y el hallazgo",
+  msCam1:"La <strong>Space Cam</strong> de StratoFlights va montada en horizontal y graba durante todo el vuelo. La posición está condicionada: hacía falta una vista libre, sin aletas ni sondas en el encuadre, y eso fijó la pared. En consecuencia el sensor de material particulado se pasó a la pared delantera, para no adelgazar dos veces el mismo lado de la caja.",
+  msCam2:"Para encontrarla hay dos aparatos independientes: el <strong>STRATOfinder 4G</strong>, que transmite la posición donde hay cobertura de red, y un <strong>SPOT Trace</strong>, que usa satélites y funciona también donde la red no llega. Ninguno de los dos está conectado al resto de la sonda.",
+
+  msFwKicker:"La placa que programamos",
+  msFw1:"El computador es un <strong>Teensy 4.1</strong>, y el programa que corre en él lo escribimos nosotros: lee los sensores, interroga a cada uno a su propio ritmo y escribe todo en una microSD. Al lado, un segundo registrador completamente separado — <strong>Feather M0 Adalogger</strong>, con su propio GPS, sus propias pilas y su propia memoria — registra altura y trayectoria sin compartir nada con el primero.",
+  msFw2:"Dos detalles del programa valen más que todos los demás. El primero: los receptores GPS civiles dejan de funcionar por encima de 18 km, por una regla internacional nacida para que no sirvieran para guiar misiles. Se puede salir de ese bloqueo declarándole al receptor que va a bordo de una aeronave, pero hay que hacerlo en cada encendido y verificar que el comando fue aceptado. Si nos olvidamos, la sonda deja de decirnos dónde está justo cuando se pone interesante.",
+  msFw3:"El segundo: el archivo hay que cerrarlo y reescribirlo cada pocas muestras. La forma típica de perder los datos de un vuelo no es que la tarjeta se congele — es el archivo que quedó abierto cuando la alimentación se cortó en el impacto.",
+
+  msEngKicker:"Cinco decisiones de diseño",
+  msE1t:"Dos termómetros en vez de uno",
+  msE1:"Sobre la medición de la temperatura del aire hay dos escuelas: elemento desnudo al aire libre, como las radiosondas clásicas, o elemento protegido dentro de un conducto. La primera es más fiel a los cambios rápidos pero recibe el sol; la segunda está protegida pero es más lenta. En vez de elegir una, montamos <strong>las dos</strong> y comparamos las curvas. La diferencia entre ellas mide directamente el error por radiación solar — con datos propios, en vez de con argumentos.",
+  msE2t:"Una curva de 90° para quitar el hielo",
+  msE2:"El conducto del segundo termómetro tiene un codo. No sirve para que escurra el agua: sirve para <strong>separar las gotas</strong>. Al atravesar las nubes, el aire dobla la esquina, pero las gotitas sobreenfriadas tienen demasiada inercia para seguirlo y terminan contra la pared exterior de la curva. Aguas abajo el sensor recibe aire limpio y no se cubre de hielo. Es el mismo principio de los tubos de Pitot de los aviones.",
+  msE3t:"Una ventana de PTFE, no de cuarzo",
+  msE3:"El poliestireno es opaco al ultravioleta: sin una abertura el sensor no leería nada. El cuarzo sería la opción obvia, pero el PTFE hace dos cosas mejor: <strong>difunde</strong> la luz, lo que importa mucho en una sonda que gira sobre sí misma, y conduce unas seis veces menos calor, lo que importa mucho en una caja que debe mantenerse tibia.",
+  msE4t:"Cuatrocientos voltios lejos del computador",
+  msE4:"El tubo Geiger trabaja a unos 400 voltios. Entre su circuito y el pin del computador que cuenta los pulsos pusimos un <strong>optoacoplador</strong>: la señal pasa como luz, no como corriente, y los dos lados quedan eléctricamente separados. Es la protección más importante de toda la sonda y cuesta dos dólares.",
+  msE5t:"El centro de masa sobre el eje",
+  msE5:"Las masas pesadas — el paquete de pilas y la batería externa — van en el estante más bajo, y la posición de cada componente se calculó para que el centro de masa caiga sobre el eje de suspensión. El desvío que queda es de 3 milímetros sobre 780 gramos, que colgados tres metros por debajo del paracaídas dan una inclinación estática de <strong>0,74 grados</strong>. Una sonda que cuelga torcida graba torcido y mide torcido.",
+  msWipTag:"En proceso",
+  msWip:"La lista de componentes <strong>no es definitiva</strong>. El proyecto sigue en curso y cambiará tanto antes de los ensayos en tierra como después, en función de lo que los ensayos muestren. Lo que se lee aquí es el estado actual, no una configuración congelada.",
 },
 
 /* ==========================================================
@@ -366,7 +454,7 @@ en:{
   code:"en", title:"COMETA · Klo-01 Probe — Scuola Italiana di Montevideo",
   metaDesc:"COMETA is a stratospheric balloon programme at the Scuola Italiana di Montevideo: atmospheric measurements up to over 37 km, designed and built by students.",
 
-  navHome:"Home", navMission:"Mission", navPhysics:"The physics", navProbe:"The probe", navWinds:"Wind study", navAbout:"About",
+  navHome:"Home", navMission:"Mission", navPhysics:"The physics", navProbe:"The probe", navWinds:"Wind study", navAbout:"About and contact",
 
   heroEyebrow:"Scuola Italiana di Montevideo · 2EMS · IIIS · 3EMS · IVL · IVS",
   introSub:"Klo-01 probe · a stratospheric balloon to over 37 kilometres.",
@@ -393,7 +481,7 @@ en:{
   ix4t:"How we work", ix4n:"The working groups and how the project is organised",
   ix5t:"Legal aspects", ix5n:"Aviation regulation and what it means for us",
   ix7t:"Frequently asked questions", ix7n:"No, it is not a satellite. And yes, we go and get it back.",
-  ix8t:"Contact", ix8n:"Schools, companies, curious people",
+  ix8t:"About and contact", ix8n:"Come and meet us!",
 
   pKicker:"Flight profile", missionTitle:"Mission",
   missionSub:"What we study and how the probe ascends.",
@@ -462,7 +550,7 @@ en:{
 
   aboutKicker:"About", aboutTitle:"About us", aboutSub:"The people behind COMETA.",
   aboutBody:"We are students of 2EMS, IIIS, 3EMS, IVL and IVS at the Scuola Italiana di Montevideo.",
-  contactHead:"Follow us", contactSub:"Mission updates on Instagram.", igCta:"Follow on Instagram",
+  contactHead:"Follow us", contactSub:"To see what we are making and follow the mission news.", igCta:"Follow on Instagram",
 
   footNav:"Pages", footFollow:"Follow us", footStatus:"Status: in progress", footRights:"Text and images CC BY 4.0",
 
@@ -489,7 +577,7 @@ en:{
   /* — Contact — */
   contactMailHead:"Write to us", contactMailSub:"For information, collaborations, proposals.",
   mailCta:"Send us an email", tiktokCta:"Follow us on TikTok", footContact:"Contact",
-  classesNote:"Five classes from the two systems that coexist in the school, the Italian one and the Uruguayan one: 2EMS, IIIS, 3EMS, IVL and IVS.",
+  classesNote:"Five classes from the two systems that coexist in the school, the Italian one and the Uruguayan one.",
 
   bands:["Ground","Troposphere","Tropopause","Stratosphere"],
   skip:"Skip to content",
@@ -504,13 +592,13 @@ en:{
   lLede:"The reference DINACIA pointed us to is <strong>LAR 91, Part I, Appendix P — Unmanned free balloons</strong>, the Latin American aviation regulation covering unmanned free balloons. It sets out how they are classified, what obligations each category carries, and what may and may not be done.",
 
   lClassHead:"How our probe is classified",
-  lClassIntro:"The regulation distinguishes three categories — <em>light</em>, <em>medium</em> and <em>heavy</em> — using four criteria. Exceeding any one of them puts a balloon in the heavier category, with all the obligations that follow. These are the four criteria and our figures.",
-  thCriterion:"Criterion", thThreshold:"Threshold for «heavy»", thOurs:"Klo-01",
-  lc1:"Combined payload mass", lc1t:"≥ 6 kg",
-  lc2:"Mass of a single package", lc2t:"≥ 3 kg",
-  lc3:"Package density", lc3t:"≥ 2 kg and > 13 g/cm²",
-  lc4:"Force needed to separate the payload", lc4t:"≥ 230 N", lc4v:"below threshold",
-  lClassOut:"Below every threshold, and comfortably so. The Klo-01 probe is therefore a <strong>«light»</strong> balloon. The fourth criterion is the least intuitive and worth explaining: if the cord joining probe and balloon were too strong — 230 N is roughly 23 kilograms of force — the probe would count as heavy even at one and a half kilos. Our cord breaks below that threshold, and that is a design decision, not an accident.",
+  lClassIntro:"There are three categories. <strong>Light</strong>: combined payload under 4 kg. <strong>Medium</strong>: 4 to 6 kg, spread over two or more packages. <strong>Heavy</strong>: 6 kg or more. But mass does not decide on its own — three conditions trigger the «heavy» category at any weight, and they are the last three rows of the table. Meeting any one of them is enough.",
+  thCriterion:"Criterion", thThreshold:"To stay «light»", thOurs:"Klo-01",
+  lc1:"Combined payload mass", lc1t:"under 4 kg",
+  lc2:"Mass of the heaviest package", lc2t:"under 3 kg",
+  lc3:"Packages of 2 kg or more with density above 13 g/cm²", lc3t:"none",
+  lc4:"Force needed to separate payload from balloon", lc4t:"under 230 N", lc4v:"below threshold", lc3v:"1.3 kg · ≈ 3 g/cm²",
+  lClassOut:"Four criteria, inside on all four. The Klo-01 probe is a <strong>«light»</strong> balloon: it weighs a third of the 4 kg threshold, it is a single package well under 3 kg, its density is four times below the limit, and the cord breaks before 230 N. That last one is the least intuitive and worth explaining: 230 N is roughly 23 kilograms of force, and a stronger cord would make the probe «heavy» even at one and a half kilos. Ours gives way below that threshold, and that is a design decision, not an accident.",
 
   lDutyHead:"What it means in practice",
   lDuty1:"Almost every operational obligation in the regulation — two independent flight termination systems, a radar transponder, a radar reflector, notification to air traffic control seven days ahead, position reports every two hours — applies to <em>medium</em> and <em>heavy</em> balloons. A light balloon is exempt.",
@@ -528,5 +616,49 @@ en:{
   lDisc2:"<strong>Anyone planning their own launch must contact DINACIA directly</strong> and follow the regulation as currently in force. We accept no responsibility for any use others make of the information published here.",
   lSrc1:"<strong>Regulation:</strong> LAR 91 — Reglas de vuelo y operación general, Part I, Appendix P «Globos libres no tripulados». Second edition, Amendment 16, February 2025 (the Appendix P text dates from Amendment 11).",
   lSrc2:"<strong>Authority:</strong> <a href=\"https://www.dinacia.gub.uy/\" target=\"_blank\" rel=\"noopener\">DINACIA</a> — Dirección Nacional de Aviación Civil e Infraestructura Aeronáutica, Uruguay.",
+
+  /* — Mission: measurements, decisions, limits — */
+  msKicker:"What we measure", msHead:"Eleven quantities, and their limits",
+  msIntro:"Every sensor has an altitude above which its reading is no longer defensible. Saying so in advance is what separates a measurement from a number. This is the table of limits, not the table of specifications.",
+  thVar:"Quantity", thSens:"Instrument", thValid:"Valid up to",
+  mv1:"Altitude, speed, trajectory", mv1v:"whole flight",
+  mv2:"Pressure",
+  mv3:"Air temperature", mv3v:"whole flight",
+  mv4:"Internal temperatures", mv4v:"whole flight",
+  mv5:"Relative humidity",
+  mv6:"Carbon dioxide",
+  mv7:"Particulate matter", mv7v:"4–5 km",
+  mv8:"Ionising radiation", mv8s:"Geiger tube", mv8v:"whole flight",
+  mv9:"UV-A", mv9v:"whole flight",
+  mv10:"Attitude and rotation", mv10v:"whole flight",
+  mv11:"Moment of burst", mv11v:"a single instant",
+  msAfter:"Some limits deserve a word. The barometer bottoms out at 10 hPa, one hundredth of ground pressure: above 31 km, altitude comes from GPS alone. Humidity falls outside specification below −40 °C, and from there the reading is flagged as invalid rather than quietly discarded. CO₂ is a <strong>tropospheric</strong> measurement, not a stratospheric one. Particulate matter holds to −10 °C, which is four or five kilometres: we keep it running while the temperature allows and switch it off when it stops being useful. Going up and coming down, the probe crosses the same column of air twice: every quantity becomes a vertical profile, and that is what studying the atmosphere with a balloon consists of.",
+
+  msNotKicker:"What we do not measure",
+  msNot1:"<strong>Ozone.</strong> It was on the first list, and it was removed. The sensors available at this price are calibrated for air at sea level; at 5 hPa their response cannot be interpreted, and there is no practical way to calibrate them for those conditions. We would have obtained numbers, not measurements.",
+  msNot2:"The UV-A sensor has a declared limit too: it reads a single band, and ozone cannot be derived from a single band. We would rather say so here than let it be inferred from the data.",
+
+  msCamKicker:"The footage and the recovery",
+  msCam1:"The StratoFlights <strong>Space Cam</strong> is mounted horizontally and films for the whole flight. Its position was constrained: we needed a clear view, with no fins or probes in frame, and that fixed the wall. As a result the particulate sensor moved to the front wall, so as not to thin the same side of the box twice.",
+  msCam2:"Two independent devices are there to find it again: the <strong>STRATOfinder 4G</strong>, which transmits its position wherever there is mobile coverage, and a <strong>SPOT Trace</strong>, which uses satellites and works where the network does not reach. Neither is connected to the rest of the probe.",
+
+  msFwKicker:"The board we program",
+  msFw1:"The computer is a <strong>Teensy 4.1</strong>, and we write the program that runs on it: it reads the sensors, polls each one at its own rate, and writes everything to a microSD card. Alongside it, a completely separate second logger — a <strong>Feather M0 Adalogger</strong> with its own GPS, its own batteries and its own memory — records altitude and trajectory while sharing nothing with the first.",
+  msFw2:"Two details of the program matter more than all the rest. First: civilian GPS receivers stop working above 18 km, because of an international rule created so that they could not guide missiles. That block can be lifted by telling the receiver it is aboard an aircraft, but it must be done at every power-up and the command must be confirmed. If we forget, the probe stops telling us where it is exactly when it becomes interesting.",
+  msFw3:"Second: the file must be closed and rewritten every few samples. The usual way to lose a flight's data is not the card freezing — it is the file left open when power is cut at impact.",
+
+  msEngKicker:"Five design decisions",
+  msE1t:"Two thermometers instead of one",
+  msE1:"There are two schools of thought on measuring air temperature: a bare element in free air, as classic radiosondes use, or a shielded element inside a duct. The first follows rapid changes more faithfully but catches the sun; the second is protected but slower. Rather than choose, we fit <strong>both</strong> and compare the two curves. The difference between them measures the solar heating error directly — with our own data, rather than by argument.",
+  msE2t:"A 90° bend to keep the ice off",
+  msE2:"The duct holding the second thermometer has an elbow. It is not there to drain water: it is there to <strong>separate droplets</strong>. Crossing cloud, the air turns the corner, but supercooled droplets have too much inertia to follow and strike the outer wall of the bend instead. Downstream the sensor receives cleaned air and does not ice up. It is the same principle as an aircraft's pitot tube.",
+  msE3t:"A PTFE window, not quartz",
+  msE3:"Polystyrene is opaque to ultraviolet: without an opening the sensor would read nothing. Quartz would be the obvious choice, but PTFE does two things better: it <strong>diffuses</strong> the light, which matters a great deal on a probe that spins, and it conducts about six times less heat, which matters a great deal in a box that has to stay warm.",
+  msE4t:"Four hundred volts, kept away from the computer",
+  msE4:"The Geiger tube runs at about 400 volts. Between its circuit and the computer pin that counts the pulses we placed an <strong>optoisolator</strong>: the signal crosses as light rather than as current, and the two sides stay electrically separate. It is the single most important protection in the whole probe, and it costs two dollars.",
+  msE5t:"The centre of mass on the axis",
+  msE5:"The heavy masses — battery pack and power bank — sit on the lowest deck, and every component's position was calculated so that the centre of mass falls on the suspension axis. The residual offset is 3 millimetres on 780 grams, which hanging three metres below the parachute gives a static tilt of <strong>0.74 degrees</strong>. A probe that hangs crooked films crooked and measures crooked.",
+  msWipTag:"Work in progress",
+  msWip:"The component list is <strong>not final</strong>. The project is still under way, and it will change both before the ground tests and after them, depending on what those tests show. What you read here is the current state, not a frozen configuration.",
 }
 };

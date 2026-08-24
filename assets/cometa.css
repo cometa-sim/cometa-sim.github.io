@@ -588,10 +588,8 @@ footer{border-top:1px solid var(--line-soft);padding:56px 0 66px;background:rgba
 
 /* Il motto è diventato un hashtag: niente corsivo, che su una
    parola sola e senza spazi risulta storto invece che elegante. */
-.foot-motto{font-style:normal;font-family:var(--mono);font-size:12.5px;
-  letter-spacing:.05em;color:var(--muted);margin-top:8px}
-.intro .motto{font-style:normal;letter-spacing:.01em}
-.motto-big{font-style:normal}
+/* Il motto resta in corsivo, come nel resto del sito. */
+.foot-motto{margin-top:8px}
 
 /* I due marchi nel piede: affiancati e centrati sull'asse
    orizzontale, non impilati. Le altezze sono diverse di proposito
@@ -629,3 +627,24 @@ td.ok{color:var(--ice);font-variant-numeric:tabular-nums}
   background:radial-gradient(circle,rgba(255,255,255,.95),rgba(207,228,245,.5) 34%,transparent 66%)}
 .balloon{transition:opacity .35s ease-out}
 @media(prefers-reduced-motion:reduce){.balloon{transition:none}}
+
+/* Il paracadute e il cordame compaiono e spariscono con una dissolvenza */
+#hChute,#hCord,#pChute,#pCord{transition:opacity .45s var(--ease)}
+@media(prefers-reduced-motion:reduce){#hChute,#hCord,#pChute,#pCord{transition:none}}
+
+/* Il primo riquadro d'avvertenza degli aspetti legali stava
+   addosso al testo che segue */
+#page-legale .note{margin-bottom:34px}
+
+/* Icone social con i colori dei rispettivi marchi, invece
+   che spente come il resto del testo */
+.soc-ig{color:#E1306C}
+.soc-tt{color:#25F4EE}
+.soc-card:hover .soc-ig{color:#F77737}
+.soc-card:hover .soc-tt{color:#FE2C55}
+
+/* Codici dei componenti nella tabella della missione */
+td.mono{font-family:var(--mono);font-size:12.5px;letter-spacing:.01em;color:var(--muted)}
+/* I titoletti delle scelte di progetto */
+.body-col h3{font-family:var(--disp);font-size:19px;font-weight:600;margin:26px 0 8px}
+.body-col h3:first-child{margin-top:0}

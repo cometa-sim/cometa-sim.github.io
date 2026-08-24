@@ -264,7 +264,7 @@ function sfDraw(){
    ========================================================== */
 const flight = $("#flight"), stage = $("#stage"), sky = $("#sky"), arc = $("#arc"),
       balloon = $("#balloon"), env = $("#env"), chainSvg = $("#chain"),
-      intro = $("#intro"), cue = $("#cue"), homeBurst = $("#homeBurst"),
+      intro = $("#intro"), cue = $("#cue"), homeBurst = $("#homeBurst"), hChute = $("#hChute"), hCord = $("#hCord"),
       altSide = $("#altSide"), altN = $("#altN"), altLay = $("#altLay"),
       altFill = $("#altFill"), altMark = $("#altMark");
 
@@ -401,7 +401,10 @@ function updateFlight(){
   ground.style.transform = "translateY(" + (alt*k*0.9) + "px)";
   ground.style.opacity = clamp(1 - alt/3.2, 0, 1);
 
-  env.style.transform = "scale(" + lerp(0.16, 1, inflateT) + ")";
+  /* Come nella sezione della fisica: il riempimento iniziale porta il
+     pallone a dimensione di partenza, poi cresce salendo. */
+  const grow = 1 + 1.18*Math.pow(clamp(alt/BURST_KM, 0, 1), 1.35);
+  env.style.transform = "scale(" + (lerp(0.16, 1, inflateT)*grow).toFixed(3) + ")";
   chainSvg.style.opacity = inflateT;
   const lift = smooth(p, 0.03, 0.16), groundY = innerHeight*0.30;
   const sway = reduced ? 0 : Math.sin(performance.now()/1400)*8*inflateT*(1 - lift*0.4);
@@ -425,7 +428,10 @@ function updateFlight(){
   const scoppiato = alt >= BURST_KM;
   if(scoppiato && !burstDone){ burstDone = true; homeFlash(); }
   if(!scoppiato) burstDone = false;
-  balloon.style.opacity = scoppiato ? "0" : "1";
+  /* Sparisce l'involucro, non la sonda: quella scende col paracadute. */
+  env.style.opacity   = scoppiato ? "0" : "1";
+  if(hChute) hChute.style.opacity = scoppiato ? "1" : "0";
+  if(hCord)  hCord.style.opacity  = scoppiato ? "0" : "1";
 }
 
 const BURST_KM = 37.8;
@@ -566,7 +572,7 @@ const phys      = $("#phys"),      physStage = $("#physStage"),
       physCraft = $("#physCraft"), physBurst = $("#physBurst"),
       physRail  = $("#physRail"),  physCue   = $("#physCue"),
       pAltN = $("#pAltN"), pAltL = $("#pAltL"),
-      pEnv = $("#pEnv"), pChute = $("#pChute"), pRig = $("#pRig"),
+      pEnv = $("#pEnv"), pChute = $("#pChute"), pRig = $("#pRig"), pCord = $("#pCord"),
       physSf = $("#physSf"), physSx = physSf ? physSf.getContext("2d") : null;
 
 const PH_TOP = 37.8;              /* quota di scoppio, dal calcolo del progetto */
@@ -627,6 +633,7 @@ function updatePhys(){
     pEnv.style.opacity = rising ? 1 : 0;
   }
   if(pChute) pChute.style.opacity = rising ? 0 : 1;
+  if(pCord)  pCord.style.opacity = rising ? 1 : 0;
   if(pRig)   pRig.style.opacity = 1;
 
   /* crescendo verso l'alto, il pallone va accompagnato in basso
