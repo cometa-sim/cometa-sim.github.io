@@ -23,7 +23,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@200;300;400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/cometa.css?v=14">
+<link rel="stylesheet" href="assets/cometa.css?v=15">
 </head>
 <body>
 
@@ -49,7 +49,6 @@
     <a data-page="qa" data-i18n="navQA" tabindex="0">Q&amp;A</a>
     <a data-page="about" data-i18n="navAbout" tabindex="0">Chi siamo</a>
   </div>
-  <span class="cbadge" id="cbadge"></span>
   <a class="ig" href="https://instagram.com/cometa.sim" target="_blank" rel="noopener" aria-label="Instagram @cometa.sim">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none"/></svg>
   </a>
@@ -154,7 +153,6 @@
           <div class="ctile"><div class="cn" id="cm">00</div><div class="cl" data-i18n="cMins">Minuti</div></div>
           <div class="ctile"><div class="cn" id="cs">00</div><div class="cl" data-i18n="cSecs">Secondi</div></div>
         </div>
-        <div class="count-date"><span data-i18n="cTentative">Data provvisoria</span> · <b data-i18n="cLate">fine settembre 2026</b></div>
       </div>
 
       <div class="cue" id="cue"><span data-i18n="scrollCue">Scorri per salire</span><span class="a"></span></div>
@@ -172,7 +170,8 @@
     <section class="section">
       <div class="wrap">
         <div class="kicker reveal" data-i18n="afterKicker">Progetto COMETA</div>
-        <h2 class="head reveal d1" data-i18n="afterHead">Dalla pista al bordo dello spazio.</h2>
+        <h2 class="head reveal d1" data-i18n="afterHead">Da terra al bordo dello spazio.</h2>
+        <p class="note-inline reveal d2" data-i18n-html="dateNote"></p>
 
         <div class="stat-wrap reveal d2">
           <i class="bk tl"></i><i class="bk tr"></i><i class="bk bl"></i><i class="bk br"></i>
@@ -197,14 +196,13 @@
       <div class="wrap">
         <div class="kicker reveal" data-i18n="idxKicker">Il sito</div>
         <h2 class="head reveal d1" data-i18n="idxHead">Una sezione alla volta.</h2>
-        <p class="lede reveal d2" data-i18n="idxIntro">Stiamo pubblicando il progetto man mano che il materiale è pronto.</p>
         <ul class="index-list reveal d2">
+          <li><a class="entry" data-page="missione" tabindex="0"><span><span class="et" data-i18n="ix6t">La fisica del volo</span><span class="en" data-i18n="ix6n">Perché sale, perché scoppia</span></span><span class="st on" data-i18n="stOnline">Online</span></a></li>
           <li><a class="entry" data-page="fisica" tabindex="0"><span><span class="et" data-i18n="ix3t">La fisica del volo</span><span class="en" data-i18n="ix3n">Perché sale, perché scoppia</span></span><span class="st on" data-i18n="stOnline">Online</span></a></li>
           <li><a class="entry" data-page="sonda" tabindex="0"><span><span class="et" data-i18n="ix2t">La sonda</span><span class="en" data-i18n="ix2n">Modello tridimensionale</span></span><span class="st on" data-i18n="stOnline">Online</span></a></li>
           <li><a class="entry" data-page="venti" tabindex="0"><span><span class="et" data-i18n="ix1t">Studio dei venti</span><span class="en" data-i18n="ix1n">240 voli simulati</span></span><span class="st on" data-i18n="stOnline">Online</span></a></li>
           <li><a class="entry" data-page="legale" tabindex="0"><span><span class="et" data-i18n="ix5t">Aspetti legali</span><span class="en" data-i18n="ix5n">La normativa aeronautica</span></span><span class="st on" data-i18n="stOnline">Online</span></a></li>
           <li><a class="entry" data-page="qa" tabindex="0"><span><span class="et" data-i18n="ix7t">Domande frequenti</span><span class="en" data-i18n="ix7n">No, non è un satellite.</span></span><span class="st on" data-i18n="stOnline">Online</span></a></li>
-          <li><div class="entry"><span><span class="et" data-i18n="ix4t">Come lavoriamo</span><span class="en" data-i18n="ix4n">I gruppi di lavoro</span></span><span class="st" data-i18n="stSoon">In preparazione</span></div></li>
           <li><a class="entry" data-page="about" tabindex="0"><span><span class="et" data-i18n="ix8t">Contatti</span><span class="en" data-i18n="ix8n">Scuole, aziende, curiosi</span></span><span class="st on" data-i18n="stOnline">Online</span></a></li>
         </ul>
       </div>
@@ -277,6 +275,21 @@
 
   <section class="section tight">
     <div class="wrap">
+      <div class="kicker reveal" data-i18n="prKicker">La sonda</div>
+      <h2 class="head reveal d1" style="font-size:clamp(26px,3.4vw,38px)" data-i18n="prHead">Klo-01</h2>
+      <p class="lede reveal d1" data-i18n-html="prBody"></p>
+      <div class="spec-rows reveal d2" style="margin-top:22px">
+        <div class="spec-row"><span class="k" data-i18n="prS1">Massa</span><span class="v">≈ 1280 g</span></div>
+        <div class="spec-row"><span class="k" data-i18n="prS2">Interno</span><span class="v">160 × 160 × 130 mm</span></div>
+        <div class="spec-row"><span class="k" data-i18n="prS3">Parete</span><span class="v">30 mm EPS</span></div>
+        <div class="spec-row"><span class="k" data-i18n="prS4">Ripiani</span><span class="v">3</span></div>
+      </div>
+      <p class="reveal d3" style="margin-top:18px"><a data-page="sonda" tabindex="0" data-i18n="prLink">Esplora il modello tridimensionale</a></p>
+    </div>
+  </section>
+
+  <section class="section tight">
+    <div class="wrap">
       <div class="kicker reveal" data-i18n="msKicker">Cosa misuriamo</div>
       <h2 class="head reveal d1" data-i18n="msHead">Undici grandezze, e i loro limiti</h2>
       <div class="note reveal d1">
@@ -333,8 +346,8 @@
     <div class="wrap">
       <div class="kicker reveal" data-i18n="msEngKicker">Cinque scelte di progetto</div>
       <div class="body-col reveal d1">
+        <h3 data-i18n="msE0t"></h3><p data-i18n-html="msE0a"></p><p data-i18n-html="msE0b"></p>
         <h3 data-i18n="msE1t"></h3><p data-i18n-html="msE1"></p>
-        <h3 data-i18n="msE2t"></h3><p data-i18n-html="msE2"></p>
         <h3 data-i18n="msE3t"></h3><p data-i18n-html="msE3"></p>
         <h3 data-i18n="msE4t"></h3><p data-i18n-html="msE4"></p>
         <h3 data-i18n="msE5t"></h3><p data-i18n-html="msE5"></p>
@@ -708,7 +721,6 @@
   <div class="wrap page-hero">
     <div class="kicker reveal" data-i18n="qKicker">Fase 1 · Domande</div>
     <h1 class="ttl reveal d1" data-i18n="qaTitle">Domande</h1>
-    <p class="psub reveal d2" data-i18n="qaSub"></p>
   </div>
   <section class="section tight">
     <div class="wrap">
@@ -818,8 +830,8 @@
 
 </div>
 
-<script src="assets/i18n.js?v=14"></script>
-<script src="assets/sonda.js?v=14"></script>
-<script src="assets/app.js?v=14"></script>
+<script src="assets/i18n.js?v=15"></script>
+<script src="assets/sonda.js?v=15"></script>
+<script src="assets/app.js?v=15"></script>
 </body>
 </html>
