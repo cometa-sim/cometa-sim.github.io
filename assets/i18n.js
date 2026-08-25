@@ -16,13 +16,13 @@ window.I18N = {
    ========================================================== */
 it:{
   code:"it", title:"COMETA · Sonda Klo-01 — Scuola Italiana di Montevideo",
-  metaDesc:"COMETA è un programma di palloni stratosferici della Scuola Italiana di Montevideo: misure atmosferiche fino a oltre 37 km di quota, progettate e realizzate dagli studenti.",
+  metaDesc:"COMETA è un programma di palloni stratosferici della Scuola Italiana di Montevideo: misure atmosferiche fino a più di 37 km di quota, progettate e realizzate dagli studenti.",
 
   navHome:"Inizio", navMission:"Missione", navPhysics:"La fisica", navProbe:"La sonda", navWinds:"Studio dei venti", navAbout:"Chi siamo e contatti",
 
   /* — Inizio — */
   heroEyebrow:"Scuola Italiana di Montevideo · 2EMS · IIIS · 3EMS · IVL · IVS",
-  introSub:"Sonda Klo-01 · un pallone stratosferico fino a oltre 37 chilometri di quota.",
+  introSub:"Sonda Klo-01 · un pallone stratosferico fino a più di 37 chilometri di quota.",
   launchBtn:"Simula il decollo", scrollCue:"Scorri per salire",
   countHead:"Lancio tra", cDays:"Giorni", cHours:"Ore", cMins:"Minuti", cSecs:"Secondi",
   cTentative:"Data provvisoria", cLate:"fine settembre 2026", cUnit:"g",
@@ -49,7 +49,7 @@ it:{
   ix8t:"Chi siamo e contatti", ix8n:"Vieni a conoscerci!",
 
   /* — Missione — */
-  pKicker:"Profilo di volo", missionTitle:"Missione",
+  pKicker:"Fase 1 · Profilo di volo", missionTitle:"Missione",
   missionSub:"Cosa studiamo e come sale la sonda.",
   mBody:"Il progetto COMETA invia la sonda Klo-01 fino a circa 37,8 km di quota per studiare la stratosfera attraverso misure dirette, in una regione dell'atmosfera che gli aerei non raggiungono e i satelliti sorvolano. Tre ore di volo, un pallone che si gonfia fino a scoppiare, e una scatola di polistirolo che torna a terra col paracadute.",
 
@@ -85,7 +85,7 @@ it:{
   /* — Studio dei venti — */
   wKicker:"Fase 1 · Studio preliminare", windsTitle:"Dove va a finire la sonda",
   windsSub:"240 traiettorie simulate per scegliere da dove partire.",
-  wLede:"Prima di scegliere il luogo di lancio abbiamo simulato 240 voli da due località diverse, usando i venti realmente previsti nello stesso periodo di quattro anni passati.<br><br>Il risultato è che la sonda deriva verso est di circa 190 km.",
+  wLede:"Prima di scegliere il luogo di lancio abbiamo simulato 240 voli da due località diverse, usando i venti realmente previsti nello stesso periodo di quattro anni passati, dal 2021 al 2024.<br><br>Il risultato è che la sonda deriva verso est di circa 190 km.",
   wTraj:"Traiettorie simulate", wDrift:"Deriva media", wBearing:"Rotta media", wDur:"Durata media", wBearingU:"(est)",
 
   wSimHead:"La simulazione",
@@ -168,7 +168,7 @@ it:{
   lc2:"Massa del collo più pesante", lc2t:"sotto 3 kg",
   lc3:"Colli da 2 kg o più con densità oltre 13 g/cm²", lc3t:"nessuno",
   lc4:"Forza per separare il carico dal pallone", lc4t:"sotto 230 N", lc4v:"sotto soglia", lc3v:"1,3 kg · ≈ 3 g/cm²",
-  lClassOut:"Quattro criteri, quattro volte dentro. La sonda Klo-01 è un pallone <strong>«ligero»</strong>: pesa un terzo della soglia dei 4 kg, il collo è unico e ben sotto i 3 kg, la sua densità è quattro volte inferiore al limite, e il cordame cede prima dei 230 N. Quest'ultimo è il criterio meno intuitivo e vale la pena spiegarlo: 230 N sono circa 23 chili di forza, e un cordame più robusto renderebbe la sonda «pesada» anche pesando un chilo e mezzo. Il nostro cede sotto quella soglia, ed è una scelta di progetto, non un caso.",
+  lClassOut:"Quattro criteri, quattro volte dentro. La sonda Klo-01 è un pallone <strong>«ligero»</strong>: pesa un terzo della soglia dei 4 kg, il collo è unico e ben sotto i 3 kg, la sua densità è quattro volte inferiore al limite, e il cordame cede prima dei 230 N. Quest'ultimo è il criterio meno intuitivo e vale la pena spiegarlo: 230 N sono circa 23 chili di forza, e un cordame più robusto renderebbe la sonda «pesada» anche pesando un chilo e mezzo.",
 
   lDutyHead:"Che cosa comporta",
   lDuty1:"Quasi tutti gli obblighi operativi del regolamento — due sistemi indipendenti per interrompere il volo, il transponder radar, il riflettore radar, le notifiche al controllo del traffico aereo sette giorni prima, i rapporti di posizione ogni due ore — riguardano i palloni <em>mediani</em> e <em>pesados</em>. A un pallone leggero non si applicano.",
@@ -179,7 +179,7 @@ it:{
   lZone1:"C'è una cosa che il regolamento non dice, e che va cercata altrove: attorno agli aeroporti esistono zone in cui non si può lanciare. L'Appendice P disciplina la classificazione dei palloni e gli obblighi che ne derivano; la protezione dello spazio aereo attorno agli aeroporti viene da una fonte diversa. Questa è l'area che la DINACIA ci ha indicato.",
   lZoneAlt:"Mappa dell'area di esclusione attorno a Montevideo indicata dalla DINACIA, con gli aeroporti di Carrasco, Ángel Adami, Laguna del Sauce e Punta del Este.",
   lZoneCap:"Area di esclusione indicata dalla DINACIA. Immagine fornita dall'autorità aeronautica.",
-  lZone2:"È la ragione per cui non lanciamo da Montevideo. I luoghi che stiamo valutando — Durazno e Mercedes — stanno abbondantemente fuori da quest'area, e questo è il primo dei vincoli che hanno guidato lo <a href=\"#\" data-page=\"venti\">studio dei venti</a>.",
+  lZone2:"È la ragione per cui non lanciamo da Montevideo. Il luogo che stiamo valutando — fra Durazno e Mercedes — sta abbondantemente fuori da quest'area, e questo è il primo dei vincoli che hanno guidato lo <a href=\"#\" data-page=\"venti\">studio dei venti</a>.",
 
   lDiscTag:"Avvertenza",
   lDisc1:"Le informazioni di questa pagina sono pubblicate a scopo divulgativo e didattico. Non costituiscono consulenza tecnica o legale, e possono contenere errori o essere superate da modifiche normative successive.",
@@ -222,6 +222,40 @@ it:{
   msE5:"Le masse pesanti — pacco pile e power bank — stanno sul ripiano più basso, e la disposizione di ogni componente è stata calcolata perché il centro di massa cada sull'<strong>asse di sospensione</strong>. Lo scarto residuo è di 3 millimetri, e con il punto di sospensione 25 centimetri più in alto dà un'inclinazione statica di appena 0,74 gradi. Una sonda che pende storta riprende storto e misura storto.",
   msWipTag:"In lavorazione",
   msWip:"La lista dei componenti <strong>non è definitiva</strong>. Il progetto è ancora in corso, e cambierà sia prima delle prove a terra sia dopo.",
+
+  /* — Domande — */
+  navQA:"Q&A", qKicker:"Fase 1 · Domande", qaTitle:"Domande",
+  qaSub:"Quelle che ci hanno fatto più spesso, e quelle a cui era più interessante rispondere.",
+
+  q1t:"Perché si usa l'elio?",
+  q1:"Perché serve un gas meno denso dell'aria, e l'elio lo è di circa sette volte. L'idrogeno lo sarebbe ancora di più — è il gas più leggero che esista — e costa meno, ma è infiammabile, e con degli studenti attorno alla bombola la scelta non è in discussione. L'elio non brucia, non reagisce con niente, e la spinta che perdiamo rispetto all'idrogeno è di pochi punti percentuali.",
+
+  q2t:"Come si sceglie a che velocità deve salire?",
+  q2:"Decidendo quanto elio mettere. Il peso da sollevare è fisso; l'elio in più è spinta in eccesso, e quella eccedenza diventa velocità di salita. Con più elio si sale più in fretta ma si scoppia più in basso, perché il pallone parte già più gonfio e raggiunge prima il suo limite di allungamento. Con meno elio si sale più lentamente e si arriva più in alto, ma si resta in aria più a lungo — e più tempo significa più deriva. Abbiamo scelto <strong>5 m/s</strong> come compromesso.",
+
+  q3t:"A che velocità cade?",
+  q3:"Dipende dalla quota, e molto. Il paracadute frena grazie all'aria che incontra: dove l'aria è duecento volte più rada, frena duecento volte meno. Nei primi minuti dopo lo scoppio la sonda scende molto rapidamente, poi rallenta man mano che entra in aria più densa. Al suolo arriva a circa <strong>4,5 m/s</strong>, la velocità di chi salta da un paio di metri.",
+
+  q4t:"Perché il cielo è azzurro, e più in alto diventa nero?",
+  q4:"L'azzurro non è un colore dell'aria: è luce del Sole deviata dalle molecole. Le molecole deviano molto più il blu del rosso, e quel blu sparso in tutte le direzioni è ciò che vediamo guardando in su. Salendo, le molecole diminuiscono, la luce deviata diminuisce con loro, e il cielo si spegne: a trenta chilometri sopra la testa è rimasto meno dell'1 % dell'aria, e resta il nero dello spazio — con il Sole che continua a splendere accanto, perché non c'è più niente che ne sparpagli la luce.",
+
+  q5t:"Quando finisce l'atmosfera?",
+  q5:"Non finisce. La densità dell'aria cala esponenzialmente con la quota: si dimezza ogni cinque chilometri e mezzo circa, quindi diventa sempre più piccola senza mai annullarsi. Il confine a 100 km che si sente nominare — la linea di Kármán — è una convenzione utile, non un muro. Vale la pena guardarlo dalla nostra parte: dove arriva la sonda l'aria è già oltre duecento volte più rada che al suolo. In termini di quanta atmosfera resta sopra di noi, siamo molto più vicini al vuoto che alla superficie.",
+
+  q6t:"Che quota massima può raggiungere un pallone?",
+  q6:"Il record per un pallone non pilotato è di circa <strong>53 km</strong>, ottenuto in Giappone nel 2013 con una pellicola sottilissima e un carico minimo. Ma quel record è di un tipo di pallone diverso dal nostro. I nostri sono <em>elastici</em>: si gonfiano finché il lattice cede, e il volo finisce lì. Quelli da record sono <em>a volume costante</em>, gonfi solo in parte alla partenza, e si fermano quando l'aria attorno diventa rada quanto il gas che hanno dentro. Ed è questo il limite vero, per tutti: si sale finché c'è aria più densa del gas del pallone. Quando non ce n'è più, non c'è più spinta — e nessuna quantità di elio può cambiarlo.",
+
+  q7t:"Si vede la curvatura della Terra?",
+  q7:"Dipende da cosa si intende. Vedere la Terra <em>intera</em>, come nelle fotografie dallo spazio profondo, no: manca moltissimo, e a 37 km si abbraccia un orizzonte di circa <strong>690 km</strong> di raggio, che è meno di un decimo del pianeta. Vedere l'orizzonte <em>curvo</em>, invece, sì — ma poco. A quella quota l'orizzonte si abbassa di poco più di <strong>6 gradi</strong> sotto la linea dello sguardo, e in un'inquadratura normale l'arco si scosta dalla retta di circa l'1 % della larghezza dell'immagine. Con un obiettivo grandangolare la deformazione ai bordi la accentua parecchio: gran parte della curvatura spettacolare che si vede nei video di palloni stratosferici è dell'obiettivo, non del pianeta.",
+
+  q8t:"Perché dentro la scatola fa più caldo, se pressione e aria sono le stesse di fuori?",
+  q8:"Perché la scatola non è sigillata — pressione e composizione dentro seguono quelle esterne — ma è <em>coibentata</em>, e soprattutto contiene apparecchi accesi. Ogni componente elettronico dissipa calore, e in una scatola di polistirolo quel calore fatica a uscire. In più, salendo, l'aria si dirada e il raffreddamento per convezione — quello che porta via calore mescolando aria — diventa sempre meno efficace: in alto la scatola perde calore quasi soltanto per irraggiamento, che è molto più lento. Il risultato è che l'interno resta decine di gradi sopra l'esterno, e non è un caso: è la ragione per cui la sonda funziona ancora a −60 °C.",
+
+  wModHead:"Come sono calcolati salita e discesa",
+  wMod1:"<strong>Quanto elio.</strong> La spinta verso l'alto dipende solo dal volume del pallone: più grande è, più aria sposta. Il peso da sollevare invece è fissato — sonda, involucro, paracadute, cordame. Mettendo esattamente l'elio che pareggia il peso, il pallone resterebbe fermo a mezz'aria; tutto quello che si aggiunge oltre diventa velocità di salita. Per salire a 5 m/s con il nostro carico servono circa 4,5 m³.",
+  wMod2:"<strong>Fin dove sale.</strong> Salendo, la pressione esterna cala e il pallone si dilata: a 37 km il suo volume è più di duecento volte quello di partenza, e il diametro passa da due metri a più di dodici. Il lattice ha però un allungamento massimo, e lo scoppio avviene dove quel limite viene raggiunto. Da qui la conseguenza che sorprende: <strong>meno elio significa scoppio più alto</strong>, perché il pallone parte più piccolo e ha più strada da fare prima di arrivare al suo limite.",
+  wMod3:"<strong>Quanto resta in aria — e perché conta qui.</strong> La deriva è, in sostanza, velocità del vento moltiplicata per il tempo passato dentro di esso. Rallentare la salita per guadagnare quota allunga il volo, e quindi allunga la deriva: passare da 5 a 4 m/s aggiungerebbe circa ottocento metri di quota e trentacinque minuti di volo, con un aumento della deriva dell'ordine del 15-20 %. È il compromesso che questa mappa serve a valutare.",
+  wMod4:"<strong>Come cade.</strong> Il paracadute frena in proporzione alla densità dell'aria che incontra. In alto, dove l'aria è duecento volte più rada, frena pochissimo e la discesa è rapida; scendendo l'aria si infittisce e la sonda rallenta progressivamente. Con il nostro paracadute da 1,2 m di diametro l'arrivo al suolo è a circa 4,5 m/s. La discesa dura poco meno di un'ora e non dipende da quanto elio si è messo, mentre la salita sì: per questo tutto il compromesso si gioca sulla salita.",
 },
 
 /* ==========================================================
@@ -260,7 +294,7 @@ es:{
   ix7t:"Preguntas frecuentes", ix7n:"No, no es un satélite. Y sí, la vamos a buscar.",
   ix8t:"Quiénes somos y contacto", ix8n:"¡Vení a conocernos!",
 
-  pKicker:"Perfil de vuelo", missionTitle:"Misión",
+  pKicker:"Fase 1 · Perfil de vuelo", missionTitle:"Misión",
   missionSub:"Qué estudiamos y cómo asciende la sonda.",
   mBody:"El proyecto COMETA envía la sonda Klo-01 hasta unos 37,8 km de altura para estudiar la estratósfera mediante mediciones directas, en una región de la atmósfera que los aviones no alcanzan y los satélites sobrevuelan. Tres horas de vuelo, un globo que se infla hasta reventar, y una caja de poliestireno que vuelve al suelo en paracaídas.",
 
@@ -294,7 +328,7 @@ es:{
 
   wKicker:"Fase 1 · Estudio preliminar", windsTitle:"Dónde va a caer la sonda",
   windsSub:"240 trayectorias simuladas para elegir desde dónde partir.",
-  wLede:"Antes de elegir el lugar de lanzamiento simulamos 240 vuelos desde dos localidades distintas, usando los vientos realmente previstos en el mismo período de cuatro años pasados.<br><br>El resultado es que la sonda deriva hacia el este unos 190 km.",
+  wLede:"Antes de elegir el lugar de lanzamiento simulamos 240 vuelos desde dos localidades distintas, usando los vientos realmente previstos en el mismo período de cuatro años pasados, de 2021 a 2024.<br><br>El resultado es que la sonda deriva hacia el este unos 190 km.",
   wTraj:"Trayectorias simuladas", wDrift:"Deriva media", wBearing:"Rumbo medio", wDur:"Duración media", wBearingU:"(este)",
 
   wSimHead:"La simulación",
@@ -375,7 +409,7 @@ es:{
   lc2:"Masa del bulto más pesado", lc2t:"menos de 3 kg",
   lc3:"Bultos de 2 kg o más con densidad superior a 13 g/cm²", lc3t:"ninguno",
   lc4:"Fuerza para separar la carga del globo", lc4t:"menos de 230 N", lc4v:"bajo el umbral", lc3v:"1,3 kg · ≈ 3 g/cm²",
-  lClassOut:"Cuatro criterios, cuatro veces dentro. La sonda Klo-01 es un globo <strong>«ligero»</strong>: pesa un tercio del umbral de 4 kg, el bulto es único y muy por debajo de 3 kg, su densidad es cuatro veces menor que el límite, y el cordaje se corta antes de los 230 N. Este último es el criterio menos intuitivo y vale la pena explicarlo: 230 N son unos 23 kilos de fuerza, y un cordaje más resistente haría «pesada» a la sonda aun pesando kilo y medio. El nuestro cede por debajo de ese umbral, y es una decisión de diseño, no una casualidad.",
+  lClassOut:"Cuatro criterios, cuatro veces dentro. La sonda Klo-01 es un globo <strong>«ligero»</strong>: pesa un tercio del umbral de 4 kg, el bulto es único y muy por debajo de 3 kg, su densidad es cuatro veces menor que el límite, y el cordaje se corta antes de los 230 N. Este último es el criterio menos intuitivo y vale la pena explicarlo: 230 N son unos 23 kilos de fuerza, y un cordaje más resistente haría «pesada» a la sonda aun pesando kilo y medio.",
 
   lDutyHead:"Qué implica",
   lDuty1:"Casi todas las obligaciones operativas del reglamento — dos sistemas independientes para interrumpir el vuelo, el transpondedor de radar, el reflector radar, la notificación al control de tránsito aéreo siete días antes, los informes de posición cada dos horas — corresponden a los globos <em>medianos</em> y <em>pesados</em>. A un globo ligero no se le aplican.",
@@ -386,7 +420,7 @@ es:{
   lZone1:"Hay algo que el reglamento no dice y que hay que buscar en otro lado: alrededor de los aeropuertos existen zonas donde no se puede lanzar. El Apéndice P regula la clasificación de los globos y las obligaciones que se derivan de ella; la protección del espacio aéreo alrededor de los aeropuertos viene de otra fuente. Esta es el área que nos indicó la DINACIA.",
   lZoneAlt:"Mapa del área de exclusión alrededor de Montevideo indicada por la DINACIA, con los aeropuertos de Carrasco, Ángel Adami, Laguna del Sauce y Punta del Este.",
   lZoneCap:"Área de exclusión indicada por la DINACIA. Imagen proporcionada por la autoridad aeronáutica.",
-  lZone2:"Es la razón por la que no lanzamos desde Montevideo. Los lugares que estamos evaluando — Durazno y Mercedes — quedan holgadamente fuera de esta área, y ésta es la primera de las restricciones que guiaron el estudio de los vientos.",
+  lZone2:"Es la razón por la que no lanzamos desde Montevideo. El lugar que estamos evaluando — entre Durazno y Mercedes — queda holgadamente fuera de esta área, y ésta es la primera de las restricciones que guiaron el estudio de los vientos.",
 
   lDiscTag:"Advertencia",
   lDisc1:"La información de esta página se publica con fines divulgativos y educativos. No constituye asesoramiento técnico ni legal, y puede contener errores o quedar superada por modificaciones normativas posteriores.",
@@ -429,6 +463,40 @@ es:{
   msE5:"Las masas pesadas — el paquete de pilas y la batería externa — van en el estante más bajo, y la posición de cada componente se calculó para que el centro de masa caiga sobre el <strong>eje de suspensión</strong>. El desvío que queda es de 3 milímetros, y con el punto de suspensión 25 centímetros más arriba da una inclinación estática de apenas 0,74 grados. Una sonda que cuelga torcida graba torcido y mide torcido.",
   msWipTag:"En proceso",
   msWip:"La lista de componentes <strong>no es definitiva</strong>. El proyecto sigue en curso y cambiará tanto antes de los ensayos en tierra como después.",
+
+  /* — Preguntas — */
+  navQA:"Q&A", qKicker:"Fase 1 · Preguntas", qaTitle:"Preguntas",
+  qaSub:"Las que más nos hicieron, y aquellas a las que fue más interesante responder.",
+
+  q1t:"¿Por qué se usa helio?",
+  q1:"Porque hace falta un gas menos denso que el aire, y el helio lo es unas siete veces. El hidrógeno lo sería aún más — es el gas más liviano que existe — y cuesta menos, pero es inflamable, y con estudiantes alrededor del tubo la elección no se discute. El helio no arde, no reacciona con nada, y el empuje que perdemos frente al hidrógeno es de pocos puntos porcentuales.",
+
+  q2t:"¿Cómo se elige a qué velocidad tiene que subir?",
+  q2:"Decidiendo cuánto helio poner. El peso a levantar es fijo; el helio de más es empuje sobrante, y ese sobrante se convierte en velocidad de ascenso. Con más helio se sube más rápido pero se estalla más abajo, porque el globo sale ya más inflado y alcanza antes su límite de estiramiento. Con menos helio se sube más lento y se llega más alto, pero se está más tiempo en el aire — y más tiempo significa más deriva. Elegimos <strong>5 m/s</strong> como compromiso.",
+
+  q3t:"¿A qué velocidad cae?",
+  q3:"Depende de la altura, y mucho. El paracaídas frena gracias al aire que encuentra: donde el aire es doscientas veces más tenue, frena doscientas veces menos. En los primeros minutos tras el estallido la sonda baja muy rápido, y después va frenando a medida que entra en aire más denso. Al suelo llega a unos <strong>4,5 m/s</strong>, la velocidad de quien salta desde un par de metros.",
+
+  q4t:"¿Por qué el cielo es azul, y más arriba se vuelve negro?",
+  q4:"El azul no es un color del aire: es luz del Sol desviada por las moléculas. Las moléculas desvían mucho más el azul que el rojo, y ese azul repartido en todas las direcciones es lo que vemos al mirar hacia arriba. Al subir, las moléculas disminuyen, la luz desviada disminuye con ellas, y el cielo se apaga: a treinta kilómetros queda por encima menos del 1 % del aire, y aparece el negro del espacio — con el Sol brillando al lado, porque ya no hay nada que disperse su luz.",
+
+  q5t:"¿Dónde termina la atmósfera?",
+  q5:"No termina. La densidad del aire cae exponencialmente con la altura: se reduce a la mitad cada cinco kilómetros y medio, así que se hace cada vez más pequeña sin anularse nunca. El límite de 100 km que se suele nombrar — la línea de Kármán — es una convención útil, no una pared. Vale mirarlo desde nuestro lado: donde llega la sonda el aire ya es más de doscientas veces más tenue que en el suelo. En términos de cuánta atmósfera queda por encima, estamos mucho más cerca del vacío que de la superficie.",
+
+  q6t:"¿Qué altura máxima puede alcanzar un globo?",
+  q6:"El récord para un globo no tripulado es de unos <strong>53 km</strong>, logrado en Japón en 2013 con una película finísima y una carga mínima. Pero ese récord es de un tipo de globo distinto al nuestro. Los nuestros son <em>elásticos</em>: se inflan hasta que el látex cede, y ahí termina el vuelo. Los de récord son de <em>volumen constante</em>, inflados sólo en parte al partir, y se detienen cuando el aire alrededor se vuelve tan tenue como el gas que llevan dentro. Y ése es el límite verdadero, para todos: se sube mientras haya aire más denso que el gas del globo. Cuando ya no lo hay, no hay empuje — y ninguna cantidad de helio puede cambiarlo.",
+
+  q7t:"¿Se ve la curvatura de la Tierra?",
+  q7:"Depende de qué se entienda. Ver la Tierra <em>entera</em>, como en las fotografías desde el espacio profundo, no: falta muchísimo, y a 37 km se abarca un horizonte de unos <strong>690 km</strong> de radio, menos de una décima parte del planeta. Ver el horizonte <em>curvo</em>, en cambio, sí — pero poco. A esa altura el horizonte baja algo más de <strong>6 grados</strong> por debajo de la línea de la mirada, y en un encuadre normal el arco se separa de la recta alrededor del 1 % del ancho de la imagen. Con un objetivo gran angular la deformación de los bordes lo acentúa bastante: buena parte de la curvatura espectacular que se ve en los videos de globos estratosféricos es del objetivo, no del planeta.",
+
+  q8t:"¿Por qué dentro de la caja hace más calor, si la presión y el aire son los mismos que fuera?",
+  q8:"Porque la caja no está sellada — presión y composición adentro siguen a las de afuera — pero está <em>aislada</em>, y sobre todo contiene aparatos encendidos. Cada componente electrónico disipa calor, y en una caja de poliestireno ese calor cuesta que salga. Además, al subir, el aire se enrarece y el enfriamiento por convección — el que se lleva el calor mezclando aire — se vuelve cada vez menos eficaz: arriba la caja pierde calor casi sólo por radiación, que es mucho más lenta. El resultado es que el interior se mantiene decenas de grados por encima del exterior, y no es casualidad: es la razón por la que la sonda sigue funcionando a −60 °C.",
+
+  wModHead:"Cómo se calculan el ascenso y el descenso",
+  wMod1:"<strong>Cuánto helio.</strong> El empuje hacia arriba depende sólo del volumen del globo: cuanto más grande, más aire desplaza. El peso a levantar, en cambio, es fijo — sonda, envoltura, paracaídas, cordaje. Poniendo exactamente el helio que iguala al peso, el globo quedaría quieto en el aire; todo lo que se agregue por encima se convierte en velocidad de ascenso. Para subir a 5 m/s con nuestra carga hacen falta unos 4,5 m³.",
+  wMod2:"<strong>Hasta dónde sube.</strong> Al subir, la presión exterior baja y el globo se dilata: a 37 km su volumen es más de doscientas veces el de partida, y el diámetro pasa de dos metros a más de doce. Pero el látex tiene un estiramiento máximo, y el estallido ocurre donde se alcanza ese límite. De ahí la consecuencia que sorprende: <strong>menos helio significa estallido más alto</strong>, porque el globo sale más pequeño y tiene más camino por recorrer antes de llegar a su límite.",
+  wMod3:"<strong>Cuánto tiempo está en el aire — y por qué importa aquí.</strong> La deriva es, en esencia, velocidad del viento multiplicada por el tiempo que se pasa dentro de él. Frenar el ascenso para ganar altura alarga el vuelo, y por lo tanto alarga la deriva: pasar de 5 a 4 m/s agregaría unos ochocientos metros de altura y treinta y cinco minutos de vuelo, con un aumento de la deriva del orden del 15-20 %. Es el compromiso que este mapa sirve para evaluar.",
+  wMod4:"<strong>Cómo cae.</strong> El paracaídas frena en proporción a la densidad del aire que encuentra. Arriba, donde el aire es doscientas veces más tenue, frena poquísimo y el descenso es rápido; al bajar el aire se hace más denso y la sonda frena progresivamente. Con nuestro paracaídas de 1,2 m de diámetro la llegada al suelo es a unos 4,5 m/s. El descenso dura poco menos de una hora y no depende de cuánto helio se puso, mientras que el ascenso sí: por eso todo el compromiso se juega en el ascenso.",
 },
 
 /* ==========================================================
@@ -467,7 +535,7 @@ en:{
   ix7t:"Frequently asked questions", ix7n:"No, it is not a satellite. And yes, we go and get it back.",
   ix8t:"About and contact", ix8n:"Come and meet us!",
 
-  pKicker:"Flight profile", missionTitle:"Mission",
+  pKicker:"Phase 1 · Flight profile", missionTitle:"Mission",
   missionSub:"What we study and how the probe ascends.",
   mBody:"Project COMETA sends the Klo-01 probe to about 37.8 km to study the stratosphere through direct measurements, in a region of the atmosphere that aircraft cannot reach and satellites fly over. Three hours of flight, a balloon that inflates until it bursts, and a polystyrene box that comes back down on a parachute.",
 
@@ -501,7 +569,7 @@ en:{
 
   wKicker:"Phase 1 · Preliminary study", windsTitle:"Where the probe ends up",
   windsSub:"240 simulated trajectories to choose the launch site.",
-  wLede:"Before choosing a launch site we simulated 240 flights from two different towns, using the winds actually forecast over the same period in four past years.<br><br>The result is that the probe drifts about 190 km east.",
+  wLede:"Before choosing a launch site we simulated 240 flights from two different towns, using the winds actually forecast over the same period in four past years, from 2021 to 2024.<br><br>The result is that the probe drifts about 190 km east.",
   wTraj:"Simulated trajectories", wDrift:"Mean drift", wBearing:"Mean bearing", wDur:"Mean duration", wBearingU:"(east)",
 
   wSimHead:"The simulation",
@@ -582,7 +650,7 @@ en:{
   lc2:"Mass of the heaviest package", lc2t:"under 3 kg",
   lc3:"Packages of 2 kg or more with density above 13 g/cm²", lc3t:"none",
   lc4:"Force needed to separate payload from balloon", lc4t:"under 230 N", lc4v:"below threshold", lc3v:"1.3 kg · ≈ 3 g/cm²",
-  lClassOut:"Four criteria, inside on all four. The Klo-01 probe is a <strong>«light»</strong> balloon: it weighs a third of the 4 kg threshold, it is a single package well under 3 kg, its density is four times below the limit, and the cord breaks before 230 N. That last one is the least intuitive and worth explaining: 230 N is roughly 23 kilograms of force, and a stronger cord would make the probe «heavy» even at one and a half kilos. Ours gives way below that threshold, and that is a design decision, not an accident.",
+  lClassOut:"Four criteria, inside on all four. The Klo-01 probe is a <strong>«light»</strong> balloon: it weighs a third of the 4 kg threshold, it is a single package well under 3 kg, its density is four times below the limit, and the cord breaks before 230 N. That last one is the least intuitive and worth explaining: 230 N is roughly 23 kilograms of force, and a stronger cord would make the probe «heavy» even at one and a half kilos.",
 
   lDutyHead:"What it means in practice",
   lDuty1:"Almost every operational obligation in the regulation — two independent flight termination systems, a radar transponder, a radar reflector, notification to air traffic control seven days ahead, position reports every two hours — applies to <em>medium</em> and <em>heavy</em> balloons. A light balloon is exempt.",
@@ -593,7 +661,7 @@ en:{
   lZone1:"There is something the regulation does not cover, and that has to be looked up elsewhere: around airports there are areas where launching is not permitted. Appendix P governs balloon classification and the obligations that follow from it; protection of the airspace around airports comes from a different source. This is the area DINACIA indicated to us.",
   lZoneAlt:"Map of the exclusion area around Montevideo indicated by DINACIA, showing Carrasco, Ángel Adami, Laguna del Sauce and Punta del Este airports.",
   lZoneCap:"Exclusion area as indicated by DINACIA. Image supplied by the aviation authority.",
-  lZone2:"It is the reason we are not launching from Montevideo. The sites we are considering — Durazno and Mercedes — lie well outside this area, and this was the first of the constraints that shaped the wind study.",
+  lZone2:"It is the reason we are not launching from Montevideo. The area we are considering — between Durazno and Mercedes — lies well outside this zone, and this was the first of the constraints that shaped the wind study.",
 
   lDiscTag:"Disclaimer",
   lDisc1:"The information on this page is published for educational purposes. It is not technical or legal advice, and it may contain errors or be superseded by later amendments to the regulation.",
@@ -636,5 +704,39 @@ en:{
   msE5:"The heavy masses — battery pack and power bank — sit on the lowest deck, and every component's position was calculated so that the centre of mass falls on the <strong>suspension axis</strong>. The residual offset is 3 millimetres, and with the suspension point 25 centimetres higher it gives a static tilt of just 0.74 degrees. A probe that hangs crooked films crooked and measures crooked.",
   msWipTag:"Work in progress",
   msWip:"The component list is <strong>not final</strong>. The project is still under way, and it will change both before the ground tests and after them.",
+
+  /* — Questions — */
+  navQA:"Q&A", qKicker:"Phase 1 · Questions", qaTitle:"Questions",
+  qaSub:"The ones we are asked most often, and the ones that were most interesting to answer.",
+
+  q1t:"Why helium?",
+  q1:"Because you need a gas less dense than air, and helium is about seven times less dense. Hydrogen would be even better — it is the lightest gas there is — and it costs less, but it is flammable, and with students around the cylinder that settles the question. Helium does not burn, reacts with nothing, and the lift we give up compared with hydrogen is a few per cent.",
+
+  q2t:"How do you choose the ascent rate?",
+  q2:"By deciding how much helium to put in. The weight to be lifted is fixed; extra helium is surplus lift, and that surplus becomes ascent speed. More helium means climbing faster but bursting lower, because the balloon leaves the ground already fuller and reaches its stretching limit sooner. Less helium means climbing more slowly and reaching higher, but staying airborne longer — and longer means more drift. We chose <strong>5 m/s</strong> as the compromise.",
+
+  q3t:"How fast does it fall?",
+  q3:"It depends on altitude, a great deal. A parachute brakes thanks to the air it meets: where the air is two hundred times thinner, it brakes two hundred times less. In the first minutes after the burst the probe drops very fast, then slows as it enters denser air. It reaches the ground at about <strong>4.5 m/s</strong>, the speed of someone jumping off a couple of metres.",
+
+  q4t:"Why is the sky blue, and black higher up?",
+  q4:"Blue is not a colour of the air: it is sunlight deflected by molecules. Molecules deflect blue far more than red, and that blue scattered in every direction is what we see looking up. As you climb, there are fewer molecules, less light is deflected, and the sky fades: at thirty kilometres less than 1 % of the air is left above you, and what remains is the black of space — with the Sun still shining beside it, because there is nothing left to spread its light around.",
+
+  q5t:"Where does the atmosphere end?",
+  q5:"It does not. Air density falls exponentially with height: it halves roughly every five and a half kilometres, so it grows ever smaller without ever reaching zero. The 100 km boundary people mention — the Kármán line — is a useful convention, not a wall. It is worth looking at it from our side: where the probe arrives, the air is already more than two hundred times thinner than at ground level. In terms of how much atmosphere is left above us, we are far closer to vacuum than to the surface.",
+
+  q6t:"What is the highest a balloon can go?",
+  q6:"The record for an unmanned balloon is about <strong>53 km</strong>, set in Japan in 2013 with an extremely thin film and a minimal payload. But that record belongs to a different kind of balloon from ours. Ours are <em>elastic</em>: they inflate until the latex gives way, and the flight ends there. Record balloons are <em>constant volume</em>, only partly inflated at launch, and they stop when the air around them becomes as thin as the gas they carry. And that is the real limit, for everyone: you rise as long as there is air denser than the balloon's gas. When there is none, there is no lift — and no amount of helium can change that.",
+
+  q7t:"Can you see the Earth's curvature?",
+  q7:"It depends what you mean. Seeing the <em>whole</em> Earth, as in photographs from deep space, no: it is nowhere near enough, and at 37 km you take in a horizon about <strong>690 km</strong> in radius, less than a tenth of the planet. Seeing the horizon <em>curved</em>, yes — but only slightly. At that height the horizon drops a little over <strong>6 degrees</strong> below eye level, and in a normal frame the arc departs from a straight line by about 1 % of the image width. A wide-angle lens exaggerates it considerably through edge distortion: much of the spectacular curvature in stratospheric balloon videos belongs to the lens, not to the planet.",
+
+  q8t:"Why is it warmer inside the box, if pressure and air are the same as outside?",
+  q8:"Because the box is not sealed — pressure and composition inside follow the outside — but it is <em>insulated</em>, and above all it holds equipment that is switched on. Every electronic component dissipates heat, and in a polystyrene box that heat struggles to escape. On top of that, as it climbs the air thins and convective cooling — the kind that carries heat away by stirring air — becomes steadily less effective: high up, the box loses heat almost only by radiation, which is far slower. The result is an interior tens of degrees above the outside, and that is not an accident: it is why the probe still works at −60 °C.",
+
+  wModHead:"How ascent and descent are calculated",
+  wMod1:"<strong>How much helium.</strong> Upward lift depends only on the balloon's volume: the bigger it is, the more air it displaces. The weight to be lifted, on the other hand, is fixed — probe, envelope, parachute, cords. Put in exactly the helium that matches the weight and the balloon would hang motionless; everything added beyond that becomes ascent speed. To climb at 5 m/s with our payload takes about 4.5 m³.",
+  wMod2:"<strong>How high it goes.</strong> As it climbs, outside pressure falls and the balloon expands: at 37 km its volume is more than two hundred times what it was, and its diameter goes from two metres to over twelve. But latex has a maximum stretch, and the burst happens where that limit is reached. Hence the consequence that surprises people: <strong>less helium means a higher burst</strong>, because the balloon starts smaller and has further to go before reaching its limit.",
+  wMod3:"<strong>How long it stays up — and why that matters here.</strong> Drift is, in essence, wind speed multiplied by the time spent in it. Slowing the ascent to gain altitude lengthens the flight, and therefore lengthens the drift: going from 5 to 4 m/s would add some eight hundred metres of altitude and thirty-five minutes of flight, increasing drift by something like 15-20 %. That is the trade-off this map exists to weigh.",
+  wMod4:"<strong>How it falls.</strong> A parachute brakes in proportion to the density of the air it meets. High up, where the air is two hundred times thinner, it brakes very little and the descent is fast; lower down the air thickens and the probe slows progressively. With our 1.2 m parachute it reaches the ground at about 4.5 m/s. The descent takes a little under an hour and does not depend on how much helium was used, whereas the ascent does: that is why the whole trade-off is played out on the way up.",
 }
 };

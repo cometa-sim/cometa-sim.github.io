@@ -128,6 +128,7 @@ const pages = {
   sonda:    $("#page-sonda"),
   venti:    $("#page-venti"),
   legale:   $("#page-legale"),
+  qa:       $("#page-qa"),
   about:    $("#page-about")
 };
 
