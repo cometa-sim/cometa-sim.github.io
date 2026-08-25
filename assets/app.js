@@ -617,9 +617,13 @@ function updatePhys(){
   const alt = physAlt(p), rising = p <= PH_BURST;
 
   const c = skyAt(alt);
-  physStage.style.background = "linear-gradient(180deg," + c[0] + " 0%," + c[0] + " 6%," + c[1] + " 74%," + c[1] + " 100%)";
-  /* stesso colore al contenitore: il bordo della scena sparisce */
-  if(physWrap) physWrap.style.setProperty("--sky-top", c[0]);
+  /* Lo stesso gradiente su scena e contenitore. Sul contenitore e'
+     ancorato alla finestra (background-attachment:fixed) e alto
+     esattamente una schermata, quindi i due lati del bordo hanno lo
+     stesso colore in ogni punto, a qualunque quota e a qualunque ora. */
+  const cielo = "linear-gradient(180deg," + c[0] + " 0%," + c[0] + " 6%," + c[1] + " 74%," + c[1] + " 100%)";
+  physStage.style.background = cielo;
+  if(physWrap) physWrap.style.backgroundImage = cielo;
   if(physSf) physSf.style.opacity = Math.max(nightMix*0.85, smooth(alt, 18, 30));
 
   const g = $("#physGround");
