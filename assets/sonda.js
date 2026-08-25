@@ -584,6 +584,28 @@ function loop(){
 const totMass = PARTS.reduce((s,p) => s + p.g, 0);
 const totArea = PARTS.filter(p => EXT_IDS.indexOf(p.id) < 0).reduce((s,p) => s + p.w*p.d, 0)/100;
 
+/* Esporta il fotogramma corrente come PNG a fondo trasparente, a
+   risoluzione moltiplicata. Serve per riusare il modello nelle altre
+   pagine e nel materiale stampa senza catturare lo schermo. */
+function esportaPNG(scala){
+  if(!renderer || !scene || !cam) return;
+  scala = scala || 3;
+  const c = renderer.domElement, w = c.clientWidth, h = c.clientHeight;
+  const pr = renderer.getPixelRatio();
+  renderer.setPixelRatio(scala);
+  renderer.setSize(w, h, false);
+  cam.aspect = w / h; cam.updateProjectionMatrix();
+  renderer.render(scene, cam);
+  const url = c.toDataURL("image/png");
+  renderer.setPixelRatio(pr);
+  renderer.setSize(w, h, false);
+  cam.updateProjectionMatrix();
+  renderer.render(scene, cam);
+  const a = document.createElement("a");
+  a.href = url; a.download = "sonda-klo01.png"; a.click();
+}
+window.esportaPNG = esportaPNG;
+
 function renderDecks(){
   const box = el("decks"); if(!box) return;
   box.innerHTML = DECKS.map(d => {
