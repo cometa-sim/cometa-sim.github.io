@@ -159,11 +159,19 @@ function go(id){
   else showPage(id);
 }
 addEventListener("hashchange", function(){ showPage(location.hash.slice(1) || "home"); });
-$$("[data-page]").forEach(function(el){
-  el.addEventListener("click", function(e){ e.preventDefault(); go(el.dataset.page); });
-  el.addEventListener("keydown", function(e){
-    if(e.key === "Enter" || e.key === " "){ e.preventDefault(); go(el.dataset.page); }
-  });
+/* Delega sull'intero documento: i collegamenti dentro i testi
+   tradotti nascono dopo il caricamento, quando i18n riscrive il
+   contenuto, quindi legarli uno per uno all'avvio non basta. */
+document.addEventListener("click", function(e){
+  const el = e.target.closest("[data-page]");
+  if(!el) return;
+  e.preventDefault(); go(el.dataset.page);
+});
+document.addEventListener("keydown", function(e){
+  if(e.key !== "Enter" && e.key !== " ") return;
+  const el = e.target.closest && e.target.closest("[data-page]");
+  if(!el) return;
+  e.preventDefault(); go(el.dataset.page);
 });
 
 /* ---------- Menu per schermi stretti ---------- */
