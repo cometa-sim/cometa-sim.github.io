@@ -665,10 +665,10 @@ td.mono{font-family:var(--mono);font-size:12.5px;letter-spacing:.01em;color:var(
 
 
 /* Collegamenti dentro il testo: evidenziati, non sottolineati */
-.body-col a,.lede a{color:var(--cyan);text-decoration:none;
+.body-col a,.lede a,.note a,.psub a{color:var(--cyan);text-decoration:none;
   background:rgba(95,227,255,.10);border-radius:5px;padding:1px 5px;
   transition:background .25s var(--ease),color .25s}
-.body-col a:hover,.lede a:hover{background:rgba(95,227,255,.20);color:#fff}
+.body-col a:hover,.lede a:hover,.note a:hover,.psub a:hover{background:rgba(95,227,255,.20);color:#fff}
 
 /* Distacco fra tabella e testo che segue */
 .table-wrap{margin:22px 0 32px}
