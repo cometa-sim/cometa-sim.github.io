@@ -569,7 +569,7 @@ function darkenMap(){
    La fisica del volo — la stessa salita, ma a tappe
    ========================================================== */
 const phys      = $("#phys"),      physStage = $("#physStage"),
-      physCraft = $("#physCraft"), physBurst = $("#physBurst"), physWrap = $("#phys"),
+      physCraft = $("#physCraft"), physBurst = $("#physBurst"),
       physRail  = $("#physRail"),  physCue   = $("#physCue"),
       pAltN = $("#pAltN"), pAltL = $("#pAltL"),
       pEnv = $("#pEnv"), pChute = $("#pChute"), pRig = $("#pRig"), pCord = $("#pCord"),
@@ -617,13 +617,7 @@ function updatePhys(){
   const alt = physAlt(p), rising = p <= PH_BURST;
 
   const c = skyAt(alt);
-  /* Lo stesso gradiente su scena e contenitore. Sul contenitore e'
-     ancorato alla finestra (background-attachment:fixed) e alto
-     esattamente una schermata, quindi i due lati del bordo hanno lo
-     stesso colore in ogni punto, a qualunque quota e a qualunque ora. */
-  const cielo = "linear-gradient(180deg," + c[0] + " 0%," + c[0] + " 6%," + c[1] + " 74%," + c[1] + " 100%)";
-  physStage.style.background = cielo;
-  if(physWrap) physWrap.style.backgroundImage = cielo;
+  physStage.style.background = "linear-gradient(180deg," + c[0] + " 0%," + c[0] + " 6%," + c[1] + " 74%," + c[1] + " 100%)";
   if(physSf) physSf.style.opacity = Math.max(nightMix*0.85, smooth(alt, 18, 30));
 
   const g = $("#physGround");

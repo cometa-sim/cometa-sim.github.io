@@ -206,7 +206,13 @@ h3.sub-head{font-family:var(--disp);font-weight:600;font-size:clamp(19px,2.4vw,2
 #sky{position:absolute;inset:0;background:linear-gradient(180deg,#7db4e0,#cfe6f5)}
 #sf{position:absolute;inset:0;opacity:0;pointer-events:none}
 #arc{position:absolute;left:50%;bottom:-34vh;width:200vw;height:60vh;transform:translateX(-50%);pointer-events:none;opacity:0;
-  background:radial-gradient(ellipse at center top,rgba(90,170,235,.5),rgba(60,120,200,.15) 45%,transparent 65%);mix-blend-mode:screen}
+  background:radial-gradient(ellipse at center top,rgba(90,170,235,.5),rgba(60,120,200,.15) 45%,transparent 65%);mix-blend-mode:screen;
+  /* La sfumatura ha il massimo di luce proprio sul bordo superiore
+     dell'elemento: senza maschera quel bordo si vede come una riga
+     netta, tanto piu' evidente quanto piu' l'arco diventa opaco
+     salendo. La maschera lo porta a zero e lo fa sparire. */
+  -webkit-mask-image:linear-gradient(180deg,rgba(0,0,0,0) 0,rgba(0,0,0,.35) 14%,#000 38%);
+  mask-image:linear-gradient(180deg,rgba(0,0,0,0) 0,rgba(0,0,0,.35) 14%,#000 38%)}
 .layer{position:absolute;inset:0;pointer-events:none;will-change:transform,opacity}
 .layer > *{position:absolute}
 #ground{bottom:0;height:34vh;top:auto;background:linear-gradient(180deg,rgba(40,58,44,0) 0%,#2f4a34 22%,#233a29 60%,#1a2c1f 100%)}
@@ -290,11 +296,7 @@ h3.sub-head{font-family:var(--disp);font-weight:600;font-size:clamp(19px,2.4vw,2
 .arrived .sub{font-family:var(--mono);font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-top:14px}
 .confetti{position:absolute;width:9px;height:9px;border-radius:2px;top:0;pointer-events:none}
 
-.home-after{position:relative;z-index:2;
-  /* Il primo tratto e' trasparente: il cielo della scena traspare e
-     sfuma nel fondo, invece di essere tagliato da una riga netta.
-     Vale a qualunque ora, perche' cio' che traspare e' il cielo vero. */
-  background:linear-gradient(180deg,rgba(2,6,15,0) 0,rgba(2,6,15,.55) 9vh,#02060f 20vh,#041226 45%,#02060f)}
+.home-after{position:relative;z-index:2;background:linear-gradient(180deg,#02060f,#041226 40%,#02060f)}
 .teasers{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:30px}
 @media(max-width:980px){.teasers{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:560px){.teasers{grid-template-columns:1fr}}
@@ -661,19 +663,6 @@ td.mono{font-family:var(--mono);font-size:12.5px;letter-spacing:.01em;color:var(
 .table-wrap{margin-bottom:30px}
 .table-wrap + .body-col{margin-top:6px}
 
-/* ------------------------------------------------------------
-   Il bordo superiore della scena
-   Finche' la sezione non e' agganciata in cima, il bordo del
-   riquadro del cielo attraversa lo schermo e si vede come una
-   riga netta. La cura non e' sfumare il riquadro: e' dare al
-   contenitore lo stesso colore del cielo, aggiornato dal
-   codice a ogni fotogramma. Cosi' i due lati coincidono a
-   qualunque quota e a qualunque ora.
-   ------------------------------------------------------------ */
-.phys{background-color:var(--space);background-attachment:fixed;
-  background-size:100% 100vh;background-repeat:no-repeat}
-.phys::before{content:"";position:absolute;top:0;left:0;right:0;height:14vh;z-index:1;
-  pointer-events:none;background:linear-gradient(180deg,var(--space),rgba(1,3,8,0))}
 
 /* Collegamenti dentro il testo: evidenziati, non sottolineati */
 .body-col a,.lede a{color:var(--cyan);text-decoration:none;
