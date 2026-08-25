@@ -673,3 +673,10 @@ td.mono{font-family:var(--mono);font-size:12.5px;letter-spacing:.01em;color:var(
 /* Distacco fra tabella e testo che segue */
 .table-wrap{margin:22px 0 32px}
 .table-wrap + .body-col{margin-top:4px}
+
+/* La sonda che gira su se stessa, nel riquadro della Missione */
+.probe-spin{margin:26px 0 22px;display:flex;justify-content:center;perspective:900px}
+.probe-spin svg{width:min(260px,60vw);height:auto;overflow:visible}
+.probe-spin .spin-in{transform-origin:120px 106px;animation:probeSpin 14s linear infinite}
+@keyframes probeSpin{from{transform:rotateY(0deg)}to{transform:rotateY(360deg)}}
+@media(prefers-reduced-motion:reduce){.probe-spin .spin-in{animation:none}}
