@@ -44,7 +44,7 @@ it:{
   ix3t:"La fisica del volo", ix3n:"Perché sale, perché scoppia, perché fa così freddo",
   ix4t:"Come lavoriamo", ix4n:"I gruppi di lavoro e l'organizzazione del progetto",
   ix5t:"Aspetti legali", ix5n:"La normativa aeronautica e cosa comporta per noi",
-  ix7t:"Domande (non così) frequenti", ix7n:"No, non è un satellite. E sì, lo andiamo a recuperare.",
+  ix7t:"Domande (non così) frequenti", ix7n:"La sonda va nello spazio? Scopriamolo.",
   ix8t:"Chi siamo e contatti", ix8n:"Vieni a conoscerci!",
 
   /* — Missione — */
@@ -66,7 +66,7 @@ it:{
   burstLbl:"Quota di scoppio prevista · Pallone 2000",
 
   /* — La sonda — */
-  probeKicker:"Fase 1 · 2026", probeTitle:"Dentro la sonda Klo-01",
+  probeKicker:"Fase 1 · Modello 3D", probeTitle:"Dentro la sonda Klo-01",
   modeBench:"Banco", modeFlight:"Volo",
   benchNote:"Trascina per ruotare · rotella o due dita per ingrandire",
   flightNote:"Sonda chiusa, con ali di stabilizzazione, braccetto esterno e tubo di confronto.",
@@ -114,7 +114,7 @@ it:{
   wDate:"giugno 2026",
 
   /* — Chi siamo — */
-  aboutKicker:"Chi siamo", aboutTitle:"Chi siamo", aboutSub:"Le persone dietro COMETA.",
+  aboutKicker:"Fase 1 · Chi siamo", aboutTitle:"Chi siamo", aboutSub:"Le persone dietro COMETA.",
   aboutBody:"Siamo studentesse e studenti di 2EMS, IIIS, 3EMS, IVL e IVS della Scuola Italiana di Montevideo.",
   contactHead:"Seguici", contactSub:"Per vedere i nostri contenuti e scoprire le novità sulla missione.", igCta:"Seguici su Instagram",
 
@@ -128,7 +128,7 @@ it:{
   ph1t:"A terra — la spinta di Archimede",
   ph1p:"Il pallone viene spinto in alto dall'aria che ha intorno. L'elio è circa <strong>sette volte meno denso</strong> dell'aria, e questa differenza deve sollevare tutto il resto: il payload, il pallone stesso, il paracadute, il cordame. Più elio si mette dentro, più rapidamente il pallone sale.",
   ph2t:"Troposfera, 0–11 km — fa sempre più freddo",
-  ph2p:"Salendo, l'aria si dirada e la temperatura scende di circa <strong>6,5 °C ogni chilometro</strong>: a undici chilometri siamo a −56 °C.",
+  ph2p:"Salendo, l'aria si dirada e la temperatura scende di circa <strong>6,5 °C ogni chilometro</strong>: a undici chilometri siamo a −56 °C. Il freddo non viene dalla lontananza dal Sole, che è del tutto trascurabile: viene dal fatto che l'aria è scaldata da sotto, dal suolo, e che salendo si espande. Un gas che si espande si raffredda, ed è la stessa ragione per cui una bomboletta spray diventa fredda mentre la si usa.",
   ph3t:"Tropopausa, 11–18 km — il punto più freddo",
   ph3p:"La discesa della temperatura si ferma: la tropopausa è il minimo, <strong>fino a −60 °C</strong> all'esterno. A 18 km il GPS principale smette di inviarci segnali: la sonda «si perde».",
   ph4t:"Stratosfera, sopra i 18 km — l'aria finisce",
@@ -221,7 +221,7 @@ it:{
   /* — Domande — */
   navQA:"Q&A", qKicker:"Fase 1 · Domande", qaTitle:"Domande (non così) frequenti",
   q1t:"La sonda va nello spazio?",
-  q1:"Non c'è un'altezza precisa in cui finisce l'atmosfera e comincia lo spazio. La densità dell'aria cala esponenzialmente con la quota: si dimezza ogni cinque chilometri e mezzo circa, quindi diventa sempre più piccola senza mai annullarsi. Il confine a 100 km che si sente nominare — la linea di Kármán — è una convenzione utile, non un muro. Dove arriva la sonda l'aria è già oltre duecento volte più rada che al suolo: in termini di quanta atmosfera resta sopra di noi, siamo molto più vicini allo spazio che alla superficie.",
+  q1:"Non c'è un'altezza precisa in cui finisce l'atmosfera e comincia lo spazio. La densità dell'aria cala esponenzialmente con la quota: si dimezza ogni cinque chilometri e mezzo circa, quindi diventa sempre più piccola senza mai annullarsi. Il confine a 100 km che si sente nominare — la linea di Kármán — è una convenzione utile, non un limite preciso come lo è invece la superficie di un liquido. Dove arriva la sonda l'aria è già oltre duecento volte più rada che al suolo: in termini di quanta atmosfera resta sopra di noi, siamo molto più vicini allo spazio che alla superficie.",
 
   q2t:"Si vede la curvatura della Terra?",
   q2:"Dipende da cosa si intende. Vedere la Terra <em>intera</em>, come nelle fotografie dallo spazio profondo, no: manca moltissimo, e a 37 km si abbraccia un orizzonte di circa <strong>690 km</strong> di raggio, che è meno di un decimo del pianeta. Vedere l'orizzonte <em>curvo</em>, invece, sì — ma poco. A quella quota l'orizzonte si abbassa di poco più di <strong>6 gradi</strong> sotto la linea dello sguardo, e in un'inquadratura normale l'arco si scosta dalla retta di circa l'1 % della larghezza dell'immagine. Con un obiettivo grandangolare la deformazione ai bordi la accentua parecchio: gran parte della curvatura spettacolare che si vede nei video di palloni stratosferici è dell'obiettivo, non del pianeta.",
@@ -230,16 +230,16 @@ it:{
   q3:"Il record per un pallone non pilotato è di circa <strong>53 km</strong>, ottenuto in Giappone nel 2013 con una pellicola sottilissima e un carico minimo. Ma quel record è di un tipo di pallone diverso dal nostro. I nostri sono <em>elastici</em>: si gonfiano finché il lattice cede, e il volo finisce lì. Quelli da record sono <em>a volume costante</em>, gonfi solo in parte alla partenza, e si fermano quando l'aria attorno diventa rada quanto il gas che hanno dentro. Ed è questo il limite vero, per tutti: si sale finché c'è aria più densa del gas del pallone. Quando non ce n'è più, non c'è più spinta — e nessuna quantità di elio può cambiarlo.",
 
   q4t:"Perché il cielo è azzurro, e più in alto diventa nero?",
-  q4:"L'azzurro non è un colore dell'aria: è luce del Sole deviata dalle molecole. Le molecole deviano molto più il blu del rosso, e quel blu sparso in tutte le direzioni è ciò che vediamo guardando in su. Salendo, le molecole diminuiscono, la luce deviata diminuisce con loro, e il cielo si spegne: a trenta chilometri sopra la testa è rimasto meno dell'1 % dell'aria, e resta il nero dello spazio — con il Sole che continua a splendere accanto, perché non c'è più niente che ne disperda la luce.",
+  q4:"La luce è un'onda elettromagnetica, e la sua frequenza di oscillazione corrisponde al colore: il viola ha la frequenza più alta, poi vengono blu, verde, giallo e rosso. Il processo che devia la luce del Sole nell'atmosfera — la <em>diffusione di Rayleigh</em> — favorisce decisamente le frequenze alte, cioè il blu, ed è quel blu sparso in tutte le direzioni che vediamo guardando in su. Allora perché non viola? Perché nella luce del Sole il viola è meno presente, e i nostri occhi lo percepiscono molto meno. Salendo di quota le molecole diminuiscono, la luce deviata diminuisce con loro, e il cielo si spegne: a trenta chilometri sopra la testa è rimasto meno dell'1 % dell'aria, e resta il nero dello spazio — con il Sole che continua a splendere accanto, perché non c'è più niente che ne disperda la luce.",
 
   q5t:"Perché si usa l'elio?",
-  q5:"I gas meno densi dell'aria sono l'elio e l'idrogeno: l'elio lo è di circa sette volte, l'idrogeno — il gas più leggero che esista — circa quattordici. L'idrogeno costa meno e si può produrre, mentre l'elio è una risorsa limitata. Tuttavia l'idrogeno è infiammabile — si pensi al disastro dell'Hindenburg — mentre l'elio è un gas inerte e sicuro.",
+  q5:"L'elio e l'idrogeno sono molto più leggeri dell'aria: l'idrogeno — il gas più leggero che esista — circa quattordici volte, l'elio circa sette. Quello che conta per la spinta è la densità, cioè quanto pesa un certo volume di gas rispetto allo stesso volume d'aria; e all'origine c'è la massa delle singole molecole, molto minore di quella dell'azoto che compone gran parte dell'aria. L'idrogeno costa meno e si può produrre, mentre l'elio è una risorsa limitata. Ma l'idrogeno è infiammabile — si pensi al disastro dell'Hindenburg — e l'elio invece è un gas inerte e sicuro. Dell'elio esistono poi diversi gradi di purezza: più è puro, più è leggero, e a parità di spinta si ottiene una quota di scoppio più alta.",
 
   q6t:"Come si sceglie a che velocità deve salire?",
   q6:"Decidendo quanto elio mettere. Il peso da sollevare è fisso; l'elio in più è spinta in eccesso, e quella eccedenza diventa velocità di salita. Con più elio si sale più in fretta ma si scoppia più in basso, perché il pallone parte già più gonfio e raggiunge prima il suo limite di allungamento. Con meno elio si sale più lentamente e si arriva più in alto, ma si resta in aria più a lungo — e più tempo significa più deriva. La velocità di salita tiene conto di questo compromesso.",
 
   q7t:"A che velocità cade?",
-  q7:"Dipende dalla quota e dalla massa del payload. Il paracadute frena grazie all'aria che incontra: dove l'aria è duecento volte più rada, frena duecento volte meno, quindi nei primi minuti dopo lo scoppio la sonda scende molto rapidamente e poi rallenta man mano che entra in aria più densa. A parità di paracadute, una sonda più pesante arriva più veloce. Con la nostra massa e un paracadute da 1,2 m, al suolo si arriva a circa <strong>4,5 m/s</strong>: la velocità di chi salta da un paio di metri.",
+  q7:"Dipende dalla quota e dalla massa del payload. Il paracadute frena grazie all'aria che incontra: dove l'aria è duecento volte più rada, frena duecento volte meno, quindi nei primi minuti dopo lo scoppio la sonda scende molto rapidamente e poi rallenta man mano che entra in aria più densa. A parità di paracadute, una sonda più pesante arriva più veloce: la forza di gravità cresce con la massa, mentre la frenata del paracadute no — dipende solo dalla sua superficie e dalla velocità — quindi per pareggiarle serve una velocità maggiore. Con la nostra massa e un paracadute da 1,2 m si tocca terra a circa <strong>4,5 m/s</strong>: la velocità di chi salta da un paio di metri. In generale la discesa è comunque più rapida della salita; nel nostro caso durerà circa la metà.",
 
   q8t:"La scatola è isolata rispetto all'esterno?",
   q8:"La scatola non è sigillata: pressione e composizione dentro seguono quelle esterne, altrimenti la differenza di pressione la deformerebbe e la romperebbe. È però <em>coibentata</em>, e soprattutto contiene apparecchi accesi. Ogni componente elettronico dissipa calore, e in una scatola di polistirolo quel calore fatica a uscire. In più, salendo, l'aria si dirada e il raffreddamento per convezione diventa sempre meno efficace: in pratica il movimento d'aria è sufficiente a riequilibrare la pressione, ma insufficiente a trasportare energia. In alto la scatola perde calore quasi soltanto per irraggiamento, che è molto più lento. Il risultato è che l'interno resta decine di gradi sopra l'esterno, e non è un caso: è la ragione per cui la sonda funziona ancora a −60 °C.",
@@ -267,15 +267,21 @@ it:{
   paS3:"Durata della discesa",
   sfNote:"Essendo la nostra prima esperienza, per pallone, paracadute e catena di volo utilizziamo il materiale di <a href=\"https://stratoflights.com/\" target=\"_blank\" rel=\"noopener\">StratoFlights</a>, azienda tedesca di grande esperienza nel settore. La sonda e i suoi strumenti invece li progettiamo e li costruiamo noi.",
   q9t:"Si possono vedere il video e i dati in diretta?",
-  q9:"No. La sonda non può trasmettere quelle informazioni: restano tutte a bordo, sulle memorie. È per questo che recuperarla è fondamentale, ed è per questo che abbiamo messo due tracciatori indipendenti. L'unica informazione che ci arriva davvero durante il volo è la posizione — e comunque solo sotto i 18 km.",
+  q9:"No. La sonda non può trasmettere quelle informazioni: restano tutte a bordo, sulle memorie. È per questo che recuperarla è fondamentale, ed è per questo che abbiamo messo due tracciatori indipendenti. L'unica informazione che ci arriva durante il volo è la posizione, e solo sotto i 18 km: oltre quella quota i ricevitori GPS civili smettono di funzionare, per un limite di sicurezza imposto ai dispositivi allo scopo di impedirne l'uso militare. Vale anche il contrario: neanche noi possiamo comunicare con la sonda, in nessun modo.",
   q10t:"Quali sono i rischi principali?",
   q10a:"In ordine di gravità, non di probabilità.",
-  q10b:"<strong>Il paracadute non si apre.</strong> È la cosa peggiore che possa succedere, ed è la ragione per cui abbiamo scelto di usare materiale StratoFlights per tutto ciò che riguarda il volo.",
-  q10c:"<strong>La sonda si perde.</strong> Niente sonda, niente video, niente dati. La previsione della traiettoria e i due tracciatori indipendenti riducono questo rischio quasi a zero.",
-  q10d:"<strong>Qualcosa non funziona nella scheda, nei sensori o nei collegamenti.</strong> Per questo abbiamo separato il sistema in tre livelli indipendenti: prima il ritrovamento, poi il filmato, poi tutto il resto. I test prima del lancio saranno decisivi per ridurre al minimo gli imprevisti.",
+  q10b:"<em>Il paracadute non si apre.</em> È la cosa peggiore che possa succedere, ed è la ragione per cui abbiamo scelto di usare materiale StratoFlights per tutto ciò che riguarda il volo.",
+  q10c:"<em>La sonda si perde.</em> Niente sonda, niente video, niente dati. La previsione della traiettoria e i due tracciatori indipendenti riducono questo rischio quasi a zero.",
+  q10d:"<em>Qualcosa non funziona nella scheda, nei sensori o nei collegamenti.</em> Per questo abbiamo separato il sistema in tre livelli indipendenti: prima il ritrovamento, poi il filmato, poi tutto il resto. I test prima del lancio saranno decisivi per ridurre al minimo gli imprevisti.",
   hwKicker:"Come funziona",
   hw1:"La <a data-page=\"sonda\" tabindex=\"0\">sonda</a> è una scatola in polistirolo che ospita la videocamera, i sensori per i dati scientifici e tutta l'elettronica. Per portarla nella stratosfera è necessario un pallone in lattice riempito di elio. Allo scoppio del pallone si apre il paracadute per il rientro.",
   mailRole:"Carlo De Toni · docente coordinatore del progetto",
+  q11t:"Il pallone diventa enorme: non è un pericolo per gli aerei?",
+  q11:"Il luogo esatto del lancio sarà scelto in modo che decollo, volo e atterraggio si svolgano lontano dalla zona proibita al traffico aereo, e la posizione della sonda sarà comunicata in tempo reale alle autorità. Quando smetteremo di avere dati sulla posizione, la sonda sarà già a una quota dove non c'è traffico aereo di nessun tipo — e nemmeno satelliti. Infine, e con le precauzioni precedenti non dovrebbe servire, la corda che usiamo ha un punto di rottura calcolato: in caso di collisione il pallone si separa dal paracadute e dalla sonda.",
+  q12t:"Si può riutilizzare?",
+  q12a:"Se la recuperiamo, si riutilizza tutto tranne tre cose: il pallone, che scoppia frantumandosi; l'elio, che si disperde nell'alta atmosfera; e le pile al litio, che sono usa e getta, ma sono le uniche che garantiscono affidabilità e prestazioni a quelle temperature. La scatola resta modellata su questo esperimento, quindi si riusa nella stessa configurazione. Tutto il resto è riutilizzabile al cento per cento, e non solo per palloni stratosferici.",
+  q12b:"Il pallone è l'unica parte che si disperde nell'ambiente. È fatto prevalentemente di lattice, un materiale di origine naturale che si degrada nel tempo — non è un materiale innocuo, ma è il meno problematico fra quelli disponibili per questo impiego.",
+  qMore:"Hai altre domande o curiosità? <a data-page=\"about\" tabindex=\"0\">Scrivici</a>.",
 },
 
 /* ==========================================================
@@ -310,7 +316,7 @@ es:{
   ix3t:"La física del vuelo", ix3n:"Por qué sube, por qué revienta, por qué hace tanto frío",
   ix4t:"Cómo trabajamos", ix4n:"Los grupos de trabajo y la organización del proyecto",
   ix5t:"Aspectos legales", ix5n:"La normativa aeronáutica y qué implica para nosotros",
-  ix7t:"Preguntas (no tan) frecuentes", ix7n:"No, no es un satélite. Y sí, la vamos a buscar.",
+  ix7t:"Preguntas (no tan) frecuentes", ix7n:"¿La sonda va al espacio? Averigüémoslo.",
   ix8t:"Quiénes somos y contacto", ix8n:"¡Vení a conocernos!",
 
   pKicker:"Fase 1 · Perfil de vuelo", missionTitle:"Misión",
@@ -330,7 +336,7 @@ es:{
 
   burstLbl:"Altura de reventado prevista · Globo 2000",
 
-  probeKicker:"Fase 1 · 2026", probeTitle:"Dentro de la sonda Klo-01",
+  probeKicker:"Fase 1 · Modelo 3D", probeTitle:"Dentro de la sonda Klo-01",
   modeBench:"Banco", modeFlight:"Vuelo",
   benchNote:"Arrastrá para rotar · rueda o dos dedos para ampliar",
   flightNote:"Sonda cerrada, con aletas de estabilización, brazo exterior y tubo de comparación.",
@@ -376,7 +382,7 @@ es:{
   srcUpdated:"<strong>Simulación realizada en:</strong> {date}",
   wDate:"junio de 2026",
 
-  aboutKicker:"Nosotros", aboutTitle:"Nosotros", aboutSub:"Las personas detrás de COMETA.",
+  aboutKicker:"Fase 1 · Quiénes somos", aboutTitle:"Nosotros", aboutSub:"Las personas detrás de COMETA.",
   aboutBody:"Somos estudiantes de 2EMS, IIIS, 3EMS, IVL y IVS de la Scuola Italiana di Montevideo.",
   contactHead:"Seguinos", contactSub:"Para ver nuestros contenidos y descubrir las novedades de la misión.", igCta:"Seguinos en Instagram",
 
@@ -389,7 +395,7 @@ es:{
   ph1t:"En tierra — el empuje de Arquímedes",
   ph1p:"El globo es empujado hacia arriba por el aire que lo rodea. El helio es unas <strong>siete veces menos denso</strong> que el aire, y esa diferencia tiene que levantar todo lo demás: la carga útil, el propio globo, el paracaídas, el cordaje. Cuanto más helio se pone, más rápido sube el globo.",
   ph2t:"Troposfera, 0–11 km — cada vez más frío",
-  ph2p:"Al subir, el aire se enrarece y la temperatura baja unos <strong>6,5 °C por kilómetro</strong>: a once kilómetros estamos a −56 °C.",
+  ph2p:"Al subir, el aire se enrarece y la temperatura baja unos <strong>6,5 °C por kilómetro</strong>: a once kilómetros estamos a −56 °C. El frío no viene de estar más lejos del Sol, lo cual es del todo despreciable: viene de que el aire se calienta desde abajo, desde el suelo, y de que al subir se expande. Un gas que se expande se enfría, y es la misma razón por la que un aerosol se pone frío mientras se usa.",
   ph3t:"Tropopausa, 11–18 km — el punto más frío",
   ph3p:"La caída de la temperatura se detiene: la tropopausa es el mínimo, <strong>hasta −60 °C</strong> en el exterior. A 18 km el GPS principal deja de enviarnos señal: la sonda «se pierde».",
   ph4t:"Estratosfera, por encima de 18 km — el aire se acaba",
@@ -482,19 +488,19 @@ es:{
   /* — Preguntas — */
   navQA:"Q&A", qKicker:"Fase 1 · Preguntas", qaTitle:"Preguntas (no tan) frecuentes",
   q5t:"¿Por qué se usa helio?",
-  q5:"Los gases menos densos que el aire son el helio y el hidrógeno: el helio lo es unas siete veces, el hidrógeno — el gas más liviano que existe — unas catorce. El hidrógeno cuesta menos y se puede producir, mientras que el helio es un recurso limitado. Sin embargo el hidrógeno es inflamable — piénsese en el desastre del Hindenburg — mientras que el helio es un gas inerte y seguro.",
+  q5:"El helio y el hidrógeno son mucho más livianos que el aire: el hidrógeno — el gas más liviano que existe — unas catorce veces, el helio unas siete. Lo que cuenta para el empuje es la densidad, es decir cuánto pesa cierto volumen de gas frente al mismo volumen de aire; y en el origen está la masa de cada molécula, mucho menor que la del nitrógeno que compone gran parte del aire. El hidrógeno cuesta menos y se puede producir, mientras que el helio es un recurso limitado. Pero el hidrógeno es inflamable — piénsese en el desastre del Hindenburg — y el helio, en cambio, es un gas inerte y seguro. Del helio existen además distintos grados de pureza: cuanto más puro, más liviano, y a igual empuje se obtiene una altura de estallido mayor.",
 
   q6t:"¿Cómo se elige a qué velocidad tiene que subir?",
   q6:"Decidiendo cuánto helio poner. El peso a levantar es fijo; el helio de más es empuje sobrante, y ese sobrante se convierte en velocidad de ascenso. Con más helio se sube más rápido pero se estalla más abajo, porque el globo sale ya más inflado y alcanza antes su límite de estiramiento. Con menos helio se sube más lento y se llega más alto, pero se está más tiempo en el aire — y más tiempo significa más deriva. La velocidad de ascenso tiene en cuenta este compromiso.",
 
   q7t:"¿A qué velocidad cae?",
-  q7:"Depende de la altura y de la masa de la carga útil. El paracaídas frena gracias al aire que encuentra: donde el aire es doscientas veces más tenue, frena doscientas veces menos, así que en los primeros minutos tras el estallido la sonda baja muy rápido y después va frenando a medida que entra en aire más denso. Con el mismo paracaídas, una sonda más pesada llega más rápido. Con nuestra masa y un paracaídas de 1,2 m, al suelo se llega a unos <strong>4,5 m/s</strong>: la velocidad de quien salta desde un par de metros.",
+  q7:"Depende de la altura y de la masa de la carga útil. El paracaídas frena gracias al aire que encuentra: donde el aire es doscientas veces más tenue, frena doscientas veces menos, así que en los primeros minutos tras el estallido la sonda baja muy rápido y después va frenando a medida que entra en aire más denso. Con el mismo paracaídas, una sonda más pesada llega más rápido: la fuerza de gravedad crece con la masa, mientras que el frenado del paracaídas no — depende sólo de su superficie y de la velocidad — así que para igualarlas hace falta más velocidad. Con nuestra masa y un paracaídas de 1,2 m se toca el suelo a unos <strong>4,5 m/s</strong>: la velocidad de quien salta desde un par de metros. En general el descenso es de todos modos más rápido que el ascenso; en nuestro caso durará aproximadamente la mitad.",
 
   q4t:"¿Por qué el cielo es azul, y más arriba se vuelve negro?",
-  q4:"El azul no es un color del aire: es luz del Sol desviada por las moléculas. Las moléculas desvían mucho más el azul que el rojo, y ese azul repartido en todas las direcciones es lo que vemos al mirar hacia arriba. Al subir, las moléculas disminuyen, la luz desviada disminuye con ellas, y el cielo se apaga: a treinta kilómetros queda por encima menos del 1 % del aire, y aparece el negro del espacio — con el Sol brillando al lado, porque ya no hay nada que disperse su luz.",
+  q4:"La luz es una onda electromagnética, y su frecuencia de oscilación corresponde al color: el violeta tiene la frecuencia más alta, después vienen el azul, el verde, el amarillo y el rojo. El proceso que desvía la luz del Sol en la atmósfera — la <em>dispersión de Rayleigh</em> — favorece decididamente las frecuencias altas, es decir el azul, y ese azul repartido en todas las direcciones es lo que vemos al mirar hacia arriba. ¿Y por qué no violeta? Porque en la luz del Sol el violeta está menos presente, y nuestros ojos lo perciben mucho menos. Al subir, las moléculas disminuyen, la luz desviada disminuye con ellas, y el cielo se apaga: a treinta kilómetros queda por encima menos del 1 % del aire, y aparece el negro del espacio — con el Sol brillando al lado, porque ya no hay nada que disperse su luz.",
 
   q1t:"¿La sonda va al espacio?",
-  q1:"No hay una altura precisa donde termina la atmósfera y empieza el espacio. La densidad del aire cae exponencialmente con la altura: se reduce a la mitad cada cinco kilómetros y medio, así que se hace cada vez más pequeña sin anularse nunca. El límite de 100 km que se suele nombrar — la línea de Kármán — es una convención útil, no una pared. Donde llega la sonda el aire ya es más de doscientas veces más tenue que en el suelo: en términos de cuánta atmósfera queda por encima, estamos mucho más cerca del espacio que de la superficie.",
+  q1:"No hay una altura precisa donde termina la atmósfera y empieza el espacio. La densidad del aire cae exponencialmente con la altura: se reduce a la mitad cada cinco kilómetros y medio, así que se hace cada vez más pequeña sin anularse nunca. El límite de 100 km que se suele nombrar — la línea de Kármán — es una convención útil, no un límite preciso como sí lo es la superficie de un líquido. Donde llega la sonda el aire ya es más de doscientas veces más tenue que en el suelo: en términos de cuánta atmósfera queda por encima, estamos mucho más cerca del espacio que de la superficie.",
 
   q3t:"¿Qué altura máxima puede alcanzar un globo?",
   q3:"El récord para un globo no tripulado es de unos <strong>53 km</strong>, logrado en Japón en 2013 con una película finísima y una carga mínima. Pero ese récord es de un tipo de globo distinto al nuestro. Los nuestros son <em>elásticos</em>: se inflan hasta que el látex cede, y ahí termina el vuelo. Los de récord son de <em>volumen constante</em>, inflados sólo en parte al partir, y se detienen cuando el aire alrededor se vuelve tan tenue como el gas que llevan dentro. Y ése es el límite verdadero, para todos: se sube mientras haya aire más denso que el gas del globo. Cuando ya no lo hay, no hay empuje — y ninguna cantidad de helio puede cambiarlo.",
@@ -528,15 +534,21 @@ es:{
   paS3:"Duración del descenso",
   sfNote:"Al ser nuestra primera experiencia, para el globo, el paracaídas y la cadena de vuelo usamos material de <a href=\"https://stratoflights.com/\" target=\"_blank\" rel=\"noopener\">StratoFlights</a>, empresa alemana de gran experiencia en el sector. La sonda y sus instrumentos, en cambio, los diseñamos y construimos nosotros.",
   q9t:"¿Se pueden ver el video y los datos en vivo?",
-  q9:"No. La sonda no puede transmitir esa información: queda toda a bordo, en las memorias. Por eso recuperarla es fundamental, y por eso pusimos dos rastreadores independientes. La única información que nos llega realmente durante el vuelo es la posición — y sólo por debajo de los 18 km.",
+  q9:"No. La sonda no puede transmitir esa información: queda toda a bordo, en las memorias. Por eso recuperarla es fundamental, y por eso pusimos dos rastreadores independientes. La única información que nos llega durante el vuelo es la posición, y sólo por debajo de los 18 km: por encima de esa altura los receptores GPS civiles dejan de funcionar, por un límite de seguridad impuesto a los dispositivos para impedir su uso militar. Vale también lo contrario: tampoco nosotros podemos comunicarnos con la sonda, de ninguna manera.",
   q10t:"¿Cuáles son los riesgos principales?",
   q10a:"En orden de gravedad, no de probabilidad.",
-  q10b:"<strong>El paracaídas no se abre.</strong> Es lo peor que puede pasar, y es la razón por la que elegimos usar material de StratoFlights para todo lo relativo al vuelo.",
-  q10c:"<strong>La sonda se pierde.</strong> Sin sonda no hay video ni datos. La previsión de la trayectoria y los dos rastreadores independientes reducen este riesgo casi a cero.",
-  q10d:"<strong>Algo falla en la placa, en los sensores o en las conexiones.</strong> Por eso separamos el sistema en tres niveles independientes: primero el hallazgo, después el filmado, después todo lo demás. Los ensayos previos al lanzamiento serán decisivos para reducir al mínimo los imprevistos.",
+  q10b:"<em>El paracaídas no se abre.</em> Es lo peor que puede pasar, y es la razón por la que elegimos usar material de StratoFlights para todo lo relativo al vuelo.",
+  q10c:"<em>La sonda se pierde.</em> Sin sonda no hay video ni datos. La previsión de la trayectoria y los dos rastreadores independientes reducen este riesgo casi a cero.",
+  q10d:"<em>Algo falla en la placa, en los sensores o en las conexiones.</em> Por eso separamos el sistema en tres niveles independientes: primero el hallazgo, después el filmado, después todo lo demás. Los ensayos previos al lanzamiento serán decisivos para reducir al mínimo los imprevistos.",
   hwKicker:"Cómo funciona",
   hw1:"La <a data-page=\"sonda\" tabindex=\"0\">sonda</a> es una caja de poliestireno que aloja la cámara, los sensores para los datos científicos y toda la electrónica. Para llevarla a la estratosfera hace falta un globo de látex lleno de helio. Al estallar el globo se abre el paracaídas para el regreso.",
   mailRole:"Carlo De Toni · docente coordinador del proyecto",
+  q11t:"El globo se vuelve enorme: ¿no es un peligro para los aviones?",
+  q11:"El lugar exacto del lanzamiento se elegirá de modo que el despegue, el vuelo y el aterrizaje ocurran lejos de la zona prohibida al tráfico aéreo, y la posición de la sonda se comunicará en tiempo real a las autoridades. Cuando dejemos de tener datos de posición, la sonda estará ya a una altura donde no hay tráfico aéreo de ningún tipo — ni tampoco satélites. Por último, y con las precauciones anteriores no debería hacer falta, la cuerda que usamos tiene un punto de rotura calculado: en caso de colisión el globo se separa del paracaídas y de la sonda.",
+  q12t:"¿Se puede reutilizar?",
+  q12a:"Si la recuperamos, se reutiliza todo salvo tres cosas: el globo, que estalla y se hace pedazos; el helio, que se dispersa en la alta atmósfera; y las pilas de litio, que son de un solo uso, pero son las únicas que garantizan fiabilidad y prestaciones a esas temperaturas. La caja queda modelada sobre este experimento, así que se reutiliza en la misma configuración. Todo lo demás es reutilizable al cien por cien, y no sólo para globos estratosféricos.",
+  q12b:"El globo es la única parte que se dispersa en el ambiente. Está hecho principalmente de látex, un material de origen natural que se degrada con el tiempo — no es un material inocuo, pero es el menos problemático entre los disponibles para este uso.",
+  qMore:"¿Tenés otras preguntas o curiosidades? <a data-page=\"about\" tabindex=\"0\">Escribinos</a>.",
 },
 
 /* ==========================================================
@@ -571,7 +583,7 @@ en:{
   ix3t:"The physics of the flight", ix3n:"Why it rises, why it bursts, why it gets so cold",
   ix4t:"How we work", ix4n:"The working groups and how the project is organised",
   ix5t:"Legal aspects", ix5n:"Aviation regulation and what it means for us",
-  ix7t:"(Not so) frequently asked questions", ix7n:"No, it is not a satellite. And yes, we go and get it back.",
+  ix7t:"(Not so) frequently asked questions", ix7n:"Does the probe reach space? Let's find out.",
   ix8t:"About and contact", ix8n:"Come and meet us!",
 
   pKicker:"Phase 1 · Flight profile", missionTitle:"Mission",
@@ -591,7 +603,7 @@ en:{
 
   burstLbl:"Predicted burst altitude · Balloon 2000",
 
-  probeKicker:"Phase 1 · 2026", probeTitle:"Inside the Klo-01 probe",
+  probeKicker:"Phase 1 · 3D model", probeTitle:"Inside the Klo-01 probe",
   modeBench:"Bench", modeFlight:"Flight",
   benchNote:"Drag to rotate · wheel or two fingers to zoom",
   flightNote:"Closed probe, with stabilising fins, external arm and comparison tube.",
@@ -637,7 +649,7 @@ en:{
   srcUpdated:"<strong>Simulation run in:</strong> {date}",
   wDate:"June 2026",
 
-  aboutKicker:"About", aboutTitle:"About us", aboutSub:"The people behind COMETA.",
+  aboutKicker:"Phase 1 · About us", aboutTitle:"About us", aboutSub:"The people behind COMETA.",
   aboutBody:"We are students of 2EMS, IIIS, 3EMS, IVL and IVS at the Scuola Italiana di Montevideo.",
   contactHead:"Follow us", contactSub:"To see what we are making and follow the mission news.", igCta:"Follow on Instagram",
 
@@ -650,7 +662,7 @@ en:{
   ph1t:"On the ground — Archimedes' push",
   ph1p:"The balloon is pushed upwards by the air around it. Helium is about <strong>seven times less dense</strong> than air, and that difference has to lift everything else: the payload, the balloon itself, the parachute, the cords. The more helium you put in, the faster the balloon climbs.",
   ph2t:"Troposphere, 0–11 km — colder and colder",
-  ph2p:"As it climbs, the air thins and the temperature drops by about <strong>6.5 °C per kilometre</strong>: at eleven kilometres we are at −56 °C.",
+  ph2p:"As it climbs, the air thins and the temperature drops by about <strong>6.5 °C per kilometre</strong>: at eleven kilometres we are at −56 °C. The cold does not come from being further from the Sun, which is entirely negligible: it comes from the fact that air is heated from below, by the ground, and that it expands as it rises. An expanding gas cools, which is the same reason an aerosol can goes cold while you use it.",
   ph3t:"Tropopause, 11–18 km — the coldest point",
   ph3p:"The temperature stops falling: the tropopause is the minimum, <strong>down to −60 °C</strong> outside. At 18 km the main GPS stops sending us a signal: the probe «goes missing».",
   ph4t:"Stratosphere, above 18 km — the air runs out",
@@ -743,19 +755,19 @@ en:{
   /* — Questions — */
   navQA:"Q&A", qKicker:"Phase 1 · Questions", qaTitle:"(Not so) frequently asked questions",
   q5t:"Why helium?",
-  q5:"The gases less dense than air are helium and hydrogen: helium by about seven times, hydrogen — the lightest gas there is — by about fourteen. Hydrogen costs less and can be produced, whereas helium is a finite resource. But hydrogen is flammable — think of the Hindenburg disaster — while helium is inert and safe.",
+  q5:"Helium and hydrogen are much lighter than air: hydrogen — the lightest gas there is — about fourteen times, helium about seven. What matters for lift is density, how much a given volume of gas weighs against the same volume of air; and behind that is the mass of the individual molecules, far smaller than the nitrogen that makes up most of the air. Hydrogen costs less and can be produced, whereas helium is a finite resource. But hydrogen is flammable — think of the Hindenburg disaster — while helium is inert and safe. Helium also comes in different grades of purity: the purer it is, the lighter it is, and for the same lift you get a higher burst altitude.",
 
   q6t:"How do you choose the ascent rate?",
   q6:"By deciding how much helium to put in. The weight to be lifted is fixed; extra helium is surplus lift, and that surplus becomes ascent speed. More helium means climbing faster but bursting lower, because the balloon leaves the ground already fuller and reaches its stretching limit sooner. Less helium means climbing more slowly and reaching higher, but staying airborne longer — and longer means more drift. The ascent rate reflects that trade-off.",
 
   q7t:"How fast does it fall?",
-  q7:"It depends on altitude and on the payload mass. A parachute brakes thanks to the air it meets: where the air is two hundred times thinner, it brakes two hundred times less, so in the first minutes after the burst the probe drops very fast and then slows as it enters denser air. With the same parachute, a heavier probe lands faster. With our mass and a 1.2 m parachute it reaches the ground at about <strong>4.5 m/s</strong>: the speed of someone jumping off a couple of metres.",
+  q7:"It depends on altitude and on the payload mass. A parachute brakes thanks to the air it meets: where the air is two hundred times thinner, it brakes two hundred times less, so in the first minutes after the burst the probe drops very fast and then slows as it enters denser air. With the same parachute, a heavier probe lands faster: gravity grows with mass, while the parachute's braking does not — it depends only on its area and on speed — so a higher speed is needed to balance them. With our mass and a 1.2 m parachute it touches down at about <strong>4.5 m/s</strong>: the speed of someone jumping off a couple of metres. In general the descent is faster than the climb anyway; in our case it will take about half as long.",
 
   q4t:"Why is the sky blue, and black higher up?",
-  q4:"Blue is not a colour of the air: it is sunlight deflected by molecules. Molecules deflect blue far more than red, and that blue scattered in every direction is what we see looking up. As you climb, there are fewer molecules, less light is deflected, and the sky fades: at thirty kilometres less than 1 % of the air is left above you, and what remains is the black of space — with the Sun still shining beside it, because there is nothing left to spread its light around.",
+  q4:"Light is an electromagnetic wave, and its frequency of oscillation corresponds to colour: violet has the highest frequency, then blue, green, yellow and red. The process that deflects sunlight in the atmosphere — <em>Rayleigh scattering</em> — strongly favours high frequencies, that is blue, and it is that blue scattered in every direction that we see looking up. So why not violet? Because there is less violet in sunlight, and our eyes are far less sensitive to it. As you climb, molecules become fewer, less light is deflected, and the sky fades: at thirty kilometres less than 1 % of the air is left above you, and what remains is the black of space — with the Sun still shining beside it, because there is nothing left to spread its light around.",
 
   q1t:"Does the probe reach space?",
-  q1:"There is no precise height where the atmosphere ends and space begins. Air density falls exponentially with height: it halves roughly every five and a half kilometres, so it grows ever smaller without ever reaching zero. The 100 km boundary people mention — the Kármán line — is a useful convention, not a wall. Where the probe arrives, the air is already more than two hundred times thinner than at ground level: in terms of how much atmosphere is left above us, we are far closer to space than to the surface.",
+  q1:"There is no precise height where the atmosphere ends and space begins. Air density falls exponentially with height: it halves roughly every five and a half kilometres, so it grows ever smaller without ever reaching zero. The 100 km boundary people mention — the Karman line — is a useful convention, not a sharp limit the way the surface of a liquid is. Where the probe arrives, the air is already more than two hundred times thinner than at ground level: in terms of how much atmosphere is left above us, we are far closer to space than to the surface.",
 
   q3t:"What is the highest a balloon can go?",
   q3:"The record for an unmanned balloon is about <strong>53 km</strong>, set in Japan in 2013 with an extremely thin film and a minimal payload. But that record belongs to a different kind of balloon from ours. Ours are <em>elastic</em>: they inflate until the latex gives way, and the flight ends there. Record balloons are <em>constant volume</em>, only partly inflated at launch, and they stop when the air around them becomes as thin as the gas they carry. And that is the real limit, for everyone: you rise as long as there is air denser than the balloon's gas. When there is none, there is no lift — and no amount of helium can change that.",
@@ -789,14 +801,20 @@ en:{
   paS3:"Descent duration",
   sfNote:"As this is our first attempt, for the balloon, the parachute and the flight chain we use equipment from <a href=\"https://stratoflights.com/\" target=\"_blank\" rel=\"noopener\">StratoFlights</a>, a German company with long experience in the field. The probe and its instruments, on the other hand, we design and build ourselves.",
   q9t:"Can the video and the data be watched live?",
-  q9:"No. The probe cannot transmit any of that: it all stays on board, in memory. That is why recovering it is essential, and why we fitted two independent trackers. The only information that actually reaches us during the flight is the position — and only below 18 km.",
+  q9:"No. The probe cannot transmit any of that: it all stays on board, in memory. That is why recovering it is essential, and why we fitted two independent trackers. The only information that reaches us during the flight is the position, and only below 18 km: above that height civilian GPS receivers stop working, because of a safety limit imposed on the devices to prevent military use. The reverse is also true: we cannot communicate with the probe either, in any way.",
   q10t:"What are the main risks?",
   q10a:"In order of severity, not of likelihood.",
-  q10b:"<strong>The parachute fails to open.</strong> It is the worst thing that could happen, and it is why we chose StratoFlights equipment for everything to do with the flight itself.",
-  q10c:"<strong>The probe is lost.</strong> No probe, no footage, no data. Trajectory prediction and two independent trackers cut this risk almost to zero.",
-  q10d:"<strong>Something fails on the board, in the sensors or in the wiring.</strong> That is why we separated the system into three independent levels: recovery first, then the footage, then everything else. The tests before launch will be decisive in minimising surprises.",
+  q10b:"<em>The parachute fails to open.</em> It is the worst thing that could happen, and it is why we chose StratoFlights equipment for everything to do with the flight itself.",
+  q10c:"<em>The probe is lost.</em> No probe, no footage, no data. Trajectory prediction and two independent trackers cut this risk almost to zero.",
+  q10d:"<em>Something fails on the board, in the sensors or in the wiring.</em> That is why we separated the system into three independent levels: recovery first, then the footage, then everything else. The tests before launch will be decisive in minimising surprises.",
   hwKicker:"How it works",
   hw1:"The <a data-page=\"sonda\" tabindex=\"0\">probe</a> is a polystyrene box holding the camera, the sensors for the scientific data and all the electronics. To carry it into the stratosphere you need a latex balloon filled with helium. When the balloon bursts, the parachute opens for the return.",
   mailRole:"Carlo De Toni · teacher and project coordinator",
+  q11t:"The balloon becomes enormous: is it not a danger to aircraft?",
+  q11:"The exact launch site will be chosen so that take-off, flight and landing all happen well away from the zone closed to air traffic, and the probe's position will be reported to the authorities in real time. By the time we stop receiving position data, the probe will already be at a height where there is no air traffic of any kind — and no satellites either. Finally, and with the precautions above it should not be needed, the cord we use has a calculated breaking point: in a collision the balloon separates from the parachute and the probe.",
+  q12t:"Can it be reused?",
+  q12a:"If we recover it, everything is reused except three things: the balloon, which bursts into fragments; the helium, which disperses into the upper atmosphere; and the lithium cells, which are single-use, but are the only ones that give reliability and performance at those temperatures. The box stays shaped around this experiment, so it is reused in the same configuration. Everything else is fully reusable, and not only for stratospheric balloons.",
+  q12b:"The balloon is the only part that is lost to the environment. It is made mostly of latex, a material of natural origin that degrades over time — not a harmless material, but the least problematic of those available for this use.",
+  qMore:"Any other questions or curiosities? <a data-page=\"about\" tabindex=\"0\">Write to us</a>.",
 }
 };
