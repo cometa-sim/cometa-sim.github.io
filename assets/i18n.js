@@ -50,14 +50,12 @@ it:{
   /* — Missione — */
   pKicker:"Fase 1 · Profilo di volo", missionTitle:"Missione",
   missionSub:"Cosa studiamo e come sale la sonda.",
-  mBody:"Il progetto COMETA invia la sonda Klo-01 fino a circa 37,8 km di quota per studiare la stratosfera attraverso misure dirette, in una regione dell'atmosfera che gli aerei non raggiungono e i satelliti sorvolano. Tre ore di volo, un pallone che si gonfia fino a scoppiare, e una scatola di polistirolo che torna a terra col paracadute.",
+  mBody:"Il progetto COMETA invia la sonda Klo-01 fino a circa 37,8 km di quota per studiare la stratosfera attraverso misure dirette, in una regione dell'atmosfera che gli aerei non raggiungono e i satelliti sorvolano.",
 
-  pHead2:"Condizioni della salita",
+  pHead2:"Dati del progetto",
   pAlt:"Quota prevista", pTemp:"Temperatura esterna", pPress:"Pressione atmosferica", pPressU:"del livello del mare",
   pGas:"Gas di riempimento", pGasMain:"Elio", pVel:"Velocità di salita", pDur:"Durata del volo",
-  pHe:"Elio disponibile", pMass:"Massa del payload", pMassU:"limite 2000 g",
-
-  bKicker:"Il pallone", bHead:"Pallone 2000",
+  pHe:"Elio necessario", pMass:"Massa del payload", bKicker:"Il pallone", bHead:"Pallone 2000",
   bBody:"La missione utilizza il pallone da 2000 g. Riempito con circa 4,5 m³ di elio, raggiunge una quota di scoppio intorno ai 37,8 km.",
   specDiam:"Diametro iniziale", specBurst:"Quota di scoppio", specHe:"Elio necessario",
   specMass:"Massa del payload",
@@ -275,6 +273,8 @@ it:{
   q10b:"<strong>Il paracadute non si apre.</strong> È la cosa peggiore che possa succedere, ed è la ragione per cui abbiamo scelto di usare materiale StratoFlights per tutto ciò che riguarda il volo.",
   q10c:"<strong>La sonda si perde.</strong> Niente sonda, niente video, niente dati. La previsione della traiettoria e i due tracciatori indipendenti riducono questo rischio quasi a zero.",
   q10d:"<strong>Qualcosa non funziona nella scheda, nei sensori o nei collegamenti.</strong> Per questo abbiamo separato il sistema in tre livelli indipendenti: prima il ritrovamento, poi il filmato, poi tutto il resto. I test prima del lancio saranno decisivi per ridurre al minimo gli imprevisti.",
+  hwKicker:"Come funziona",
+  hw1:"La <a data-page=\"sonda\" tabindex=\"0\">sonda</a> è una scatola in polistirolo che ospita la videocamera, i sensori per i dati scientifici e tutta l'elettronica. Per portarla nella stratosfera è necessario un pallone in lattice riempito di elio. Allo scoppio del pallone si apre il paracadute per il rientro.",
 },
 
 /* ==========================================================
@@ -314,14 +314,12 @@ es:{
 
   pKicker:"Fase 1 · Perfil de vuelo", missionTitle:"Misión",
   missionSub:"Qué estudiamos y cómo asciende la sonda.",
-  mBody:"El proyecto COMETA envía la sonda Klo-01 hasta unos 37,8 km de altura para estudiar la estratósfera mediante mediciones directas, en una región de la atmósfera que los aviones no alcanzan y los satélites sobrevuelan. Tres horas de vuelo, un globo que se infla hasta reventar, y una caja de poliestireno que vuelve al suelo en paracaídas.",
+  mBody:"El proyecto COMETA envía la sonda Klo-01 hasta unos 37,8 km de altura para estudiar la estratosfera mediante mediciones directas, en una región de la atmósfera que los aviones no alcanzan y los satélites sobrevuelan.",
 
-  pHead2:"Condiciones del ascenso",
+  pHead2:"Datos del proyecto",
   pAlt:"Altura prevista", pTemp:"Temperatura exterior", pPress:"Presión atmosférica", pPressU:"del nivel del mar",
   pGas:"Gas de llenado", pGasMain:"Helio", pVel:"Velocidad de ascenso", pDur:"Duración del vuelo",
-  pHe:"Helio disponible", pMass:"Masa del payload", pMassU:"límite 2000 g",
-
-  bKicker:"El globo", bHead:"Globo 2000",
+  pHe:"Helio necesario", pMass:"Masa de la carga útil", bKicker:"El globo", bHead:"Globo 2000",
   bBody:"La misión usa el globo de 2000 g. Lleno con unos 4,5 m³ de helio, alcanza una altura de reventado en torno a los 37,8 km.",
   specDiam:"Diámetro inicial", specBurst:"Altura de reventado", specHe:"Helio necesario",
   specMass:"Masa del payload",
@@ -535,6 +533,8 @@ es:{
   q10b:"<strong>El paracaídas no se abre.</strong> Es lo peor que puede pasar, y es la razón por la que elegimos usar material de StratoFlights para todo lo relativo al vuelo.",
   q10c:"<strong>La sonda se pierde.</strong> Sin sonda no hay video ni datos. La previsión de la trayectoria y los dos rastreadores independientes reducen este riesgo casi a cero.",
   q10d:"<strong>Algo falla en la placa, en los sensores o en las conexiones.</strong> Por eso separamos el sistema en tres niveles independientes: primero el hallazgo, después el filmado, después todo lo demás. Los ensayos previos al lanzamiento serán decisivos para reducir al mínimo los imprevistos.",
+  hwKicker:"Cómo funciona",
+  hw1:"La <a data-page=\"sonda\" tabindex=\"0\">sonda</a> es una caja de poliestireno que aloja la cámara, los sensores para los datos científicos y toda la electrónica. Para llevarla a la estratosfera hace falta un globo de látex lleno de helio. Al estallar el globo se abre el paracaídas para el regreso.",
 },
 
 /* ==========================================================
@@ -574,14 +574,12 @@ en:{
 
   pKicker:"Phase 1 · Flight profile", missionTitle:"Mission",
   missionSub:"What we study and how the probe ascends.",
-  mBody:"Project COMETA sends the Klo-01 probe to about 37.8 km to study the stratosphere through direct measurements, in a region of the atmosphere that aircraft cannot reach and satellites fly over. Three hours of flight, a balloon that inflates until it bursts, and a polystyrene box that comes back down on a parachute.",
+  mBody:"Project COMETA sends the Klo-01 probe to about 37.8 km to study the stratosphere through direct measurements, in a region of the atmosphere that aircraft do not reach and satellites fly over.",
 
-  pHead2:"Conditions of the ascent",
+  pHead2:"Project data",
   pAlt:"Target altitude", pTemp:"External temperature", pPress:"Atmospheric pressure", pPressU:"of sea level",
   pGas:"Fill gas", pGasMain:"Helium", pVel:"Ascent rate", pDur:"Flight duration",
-  pHe:"Helium available", pMass:"Payload mass", pMassU:"limit 2000 g",
-
-  bKicker:"The balloon", bHead:"Balloon 2000",
+  pHe:"Helium required", pMass:"Payload mass", bKicker:"The balloon", bHead:"Balloon 2000",
   bBody:"The mission uses the 2000 g balloon. Filled with about 4.5 m³ of helium, it reaches a burst altitude of around 37.8 km.",
   specDiam:"Initial diameter", specBurst:"Burst altitude", specHe:"Helium required",
   specMass:"Payload mass",
@@ -795,5 +793,7 @@ en:{
   q10b:"<strong>The parachute fails to open.</strong> It is the worst thing that could happen, and it is why we chose StratoFlights equipment for everything to do with the flight itself.",
   q10c:"<strong>The probe is lost.</strong> No probe, no footage, no data. Trajectory prediction and two independent trackers cut this risk almost to zero.",
   q10d:"<strong>Something fails on the board, in the sensors or in the wiring.</strong> That is why we separated the system into three independent levels: recovery first, then the footage, then everything else. The tests before launch will be decisive in minimising surprises.",
+  hwKicker:"How it works",
+  hw1:"The <a data-page=\"sonda\" tabindex=\"0\">probe</a> is a polystyrene box holding the camera, the sensors for the scientific data and all the electronics. To carry it into the stratosphere you need a latex balloon filled with helium. When the balloon bursts, the parachute opens for the return.",
 }
 };
