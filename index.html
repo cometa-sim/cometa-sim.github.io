@@ -23,7 +23,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@200;300;400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/cometa.css?v=15">
+<link rel="stylesheet" href="assets/cometa.css?v=16">
 </head>
 <body>
 
@@ -273,18 +273,46 @@
   </section>
 
 
+
+  <section class="section tight">
+    <div class="wrap">
+      <div class="kicker reveal" data-i18n="paKicker">Il paracadute</div>
+      <h2 class="head reveal d1" style="font-size:clamp(26px,3.4vw,38px)" data-i18n="paHead">Parachute 2500</h2>
+      <p class="lede reveal d1" data-i18n-html="paBody"></p>
+      <div class="spec-rows reveal d2" style="margin-top:22px">
+        <div class="spec-row"><span class="k" data-i18n="paS1">Diametro</span><span class="v">1,2 m</span></div>
+        <div class="spec-row"><span class="k" data-i18n="paS2">Velocità al suolo</span><span class="v">≈ 4,5 m/s</span></div>
+        <div class="spec-row"><span class="k" data-i18n="paS3">Durata della discesa</span><span class="v">≈ 55 min</span></div>
+      </div>
+    </div>
+  </section>
+
   <section class="section tight">
     <div class="wrap">
       <div class="kicker reveal" data-i18n="prKicker">La sonda</div>
       <h2 class="head reveal d1" style="font-size:clamp(26px,3.4vw,38px)" data-i18n="prHead">Klo-01</h2>
-      <p class="lede reveal d1" data-i18n-html="prBody"></p>
-      <div class="spec-rows reveal d2" style="margin-top:22px">
-        <div class="spec-row"><span class="k" data-i18n="prS1">Massa</span><span class="v">≈ 1280 g</span></div>
-        <div class="spec-row"><span class="k" data-i18n="prS2">Interno</span><span class="v">160 × 160 × 130 mm</span></div>
-        <div class="spec-row"><span class="k" data-i18n="prS3">Parete</span><span class="v">30 mm EPS</span></div>
-        <div class="spec-row"><span class="k" data-i18n="prS4">Ripiani</span><span class="v">3</span></div>
+      <div class="probe-spin reveal d1" aria-hidden="true">
+        <svg viewBox="0 0 240 220" xmlns="http://www.w3.org/2000/svg">
+          <g class="spin-in">
+            <path d="M84,86 L44,68 L44,150 L84,132 Z" fill="#E4E9EE" stroke="#AFBAC5" stroke-width="2" stroke-linejoin="round"/>
+            <path d="M156,86 L196,68 L196,150 L156,132 Z" fill="#E4E9EE" stroke="#AFBAC5" stroke-width="2" stroke-linejoin="round"/>
+            <rect x="84" y="64" width="72" height="76" rx="8" fill="#F4F7FA" stroke="#AFBAC5" stroke-width="2.2"/>
+            <rect x="84" y="64" width="72" height="13" rx="6" fill="#E7EDF2"/>
+            <circle cx="120" cy="106" r="10" fill="#0D1319"/>
+            <circle cx="120" cy="106" r="4" fill="#2C3A47"/>
+            <line x1="150" y1="64" x2="164" y2="40" stroke="#8a97a6" stroke-width="2.4"/>
+            <line x1="120" y1="64" x2="120" y2="30" stroke="#c7d0da" stroke-width="2.4"/>
+          </g>
+        </svg>
       </div>
-      <p class="reveal d3" style="margin-top:18px"><a data-page="sonda" tabindex="0" data-i18n="prLink">Esplora il modello tridimensionale</a></p>
+      <p class="lede reveal d2" data-i18n-html="prBody"></p>
+      <p class="reveal d3" style="margin-top:14px"><a data-page="sonda" tabindex="0" data-i18n="prLink">Esplora il modello tridimensionale</a></p>
+    </div>
+  </section>
+
+  <section class="section tight">
+    <div class="wrap">
+      <div class="body-col reveal d1"><p data-i18n-html="sfNote"></p></div>
     </div>
   </section>
 
@@ -733,6 +761,8 @@
         <h3 data-i18n="q6t"></h3><p data-i18n-html="q6"></p>
         <h3 data-i18n="q7t"></h3><p data-i18n-html="q7"></p>
         <h3 data-i18n="q8t"></h3><p data-i18n-html="q8"></p>
+        <h3 data-i18n="q9t"></h3><p data-i18n-html="q9"></p>
+        <h3 data-i18n="q10t"></h3><p data-i18n-html="q10a"></p><p data-i18n-html="q10b"></p><p data-i18n-html="q10c"></p><p data-i18n-html="q10d"></p>
       </div>
     </div>
   </section>
@@ -830,8 +860,8 @@
 
 </div>
 
-<script src="assets/i18n.js?v=15"></script>
-<script src="assets/sonda.js?v=15"></script>
-<script src="assets/app.js?v=15"></script>
+<script src="assets/i18n.js?v=16"></script>
+<script src="assets/sonda.js?v=16"></script>
+<script src="assets/app.js?v=16"></script>
 </body>
 </html>
