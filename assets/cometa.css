@@ -649,16 +649,33 @@ td.mono{font-family:var(--mono);font-size:12.5px;letter-spacing:.01em;color:var(
 .body-col h3{font-family:var(--disp);font-size:19px;font-weight:600;margin:26px 0 8px}
 .body-col h3:first-child{margin-top:0}
 
-/* Il cielo della sezione fisica finiva di netto contro il fondo
-   della pagina, con due righe orizzontali nette sopra e sotto.
-   Due sfumature ai bordi lo raccordano. */
-.phys-stage::before,
-.phys-stage::after{content:"";position:absolute;left:0;right:0;height:16vh;
-  pointer-events:none;z-index:3}
-.phys-stage::before{top:0;background:linear-gradient(180deg,var(--space),rgba(1,3,8,0))}
-.phys-stage::after{bottom:0;background:linear-gradient(0deg,var(--space),rgba(1,3,8,0))}
-/* il suolo e il pallone restano sopra la sfumatura inferiore */
-.phys-ground,.phys-craft{z-index:4}
 
 /* Il motto è in corsivo anche nella parte in grassetto */
 .intro .motto b{font-style:italic}
+
+/* Il testo che segue una tabella le stava addosso */
+.table-wrap{margin-bottom:30px}
+.table-wrap + .body-col{margin-top:6px}
+
+/* ------------------------------------------------------------
+   Il bordo superiore della scena
+   Finche' la sezione non e' agganciata in cima, il bordo del
+   riquadro del cielo attraversa lo schermo e si vede come una
+   riga netta. La cura non e' sfumare il riquadro: e' dare al
+   contenitore lo stesso colore del cielo, aggiornato dal
+   codice a ogni fotogramma. Cosi' i due lati coincidono a
+   qualunque quota e a qualunque ora.
+   ------------------------------------------------------------ */
+.phys{background:var(--sky-top,var(--space))}
+.phys::before{content:"";position:absolute;top:0;left:0;right:0;height:14vh;z-index:1;
+  pointer-events:none;background:linear-gradient(180deg,var(--space),rgba(1,3,8,0))}
+
+/* Collegamenti dentro il testo: evidenziati, non sottolineati */
+.body-col a,.lede a{color:var(--cyan);text-decoration:none;
+  background:rgba(95,227,255,.10);border-radius:5px;padding:1px 5px;
+  transition:background .25s var(--ease),color .25s}
+.body-col a:hover,.lede a:hover{background:rgba(95,227,255,.20);color:#fff}
+
+/* Distacco fra tabella e testo che segue */
+.table-wrap{margin:22px 0 32px}
+.table-wrap + .body-col{margin-top:4px}

@@ -113,8 +113,8 @@ it:{
   srcMap:"<strong>Mappa:</strong> Leaflet su sfondo cartografico OpenStreetMap, © contributori OpenStreetMap.",
   srcCalc:"<strong>Calcolo:</strong> <code>cometa_venti.py</code>, sviluppato all'interno del progetto — modello di atmosfera standard, integrazione della traiettoria strato per strato, ellissi da matrice di covarianza. Il codice è pubblico.",
   srcExcl:"<strong>Area di esclusione:</strong> poligono approssimato.",
-  srcUpdated:"<strong>Sintesi aggiornata al:</strong> {date}",
-  wDate:"[DATA]",
+  srcUpdated:"<strong>Simulazione eseguita nel:</strong> {date}",
+  wDate:"giugno 2026",
 
   /* — Chi siamo — */
   aboutKicker:"Chi siamo", aboutTitle:"Chi siamo", aboutSub:"Le persone dietro COMETA.",
@@ -322,8 +322,8 @@ es:{
   srcMap:"<strong>Mapa:</strong> Leaflet sobre cartografía de OpenStreetMap, © colaboradores de OpenStreetMap.",
   srcCalc:"<strong>Cálculo:</strong> <code>cometa_venti.py</code>, desarrollado dentro del proyecto — modelo de atmósfera estándar, integración de la trayectoria capa por capa, elipses a partir de la matriz de covarianza. El código es público.",
   srcExcl:"<strong>Área de exclusión:</strong> polígono aproximado.",
-  srcUpdated:"<strong>Síntesis actualizada al:</strong> {date}",
-  wDate:"[FECHA]",
+  srcUpdated:"<strong>Simulación realizada en:</strong> {date}",
+  wDate:"junio de 2026",
 
   aboutKicker:"Nosotros", aboutTitle:"Nosotros", aboutSub:"Las personas detrás de COMETA.",
   aboutBody:"Somos estudiantes de 2EMS, IIIS, 3EMS, IVL y IVS de la Scuola Italiana di Montevideo.",
@@ -529,8 +529,8 @@ en:{
   srcMap:"<strong>Map:</strong> Leaflet over OpenStreetMap cartography, © OpenStreetMap contributors.",
   srcCalc:"<strong>Computation:</strong> <code>cometa_venti.py</code>, developed within the project — standard atmosphere model, layer-by-layer trajectory integration, ellipses from the covariance matrix. The code is public.",
   srcExcl:"<strong>Exclusion area:</strong> approximate polygon.",
-  srcUpdated:"<strong>Summary updated:</strong> {date}",
-  wDate:"[DATE]",
+  srcUpdated:"<strong>Simulation run in:</strong> {date}",
+  wDate:"June 2026",
 
   aboutKicker:"About", aboutTitle:"About us", aboutSub:"The people behind COMETA.",
   aboutBody:"We are students of 2EMS, IIIS, 3EMS, IVL and IVS at the Scuola Italiana di Montevideo.",

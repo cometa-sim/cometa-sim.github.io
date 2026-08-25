@@ -569,7 +569,7 @@ function darkenMap(){
    La fisica del volo — la stessa salita, ma a tappe
    ========================================================== */
 const phys      = $("#phys"),      physStage = $("#physStage"),
-      physCraft = $("#physCraft"), physBurst = $("#physBurst"),
+      physCraft = $("#physCraft"), physBurst = $("#physBurst"), physWrap = $("#phys"),
       physRail  = $("#physRail"),  physCue   = $("#physCue"),
       pAltN = $("#pAltN"), pAltL = $("#pAltL"),
       pEnv = $("#pEnv"), pChute = $("#pChute"), pRig = $("#pRig"), pCord = $("#pCord"),
@@ -618,6 +618,8 @@ function updatePhys(){
 
   const c = skyAt(alt);
   physStage.style.background = "linear-gradient(180deg," + c[0] + " 0%," + c[0] + " 6%," + c[1] + " 74%," + c[1] + " 100%)";
+  /* stesso colore al contenitore: il bordo della scena sparisce */
+  if(physWrap) physWrap.style.setProperty("--sky-top", c[0]);
   if(physSf) physSf.style.opacity = Math.max(nightMix*0.85, smooth(alt, 18, 30));
 
   const g = $("#physGround");
