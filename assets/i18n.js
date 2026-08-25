@@ -275,6 +275,7 @@ it:{
   q10d:"<strong>Qualcosa non funziona nella scheda, nei sensori o nei collegamenti.</strong> Per questo abbiamo separato il sistema in tre livelli indipendenti: prima il ritrovamento, poi il filmato, poi tutto il resto. I test prima del lancio saranno decisivi per ridurre al minimo gli imprevisti.",
   hwKicker:"Come funziona",
   hw1:"La <a data-page=\"sonda\" tabindex=\"0\">sonda</a> è una scatola in polistirolo che ospita la videocamera, i sensori per i dati scientifici e tutta l'elettronica. Per portarla nella stratosfera è necessario un pallone in lattice riempito di elio. Allo scoppio del pallone si apre il paracadute per il rientro.",
+  mailRole:"Carlo De Toni · docente coordinatore del progetto",
 },
 
 /* ==========================================================
@@ -535,6 +536,7 @@ es:{
   q10d:"<strong>Algo falla en la placa, en los sensores o en las conexiones.</strong> Por eso separamos el sistema en tres niveles independientes: primero el hallazgo, después el filmado, después todo lo demás. Los ensayos previos al lanzamiento serán decisivos para reducir al mínimo los imprevistos.",
   hwKicker:"Cómo funciona",
   hw1:"La <a data-page=\"sonda\" tabindex=\"0\">sonda</a> es una caja de poliestireno que aloja la cámara, los sensores para los datos científicos y toda la electrónica. Para llevarla a la estratosfera hace falta un globo de látex lleno de helio. Al estallar el globo se abre el paracaídas para el regreso.",
+  mailRole:"Carlo De Toni · docente coordinador del proyecto",
 },
 
 /* ==========================================================
@@ -795,5 +797,6 @@ en:{
   q10d:"<strong>Something fails on the board, in the sensors or in the wiring.</strong> That is why we separated the system into three independent levels: recovery first, then the footage, then everything else. The tests before launch will be decisive in minimising surprises.",
   hwKicker:"How it works",
   hw1:"The <a data-page=\"sonda\" tabindex=\"0\">probe</a> is a polystyrene box holding the camera, the sensors for the scientific data and all the electronics. To carry it into the stratosphere you need a latex balloon filled with helium. When the balloon bursts, the parachute opens for the return.",
+  mailRole:"Carlo De Toni · teacher and project coordinator",
 }
 };

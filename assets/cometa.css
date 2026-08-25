@@ -697,3 +697,5 @@ nav a.ig:hover svg{transform:translateY(-1px)}
    magenta sfalsati e il nero sopra. Il nero del marchio, su fondo
    scuro, e' reso con il tono della pagina, cosi' resta leggibile. */
 .soc-tt{color:inherit}
+/* Ruolo sotto l'indirizzo di posta */
+.mail-role{margin-top:6px;font-family:var(--mono);font-size:11.5px;letter-spacing:.02em;color:var(--faint)}
