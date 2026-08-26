@@ -130,8 +130,8 @@
               </g>
             </g>
             <!-- la sonda: c'e' sempre, prima e dopo lo scoppio -->
-            <path d="M107,377 L92,371 L92,391 L107,388 Z" fill="#E4E9EE" stroke="#AFBAC5" stroke-width=".9" stroke-linejoin="round"/>
-            <path d="M133,377 L148,371 L148,391 L133,388 Z" fill="#E4E9EE" stroke="#AFBAC5" stroke-width=".9" stroke-linejoin="round"/>
+            <rect x="92" y="375" width="15" height="15" rx="1.5" fill="#E4E9EE" stroke="#AFBAC5" stroke-width=".9" stroke-linejoin="round"/>
+            <rect x="133" y="375" width="15" height="15" rx="1.5" fill="#E4E9EE" stroke="#AFBAC5" stroke-width=".9" stroke-linejoin="round"/>
             <rect x="107" y="371" width="26" height="23" rx="3" fill="#F4F7FA" stroke="#AFBAC5" stroke-width="1"/>
             <rect x="107" y="371" width="26" height="4.5" rx="2" fill="#E7EDF2"/>
             <circle cx="120" cy="384" r="3.4" fill="#0D1319"/>
@@ -171,8 +171,6 @@
       <div class="wrap">
         <div class="kicker reveal" data-i18n="afterKicker">Progetto COMETA</div>
         <h2 class="head reveal d1" data-i18n="afterHead">Da terra al bordo dello spazio.</h2>
-        <p class="note-inline reveal d2" data-i18n-html="dateNote"></p>
-
         <div class="stat-wrap reveal d2">
           <i class="bk tl"></i><i class="bk tr"></i><i class="bk bl"></i><i class="bk br"></i>
           <div class="stat-grid">
@@ -188,6 +186,11 @@
           <a class="teaser reveal d2" data-page="fisica" tabindex="0"><div class="tn">02</div><h3 data-i18n="navPhysics">La fisica</h3><p data-i18n="ix3n">Perché sale, perché scoppia.</p><span class="go" data-i18n="teaserMore">Scopri →</span></a>
           <a class="teaser reveal d3" data-page="sonda" tabindex="0"><div class="tn">03</div><h3 data-i18n="navProbe">La sonda</h3><p data-i18n="tzProbe">Modello tridimensionale esplorabile.</p><span class="go" data-i18n="teaserMore">Scopri →</span></a>
           <a class="teaser reveal d4" data-page="venti" tabindex="0"><div class="tn">04</div><h3 data-i18n="navWinds">Studio dei venti</h3><p data-i18n="tzWinds">240 voli simulati per scegliere da dove partire.</p><span class="go" data-i18n="teaserMore">Scopri →</span></a>
+        </div>
+
+        <div class="note note-date reveal d2">
+          <div class="nt" data-i18n="dateNoteTag">Data del lancio</div>
+          <p data-i18n-html="dateNote"></p>
         </div>
       </div>
     </section>
@@ -382,8 +385,8 @@
             </g>
             <g id="pCord"><line x1="120" y1="258" x2="120" y2="342" stroke="#c7d0da" stroke-width="1.4"/></g>
             <g id="pRig">
-              <path d="M106,348 L90,342 L90,364 L106,360 Z" fill="#E4E9EE" stroke="#AFBAC5" stroke-width=".9" stroke-linejoin="round"/>
-              <path d="M134,348 L150,342 L150,364 L134,360 Z" fill="#E4E9EE" stroke="#AFBAC5" stroke-width=".9" stroke-linejoin="round"/>
+              <rect x="90" y="346" width="16" height="16" rx="1.5" fill="#E4E9EE" stroke="#AFBAC5" stroke-width=".9" stroke-linejoin="round"/>
+              <rect x="134" y="346" width="16" height="16" rx="1.5" fill="#E4E9EE" stroke="#AFBAC5" stroke-width=".9" stroke-linejoin="round"/>
               <rect x="106" y="342" width="28" height="24" rx="3" fill="#F4F7FA" stroke="#AFBAC5" stroke-width="1"/>
               <rect x="106" y="342" width="28" height="5" rx="2" fill="#E7EDF2"/>
               <circle cx="120" cy="356" r="3.6" fill="#0D1319"/>
@@ -528,7 +531,7 @@
 
   <section class="section" style="padding-top:20px">
     <div class="wrap">
-      <p class="lede reveal" data-i18n="wLede">Prima di scegliere il luogo di lancio abbiamo simulato 240 voli.</p>
+      <p class="lede reveal" data-i18n-html="wLede">Prima di scegliere il luogo di lancio abbiamo simulato 240 voli.</p>
       <div class="stat-wrap reveal d1">
         <i class="bk tl"></i><i class="bk tr"></i><i class="bk bl"></i><i class="bk br"></i>
         <div class="stat-grid">
