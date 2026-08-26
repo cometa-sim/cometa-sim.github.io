@@ -214,7 +214,7 @@ it:{
   msE4t:"Quattrocento volt lontani dal calcolatore",
   msE4:"Il tubo Geiger, che rivela radiazione ionizzante, lavora a circa 400 volt. Fra il suo circuito e il piedino del calcolatore che conta gli impulsi abbiamo messo un <strong>optoisolatore</strong>: il segnale passa come luce, non come corrente, e i due lati restano elettricamente separati.",
   msE5t:"Il baricentro sull'asse",
-  msE5:"Le masse pesanti — pacco pile e power bank — stanno sul ripiano più basso, e la disposizione di ogni componente è stata calcolata perché il centro di massa cada sull'<strong>asse di sospensione</strong>. Lo scarto residuo è di 3 millimetri, e con il punto di sospensione 25 centimetri più in alto dà un'inclinazione statica di appena 0,74 gradi. Ottimizzare il baricentro serve a stabilizzare la sonda ed evitare rotazioni.",
+  msE5:"Le masse pesanti — pacco pile e power bank — stanno sul ripiano più basso, e la disposizione di ogni componente è stata calcolata perché il centro di massa cada sull'<strong>asse di sospensione</strong>. Ottimizzare il baricentro serve a stabilizzare la sonda ed evitare rotazioni.",
   msWipTag:"In lavorazione",
   msWip:"La lista dei componenti <strong>non è definitiva</strong>. Il progetto è ancora in corso, e cambierà sia prima delle prove a terra sia dopo.",
 
@@ -482,7 +482,7 @@ es:{
   msE4t:"Cuatrocientos voltios lejos del computador",
   msE4:"El tubo Geiger, que detecta radiación ionizante, trabaja a unos 400 voltios. Entre su circuito y el pin del computador que cuenta los pulsos pusimos un <strong>optoacoplador</strong>: la señal pasa como luz, no como corriente, y los dos lados quedan eléctricamente separados.",
   msE5t:"El centro de masa sobre el eje",
-  msE5:"Las masas pesadas — el paquete de pilas y la batería externa — van en el estante más bajo, y la posición de cada componente se calculó para que el centro de masa caiga sobre el <strong>eje de suspensión</strong>. El desvío que queda es de 3 milímetros, y con el punto de suspensión 25 centímetros más arriba da una inclinación estática de apenas 0,74 grados. Optimizar el centro de masa sirve para estabilizar la sonda y evitar rotaciones.",
+  msE5:"Las masas pesadas — el paquete de pilas y la batería externa — van en el estante más bajo, y la posición de cada componente se calculó para que el centro de masa caiga sobre el <strong>eje de suspensión</strong>. Optimizar el centro de masa sirve para estabilizar la sonda y evitar rotaciones.",
   msWipTag:"En proceso",
   msWip:"La lista de componentes <strong>no es definitiva</strong>. El proyecto sigue en curso y cambiará tanto antes de los ensayos en tierra como después.",
 
@@ -750,7 +750,7 @@ en:{
   msE4t:"Four hundred volts, kept away from the computer",
   msE4:"The Geiger tube, which detects ionising radiation, runs at about 400 volts. Between its circuit and the computer pin that counts the pulses we placed an <strong>optoisolator</strong>: the signal crosses as light rather than as current, and the two sides stay electrically separate.",
   msE5t:"The centre of mass on the axis",
-  msE5:"The heavy masses — battery pack and power bank — sit on the lowest deck, and every component's position was calculated so that the centre of mass falls on the <strong>suspension axis</strong>. The residual offset is 3 millimetres, and with the suspension point 25 centimetres higher it gives a static tilt of just 0.74 degrees. Optimising the centre of mass keeps the probe steady and stops it rotating.",
+  msE5:"The heavy masses — battery pack and power bank — sit on the lowest deck, and every component's position was calculated so that the centre of mass falls on the <strong>suspension axis</strong>. Optimising the centre of mass keeps the probe steady and stops it rotating.",
   msWipTag:"Work in progress",
   msWip:"The component list is <strong>not final</strong>. The project is still under way, and it will change both before the ground tests and after them.",
 
