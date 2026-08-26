@@ -82,7 +82,7 @@ it:{
   /* — Studio dei venti — */
   wKicker:"Fase 1 · Studio preliminare", windsTitle:"Dove va a finire la sonda",
   windsSub:"240 traiettorie simulate per scegliere da dove partire.",
-  wLede:"Prima di scegliere il luogo di lancio abbiamo simulato 240 voli da due località diverse, usando i venti realmente previsti nello stesso periodo di quattro anni passati, dal 2021 al 2024.<br><br>Il risultato è che la sonda deriva verso est di circa 190 km.",
+  wLede:"Prima di scegliere il luogo di lancio abbiamo simulato 240 voli da due località diverse, usando i venti realmente previsti nello stesso periodo di quattro anni passati, dal 2021 al 2024. Il risultato è che la sonda deriva verso est di circa 190 km.",
   wTraj:"Traiettorie simulate", wDrift:"Deriva media", wBearing:"Rotta media", wDur:"Durata media", wBearingU:"(est)",
 
   wSimHead:"La simulazione",
