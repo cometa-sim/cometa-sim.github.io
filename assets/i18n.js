@@ -28,6 +28,7 @@ it:{
   cUnit:"g",
   afterKicker:"Progetto COMETA",
   afterHead:"Da terra al bordo dello spazio.",
+  homeLede:"La Fase 1 del progetto COMETA consiste nell'inviare nella stratosfera una sonda portata da un pallone riempito di elio. La sonda riprenderà in video tutto il volo e raccoglierà dati atmosferici attraverso i sensori montati a bordo.",
   sAlt:"Quota prevista", sDur:"Durata del volo", sMass:"Massa della sonda", sStudents:"Studenti coinvolti",
 
   tzMission:"Obiettivi, profilo di volo e catena di volo.",
@@ -144,7 +145,7 @@ it:{
   /* — Contatti — */
   contactMailHead:"Scrivici", contactMailSub:"Per informazioni, collaborazioni, proposte.",
   mailCta:"Manda una mail", tiktokCta:"Seguici su TikTok", footContact:"Contatti",
-  classesNote:"Cinque classi dei due sistemi che convivono nella scuola, quello italiano e quello uruguaiano.",
+  classesNote:"COMETA coinvolge diversi indirizzi dei due sistemi che convivono nella scuola, quello italiano e quello uruguaiano, insieme ai loro insegnanti. Oltre alle classi dell'ultimo anno, il progetto accoglie alunne e alunni del penultimo anno, che si formano per portarlo avanti nelle fasi successive. Con noi collaborano anche ex alunni: un legame con la scuola che continua.",
 
   bands:["Suolo","Troposfera","Tropopausa","Stratosfera"],
   skip:"Vai al contenuto",
@@ -301,6 +302,7 @@ es:{
   cUnit:"d",
   afterKicker:"Proyecto COMETA",
   afterHead:"Desde tierra al borde del espacio.",
+  homeLede:"La Fase 1 del proyecto COMETA consiste en enviar a la estratósfera una sonda llevada por un globo lleno de helio. La sonda filmará todo el vuelo y recogerá datos atmosféricos mediante los sensores montados a bordo.",
   sAlt:"Altura prevista", sDur:"Duración del vuelo", sMass:"Masa de la sonda", sStudents:"Estudiantes involucrados",
 
   tzMission:"Objetivos, perfil de vuelo y cadena de vuelo.",
@@ -412,7 +414,7 @@ es:{
   /* — Contacto — */
   contactMailHead:"Escribinos", contactMailSub:"Para información, colaboraciones, propuestas.",
   mailCta:"Mandanos un correo", tiktokCta:"Seguinos en TikTok", footContact:"Contacto",
-  classesNote:"Cinco clases de los dos sistemas que conviven en la escuela, el italiano y el uruguayo.",
+  classesNote:"COMETA involucra varias orientaciones de los dos sistemas que conviven en la escuela, el italiano y el uruguayo, junto con sus docentes. Además de las clases del último año, el proyecto recibe a alumnas y alumnos del penúltimo año, que se forman para continuarlo en las fases siguientes. También colaboran con nosotros exalumnos: un vínculo con la escuela que se mantiene.",
 
   bands:["Suelo","Troposfera","Tropopausa","Estratósfera"],
   skip:"Ir al contenido",
@@ -569,6 +571,7 @@ en:{
   cUnit:"d",
   afterKicker:"Project COMETA",
   afterHead:"From the ground to the edge of space.",
+  homeLede:"Phase 1 of the COMETA project consists of sending a probe into the stratosphere, carried by a balloon filled with helium. The probe will film the whole flight and gather atmospheric data through the sensors on board.",
   sAlt:"Target altitude", sDur:"Flight duration", sMass:"Probe mass", sStudents:"Students involved",
 
   tzMission:"Objectives, flight profile and flight chain.",
@@ -680,7 +683,7 @@ en:{
   /* — Contact — */
   contactMailHead:"Write to us", contactMailSub:"For information, collaborations, proposals.",
   mailCta:"Send us an email", tiktokCta:"Follow us on TikTok", footContact:"Contact",
-  classesNote:"Five classes from the two systems that coexist in the school, the Italian one and the Uruguayan one.",
+  classesNote:"COMETA brings together several study tracks from the two systems that coexist in the school, the Italian one and the Uruguayan one, along with their teachers. Besides the final-year classes, the project takes in students from the second-to-last year, who are training to carry it forward in the phases ahead. Former students work with us too: a bond with the school that lasts.",
 
   bands:["Ground","Troposphere","Tropopause","Stratosphere"],
   skip:"Skip to content",
