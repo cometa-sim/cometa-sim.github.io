@@ -42,181 +42,162 @@ const PARTS = [
   it:"400 V a bordo: la sorgente di guasto più pericolosa. Optoaccoppiatore sulla linea impulsi e polyfuse sull'alimentazione. Tubo di vetro: imbottire su tutta la lunghezza.",
   es:"400 V a bordo: la fuente de falla más peligrosa. Optoacoplador en la línea de pulsos y polyfuse en la alimentación. Tubo de vidrio: acolcharlo en todo su largo.",
   en:"400 V aboard: the most dangerous failure source. Optocoupler on the pulse line and a polyfuse on the supply. Glass tube: pad it along its whole length."}},
-
-{id:2, deck:1, cat:"kit", x:21, y:60, z:0, w:103, d:41, h:28, g:126,
+{id:2, deck:1, cat:"kit", x:48, y:58, z:0, w:103, d:41, h:28, g:126,
  n:{it:"Power bank Space Cam", es:"Power bank Space Cam", en:"Space Cam power bank"},
  note:{
   it:"Misure reali. Cella 21700 Li-ion da 4500 mAh, 16,6 Wh. StratoFlights la fa volare in questa scatola: è un dato utile sulla temperatura interna.",
   es:"Medidas reales. Celda 21700 Li-ion de 4500 mAh, 16,6 Wh. StratoFlights la hace volar en esta caja: es un dato útil sobre la temperatura interna.",
   en:"Real measurements. 21700 Li-ion cell, 4500 mAh, 16.6 Wh. StratoFlights flies it in this box: a useful data point on internal temperature."}},
-
 {id:3, deck:1, cat:"atmo", x:-30, y:55, z:0, w:38, d:50, h:21, g:45,
  n:{it:"PMS5003 particolato", es:"PMS5003 material particulado", en:"PMS5003 particulate"},
  note:{
   it:"INCASSATO NELLA PARETE −X, la stessa della staffa ma a quota diversa: la staffa esce a z≈80, il PMS sta sul ripiano 1 (z 0-21). Faccia a filo esterno, perimetro sigillato con silicone NEUTRO, bocche sulla faccia stretta 50 × 21 inclinate in basso con visiera anti-ghiaccio. Ruotato 90°. Le pareti ±Y restano libere per le alette centrate, la +X per la camera. Sporge 8 mm all'interno, da fasciare con un collare di XPS. Ponte termico ~0,3 W.",
   es:"EMPOTRADO EN LA PARED −X, la misma que la ménsula pero a otra altura: la ménsula sale a z≈80, el PMS va en el estante 1 (z 0-21). Cara a ras del exterior, perímetro sellado con silicona NEUTRA, bocas en la cara angosta de 50 × 21 inclinadas hacia abajo con visera antihielo. Rotado 90°. Las paredes ±Y quedan libres para las aletas centradas, y la +X para la cámara. Sobresale 8 mm hacia adentro: envolverlo con un collar de XPS. Puente térmico ~0,3 W.",
   en:"RECESSED INTO THE −X WALL, the same one as the bracket but at a different height: the bracket exits at z≈80, the PMS sits on deck 1 (z 0-21). Face flush with the outside, perimeter sealed with NEUTRAL silicone, inlets on the narrow 50 × 21 face angled downwards with an anti-icing visor. Rotated 90°. The ±Y walls stay free for the centred fins, and +X for the camera. It protrudes 8 mm inwards and must be wrapped in an XPS collar. Thermal bridge ~0.3 W."}},
-
-{id:4, deck:1, cat:"alim", x:33, y:103, z:0, w:60, d:48, h:18, g:90,
+{id:4, deck:1, cat:"alim", x:85, y:102, z:0, w:60, d:48, h:18, g:90,
  n:{it:"Pacco 6 × AA litio L91", es:"Pack 6 × AA litio L91", en:"6 × AA lithium pack L91"},
  note:{
   it:"Massa pesante in basso. Fili saldati ai contatti e pile compresse con nastro: un micro-spostamento all'impatto riavvia il sistema.",
   es:"Masa pesada abajo. Cables soldados a los contactos y pilas comprimidas con cinta: un micro-desplazamiento en el impacto reinicia el sistema.",
   en:"Heavy mass down low. Wires soldered to the contacts and cells compressed with tape: a micro-shift on impact reboots the system."}},
-
-{id:5, deck:2, cat:"alim", x:45, y:50, z:40, w:55, d:32, h:18, g:45,
+{id:5, deck:2, cat:"alim", x:94, y:96, z:40, w:55, d:32, h:18, g:45,
  n:{it:"Pacco 3 × AA (livello 2)", es:"Pack 3 × AA (nivel 2)", en:"3 × AA pack (level 2)"},
  note:{
   it:"Alimenta SOLO l'Adalogger. Nessun contatto elettrico con il pacco principale: è ciò che rende indipendente il livello 2.",
   es:"Alimenta SOLO al Adalogger. Ningún contacto eléctrico con el pack principal: es lo que hace independiente al nivel 2.",
   en:"Powers ONLY the Adalogger. No electrical contact with the main pack: that is what makes level 2 independent."}},
-
 {id:6, deck:1, cat:"atmo", x:110, y:3, z:0, w:35, d:23, h:7, g:12,
  n:{it:"SCD30 CO₂", es:"SCD30 CO₂", en:"SCD30 CO₂"},
  note:{
-  it:"Vicino a una presa d'aria ma FUORI dal flusso della ventola del PMS5003, che genera turbolenza e riscaldamento locale.",
-  es:"Cerca de una toma de aire pero FUERA del flujo del ventilador del PMS5003, que genera turbulencia y calentamiento local.",
-  en:"Near an air inlet but OUTSIDE the airflow of the PMS5003 fan, which creates turbulence and local heating."}},
-
-{id:7, deck:2, cat:"kit", x:69, y:104, z:40, w:75, d:45, h:21, g:96,
+  it:"L'aria interna si rinnova dalle sole fughe naturali della scatola: il profilo di CO₂ risulta 'spalmato' su qualche centinaio di metri, limite dichiarato. Tenerlo FUORI dal flusso della ventola del PMS5003 (turbolenza e riscaldamento locale) e lontano dalle fonti di calore. Il DS18B20 n. 30 gli sta a contatto: offset di autoriscaldamento e temperatura del gas per la correzione di densità dell'NDIR.",
+  es:"El aire interior se renueva solo por las fugas naturales de la caja: el perfil de CO₂ queda repartido sobre algunos cientos de metros, límite declarado. Mantenerlo FUERA del flujo del ventilador del PMS5003 (turbulencia y calentamiento local) y lejos de las fuentes de calor. El DS18B20 n.º 30 está en contacto con él: aporta el offset de autocalentamiento y la temperatura del gas para la corrección de densidad del NDIR.",
+  en:"The air inside is renewed only through the natural leaks of the box: the CO₂ profile ends up smeared over a few hundred metres, a declared limitation. Keep it OUT of the PMS5003 fan flow (turbulence and local heating) and away from heat sources. DS18B20 no. 30 sits in contact with it: self-heating offset and gas temperature for the NDIR density correction."}},
+{id:7, deck:2, cat:"kit", x:27, y:33, z:40, w:75, d:45, h:21, g:96,
  n:{it:"GPS STRATOfinder 4G", es:"GPS STRATOfinder 4G", en:"STRATOfinder 4G GPS"},
  note:{
   it:"Misure reali. Livello 1: batteria propria, nessun cavo verso il resto.",
   es:"Medidas reales. Nivel 1: batería propia, ningún cable hacia el resto.",
   en:"Real measurements. Level 1: its own battery, no cable to anything else."}},
-
 {id:8, deck:2, cat:"kit", x:169, y:51, z:40, w:21, d:59, h:41, g:69,
  n:{it:"Space Cam", es:"Space Cam", en:"Space Cam"},
  note:{
-  it:"INCASSATA NELLA PARETE +X, la stessa del PMS ma a quota diversa: il PMS sta sul ripiano 1 (z 0-21), la camera sul 2 (z 40-81). Guardando in +X, le alette su ±Y restano a 90° dall'asse ottico, fuori dal campo anche di un obiettivo grandangolare — così le alette possono restare CENTRATE e simmetriche. Profonda 21,4 mm contro 30 di parete: entra per intero, 9 mm di polistirolo dietro. Scavare la tasca dall'interno per poter raggiungere batteria e microSD.",
-  es:"EMPOTRADA EN LA PARED +X, la misma que el PMS pero a otra altura: el PMS va en el estante 1 (z 0-21), la cámara en el 2 (z 40-81). Mirando hacia +X, las aletas en ±Y quedan a 90° del eje óptico, fuera del campo incluso de un gran angular — así las aletas pueden quedar CENTRADAS y simétricas. Tiene 21,4 mm de profundidad contra 30 de pared: entra entera, con 9 mm de poliestireno detrás. Excavar el hueco desde adentro para poder llegar a la batería y a la microSD.",
-  en:"RECESSED INTO THE +X WALL, the same one as the PMS but at a different height: the PMS sits on deck 1 (z 0-21), the camera on deck 2 (z 40-81). Looking along +X, the fins on ±Y stay 90° off the optical axis, out of frame even for a wide-angle lens — so the fins can stay CENTRED and symmetric. It is 21.4 mm deep against a 30 mm wall: it fits entirely, with 9 mm of polystyrene behind. Cut the pocket from the inside so the battery and microSD stay reachable."}},
-
-{id:9, deck:2, cat:"pos", x:95, y:84, z:40, w:61, d:18, h:5, g:10,
+  it:"INCASSATA NELLA PARETE +X, A FILO DELLA SUPERFICIE ESTERNA: la tasca si scava dall'esterno, così batteria e microSD restano accessibili da fuori e la registrazione si avvia all'ultimo momento senza aprire la sonda. Restano ~9 mm di polistirolo fra il dorso della camera e l'interno: lasciarli SENZA ovatta, perché il calore della camera entri nella scatola. Fissaggio removibile, perimetro nastrato prima del volo. Guardando in +X, le alette su ±Y restano a 90° dall'asse ottico, fuori dal campo anche di un grandangolare: possono restare CENTRATE e simmetriche. Il PMS sta sulla parete opposta (−X): due tasche grandi nella stessa parete la indebolirebbero.",
+  es:"EMPOTRADA EN LA PARED +X, AL RAS DE LA SUPERFICIE EXTERIOR: el hueco se cava desde afuera, así la batería y la microSD quedan accesibles desde fuera y la grabación se inicia en el último momento sin abrir la sonda. Quedan ~9 mm de poliestireno entre el dorso de la cámara y el interior: dejarlos SIN guata, para que el calor de la cámara entre en la caja. Fijación removible, perímetro encintado antes del vuelo. Mirando hacia +X, las aletas sobre ±Y quedan a 90° del eje óptico, fuera del campo incluso de un gran angular: pueden quedar CENTRADAS y simétricas. El PMS está en la pared opuesta (−X): dos huecos grandes en la misma pared la debilitarían.",
+  en:"RECESSED INTO THE +X WALL, FLUSH WITH THE OUTER SURFACE: the pocket is cut from the outside, so battery and microSD stay reachable from outside and recording starts at the last moment without opening the probe. About 9 mm of polystyrene is left between the camera's back and the interior: leave it WITHOUT wadding, so the camera's heat goes into the box. Removable mounting, perimeter taped before flight. Looking along +X, the fins on ±Y stay at 90° from the optical axis, outside the field even of a wide-angle lens: they can remain CENTRED and symmetrical. The PMS is on the opposite wall (−X): two large pockets in the same wall would weaken it."}},
+{id:9, deck:2, cat:"pos", x:35, y:15, z:40, w:61, d:18, h:5, g:10,
  n:{it:"Teensy 4.1", es:"Teensy 4.1", en:"Teensy 4.1"},
  note:{
   it:"Controllore principale, microSD integrata. Clock ridotto a 150-300 MHz per limitare la dissipazione: a bassa pressione il calore fatica a uscire.",
   es:"Controlador principal, microSD integrada. Reloj bajado a 150-300 MHz para limitar la disipación: a baja presión al calor le cuesta salir.",
   en:"Main controller, integrated microSD. Clock reduced to 150-300 MHz to limit dissipation: at low pressure heat struggles to escape."}},
-
-{id:10, deck:2, cat:"pos", x:105, y:23, z:40, w:51, d:23, h:8, g:12,
+{id:10, deck:2, cat:"pos", x:104, y:73, z:40, w:51, d:23, h:8, g:12,
  n:{it:"Feather M0 Adalogger", es:"Feather M0 Adalogger", en:"Feather M0 Adalogger"},
  note:{
   it:"LIVELLO 2. Pile, microSD e GPS propri. Registra quota e traiettoria anche se il Teensy si blocca del tutto.",
   es:"NIVEL 2. Pilas, microSD y GPS propios. Registra altura y trayectoria incluso si el Teensy se cuelga por completo.",
   en:"LEVEL 2. Its own cells, microSD and GPS. Records altitude and trajectory even if the Teensy locks up completely."}},
-
-{id:11, deck:2, cat:"atmo", x:6, y:15, z:40, w:25, d:18, h:3, g:4,
+{id:11, deck:2, cat:"atmo", x:109, y:135, z:40, w:25, d:18, h:3, g:4,
  n:{it:"MAX31865 + PT1000", es:"MAX31865 + PT1000", en:"MAX31865 + PT1000"},
  note:{
   it:"SPI, non I²C: sta fuori dalla catena Qwiic ed è per questo l'unico pezzo da saldare. L'elemento sensibile è sul braccetto esterno.",
   es:"SPI, no I²C: queda fuera de la cadena Qwiic y por eso es la única pieza a soldar. El elemento sensible va en el brazo exterior.",
   en:"SPI, not I²C: it sits outside the Qwiic chain and is therefore the only part to be soldered. The sensing element is on the external arm."}},
-
-{id:12, deck:2, cat:"alim", x:33, y:3, z:40, w:70, d:45, h:14, g:35,
+{id:12, deck:2, cat:"alim", x:6, y:95, z:40, w:81, d:51, h:14, g:35,
  n:{it:"Perfboard: optoacc. + polyfuse + MOSFET", es:"Perfboard: optoacop. + polyfuse + MOSFET", en:"Perfboard: optocoupler + polyfuse + MOSFET"},
  note:{
   it:"Isolamento guasti concentrato su una sola scheda: optoaccoppiatore del Geiger, polyfuse, driver MOSFET e morsettiere.",
   es:"Aislamiento de fallas concentrado en una sola placa: optoacoplador del Geiger, polyfuse, driver MOSFET y borneras.",
   en:"Fault isolation concentrated on a single board: the Geiger optocoupler, polyfuse, MOSFET driver and terminal blocks."}},
-
 {id:13, deck:3, cat:"kit", x:87, y:62, z:80, w:68, d:51, h:21, g:88,
  n:{it:"SPOT Trace", es:"SPOT Trace", en:"SPOT Trace"},
  note:{
   it:"Misure reali, 87,9 g. Trasmette verso l'alto: niente sopra di lui. Copre la salita fino al limite COCOM.",
   es:"Medidas reales, 87,9 g. Transmite hacia arriba: nada por encima. Cubre el ascenso hasta el límite COCOM.",
   en:"Real measurements, 87.9 g. Transmits upwards: nothing above it. Covers the ascent up to the COCOM limit."}},
-
 {id:14, deck:3, cat:"pos", x:17, y:3, z:80, w:41, d:41, h:6, g:8,
  n:{it:"GPS SAM-M8Q (principale)", es:"GPS SAM-M8Q (principal)", en:"SAM-M8Q GPS (main)"},
  note:{
   it:"Antenna integrata verso il cielo. Il polistirolo è trasparente alle radiofrequenze: non serve forare. Modo Airborne <1g salvato in flash.",
   es:"Antena integrada hacia el cielo. El poliestireno es transparente a las radiofrecuencias: no hace falta perforar. Modo Airborne <1g guardado en flash.",
   en:"Integrated antenna facing the sky. Polystyrene is transparent to radio frequencies: no need to drill. Airborne <1g mode saved to flash."}},
-
 {id:15, deck:3, cat:"pos", x:116, y:18, z:80, w:41, d:41, h:6, g:8,
  n:{it:"GPS SAM-M8Q (livello 2)", es:"GPS SAM-M8Q (nivel 2)", en:"SAM-M8Q GPS (level 2)"},
  note:{
   it:"MONTATO, non di scorta: è il GPS dell'Adalogger. Quota e istante di scoppio registrati su due catene che non condividono nulla.",
   es:"MONTADO, no de repuesto: es el GPS del Adalogger. Altura e instante del reventado registrados en dos cadenas que no comparten nada.",
   en:"FITTED, not a spare: it is the Adalogger's GPS. Altitude and burst instant recorded on two chains that share nothing."}},
-
 {id:16, deck:3, cat:"atmo", x:61, y:3, z:80, w:25, d:17, h:3, g:3,
  n:{it:"MS8607 p/T/RH", es:"MS8607 p/T/HR", en:"MS8607 p/T/RH"},
  note:{
   it:"Fondo scala 10 hPa: dato valido fino a ~31 km. Sopra, l'altimetria è solo GPS.",
   es:"Fondo de escala 10 hPa: dato válido hasta ~31 km. Más arriba, la altimetría es solo GPS.",
   en:"Full scale 10 hPa: valid up to ~31 km. Above that, altimetry is GPS only."}},
-
 {id:17, deck:3, cat:"rad", x:119, y:3, z:80, w:25, d:13, h:3, g:3,
  n:{it:"LTR390 UV", es:"LTR390 UV", en:"LTR390 UV"},
  note:{
-  it:"Sotto una finestra in quarzo o PTFE: policarbonato e acrilico assorbono l'UV-B.",
-  es:"Bajo una ventana de cuarzo o PTFE: el policarbonato y el acrílico absorben el UV-B.",
-  en:"Under a quartz or PTFE window: polycarbonate and acrylic absorb UV-B."}},
-
+  it:"Sotto la finestra in PTFE sul coperchio: il PTFE diffonde la luce e riduce la dipendenza dall'angolo su una sonda che ruota; policarbonato e acrilico assorbono l'UV. Banda singola UVA: NON consente di ricavare l'ozono.",
+  es:"Bajo la ventana de PTFE en la tapa: el PTFE difunde la luz y reduce la dependencia del ángulo en una sonda que rota; el policarbonato y el acrílico absorben el UV. Banda única UVA: NO permite deducir el ozono.",
+  en:"Under the PTFE window on the lid: PTFE diffuses the light and reduces the angular dependence on a rotating probe; polycarbonate and acrylic absorb UV. Single UVA band: it does NOT allow ozone to be derived."}},
 {id:18, deck:3, cat:"pos", x:87, y:42, z:80, w:26, d:18, h:5, g:3,
  n:{it:"ICM-20948 IMU", es:"ICM-20948 IMU", en:"ICM-20948 IMU"},
  note:{
   it:"Il ripiano più lontano dai pacchi pile e dai cavi di potenza: il magnetometro va calibrato hard/soft iron a sonda chiusa.",
   es:"El estante más lejano de los packs de pilas y de los cables de potencia: el magnetómetro se calibra hard/soft iron con la sonda cerrada.",
   en:"The deck farthest from the battery packs and power cables: the magnetometer must be hard/soft-iron calibrated with the probe closed."}},
-
-{id:19, deck:3, cat:"atmo", x:89, y:3, z:80, w:25, d:17, h:3, g:3,
- n:{it:"MS8607 (ricambio a banco)", es:"MS8607 (repuesto de banco)", en:"MS8607 (bench spare)"},
- note:{
-  it:"Non vola: serve a confrontare due letture a terra e individuare un esemplare difettoso.",
-  es:"No vuela: sirve para comparar dos lecturas en tierra y detectar una unidad defectuosa.",
-  en:"Does not fly: it serves to compare two readings on the ground and spot a faulty unit."}},
-
 {id:20, deck:3, cat:"alim", x:75, y:22, z:80, w:18, d:18, h:8, g:5,
  n:{it:"MPM3610 buck 5 V", es:"MPM3610 buck 5 V", en:"MPM3610 buck 5 V"},
  note:{
   it:"Da 9-10,8 V a 5 V. Senza questo il Teensy, che accetta al massimo 5,5 V, si distrugge.",
   es:"De 9-10,8 V a 5 V. Sin esto el Teensy, que acepta 5,5 V como máximo, se destruye.",
   en:"From 9-10.8 V down to 5 V. Without it the Teensy, which takes 5.5 V maximum, is destroyed."}},
-
-{id:21, deck:3, cat:"atmo", x:96, y:22, z:80, w:18, d:18, h:3, g:2,
- n:{it:"SHT45 + PTFE", es:"SHT45 + PTFE", en:"SHT45 + PTFE"},
+{id:21, deck:3, cat:"atmo", x:-159, y:94, z:72, w:18, d:12, h:4, g:2,
+ n:{it:"SHT45 + PTFE (braccetto esterno)", es:"SHT45 + PTFE (brazo exterior)", en:"SHT45 + PTFE (external arm)"},
  note:{
-  it:"L'elemento sensibile va sul braccetto esterno insieme al PT1000. Membrana in PTFE contro polvere e condensa.",
-  es:"El elemento sensible va en el brazo exterior junto al PT1000. Membrana de PTFE contra polvo y condensación.",
-  en:"The sensing element goes on the external arm together with the PT1000. PTFE membrane against dust and condensation."}},
-
-{id:22, deck:1, cat:"alim", x:95, y:103, z:0, w:50, d:50, h:3, g:12,
- n:{it:"Pad riscaldante 5 V", es:"Manta calefactora 5 V", en:"5 V heating pad"},
- note:{
-  it:"Avvolto attorno al pacco pile, non appeso in aria: scalda 90 g di batterie invece di 3 litri d'aria. Termostato ON sotto −15 °C, OFF sopra −5 °C, taglio di sicurezza in firmware a +40 °C. Ora si installa: il bilancio termico rifatto dà l'interno a circa −45 °C in tropopausa.",
-  es:"Envuelta alrededor del pack de pilas, no colgada en el aire: calienta 90 g de baterías en vez de 3 litros de aire. Termostato ON por debajo de −15 °C, OFF por encima de −5 °C, corte de seguridad en firmware a +40 °C. Ahora sí se instala: el balance térmico rehecho da el interior a unos −45 °C en la tropopausa.",
-  en:"Wrapped around the battery pack, not hung in the air: it heats 90 g of cells rather than 3 litres of air. Thermostat ON below −15 °C, OFF above −5 °C, firmware safety cut-out at +40 °C. It is being fitted after all: the reworked thermal budget puts the interior at about −45 °C at the tropopause."}},
-
-{id:23, deck:2, cat:"atmo", x:119, y:3, z:40, w:25, d:18, h:3, g:4,
+  it:"FUORI DALLA SONDA, accanto al PT1000: va l'INTERA scheda sul braccetto — il chip non si separa dal breakout, e l'I²C corre senza problemi nei 15 cm di cavo. L'umidità dentro una scatola tiepida non ha nulla a che vedere con quella dell'aria esterna. La membrana in PTFE protegge da polvere e condensa. Serve anche a marcare i minuti in cui si attraversa una nube e il PT1000 è impaccato di ghiaccio.",
+  es:"FUERA DE LA SONDA, junto al PT1000: va la PLACA ENTERA en el brazo — el chip no se separa del breakout, y el I²C funciona sin problemas en los 15 cm de cable. La humedad dentro de una caja tibia no tiene nada que ver con la del aire exterior. La membrana de PTFE protege del polvo y de la condensación. Sirve además para marcar los minutos en que se atraviesa una nube y el PT1000 queda cargado de hielo.",
+  en:"OUTSIDE THE PROBE, next to the PT1000: the WHOLE board goes on the arm — the chip is not separated from the breakout, and I²C runs without trouble over the 15 cm of cable. Humidity inside a warm box has nothing to do with that of the outside air. The PTFE membrane protects against dust and condensation. It also marks the minutes when a cloud is crossed and the PT1000 is caked with ice."}},
+{id:23, deck:2, cat:"atmo", x:112, y:27, z:40, w:25, d:18, h:3, g:4,
  n:{it:"2° MAX31865 (PT1000 nel tubo)", es:"2.º MAX31865 (PT1000 en el tubo)", en:"2nd MAX31865 (PT1000 in the tube)"},
  note:{
   it:"Legge un secondo PT1000 alloggiato nel tubo esterno, in parallelo a quello esposto sul braccetto. Le due curve dicono con i dati quanto pesa la termalizzazione dell'aria nel tubo.",
   es:"Lee un segundo PT1000 alojado en el tubo externo, en paralelo al expuesto en el brazo. Las dos curvas dicen con los datos cuánto pesa la termalización del aire en el tubo.",
   en:"It reads a second PT1000 housed in the external tube, in parallel with the one exposed on the arm. The two curves show, from the data, how much the thermalisation of the air inside the tube matters."}},
-
-{id:24, deck:3, cat:"atmo", x:-175, y:95, z:76, w:6, d:10, h:8, g:1,
- n:{it:"Elemento PT1000 (braccetto esterno)", es:"Elemento PT1000 (brazo exterior)", en:"PT1000 element (external arm)"},
+{id:24, deck:3, cat:"atmo", x:-175, y:95, z:76, w:6, d:10, h:8, g:19,
+ n:{it:"Sonda PT1000 (braccetto esterno)", es:"Sonda PT1000 (brazo exterior)", en:"PT1000 probe (external arm)"},
  note:{
   it:"In punta al braccetto, in aria libera e senza schermatura completa: è il TERMINE DI PARAGONE del tubo aspirato. Da verniciare di BIANCO OPACO, non lasciare l'acciaio lucido: il metallo riflette bene il sole ma irradia male, mentre il bianco opaco riflette e irradia. Il piattino ripara solo dall'alto, perché la sonda ruota e il sole arriva da ogni azimut: il bias residuo si dichiara e il tubo dice quanto vale.",
   es:"En la punta del brazo, en aire libre y sin blindaje completo: es el TÉRMINO DE COMPARACIÓN del tubo. Pintarlo de BLANCO MATE, no dejar el acero pulido: el metal refleja bien el sol pero irradia mal, mientras que el blanco mate refleja e irradia. El platillo protege solo desde arriba, porque la sonda rota y el sol llega desde cualquier azimut: el sesgo residual se declara y el tubo dice cuánto vale.",
   en:"At the tip of the arm, in free air and without full shielding: it is the REFERENCE against which the aspirated tube is judged. Paint it MATT WHITE, do not leave the steel polished: metal reflects the sun well but radiates poorly, whereas matt white both reflects and radiates. The small plate shields only from above, because the probe rotates and the sun arrives from every azimuth: the residual bias is declared, and the tube tells you how large it is."}},
-
-{id:25, deck:3, cat:"atmo", x:-175, y:106, z:76, w:6, d:8, h:6, g:1,
- n:{it:"Elemento SHT45 (braccetto esterno)", es:"Elemento SHT45 (brazo exterior)", en:"SHT45 element (external arm)"},
- note:{
-  it:"FUORI DALLA SONDA, accanto al PT1000. L'umidità dentro una scatola tiepida non ha nulla a che vedere con quella dell'aria esterna. La membrana in PTFE protegge da polvere e condensa. Serve anche a marcare i minuti in cui si attraversa una nube e il PT1000 è impaccato di ghiaccio.",
-  es:"FUERA DE LA SONDA, junto al PT1000. La humedad dentro de una caja tibia no tiene nada que ver con la del aire exterior. La membrana de PTFE protege del polvo y de la condensación. Sirve además para marcar los minutos en que se atraviesa una nube y el PT1000 queda cargado de hielo.",
-  en:"OUTSIDE THE PROBE, next to the PT1000. Humidity inside a warm box has nothing to do with that of the outside air. The PTFE membrane protects against dust and condensation. It also marks the minutes when the probe crosses a cloud and the PT1000 is caked with ice."}},
-
-{id:26, deck:3, cat:"atmo", x:-57, y:55, z:76, w:6, d:10, h:8, g:1,
+{id:26, deck:3, cat:"atmo", x:-88, y:51, z:41, w:10, d:8, h:8, g:19,
  n:{it:"PT1000 nel tubo (confronto)", es:"PT1000 en el tubo (comparación)", en:"PT1000 in the tube (comparison)"},
  note:{
-  it:"Condotto INTERAMENTE ESTERNO con CURVA A 90°. La curva è un separatore inerziale: l'aria svolta, le goccioline sopraffuse no e impattano sulla parete esterna del gomito. Il sensore sta a valle, nel tratto verticale, e riceve aria priva delle gocce più grandi. Ingresso in basso, uscita in alto, foro di scarico sul fondo del gomito. Solo i fili entrano nella sonda, da un foro da 3 mm sigillato: nessun ponte termico. Concilia l'obiezione termica con quella sul ghiaccio.",
-  es:"Conducto ENTERAMENTE EXTERIOR con CURVA DE 90°. La curva es un separador inercial: el aire dobla, las gotas sobreenfriadas no y golpean la pared externa del codo. El sensor queda aguas abajo, en el tramo vertical, y recibe aire sin las gotas más grandes. Entrada abajo, salida arriba, agujero de drenaje en el fondo del codo. Solo los cables entran en la sonda, por un orificio de 3 mm sellado: ningún puente térmico. Concilia la objeción térmica con la del hielo.",
-  en:"An ENTIRELY EXTERNAL duct with a 90° BEND. The bend is an inertial separator: the air turns, the supercooled droplets do not and hit the outer wall of the elbow. The sensor sits downstream, in the vertical run, and receives air stripped of the larger drops. Inlet at the bottom, outlet at the top, a drain hole at the base of the elbow. Only the wires enter the probe, through a sealed 3 mm hole: no thermal bridge. It reconciles the thermal objection with the icing one."}}
+  it:"Condotto INTERAMENTE ESTERNO con CURVA A 90°, orientato verso il vento relativo della salita: PRESA RIVOLTA IN ALTO, gomito in basso con foro di scarico da 2 mm nel punto più basso, sensore nel tratto ORIZZONTALE a valle del gomito, uscita laterale inclinata in basso. In salita l'aria investe la sonda dall'alto: entra dalla presa, svolta il gomito; le goccioline sopraffuse (St≈0,5 a 20 µm) non svoltano, impattano e drenano. In discesa il flusso si inverte e la separazione non opera: dato dichiarato non protetto, come per il PMS. Solo i fili entrano nella sonda, da un foro da 3 mm sigillato: nessun ponte termico.",
+  es:"Conducto ÍNTEGRAMENTE EXTERIOR con CURVA DE 90°, orientado hacia el viento relativo del ascenso: TOMA HACIA ARRIBA, codo abajo con orificio de drenaje de 2 mm en el punto más bajo, sensor en el tramo HORIZONTAL aguas abajo del codo, salida lateral inclinada hacia abajo. En el ascenso el aire golpea la sonda desde arriba: entra por la toma y dobla en el codo; las gotitas sobreenfriadas (St≈0,5 a 20 µm) no doblan, impactan y drenan. En el descenso el flujo se invierte y la separación no opera: dato declarado como no protegido, igual que en el PMS. Solo los cables entran en la sonda, por un orificio de 3 mm sellado: ningún puente térmico.",
+  en:"Duct ENTIRELY EXTERNAL with a 90° BEND, facing the relative wind of the ascent: INLET POINTING UP, elbow below with a 2 mm drain hole at the lowest point, sensor in the HORIZONTAL run downstream of the elbow, side outlet angled downwards. On the way up the air hits the probe from above: it enters the inlet and turns at the elbow; supercooled droplets (St≈0.5 at 20 µm) do not turn, they impact and drain. On the way down the flow reverses and the separation does not work: the data is declared unprotected, as for the PMS. Only the wires enter the probe, through a sealed 3 mm hole: no thermal bridge."}},
+{id:27, deck:2, cat:"atmo", x:5, y:29, z:58, w:10, d:4, h:6, g:1,
+ n:{it:"DS18B20 — cassa", es:"DS18B20 — caja", en:"DS18B20 — shell"},
+ note:{
+  it:"Incollato alla faccia interna della parete: misura la temperatura della cassa. I quattro DS18B20 condividono un solo pin (bus 1-Wire, pull-up 4,7 kΩ verso 3,3 V).",
+  es:"Pegado a la cara interna de la pared: mide la temperatura de la caja. Los cuatro DS18B20 comparten un solo pin (bus 1-Wire, pull-up de 4,7 kΩ a 3,3 V).",
+  en:"Glued to the inner face of the wall: it measures the temperature of the shell. The four DS18B20 share a single pin (1-Wire bus, 4.7 kΩ pull-up to 3.3 V)."}},
+{id:28, deck:1, cat:"atmo", x:115, y:115, z:18, w:10, d:4, h:6, g:1,
+ n:{it:"DS18B20 — pacco pile", es:"DS18B20 — paquete de pilas", en:"DS18B20 — battery pack"},
+ note:{
+  it:"Sul pacco principale: la capacità delle L91 dipende dalla temperatura, ed è questo dato — con la prova in congelatore — a dire se un riscaldamento sarà necessario.",
+  es:"Sobre el paquete principal: la capacidad de las L91 depende de la temperatura, y es este dato — junto con la prueba en el congelador — el que dice si hará falta calefacción.",
+  en:"On the main pack: the capacity of the L91 cells depends on temperature, and it is this measurement — together with the freezer test — that tells whether any heating will be needed."}},
+{id:29, deck:2, cat:"atmo", x:75, y:82, z:62, w:10, d:4, h:6, g:1,
+ n:{it:"DS18B20 — centro del volume", es:"DS18B20 — centro del volumen", en:"DS18B20 — centre of the volume"},
+ note:{
+  it:"Sospeso a metà altezza, lontano da ogni componente: misura l'ARIA interna, non una scheda. Con uno scarto di ~40 K fra modello stazionario e dato di volo, il profilo termico interno è fra le misure più interessanti del volo.",
+  es:"Suspendido a media altura, lejos de todo componente: mide el AIRE interior, no una placa. Con una diferencia de ~40 K entre el modelo estacionario y el dato de vuelo, el perfil térmico interno está entre las medidas más interesantes del vuelo.",
+  en:"Suspended at mid-height, away from every component: it measures the internal AIR, not a board. With a spread of about 40 K between the steady-state model and the flight data, the internal thermal profile is among the most interesting measurements of the flight."}},
+{id:30, deck:1, cat:"atmo", x:122, y:27, z:7, w:10, d:4, h:6, g:1,
+ n:{it:"DS18B20 — SCD30", es:"DS18B20 — SCD30", en:"DS18B20 — SCD30"},
+ note:{
+  it:"A contatto con l'SCD30: fornisce l'offset di autoriscaldamento e la temperatura del gas per la correzione di densità dell'NDIR — le ppm richiedono T e p del gas effettivamente misurato.",
+  es:"En contacto con el SCD30: aporta el offset de autocalentamiento y la temperatura del gas para la corrección de densidad del NDIR — las ppm requieren la T y la p del gas efectivamente medido.",
+  en:"In contact with the SCD30: it supplies the self-heating offset and the gas temperature for the NDIR density correction — ppm figures require the T and p of the gas actually measured."}}
 ];
 
 const DECKS = [{n:1, key:"deck1", z:0,  plate:null},
@@ -224,7 +205,7 @@ const DECKS = [{n:1, key:"deck1", z:0,  plate:null},
                {n:3, key:"deck3", z:80, plate:77}];
 const CATS  = [["atmo","catAtmo"],["pos","catPos"],["rad","catRad"],["alim","catAlim"],["kit","catKit"]];
 const FLOOR = (INT.w * INT.d) / 100;      /* cm² utili di un ripiano */
-const EXT_IDS = [24,25,26];               /* componenti fuori dalla scatola */
+const EXT_IDS = [21,24,26];               /* componenti fuori dalla scatola */
 
 /* ---------- Stato ---------- */
 const S = 0.01;                            /* mm → unità di scena */

@@ -188,6 +188,10 @@ h3.sub-head{font-family:var(--disp);font-weight:600;font-size:clamp(19px,2.4vw,2
 .note p{color:var(--muted);font-size:15px;margin-bottom:.9rem}
 .note p:last-child{margin-bottom:0}
 .note strong{color:var(--ink);font-weight:600}
+/* Nota sulla data del lancio, in fondo alla pagina iniziale:
+   piu' aria sopra dei 28px di .note, per staccarla dai teaser */
+.note-date{margin-top:46px;margin-bottom:10px}
+@media(max-width:560px){.note-date{margin-top:34px}}
 
 /* Fonti */
 .sources{margin-top:44px;padding-top:22px;border-top:1px solid var(--line-soft);max-width:70ch;

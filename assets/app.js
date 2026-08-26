@@ -47,8 +47,8 @@ function detectLang(){
 function expand(str){
   const d = I18N[LANG];
   return String(str)
-    .replace("{years}", '<span class="todo">' + d.wYears + '</span>')
-    .replace("{date}",  '<span class="todo">' + d.wDate  + '</span>');
+    .replace("{years}", d.wYears)
+    .replace("{date}",  d.wDate);
 }
 
 function buildChain(){
@@ -503,7 +503,7 @@ function smoothScrollTo(to, dur){
    ========================================================== */
 /* Ora locale di Montevideo (UTC-3). Scritta cosi', il conto alla rovescia
    e' identico per un visitatore di Montevideo, di Roma o di Malargue. */
-const LAUNCH = new Date("2026-10-06T11:00:00-03:00");
+const LAUNCH = new Date("2026-09-30T10:00:00-03:00");
 function updateCountdown(){
   const diff = LAUNCH - Date.now();
   const d = $("#cd"), h = $("#ch"), m = $("#cm"), s = $("#cs"), cb = $("#cbadge");

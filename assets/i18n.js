@@ -82,7 +82,7 @@ it:{
   /* — Studio dei venti — */
   wKicker:"Fase 1 · Studio preliminare", windsTitle:"Dove va a finire la sonda",
   windsSub:"240 traiettorie simulate per scegliere da dove partire.",
-  wLede:"Prima di scegliere il luogo di lancio abbiamo simulato 240 voli da due località diverse, usando i venti realmente previsti nello stesso periodo di quattro anni passati, dal 2021 al 2024. Il risultato è che la sonda deriva verso est di circa 190 km.",
+  wLede:"Prima di scegliere il luogo di lancio abbiamo simulato 240 voli da due località diverse, usando i venti realmente previsti nello stesso periodo di quattro anni passati, dal 2021 al 2024. Il risultato è che la sonda <strong>deriva sistematicamente verso est</strong>, di circa 190 km.",
   wTraj:"Traiettorie simulate", wDrift:"Deriva media", wBearing:"Rotta media", wDur:"Durata media", wBearingU:"(est)",
 
   wSimHead:"La simulazione",
@@ -104,7 +104,7 @@ it:{
   wUseHead:"A cosa serve, e a cosa no",
   wUseTag:"Attenzione",
   wUseP1:"Questa analisi serve a <strong>scegliere il luogo di partenza</strong>. Non dice dove cadrà la nostra sonda.",
-  wUseP2:"Per quello useremo uno strumento previsionale molto più preciso, che però funziona solo pochi giorni prima del lancio. E il luogo e la data effettivi del volo dipendono in ogni caso dall'autorizzazione della <strong>DINACIA</strong>.",
+  wUseP2:"Per quello useremo uno strumento previsionale molto più preciso, che però funziona solo pochi giorni prima del lancio. Il luogo di lancio è condizionato anche dalle <a data-page=\"legale\" tabindex=\"0\">disposizioni delle autorità aeronautiche</a>.",
 
   srcMeteo:"<strong>Dati meteorologici:</strong> previsioni archiviate dell'Historical Forecast API di <a href=\"https://open-meteo.com/\" target=\"_blank\" rel=\"noopener\">Open-Meteo</a>, distribuite con licenza CC BY 4.0.",
   srcMap:"<strong>Mappa:</strong> Leaflet su sfondo cartografico OpenStreetMap, © contributori OpenStreetMap.",
@@ -249,7 +249,8 @@ it:{
   wMod2:"<strong>Fin dove sale.</strong> Salendo, la pressione esterna cala e il pallone si dilata: a 37 km il suo volume è più di duecento volte quello di partenza, e il diametro passa da due metri a più di dodici. Il lattice ha però un allungamento massimo, e lo scoppio avviene dove quel limite viene raggiunto. Da qui la conseguenza che sorprende: <strong>meno elio significa scoppio più alto</strong>, perché il pallone parte più piccolo e ha più strada da fare prima di arrivare al suo limite.",
   wMod3:"<strong>Quanto resta in aria — e perché conta qui.</strong> La deriva è, in sostanza, velocità del vento moltiplicata per il tempo passato dentro di esso. Rallentare la salita per guadagnare quota allunga il volo, e quindi allunga la deriva: passare da 5 a 4 m/s aggiungerebbe circa ottocento metri di quota e trentacinque minuti di volo, con un aumento della deriva dell'ordine del 15-20 %. È il compromesso che questa mappa serve a valutare.",
   wMod4:"<strong>Come cade.</strong> Il paracadute frena in proporzione alla densità dell'aria che incontra. In alto, dove l'aria è duecento volte più rada, frena pochissimo e la discesa è rapida; scendendo l'aria si infittisce e la sonda rallenta progressivamente. Con il nostro paracadute da 1,2 m di diametro l'arrivo al suolo è a circa 4,5 m/s. La discesa dura poco meno di un'ora e non dipende da quanto elio si è messo, mentre la salita sì: per questo tutto il compromesso si gioca sulla salita.",
-  dateNote:"La data del lancio è <strong>provvisoria</strong>: dipende da quando saremo pronti e dalle condizioni meteorologiche del giorno.",
+  dateNoteTag:"Data del lancio",
+  dateNote:"La data del lancio è soggetta a variazioni dovute alle <strong>condizioni meteorologiche</strong> e allo <strong>stato di avanzamento del progetto</strong>.",
   prKicker:"La sonda",
   prHead:"Klo-01",
   prBody:"Una scatola di polistirolo espanso con tre ripiani interni, dieci sensori, una videocamera e due tracciatori indipendenti. Le due alette non sono decorative: servono a stabilizzarla e a rallentarne la rotazione, perché una sonda che gira su sé stessa riprende male e misura peggio.",
@@ -321,7 +322,7 @@ es:{
 
   pKicker:"Fase 1 · Perfil de vuelo", missionTitle:"Misión",
   missionSub:"Qué estudiamos y cómo.",
-  mBody:"El proyecto COMETA envía la sonda Klo-01 hasta unos 37,8 km de altura para estudiar la estratosfera mediante mediciones directas, en una región de la atmósfera que los aviones no alcanzan y los satélites sobrevuelan.",
+  mBody:"El proyecto COMETA envía la sonda Klo-01 hasta unos 37,8 km de altura para estudiar la estratósfera mediante mediciones directas, en una región de la atmósfera que los aviones no alcanzan y los satélites sobrevuelan.",
 
   pHead2:"Datos del proyecto",
   pAlt:"Altura prevista", pTemp:"Temperatura exterior", pPress:"Presión atmosférica", pPressU:"del nivel del mar",
@@ -351,7 +352,7 @@ es:{
 
   wKicker:"Fase 1 · Estudio preliminar", windsTitle:"Dónde va a caer la sonda",
   windsSub:"240 trayectorias simuladas para elegir desde dónde partir.",
-  wLede:"Antes de elegir el lugar de lanzamiento simulamos 240 vuelos desde dos localidades distintas, usando los vientos realmente previstos en el mismo período de cuatro años pasados, de 2021 a 2024.<br><br>El resultado es que la sonda deriva hacia el este unos 190 km.",
+  wLede:"Antes de elegir el lugar de lanzamiento simulamos 240 vuelos desde dos localidades distintas, usando los vientos realmente previstos en el mismo período de cuatro años pasados, de 2021 a 2024. El resultado es que la sonda <strong>deriva sistemáticamente hacia el este</strong>, unos 190 km.",
   wTraj:"Trayectorias simuladas", wDrift:"Deriva media", wBearing:"Rumbo medio", wDur:"Duración media", wBearingU:"(este)",
 
   wSimHead:"La simulación",
@@ -373,7 +374,7 @@ es:{
   wUseHead:"Para qué sirve, y para qué no",
   wUseTag:"Atención",
   wUseP1:"Este análisis sirve para <strong>elegir el lugar de partida</strong>. No dice dónde va a caer nuestra sonda.",
-  wUseP2:"Para eso vamos a usar una herramienta de pronóstico mucho más precisa, que sin embargo funciona solo pocos días antes del lanzamiento. Y el lugar y la fecha efectivos del vuelo dependen en todos los casos de la autorización de la <strong>DINACIA</strong>.",
+  wUseP2:"Para eso vamos a usar una herramienta de pronóstico mucho más precisa, que sin embargo funciona solo pocos días antes del lanzamiento. El lugar de lanzamiento está condicionado además por las <a data-page=\"legale\" tabindex=\"0\">disposiciones de las autoridades aeronáuticas</a>.",
 
   srcMeteo:"<strong>Datos meteorológicos:</strong> previsiones archivadas de la Historical Forecast API de <a href=\"https://open-meteo.com/\" target=\"_blank\" rel=\"noopener\">Open-Meteo</a>, distribuidas con licencia CC BY 4.0.",
   srcMap:"<strong>Mapa:</strong> Leaflet sobre cartografía de OpenStreetMap, © colaboradores de OpenStreetMap.",
@@ -466,7 +467,7 @@ es:{
   mv9:"Ultravioleta", mv9v:"todo el vuelo",
   mv10:"Actitud, rotación y estallido", mv10v:"todo el vuelo",
   msNotKicker:"Qué no medimos",
-  msNot1:"<strong>El ozono y los óxidos de nitrógeno.</strong> Los sensores disponibles a este costo están calibrados para aire a nivel del mar; a las presiones de la estratosfera su respuesta no es interpretable, y no existe una forma practicable de calibrarlos para esas condiciones. Habríamos obtenido números, no mediciones.",
+  msNot1:"<strong>El ozono y los óxidos de nitrógeno.</strong> Los sensores disponibles a este costo están calibrados para aire a nivel del mar; a las presiones de la estratósfera su respuesta no es interpretable, y no existe una forma practicable de calibrarlos para esas condiciones. Habríamos obtenido números, no mediciones.",
   msCamKicker:"Las imágenes y el hallazgo",
   msCam1:"La <strong>Space Cam</strong> de StratoFlights va montada en horizontal y graba durante todo el vuelo. La posición está condicionada: hacía falta una vista libre, sin aletas ni sondas en el encuadre, y eso fijó la pared. En consecuencia el sensor de material particulado se pasó a la pared delantera, para no adelgazar dos veces el mismo lado de la caja.",
   msCam2:"Para encontrarla hay dos aparatos independientes: el <strong>STRATOfinder 4G</strong>, que transmite la posición donde hay cobertura de red celular, y un <strong>SPOT Trace</strong>, que usa satélites y funciona también donde la red no llega. Ninguno de los dos puede comunicarnos la posición durante todo el vuelo.",
@@ -516,7 +517,8 @@ es:{
   wMod2:"<strong>Hasta dónde sube.</strong> Al subir, la presión exterior baja y el globo se dilata: a 37 km su volumen es más de doscientas veces el de partida, y el diámetro pasa de dos metros a más de doce. Pero el látex tiene un estiramiento máximo, y el estallido ocurre donde se alcanza ese límite. De ahí la consecuencia que sorprende: <strong>menos helio significa estallido más alto</strong>, porque el globo sale más pequeño y tiene más camino por recorrer antes de llegar a su límite.",
   wMod3:"<strong>Cuánto tiempo está en el aire — y por qué importa aquí.</strong> La deriva es, en esencia, velocidad del viento multiplicada por el tiempo que se pasa dentro de él. Frenar el ascenso para ganar altura alarga el vuelo, y por lo tanto alarga la deriva: pasar de 5 a 4 m/s agregaría unos ochocientos metros de altura y treinta y cinco minutos de vuelo, con un aumento de la deriva del orden del 15-20 %. Es el compromiso que este mapa sirve para evaluar.",
   wMod4:"<strong>Cómo cae.</strong> El paracaídas frena en proporción a la densidad del aire que encuentra. Arriba, donde el aire es doscientas veces más tenue, frena poquísimo y el descenso es rápido; al bajar el aire se hace más denso y la sonda frena progresivamente. Con nuestro paracaídas de 1,2 m de diámetro la llegada al suelo es a unos 4,5 m/s. El descenso dura poco menos de una hora y no depende de cuánto helio se puso, mientras que el ascenso sí: por eso todo el compromiso se juega en el ascenso.",
-  dateNote:"La fecha del lanzamiento es <strong>provisional</strong>: depende de cuándo estemos listos y de las condiciones meteorológicas del día.",
+  dateNoteTag:"Fecha del lanzamiento",
+  dateNote:"La fecha del lanzamiento está sujeta a cambios por las <strong>condiciones meteorológicas</strong> y por el <strong>estado de avance del proyecto</strong>.",
   prKicker:"La sonda",
   prHead:"Klo-01",
   prBody:"Una caja de poliestireno expandido con tres estantes internos, diez sensores, una cámara y dos rastreadores independientes. Las dos aletas no son decorativas: sirven para estabilizarla y frenar su rotación, porque una sonda que gira sobre sí misma graba mal y mide peor.",
@@ -541,7 +543,7 @@ es:{
   q10c:"<em>La sonda se pierde.</em> Sin sonda no hay video ni datos. La previsión de la trayectoria y los dos rastreadores independientes reducen este riesgo casi a cero.",
   q10d:"<em>Algo falla en la placa, en los sensores o en las conexiones.</em> Por eso separamos el sistema en tres niveles independientes: primero el hallazgo, después el filmado, después todo lo demás. Los ensayos previos al lanzamiento serán decisivos para reducir al mínimo los imprevistos.",
   hwKicker:"Cómo funciona",
-  hw1:"La <a data-page=\"sonda\" tabindex=\"0\">sonda</a> es una caja de poliestireno que aloja la cámara, los sensores para los datos científicos y toda la electrónica. Para llevarla a la estratosfera hace falta un globo de látex lleno de helio. Al estallar el globo se abre el paracaídas para el regreso.",
+  hw1:"La <a data-page=\"sonda\" tabindex=\"0\">sonda</a> es una caja de poliestireno que aloja la cámara, los sensores para los datos científicos y toda la electrónica. Para llevarla a la estratósfera hace falta un globo de látex lleno de helio. Al estallar el globo se abre el paracaídas para el regreso.",
   mailRole:"Carlo De Toni · docente coordinador del proyecto",
   q11t:"El globo se vuelve enorme: ¿no es un peligro para los aviones?",
   q11:"El lugar exacto del lanzamiento se elegirá de modo que el despegue, el vuelo y el aterrizaje ocurran en una zona permitida por las autoridades aeronáuticas, y la posición de la sonda se comunicará en tiempo real a las autoridades. Cuando dejemos de tener datos de posición, la sonda estará ya a una altura donde no hay tráfico aéreo de ningún tipo — ni tampoco satélites. Por último, y con las precauciones anteriores no debería hacer falta, la cuerda que usamos tiene un punto de rotura calculado: en caso de colisión el globo se separa del paracaídas y de la sonda.",
@@ -618,7 +620,7 @@ en:{
 
   wKicker:"Phase 1 · Preliminary study", windsTitle:"Where the probe ends up",
   windsSub:"240 simulated trajectories to choose the launch site.",
-  wLede:"Before choosing a launch site we simulated 240 flights from two different towns, using the winds actually forecast over the same period in four past years, from 2021 to 2024.<br><br>The result is that the probe drifts about 190 km east.",
+  wLede:"Before choosing a launch site we simulated 240 flights from two different towns, using the winds actually forecast over the same period in four past years, from 2021 to 2024. The result is that the probe <strong>drifts systematically eastwards</strong>, by about 190 km.",
   wTraj:"Simulated trajectories", wDrift:"Mean drift", wBearing:"Mean bearing", wDur:"Mean duration", wBearingU:"(east)",
 
   wSimHead:"The simulation",
@@ -640,7 +642,7 @@ en:{
   wUseHead:"What it is for, and what it is not",
   wUseTag:"Please note",
   wUseP1:"This analysis is for <strong>choosing the launch site</strong>. It does not say where our probe will land.",
-  wUseP2:"For that we will use a far more precise forecasting tool, which however only works a few days before launch. And the actual site and date of the flight depend in every case on authorisation from <strong>DINACIA</strong>.",
+  wUseP2:"For that we will use a far more precise forecasting tool, which however only works a few days before launch. The launch site is also constrained by the <a data-page=\"legale\" tabindex=\"0\">rules of the aeronautical authorities</a>.",
 
   srcMeteo:"<strong>Weather data:</strong> archived forecasts from the Historical Forecast API of <a href=\"https://open-meteo.com/\" target=\"_blank\" rel=\"noopener\">Open-Meteo</a>, distributed under CC BY 4.0.",
   srcMap:"<strong>Map:</strong> Leaflet over OpenStreetMap cartography, © OpenStreetMap contributors.",
@@ -783,7 +785,8 @@ en:{
   wMod2:"<strong>How high it goes.</strong> As it climbs, outside pressure falls and the balloon expands: at 37 km its volume is more than two hundred times what it was, and its diameter goes from two metres to over twelve. But latex has a maximum stretch, and the burst happens where that limit is reached. Hence the consequence that surprises people: <strong>less helium means a higher burst</strong>, because the balloon starts smaller and has further to go before reaching its limit.",
   wMod3:"<strong>How long it stays up — and why that matters here.</strong> Drift is, in essence, wind speed multiplied by the time spent in it. Slowing the ascent to gain altitude lengthens the flight, and therefore lengthens the drift: going from 5 to 4 m/s would add some eight hundred metres of altitude and thirty-five minutes of flight, increasing drift by something like 15-20 %. That is the trade-off this map exists to weigh.",
   wMod4:"<strong>How it falls.</strong> A parachute brakes in proportion to the density of the air it meets. High up, where the air is two hundred times thinner, it brakes very little and the descent is fast; lower down the air thickens and the probe slows progressively. With our 1.2 m parachute it reaches the ground at about 4.5 m/s. The descent takes a little under an hour and does not depend on how much helium was used, whereas the ascent does: that is why the whole trade-off is played out on the way up.",
-  dateNote:"The launch date is <strong>provisional</strong>: it depends on when we are ready and on the weather on the day.",
+  dateNoteTag:"Launch date",
+  dateNote:"The launch date is subject to change depending on <strong>weather conditions</strong> and on the <strong>progress of the project</strong>.",
   prKicker:"The probe",
   prHead:"Klo-01",
   prBody:"A polystyrene box with three internal decks, ten sensors, a camera and two independent trackers. The two fins are not decorative: they steady it and slow its rotation, because a probe that spins films badly and measures worse.",
