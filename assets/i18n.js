@@ -49,7 +49,7 @@ it:{
 
   /* — Missione — */
   pKicker:"Fase 1 · Profilo di volo", missionTitle:"Missione",
-  missionSub:"Cosa studiamo e come sale la sonda.",
+  missionSub:"Cosa studiamo e come.",
   mBody:"Il progetto COMETA invia la sonda Klo-01 fino a circa 37,8 km di quota per studiare la stratosfera attraverso misure dirette, in una regione dell'atmosfera che gli aerei non raggiungono e i satelliti sorvolano.",
 
   pHead2:"Dati del progetto",
@@ -155,8 +155,8 @@ it:{
   legalSub:"Che cosa dice la norma aeronautica, e come si applica a noi.",
   lWarnTag:"Prima di leggere",
   lWarn1:"Questa pagina è un riassunto divulgativo, scritto da noi per spiegare il quadro in cui ci muoviamo. <strong>Fa fede il testo originale del regolamento</strong>, non questa sintesi.",
-  lWarn2:"Ogni volo di pallone libero non pilotato deve essere <strong>autorizzato dalla DINACIA</strong>, l'autorità aeronautica uruguaiana. Nessuna informazione di questa pagina sostituisce quell'autorizzazione.",
-  lLede:"Il riferimento che ci è stato indicato dalla DINACIA è il <strong>LAR 91, Parte I, Appendice P — Globos libres no tripulados</strong>, il regolamento aeronautico latinoamericano sui palloni liberi non pilotati. Stabilisce come si classificano, quali obblighi porta ogni categoria, e che cosa si può e non si può fare.",
+  lWarn2:"Ogni volo di pallone libero non pilotato deve essere autorizzato dalle autorità aeronautiche competenti. Nessuna informazione di questa pagina sostituisce quell'autorizzazione.",
+  lLede:"Il riferimento che ci è stato indicato dalla DINACIA — Dirección Nacional de Aviación Civil e Infraestructura Aeronáutica, l'autorità aeronautica uruguaiana — è il LAR 91, Parte I, Appendice P «Globos libres no tripulados», il regolamento aeronautico latinoamericano sui palloni liberi non pilotati. Stabilisce come si classificano, quali obblighi porta ogni categoria, e che cosa si può e non si può fare.",
 
   lClassHead:"Come viene classificata la nostra sonda",
   lClassIntro:"Le categorie sono tre. <strong>Ligero</strong>: carico utile complessivo sotto i 4 kg. <strong>Mediano</strong>: da 4 a 6 kg, distribuiti su due o più colli. <strong>Pesado</strong>: 6 kg o più. Ma la massa non decide da sola — tre condizioni fanno scattare la categoria «pesado» a qualunque peso, e sono le ultime tre righe della tabella. Basta che una sia soddisfatta.",
@@ -180,7 +180,7 @@ it:{
 
   lDiscTag:"Avvertenza",
   lDisc1:"Le informazioni di questa pagina sono pubblicate a scopo divulgativo e didattico. Non costituiscono consulenza tecnica o legale, e possono contenere errori o essere superate da modifiche normative successive.",
-  lDisc2:"<strong>Chi volesse organizzare un proprio lancio deve rivolgersi direttamente alla DINACIA</strong> e attenersi al testo vigente del regolamento. Non ci assumiamo alcuna responsabilità per l'uso che altri facciano delle informazioni pubblicate qui.",
+  lDisc2:"Chi volesse organizzare un proprio lancio in Uruguay deve rivolgersi direttamente alla DINACIA e attenersi al testo vigente del regolamento. Non ci assumiamo alcuna responsabilità per l'uso che altri facciano delle informazioni pubblicate qui.",
   lSrc1:"<strong>Norma:</strong> LAR 91 — Reglas de vuelo y operación general, Parte I, Apéndice P «Globos libres no tripulados». Seconda edizione, Emendamento 16, febbraio 2025 (il testo dell'Appendice P risale all'Emendamento 11).",
   lSrc2:"<strong>Autorità:</strong> <a href=\"https://www.dinacia.gub.uy/\" target=\"_blank\" rel=\"noopener\">DINACIA</a> — Dirección Nacional de Aviación Civil e Infraestructura Aeronáutica, Uruguay.",
 
@@ -233,7 +233,7 @@ it:{
   q4:"La luce è un'onda elettromagnetica, e la sua frequenza di oscillazione corrisponde al colore: il viola ha la frequenza più alta, poi vengono blu, verde, giallo e rosso. Il processo che devia la luce del Sole nell'atmosfera — la <em>diffusione di Rayleigh</em> — favorisce decisamente le frequenze alte, cioè il blu, ed è quel blu sparso in tutte le direzioni che vediamo guardando in su. Allora perché non viola? Perché nella luce del Sole il viola è meno presente, e i nostri occhi lo percepiscono molto meno. Salendo di quota le molecole diminuiscono, la luce deviata diminuisce con loro, e il cielo si spegne: a trenta chilometri sopra la testa è rimasto meno dell'1 % dell'aria, e resta il nero dello spazio — con il Sole che continua a splendere accanto, perché non c'è più niente che ne disperda la luce.",
 
   q5t:"Perché si usa l'elio?",
-  q5:"L'elio e l'idrogeno sono molto più leggeri dell'aria: l'idrogeno — il gas più leggero che esista — circa quattordici volte, l'elio circa sette. Quello che conta per la spinta è la densità, cioè quanto pesa un certo volume di gas rispetto allo stesso volume d'aria; e all'origine c'è la massa delle singole molecole, molto minore di quella dell'azoto che compone gran parte dell'aria. L'idrogeno costa meno e si può produrre, mentre l'elio è una risorsa limitata. Ma l'idrogeno è infiammabile — si pensi al disastro dell'Hindenburg — e l'elio invece è un gas inerte e sicuro. Dell'elio esistono poi diversi gradi di purezza: più è puro, più è leggero, e a parità di spinta si ottiene una quota di scoppio più alta.",
+  q5:"L'elio e l'idrogeno sono molto più leggeri dell'aria, che è composta prevalentemente da molecole di azoto e ossigeno: l'idrogeno — il gas più leggero che esista — circa quattordici volte, l'elio circa sette. L'idrogeno costa meno e si può produrre, mentre l'elio è una risorsa limitata. Ma l'idrogeno è infiammabile — si pensi al disastro dell'Hindenburg — e l'elio invece è un gas inerte e sicuro. Dell'elio esistono poi diversi gradi di purezza: più è puro, più è leggero, e a parità di spinta si ottiene una quota di scoppio più alta.",
 
   q6t:"Come si sceglie a che velocità deve salire?",
   q6:"Decidendo quanto elio mettere. Il peso da sollevare è fisso; l'elio in più è spinta in eccesso, e quella eccedenza diventa velocità di salita. Con più elio si sale più in fretta ma si scoppia più in basso, perché il pallone parte già più gonfio e raggiunge prima il suo limite di allungamento. Con meno elio si sale più lentamente e si arriva più in alto, ma si resta in aria più a lungo — e più tempo significa più deriva. La velocità di salita tiene conto di questo compromesso.",
@@ -267,7 +267,7 @@ it:{
   paS3:"Durata della discesa",
   sfNote:"Essendo la nostra prima esperienza, per pallone, paracadute e catena di volo utilizziamo il materiale di <a href=\"https://stratoflights.com/\" target=\"_blank\" rel=\"noopener\">StratoFlights</a>, azienda tedesca di grande esperienza nel settore. La sonda e i suoi strumenti invece li progettiamo e li costruiamo noi.",
   q9t:"Si possono vedere il video e i dati in diretta?",
-  q9:"No. La sonda non può trasmettere quelle informazioni: restano tutte a bordo, sulle memorie. È per questo che recuperarla è fondamentale, ed è per questo che abbiamo messo due tracciatori indipendenti. L'unica informazione che ci arriva durante il volo è la posizione, e solo sotto i 18 km: oltre quella quota i ricevitori GPS civili smettono di funzionare, per un limite di sicurezza imposto ai dispositivi allo scopo di impedirne l'uso militare. Vale anche il contrario: neanche noi possiamo comunicare con la sonda, in nessun modo.",
+  q9:"No. La sonda non può trasmettere quelle informazioni: restano tutte a bordo, sulle memorie. È per questo che recuperarla è fondamentale, ed è per questo che abbiamo messo due tracciatori indipendenti. L'unica informazione che ci arriva durante il volo è la posizione, e solo sotto i 18 km: oltre quella quota i ricevitori GPS civili smettono di funzionare, per un limite di sicurezza imposto ai dispositivi allo scopo di impedirne l'uso militare. Vale anche il contrario: neanche noi possiamo comunicare con la sonda durante il volo, in nessun modo.",
   q10t:"Quali sono i rischi principali?",
   q10a:"In ordine di gravità, non di probabilità.",
   q10b:"<em>Il paracadute non si apre.</em> È la cosa peggiore che possa succedere, ed è la ragione per cui abbiamo scelto di usare materiale StratoFlights per tutto ciò che riguarda il volo.",
@@ -277,7 +277,7 @@ it:{
   hw1:"La <a data-page=\"sonda\" tabindex=\"0\">sonda</a> è una scatola in polistirolo che ospita la videocamera, i sensori per i dati scientifici e tutta l'elettronica. Per portarla nella stratosfera è necessario un pallone in lattice riempito di elio. Allo scoppio del pallone si apre il paracadute per il rientro.",
   mailRole:"Carlo De Toni · docente coordinatore del progetto",
   q11t:"Il pallone diventa enorme: non è un pericolo per gli aerei?",
-  q11:"Il luogo esatto del lancio sarà scelto in modo che decollo, volo e atterraggio si svolgano lontano dalla zona proibita al traffico aereo, e la posizione della sonda sarà comunicata in tempo reale alle autorità. Quando smetteremo di avere dati sulla posizione, la sonda sarà già a una quota dove non c'è traffico aereo di nessun tipo — e nemmeno satelliti. Infine, e con le precauzioni precedenti non dovrebbe servire, la corda che usiamo ha un punto di rottura calcolato: in caso di collisione il pallone si separa dal paracadute e dalla sonda.",
+  q11:"Il luogo esatto del lancio sarà scelto in modo che decollo, volo e atterraggio si svolgano in una zona consentita dalle autorità aeronautiche, e la posizione della sonda sarà comunicata in tempo reale alle autorità. Quando smetteremo di avere dati sulla posizione, la sonda sarà già a una quota dove non c'è traffico aereo di nessun tipo — e nemmeno satelliti. Infine, e con le precauzioni precedenti non dovrebbe servire, la corda che usiamo ha un punto di rottura calcolato: in caso di collisione il pallone si separa dal paracadute e dalla sonda.",
   q12t:"Si può riutilizzare?",
   q12a:"Se la recuperiamo, si riutilizza tutto tranne tre cose: il pallone, che scoppia frantumandosi; l'elio, che si disperde nell'alta atmosfera; e le pile al litio, che sono usa e getta, ma sono le uniche che garantiscono affidabilità e prestazioni a quelle temperature. La scatola resta modellata su questo esperimento, quindi si riusa nella stessa configurazione. Tutto il resto è riutilizzabile al cento per cento, e non solo per palloni stratosferici.",
   q12b:"Il pallone è l'unica parte che si disperde nell'ambiente. È fatto prevalentemente di lattice, un materiale di origine naturale che si degrada nel tempo — non è un materiale innocuo, ma è il meno problematico fra quelli disponibili per questo impiego.",
@@ -320,7 +320,7 @@ es:{
   ix8t:"Quiénes somos y contacto", ix8n:"¡Vení a conocernos!",
 
   pKicker:"Fase 1 · Perfil de vuelo", missionTitle:"Misión",
-  missionSub:"Qué estudiamos y cómo asciende la sonda.",
+  missionSub:"Qué estudiamos y cómo.",
   mBody:"El proyecto COMETA envía la sonda Klo-01 hasta unos 37,8 km de altura para estudiar la estratosfera mediante mediciones directas, en una región de la atmósfera que los aviones no alcanzan y los satélites sobrevuelan.",
 
   pHead2:"Datos del proyecto",
@@ -422,8 +422,8 @@ es:{
   legalSub:"Qué dice la norma aeronáutica y cómo se aplica a nosotros.",
   lWarnTag:"Antes de leer",
   lWarn1:"Esta página es un resumen divulgativo, escrito por nosotros para explicar el marco en el que trabajamos. <strong>Vale el texto original del reglamento</strong>, no esta síntesis.",
-  lWarn2:"Todo vuelo de globo libre no tripulado debe ser <strong>autorizado por la DINACIA</strong>, la autoridad aeronáutica uruguaya. Ninguna información de esta página sustituye esa autorización.",
-  lLede:"La referencia que nos indicó la DINACIA es el <strong>LAR 91, Parte I, Apéndice P — Globos libres no tripulados</strong>, el reglamento aeronáutico latinoamericano sobre globos libres no tripulados. Establece cómo se clasifican, qué obligaciones trae cada categoría y qué se puede y qué no se puede hacer.",
+  lWarn2:"Todo vuelo de globo libre no tripulado debe ser autorizado por las autoridades aeronáuticas competentes. Ninguna información de esta página sustituye esa autorización.",
+  lLede:"La referencia que nos indicó la DINACIA — Dirección Nacional de Aviación Civil e Infraestructura Aeronáutica, la autoridad aeronáutica uruguaya — es el LAR 91, Parte I, Apéndice P «Globos libres no tripulados», el reglamento aeronáutico latinoamericano sobre globos libres no tripulados. Establece cómo se clasifican, qué obligaciones trae cada categoría y qué se puede y qué no se puede hacer.",
 
   lClassHead:"Cómo se clasifica nuestra sonda",
   lClassIntro:"Las categorías son tres. <strong>Ligero</strong>: carga útil combinada por debajo de 4 kg. <strong>Mediano</strong>: de 4 a 6 kg, repartidos en dos o más bultos. <strong>Pesado</strong>: 6 kg o más. Pero la masa no decide sola — tres condiciones hacen saltar la categoría «pesado» con cualquier peso, y son las tres últimas filas de la tabla. Basta con que se cumpla una.",
@@ -447,7 +447,7 @@ es:{
 
   lDiscTag:"Advertencia",
   lDisc1:"La información de esta página se publica con fines divulgativos y educativos. No constituye asesoramiento técnico ni legal, y puede contener errores o quedar superada por modificaciones normativas posteriores.",
-  lDisc2:"<strong>Quien quiera organizar su propio lanzamiento debe dirigirse directamente a la DINACIA</strong> y atenerse al texto vigente del reglamento. No asumimos ninguna responsabilidad por el uso que terceros hagan de la información publicada aquí.",
+  lDisc2:"Quien quiera organizar su propio lanzamiento en Uruguay debe dirigirse directamente a la DINACIA y atenerse al texto vigente del reglamento. No asumimos ninguna responsabilidad por el uso que terceros hagan de la información publicada aquí.",
   lSrc1:"<strong>Norma:</strong> LAR 91 — Reglas de vuelo y operación general, Parte I, Apéndice P «Globos libres no tripulados». Segunda edición, Enmienda 16, febrero 2025 (el texto del Apéndice P corresponde a la Enmienda 11).",
   lSrc2:"<strong>Autoridad:</strong> <a href=\"https://www.dinacia.gub.uy/\" target=\"_blank\" rel=\"noopener\">DINACIA</a> — Dirección Nacional de Aviación Civil e Infraestructura Aeronáutica, Uruguay.",
 
@@ -488,7 +488,7 @@ es:{
   /* — Preguntas — */
   navQA:"Q&A", qKicker:"Fase 1 · Preguntas", qaTitle:"Preguntas (no tan) frecuentes",
   q5t:"¿Por qué se usa helio?",
-  q5:"El helio y el hidrógeno son mucho más livianos que el aire: el hidrógeno — el gas más liviano que existe — unas catorce veces, el helio unas siete. Lo que cuenta para el empuje es la densidad, es decir cuánto pesa cierto volumen de gas frente al mismo volumen de aire; y en el origen está la masa de cada molécula, mucho menor que la del nitrógeno que compone gran parte del aire. El hidrógeno cuesta menos y se puede producir, mientras que el helio es un recurso limitado. Pero el hidrógeno es inflamable — piénsese en el desastre del Hindenburg — y el helio, en cambio, es un gas inerte y seguro. Del helio existen además distintos grados de pureza: cuanto más puro, más liviano, y a igual empuje se obtiene una altura de estallido mayor.",
+  q5:"El helio y el hidrógeno son mucho más livianos que el aire, que está compuesto principalmente por moléculas de nitrógeno y oxígeno: el hidrógeno — el gas más liviano que existe — unas catorce veces, el helio unas siete. El hidrógeno cuesta menos y se puede producir, mientras que el helio es un recurso limitado. Pero el hidrógeno es inflamable — piénsese en el desastre del Hindenburg — y el helio, en cambio, es un gas inerte y seguro. Del helio existen además distintos grados de pureza: cuanto más puro, más liviano, y a igual empuje se obtiene una altura de estallido mayor.",
 
   q6t:"¿Cómo se elige a qué velocidad tiene que subir?",
   q6:"Decidiendo cuánto helio poner. El peso a levantar es fijo; el helio de más es empuje sobrante, y ese sobrante se convierte en velocidad de ascenso. Con más helio se sube más rápido pero se estalla más abajo, porque el globo sale ya más inflado y alcanza antes su límite de estiramiento. Con menos helio se sube más lento y se llega más alto, pero se está más tiempo en el aire — y más tiempo significa más deriva. La velocidad de ascenso tiene en cuenta este compromiso.",
@@ -534,7 +534,7 @@ es:{
   paS3:"Duración del descenso",
   sfNote:"Al ser nuestra primera experiencia, para el globo, el paracaídas y la cadena de vuelo usamos material de <a href=\"https://stratoflights.com/\" target=\"_blank\" rel=\"noopener\">StratoFlights</a>, empresa alemana de gran experiencia en el sector. La sonda y sus instrumentos, en cambio, los diseñamos y construimos nosotros.",
   q9t:"¿Se pueden ver el video y los datos en vivo?",
-  q9:"No. La sonda no puede transmitir esa información: queda toda a bordo, en las memorias. Por eso recuperarla es fundamental, y por eso pusimos dos rastreadores independientes. La única información que nos llega durante el vuelo es la posición, y sólo por debajo de los 18 km: por encima de esa altura los receptores GPS civiles dejan de funcionar, por un límite de seguridad impuesto a los dispositivos para impedir su uso militar. Vale también lo contrario: tampoco nosotros podemos comunicarnos con la sonda, de ninguna manera.",
+  q9:"No. La sonda no puede transmitir esa información: queda toda a bordo, en las memorias. Por eso recuperarla es fundamental, y por eso pusimos dos rastreadores independientes. La única información que nos llega durante el vuelo es la posición, y sólo por debajo de los 18 km: por encima de esa altura los receptores GPS civiles dejan de funcionar, por un límite de seguridad impuesto a los dispositivos para impedir su uso militar. Vale también lo contrario: tampoco nosotros podemos comunicarnos con la sonda durante el vuelo, de ninguna manera.",
   q10t:"¿Cuáles son los riesgos principales?",
   q10a:"En orden de gravedad, no de probabilidad.",
   q10b:"<em>El paracaídas no se abre.</em> Es lo peor que puede pasar, y es la razón por la que elegimos usar material de StratoFlights para todo lo relativo al vuelo.",
@@ -544,7 +544,7 @@ es:{
   hw1:"La <a data-page=\"sonda\" tabindex=\"0\">sonda</a> es una caja de poliestireno que aloja la cámara, los sensores para los datos científicos y toda la electrónica. Para llevarla a la estratosfera hace falta un globo de látex lleno de helio. Al estallar el globo se abre el paracaídas para el regreso.",
   mailRole:"Carlo De Toni · docente coordinador del proyecto",
   q11t:"El globo se vuelve enorme: ¿no es un peligro para los aviones?",
-  q11:"El lugar exacto del lanzamiento se elegirá de modo que el despegue, el vuelo y el aterrizaje ocurran lejos de la zona prohibida al tráfico aéreo, y la posición de la sonda se comunicará en tiempo real a las autoridades. Cuando dejemos de tener datos de posición, la sonda estará ya a una altura donde no hay tráfico aéreo de ningún tipo — ni tampoco satélites. Por último, y con las precauciones anteriores no debería hacer falta, la cuerda que usamos tiene un punto de rotura calculado: en caso de colisión el globo se separa del paracaídas y de la sonda.",
+  q11:"El lugar exacto del lanzamiento se elegirá de modo que el despegue, el vuelo y el aterrizaje ocurran en una zona permitida por las autoridades aeronáuticas, y la posición de la sonda se comunicará en tiempo real a las autoridades. Cuando dejemos de tener datos de posición, la sonda estará ya a una altura donde no hay tráfico aéreo de ningún tipo — ni tampoco satélites. Por último, y con las precauciones anteriores no debería hacer falta, la cuerda que usamos tiene un punto de rotura calculado: en caso de colisión el globo se separa del paracaídas y de la sonda.",
   q12t:"¿Se puede reutilizar?",
   q12a:"Si la recuperamos, se reutiliza todo salvo tres cosas: el globo, que estalla y se hace pedazos; el helio, que se dispersa en la alta atmósfera; y las pilas de litio, que son de un solo uso, pero son las únicas que garantizan fiabilidad y prestaciones a esas temperaturas. La caja queda modelada sobre este experimento, así que se reutiliza en la misma configuración. Todo lo demás es reutilizable al cien por cien, y no sólo para globos estratosféricos.",
   q12b:"El globo es la única parte que se dispersa en el ambiente. Está hecho principalmente de látex, un material de origen natural que se degrada con el tiempo — no es un material inocuo, pero es el menos problemático entre los disponibles para este uso.",
@@ -587,7 +587,7 @@ en:{
   ix8t:"About and contact", ix8n:"Come and meet us!",
 
   pKicker:"Phase 1 · Flight profile", missionTitle:"Mission",
-  missionSub:"What we study and how the probe ascends.",
+  missionSub:"What we study, and how.",
   mBody:"Project COMETA sends the Klo-01 probe to about 37.8 km to study the stratosphere through direct measurements, in a region of the atmosphere that aircraft do not reach and satellites fly over.",
 
   pHead2:"Project data",
@@ -689,8 +689,8 @@ en:{
   legalSub:"What the aviation regulation says, and how it applies to us.",
   lWarnTag:"Before you read",
   lWarn1:"This page is a plain-language summary, written by us to explain the framework we work within. <strong>The original text of the regulation prevails</strong>, not this summary.",
-  lWarn2:"Every unmanned free balloon flight must be <strong>authorised by DINACIA</strong>, the Uruguayan civil aviation authority. Nothing on this page replaces that authorisation.",
-  lLede:"The reference DINACIA pointed us to is <strong>LAR 91, Part I, Appendix P — Unmanned free balloons</strong>, the Latin American aviation regulation covering unmanned free balloons. It sets out how they are classified, what obligations each category carries, and what may and may not be done.",
+  lWarn2:"Every unmanned free balloon flight must be authorised by the competent aviation authorities. Nothing on this page replaces that authorisation.",
+  lLede:"The reference DINACIA — Dirección Nacional de Aviación Civil e Infraestructura Aeronáutica, the Uruguayan civil aviation authority — pointed us to is LAR 91, Part I, Appendix P «Globos libres no tripulados», the Latin American aviation regulation covering unmanned free balloons. It sets out how they are classified, what obligations each category carries, and what may and may not be done.",
 
   lClassHead:"How our probe is classified",
   lClassIntro:"There are three categories. <strong>Light</strong>: combined payload under 4 kg. <strong>Medium</strong>: 4 to 6 kg, spread over two or more packages. <strong>Heavy</strong>: 6 kg or more. But mass does not decide on its own — three conditions trigger the «heavy» category at any weight, and they are the last three rows of the table. Meeting any one of them is enough.",
@@ -714,7 +714,7 @@ en:{
 
   lDiscTag:"Disclaimer",
   lDisc1:"The information on this page is published for educational purposes. It is not technical or legal advice, and it may contain errors or be superseded by later amendments to the regulation.",
-  lDisc2:"<strong>Anyone planning their own launch must contact DINACIA directly</strong> and follow the regulation as currently in force. We accept no responsibility for any use others make of the information published here.",
+  lDisc2:"Anyone planning their own launch in Uruguay must contact DINACIA directly and follow the regulation as currently in force. We accept no responsibility for any use others make of the information published here.",
   lSrc1:"<strong>Regulation:</strong> LAR 91 — Reglas de vuelo y operación general, Part I, Appendix P «Globos libres no tripulados». Second edition, Amendment 16, February 2025 (the Appendix P text dates from Amendment 11).",
   lSrc2:"<strong>Authority:</strong> <a href=\"https://www.dinacia.gub.uy/\" target=\"_blank\" rel=\"noopener\">DINACIA</a> — Dirección Nacional de Aviación Civil e Infraestructura Aeronáutica, Uruguay.",
 
@@ -755,7 +755,7 @@ en:{
   /* — Questions — */
   navQA:"Q&A", qKicker:"Phase 1 · Questions", qaTitle:"(Not so) frequently asked questions",
   q5t:"Why helium?",
-  q5:"Helium and hydrogen are much lighter than air: hydrogen — the lightest gas there is — about fourteen times, helium about seven. What matters for lift is density, how much a given volume of gas weighs against the same volume of air; and behind that is the mass of the individual molecules, far smaller than the nitrogen that makes up most of the air. Hydrogen costs less and can be produced, whereas helium is a finite resource. But hydrogen is flammable — think of the Hindenburg disaster — while helium is inert and safe. Helium also comes in different grades of purity: the purer it is, the lighter it is, and for the same lift you get a higher burst altitude.",
+  q5:"Helium and hydrogen are much lighter than air, which is made up mostly of nitrogen and oxygen molecules: hydrogen — the lightest gas there is — about fourteen times, helium about seven. Hydrogen costs less and can be produced, whereas helium is a finite resource. But hydrogen is flammable — think of the Hindenburg disaster — while helium is inert and safe. Helium also comes in different grades of purity: the purer it is, the lighter it is, and for the same lift you get a higher burst altitude.",
 
   q6t:"How do you choose the ascent rate?",
   q6:"By deciding how much helium to put in. The weight to be lifted is fixed; extra helium is surplus lift, and that surplus becomes ascent speed. More helium means climbing faster but bursting lower, because the balloon leaves the ground already fuller and reaches its stretching limit sooner. Less helium means climbing more slowly and reaching higher, but staying airborne longer — and longer means more drift. The ascent rate reflects that trade-off.",
@@ -801,7 +801,7 @@ en:{
   paS3:"Descent duration",
   sfNote:"As this is our first attempt, for the balloon, the parachute and the flight chain we use equipment from <a href=\"https://stratoflights.com/\" target=\"_blank\" rel=\"noopener\">StratoFlights</a>, a German company with long experience in the field. The probe and its instruments, on the other hand, we design and build ourselves.",
   q9t:"Can the video and the data be watched live?",
-  q9:"No. The probe cannot transmit any of that: it all stays on board, in memory. That is why recovering it is essential, and why we fitted two independent trackers. The only information that reaches us during the flight is the position, and only below 18 km: above that height civilian GPS receivers stop working, because of a safety limit imposed on the devices to prevent military use. The reverse is also true: we cannot communicate with the probe either, in any way.",
+  q9:"No. The probe cannot transmit any of that: it all stays on board, in memory. That is why recovering it is essential, and why we fitted two independent trackers. The only information that reaches us during the flight is the position, and only below 18 km: above that height civilian GPS receivers stop working, because of a safety limit imposed on the devices to prevent military use. The reverse is also true: we cannot communicate with the probe during the flight either, in any way.",
   q10t:"What are the main risks?",
   q10a:"In order of severity, not of likelihood.",
   q10b:"<em>The parachute fails to open.</em> It is the worst thing that could happen, and it is why we chose StratoFlights equipment for everything to do with the flight itself.",
@@ -811,7 +811,7 @@ en:{
   hw1:"The <a data-page=\"sonda\" tabindex=\"0\">probe</a> is a polystyrene box holding the camera, the sensors for the scientific data and all the electronics. To carry it into the stratosphere you need a latex balloon filled with helium. When the balloon bursts, the parachute opens for the return.",
   mailRole:"Carlo De Toni · teacher and project coordinator",
   q11t:"The balloon becomes enormous: is it not a danger to aircraft?",
-  q11:"The exact launch site will be chosen so that take-off, flight and landing all happen well away from the zone closed to air traffic, and the probe's position will be reported to the authorities in real time. By the time we stop receiving position data, the probe will already be at a height where there is no air traffic of any kind — and no satellites either. Finally, and with the precautions above it should not be needed, the cord we use has a calculated breaking point: in a collision the balloon separates from the parachute and the probe.",
+  q11:"The exact launch site will be chosen so that take-off, flight and landing all take place in an area permitted by the aviation authorities, and the probe's position will be reported to the authorities in real time. By the time we stop receiving position data, the probe will already be at a height where there is no air traffic of any kind — and no satellites either. Finally, and with the precautions above it should not be needed, the cord we use has a calculated breaking point: in a collision the balloon separates from the parachute and the probe.",
   q12t:"Can it be reused?",
   q12a:"If we recover it, everything is reused except three things: the balloon, which bursts into fragments; the helium, which disperses into the upper atmosphere; and the lithium cells, which are single-use, but are the only ones that give reliability and performance at those temperatures. The box stays shaped around this experiment, so it is reused in the same configuration. Everything else is fully reusable, and not only for stratospheric balloons.",
   q12b:"The balloon is the only part that is lost to the environment. It is made mostly of latex, a material of natural origin that degrades over time — not a harmless material, but the least problematic of those available for this use.",
