@@ -193,9 +193,9 @@ const PARTS = [
 {id:23, deck:2, cat:"atmo", x:119, y:3, z:40, w:25, d:18, h:3, g:4,
  n:{it:"2° MAX31865 (PT1000 nel tubo)", es:"2.º MAX31865 (PT1000 en el tubo)", en:"2nd MAX31865 (PT1000 in the tube)"},
  note:{
-  it:"ESPERIMENTO DI CONFRONTO: legge un secondo PT1000 alloggiato in un tubo passante, in parallelo a quello esposto sul braccetto. Le due curve dicono con i vostri dati quanto pesa la termalizzazione dell'aria nel tubo — è il punto su cui il metodo di Antolini e questa configurazione divergono.",
-  es:"EXPERIMENTO DE COMPARACIÓN: lee un segundo PT1000 alojado en un tubo pasante, en paralelo al expuesto en el brazo. Las dos curvas dicen, con los datos propios, cuánto pesa la termalización del aire en el tubo — es el punto en el que el método de Antolini y esta configuración divergen.",
-  en:"COMPARISON EXPERIMENT: it reads a second PT1000 housed in a through tube, in parallel with the one exposed on the arm. The two curves tell you, from your own data, how much the thermalisation of the air inside the tube matters — the point where Antolini's method and this configuration diverge."}},
+  it:"Legge un secondo PT1000 alloggiato nel tubo esterno, in parallelo a quello esposto sul braccetto. Le due curve dicono con i dati quanto pesa la termalizzazione dell'aria nel tubo.",
+  es:"Lee un segundo PT1000 alojado en el tubo externo, en paralelo al expuesto en el brazo. Las dos curvas dicen con los datos cuánto pesa la termalización del aire en el tubo.",
+  en:"It reads a second PT1000 housed in the external tube, in parallel with the one exposed on the arm. The two curves show, from the data, how much the thermalisation of the air inside the tube matters."}},
 
 {id:24, deck:3, cat:"atmo", x:-175, y:95, z:76, w:6, d:10, h:8, g:1,
  n:{it:"Elemento PT1000 (braccetto esterno)", es:"Elemento PT1000 (brazo exterior)", en:"PT1000 element (external arm)"},
