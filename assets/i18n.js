@@ -28,6 +28,7 @@ it:{
   cUnit:"g",
   afterKicker:"Progetto COMETA",
   afterHead:"Da terra al bordo dello spazio.",
+  homeLede:"La Fase 1 del progetto COMETA consiste nell'inviare nella stratosfera una sonda portata da un pallone riempito di elio. La sonda riprenderà in video tutto il volo e raccoglierà dati atmosferici attraverso i sensori montati a bordo.",
   sAlt:"Quota prevista", sDur:"Durata del volo", sMass:"Massa della sonda", sStudents:"Studenti coinvolti",
 
   tzMission:"Obiettivi, profilo di volo e catena di volo.",
@@ -301,6 +302,7 @@ es:{
   cUnit:"d",
   afterKicker:"Proyecto COMETA",
   afterHead:"Desde tierra al borde del espacio.",
+  homeLede:"La Fase 1 del proyecto COMETA consiste en enviar a la estratósfera una sonda llevada por un globo lleno de helio. La sonda filmará todo el vuelo y recogerá datos atmosféricos mediante los sensores montados a bordo.",
   sAlt:"Altura prevista", sDur:"Duración del vuelo", sMass:"Masa de la sonda", sStudents:"Estudiantes involucrados",
 
   tzMission:"Objetivos, perfil de vuelo y cadena de vuelo.",
@@ -569,6 +571,7 @@ en:{
   cUnit:"d",
   afterKicker:"Project COMETA",
   afterHead:"From the ground to the edge of space.",
+  homeLede:"Phase 1 of the COMETA project consists of sending a probe into the stratosphere, carried by a balloon filled with helium. The probe will film the whole flight and gather atmospheric data through the sensors on board.",
   sAlt:"Target altitude", sDur:"Flight duration", sMass:"Probe mass", sStudents:"Students involved",
 
   tzMission:"Objectives, flight profile and flight chain.",
