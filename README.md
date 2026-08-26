@@ -8,22 +8,33 @@ programmato dagli studenti di III e IV Liceo.
 
 ## Com'è fatto il sito
 
-Una sola pagina con navigazione interna (`#missione`, `#sonda`, `#venti`,
-`#about`): nessun ricaricamento, la lingua scelta resta.
+Una sola pagina con navigazione interna (`#missione`, `#fisica`, `#sonda`,
+`#venti`, `#legale`, `#qa`, `#about`): nessun ricaricamento, la lingua scelta
+resta. Senza indirizzo si apre `#home`.
 
 ```
-index.html                      tutte le sezioni
-assets/cometa.css               colori, caratteri, impaginazione
-assets/i18n.js                  i testi in italiano, spagnolo e inglese
-assets/sonda.js                 i 26 componenti + il modello 3D (Three.js)
-assets/app.js                   lingua, navigazione, salita, fisica, conto alla rovescia
-assets/img/cometa-logo.png      marchio COMETA, fondo trasparente
-assets/img/sim-logo.png         stemma della Scuola, fondo trasparente
-mappe/uru2000_footprint.html    mappa generata da cometa_venti.py — NON modificare a mano
-sonda.html · venti.html         rimandi ai vecchi indirizzi
+index.html                          tutte le sezioni
+sonda.html · venti.html             rimandi ai vecchi indirizzi
+
+assets/cometa.css                   colori, caratteri, impaginazione
+assets/i18n.js                      i testi in italiano, spagnolo e inglese
+assets/sonda.js                     i 26 componenti + il modello 3D (Three.js)
+assets/app.js                       lingua, navigazione, salita, fisica, conto alla rovescia
+assets/vendor/three.min.js          Three.js r128, copia locale (vedi sotto)
+
+assets/img/cometa-logo.png          marchio COMETA, fondo trasparente
+assets/img/sim-logo.png             stemma della Scuola, fondo trasparente
+assets/img/catena-volo.png          schema della catena di volo
+assets/img/zona-exclusion-dinacia.jpg   area di esclusione aeronautica
+assets/img/og.png                   anteprima per social e messaggistica
+
+mappe/uru2000_footprint.html        mappa generata da cometa_venti.py — NON modificare a mano
+
+LICENSE · README.md · .gitignore
 ```
 
-Sezioni: Inizio · Missione · La fisica del volo · La sonda · Studio dei venti · Chi siamo.
+Sezioni: Inizio · Missione · La fisica del volo · La sonda · Studio dei venti ·
+Norme e autorizzazioni · Domande · Chi siamo.
 
 ## Dove si modificano le cose
 
@@ -34,6 +45,21 @@ Sezioni: Inizio · Missione · La fisica del volo · La sonda · Studio dei vent
 | Colori e caratteri di tutto il sito | il blocco `:root` in `assets/cometa.css` |
 | Data del lancio (conto alla rovescia) | la costante `LAUNCH` in `assets/app.js` |
 | Numeri delle schede (quota, massa, deriva…) | direttamente in `index.html` |
+
+### Dopo ogni modifica: il numero di versione
+
+In `index.html`, `sonda.html` e `venti.html` i quattro file di `assets/` sono
+richiamati con un numero in coda — oggi `?v=28`:
+
+```html
+<link rel="stylesheet" href="assets/cometa.css?v=28">
+<script src="assets/i18n.js?v=28"></script>
+```
+
+Serve a costringere il browser a riscaricarli. **Chi modifica un file in
+`assets/` deve alzare quel numero di uno in tutte e tre le pagine**, altrimenti
+i visitatori che hanno già aperto il sito continuano a vedere la versione
+vecchia, e la modifica sembra non aver funzionato.
 
 ### Lingua
 
@@ -64,6 +90,15 @@ rigenerandola, non modificandola. Il sito la scurisce dall'esterno, ne
 ritinge i punti e la inquadra da solo su tutto quello che disegna — i due
 siti di partenza, i 240 atterraggi, le ellissi: il file resta com'è.
 
+### Three.js
+
+Il modello 3D della sonda usa **Three.js r128**, tenuto in copia locale in
+`assets/vendor/` perché il sito non dipenda da una CDN. Se il file manca,
+`assets/sonda.js` ripiega da solo sulla stessa revisione servita da cdnjs
+(costante `THREE_CDN`). Aggiornando la libreria vanno allineati tre punti:
+il file in `assets/vendor/`, la costante `THREE_CDN`, e la riga di three.js
+nella sezione 3 del `LICENSE`.
+
 ### Fotografie dei componenti (facoltative)
 
 Mettere le immagini in `assets/img/` e indicarle nella tabella `TEX` in
@@ -72,12 +107,19 @@ sfondo bianco, luce diffusa, ritaglio esatto sul contorno del pezzo.
 
 ## Da completare
 
-- Gli anni della simulazione dei venti (`wYears` in `assets/i18n.js`)
-- La data della sintesi dello studio dei venti (`wDate`)
-- La data definitiva del lancio, quando la DINACIA autorizza
+- **La data definitiva del lancio**, quando la DINACIA autorizza. Oggi la
+  costante `LAUNCH` in `assets/app.js` vale `2026-09-30T10:00:00-03:00`: è
+  provvisoria, e il conto alla rovescia la mostra come se fosse certa.
 
-Sono segnati in arancione sul sito, così non si dimenticano.
+Gli anni della simulazione dei venti (`wYears`) e la data della sintesi
+(`wDate`) sono ormai valorizzati in `assets/i18n.js` — `2021-2024` e
+`giugno 2026`. Restano però mostrati in arancione, perché `assets/app.js`
+li avvolge ancora nel segnaposto `<span class="todo">` (righe 50-51): quando
+i valori sono definitivi, togliere quel `<span>` e lasciare il testo semplice.
 
 ## Licenza
 
 Codice: MIT (vedi `LICENSE`). Testi e immagini: CC BY 4.0.
+I materiali di terze parti — Three.js, Leaflet, OpenStreetMap, Open-Meteo,
+i caratteri — sono elencati con le rispettive licenze nella sezione 3 del
+`LICENSE`.
