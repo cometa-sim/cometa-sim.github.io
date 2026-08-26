@@ -144,7 +144,7 @@ it:{
   /* — Contatti — */
   contactMailHead:"Scrivici", contactMailSub:"Per informazioni, collaborazioni, proposte.",
   mailCta:"Manda una mail", tiktokCta:"Seguici su TikTok", footContact:"Contatti",
-  classesNote:"Cinque classi dei due sistemi che convivono nella scuola, quello italiano e quello uruguaiano.",
+  classesNote:"COMETA coinvolge diversi indirizzi dei due sistemi che convivono nella scuola, quello italiano e quello uruguaiano, insieme ai loro insegnanti. Oltre alle classi dell'ultimo anno, il progetto accoglie alunne e alunni del penultimo anno, che si formano per portarlo avanti nelle fasi successive. Con noi collaborano anche ex alunni: un legame con la scuola che continua.",
 
   bands:["Suolo","Troposfera","Tropopausa","Stratosfera"],
   skip:"Vai al contenuto",
@@ -412,7 +412,7 @@ es:{
   /* — Contacto — */
   contactMailHead:"Escribinos", contactMailSub:"Para información, colaboraciones, propuestas.",
   mailCta:"Mandanos un correo", tiktokCta:"Seguinos en TikTok", footContact:"Contacto",
-  classesNote:"Cinco clases de los dos sistemas que conviven en la escuela, el italiano y el uruguayo.",
+  classesNote:"COMETA involucra varias orientaciones de los dos sistemas que conviven en la escuela, el italiano y el uruguayo, junto con sus docentes. Además de las clases del último año, el proyecto recibe a alumnas y alumnos del penúltimo año, que se forman para continuarlo en las fases siguientes. También colaboran con nosotros exalumnos: un vínculo con la escuela que se mantiene.",
 
   bands:["Suelo","Troposfera","Tropopausa","Estratósfera"],
   skip:"Ir al contenido",
@@ -680,7 +680,7 @@ en:{
   /* — Contact — */
   contactMailHead:"Write to us", contactMailSub:"For information, collaborations, proposals.",
   mailCta:"Send us an email", tiktokCta:"Follow us on TikTok", footContact:"Contact",
-  classesNote:"Five classes from the two systems that coexist in the school, the Italian one and the Uruguayan one.",
+  classesNote:"COMETA brings together several study tracks from the two systems that coexist in the school, the Italian one and the Uruguayan one, along with their teachers. Besides the final-year classes, the project takes in students from the second-to-last year, who are training to carry it forward in the phases ahead. Former students work with us too: a bond with the school that lasts.",
 
   bands:["Ground","Troposphere","Tropopause","Stratosphere"],
   skip:"Skip to content",

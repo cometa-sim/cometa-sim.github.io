@@ -506,7 +506,8 @@ footer{border-top:1px solid var(--line-soft);padding:56px 0 66px;background:rgba
 .crest{width:auto;height:58px;display:block;filter:drop-shadow(0 6px 18px rgba(0,0,0,.55))}
 .crest-row{display:flex;align-items:center;gap:18px;margin-top:30px;flex-wrap:wrap}
 .crest-row .crest{height:66px}
-.crest-row .cr-txt{font-size:14px;color:var(--muted);line-height:1.6;max-width:46ch}
+.cr-txt{font-size:14px;color:var(--muted);line-height:1.6;max-width:60ch}
+.crest-row .cr-txt{max-width:46ch}
 
 /* Firma del progetto: logo grande su fondo nero pieno */
 .signature{position:relative;margin:0 auto;max-width:520px;padding:0 10px}
