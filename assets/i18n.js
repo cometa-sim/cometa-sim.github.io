@@ -160,16 +160,16 @@ it:{
   lLede:"Il riferimento che ci è stato indicato dalla DINACIA — Dirección Nacional de Aviación Civil e Infraestructura Aeronáutica, l'autorità aeronautica uruguaiana — è il LAR 91, Parte I, Appendice P «Globos libres no tripulados», il regolamento aeronautico latinoamericano sui palloni liberi non pilotati. Stabilisce come si classificano, quali obblighi porta ogni categoria, e che cosa si può e non si può fare.",
 
   lClassHead:"Come viene classificata la nostra sonda",
-  lClassIntro:"Le categorie sono tre. <strong>Ligero</strong>: carico utile complessivo sotto i 4 kg. <strong>Mediano</strong>: da 4 a 6 kg, distribuiti su due o più colli. <strong>Pesado</strong>: 6 kg o più. Ma la massa non decide da sola — tre condizioni fanno scattare la categoria «pesado» a qualunque peso, e sono le ultime tre righe della tabella. Basta che una sia soddisfatta.",
-  thCriterion:"Criterio", thThreshold:"Per restare «ligero»", thOurs:"Klo-01",
+  lClassIntro:"Le categorie sono tre. <strong>Leggero</strong>: carico utile complessivo sotto i 4 kg. <strong>Medio</strong>: da 4 a 6 kg, distribuiti su due o più colli. <strong>Pesante</strong>: 6 kg o più. Ma la massa non decide da sola — tre condizioni fanno scattare la categoria «pesante» a qualunque peso, e sono le ultime tre righe della tabella. Basta che una sia soddisfatta.",
+  thCriterion:"Criterio", thThreshold:"Per restare «leggero»", thOurs:"Klo-01",
   lc1:"Massa complessiva del carico utile", lc1t:"sotto 4 kg",
   lc2:"Massa del collo più pesante", lc2t:"sotto 3 kg",
   lc3:"Colli da 2 kg o più con densità oltre 13 g/cm²", lc3t:"nessuno",
   lc4:"Forza per separare il carico dal pallone", lc4t:"sotto 230 N", lc4v:"sotto soglia", lc3v:"1,3 kg · ≈ 3 g/cm²",
-  lClassOut:"Quattro criteri, quattro volte dentro. La sonda Klo-01 è un pallone <strong>«ligero»</strong>: pesa un terzo della soglia dei 4 kg, il collo è unico e ben sotto i 3 kg, la sua densità è quattro volte inferiore al limite, e il cordame cede prima dei 230 N. Quest'ultimo è il criterio meno intuitivo e vale la pena spiegarlo: 230 N sono circa 23 chili di forza, e un cordame più robusto renderebbe la sonda «pesada» anche pesando un chilo e mezzo.",
+  lClassOut:"Quattro criteri, quattro volte dentro. La sonda Klo-01 è un pallone <strong>«leggero»</strong>: pesa un terzo della soglia dei 4 kg, il collo è unico e ben sotto i 3 kg, la sua densità è quattro volte inferiore al limite, e il cordame cede prima dei 230 N. Quest'ultimo è il criterio meno intuitivo e vale la pena spiegarlo: 230 N sono circa 23 chili di forza, e un cordame più robusto renderebbe la sonda «pesante» anche pesando un chilo e mezzo.",
 
   lDutyHead:"Che cosa comporta",
-  lDuty1:"Quasi tutti gli obblighi operativi del regolamento — due sistemi indipendenti per interrompere il volo, il transponder radar, il riflettore radar, le notifiche al controllo del traffico aereo sette giorni prima, i rapporti di posizione ogni due ore — riguardano i palloni <em>mediani</em> e <em>pesados</em>. A un pallone leggero non si applicano.",
+  lDuty1:"Quasi tutti gli obblighi operativi del regolamento — due sistemi indipendenti per interrompere il volo, il transponder radar, il riflettore radar, le notifiche al controllo del traffico aereo sette giorni prima, i rapporti di posizione ogni due ore — riguardano i palloni <em>medi</em> e <em>pesanti</em>. A un pallone leggero non si applicano.",
   lDuty2:"Restano due obblighi, e sono i più importanti. Il primo: <strong>nessun pallone libero non pilotato può essere utilizzato senza l'autorizzazione dello Stato dal quale viene lanciato</strong>. Vale per tutte le categorie, senza eccezioni. Il secondo: il pallone non può essere utilizzato in modo che l'impatto suo o di una sua parte, carico utile compreso, metta in pericolo persone o beni estranei all'operazione.",
   lDuty3:"È per questo che la DINACIA ci ha chiesto il tracciamento durante la salita e la discesa, e non l'apparato completo previsto per i palloni pesanti: non è una concessione, è la categoria in cui rientriamo.",
 
