@@ -36,7 +36,7 @@ let host, cv, renderer, scene, cam, root, ray, ndc, tip;
 let ready = false, failed = false, started = false;
 let parts = {};                       /* chiave -> {group, meshes[], mats[]} */
 let az = 0.62, pol = 1.36, dist = 9.4;
-let drag = false, moved = false, lx = 0, ly = 0, pinch = 0, lastTouch = 0;
+let drag = false, moved = false, lx = 0, ly = 0, lastTouch = 0;
 let hover = null, lang = "it";
 const TGT = {x:0, y:-1.28, z:0};
 
@@ -46,10 +46,6 @@ const TGT = {x:0, y:-1.28, z:0};
 function C(hex){ return new THREE.Color(hex).convertSRGBToLinear(); }
 
 const $ = function(s, r){ return (r || document).querySelector(s); };
-const T = function(k){
-  const d = window.I18N && window.I18N[lang];
-  return (d && d[k]) || "";
-};
 const label = function(key){
   const d = window.I18N && window.I18N[lang];
   const c = d && d.chain;
@@ -406,8 +402,6 @@ function syncLang(){
   const l = document.documentElement.lang || "it";
   if(l === lang) return;
   lang = l;
-  const h = $("#catenaHint");
-  if(h) h.textContent = T("benchNote");
   if(tip && hover){ tip.textContent = label(hover); }
 }
 
