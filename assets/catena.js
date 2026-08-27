@@ -218,7 +218,9 @@ function build(){
     new THREE.LineBasicMaterial({color:C(0x9AA8B6), transparent:true, opacity:0.5}));
   pay.add(edge);
 
-  /* Alette: due pannelli radiali, centrati e simmetrici */
+  /* Alette: due pannelli radiali, centrati e simmetrici.
+     Stesso orientamento del modello della sonda in modalità Volo:
+     la lama esce di taglio dai fianchi, non di piatto. */
   const finMat = new THREE.MeshStandardMaterial({
     color:C(COL.fin), roughness:0.72, metalness:0.04,
     transparent:true, opacity:0.94, side:THREE.DoubleSide
@@ -226,7 +228,6 @@ function build(){
   [-1, 1].forEach(function(sg){
     const fin = new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.382, 0.477), finMat);
     fin.position.set(0, 0, sg*(0.210 + 0.239));
-    fin.rotation.y = Math.PI/2;
     pay.add(fin); reg("payload", fin, []);
     const rib = new THREE.Mesh(new THREE.BoxGeometry(0.020, 0.058, 0.038), finMat);
     rib.position.set(0, 0, sg*0.228);
