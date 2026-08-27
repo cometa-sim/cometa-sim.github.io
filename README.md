@@ -48,18 +48,21 @@ Norme e autorizzazioni · Domande · Chi siamo.
 
 ### Dopo ogni modifica: il numero di versione
 
-In `index.html`, `sonda.html` e `venti.html` i quattro file di `assets/` sono
-richiamati con un numero in coda — oggi `?v=28`:
+In `index.html` i quattro file di `assets/` sono richiamati con un numero in
+coda — oggi `?v=35`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=28">
-<script src="assets/i18n.js?v=28"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=35">
+<script src="assets/i18n.js?v=35"></script>
 ```
 
 Serve a costringere il browser a riscaricarli. **Chi modifica un file in
-`assets/` deve alzare quel numero di uno in tutte e tre le pagine**, altrimenti
-i visitatori che hanno già aperto il sito continuano a vedere la versione
-vecchia, e la modifica sembra non aver funzionato.
+`assets/` deve alzare quel numero di uno**, altrimenti i visitatori che hanno
+già aperto il sito continuano a vedere la versione vecchia, e la modifica
+sembra non aver funzionato.
+
+Riguarda solo `index.html`: `sonda.html` e `venti.html` sono rimandi con il
+foglio di stile scritto dentro, e non richiamano nessun file di `assets/`.
 
 ### Lingua
 
@@ -68,6 +71,21 @@ guardando le preferenze del browser; se il visitatore cambia lingua, la scelta
 viene ricordata. Ogni testo tradotto ha una chiave: nell'HTML compare come
 `data-i18n="chiave"` (testo semplice) o `data-i18n-html="chiave"` (testo che
 contiene `<strong>`, `<a>`…).
+
+### Come si scrivono i testi
+
+Le due sezioni hanno registri diversi, e conviene non mescolarli. Nelle pagine
+espositive — missione, la fisica del volo, studio dei venti — i numeri e i
+passaggi chiave vanno in `<strong>`. Nelle **Domande** no: lì l'unica
+sottolineatura è `<em>`, usata per le parole, e i dati stanno nella frase senza
+risalto tipografico.
+
+Le fonti seguono la stessa logica. Nelle pagine espositive stanno in un blocco
+in fondo, nella forma `<strong>Etichetta:</strong>` (le chiavi `srcMeteo`,
+`srcMap`, `srcCalc` per i venti, `lSrc1` e `lSrc2` per gli aspetti legali).
+Nelle Domande, che non hanno quel blocco, la fonte si nomina dentro la frase.
+Il collegamento si mette all'ente o al servizio, non al documento: la DINACIA e
+Open-Meteo sono linkati, il regolamento LAR 91 no.
 
 ### Il cielo della pagina iniziale
 
@@ -108,14 +126,8 @@ sfondo bianco, luce diffusa, ritaglio esatto sul contorno del pezzo.
 ## Da completare
 
 - **La data definitiva del lancio**, quando la DINACIA autorizza. Oggi la
-  costante `LAUNCH` in `assets/app.js` vale `2026-09-30T10:00:00-03:00`: è
+  costante `LAUNCH` in `assets/app.js` vale `2026-10-07T11:00:00-03:00`: è
   provvisoria, e il conto alla rovescia la mostra come se fosse certa.
-
-Gli anni della simulazione dei venti (`wYears`) e la data della sintesi
-(`wDate`) sono ormai valorizzati in `assets/i18n.js` — `2021-2024` e
-`giugno 2026`. Restano però mostrati in arancione, perché `assets/app.js`
-li avvolge ancora nel segnaposto `<span class="todo">` (righe 50-51): quando
-i valori sono definitivi, togliere quel `<span>` e lasciare il testo semplice.
 
 ## Licenza
 
