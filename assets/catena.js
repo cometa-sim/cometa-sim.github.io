@@ -262,8 +262,6 @@ function build(){
 
 /* ---------- Camera ---------- */
 function place(){
-  pol = Math.max(0.30, Math.min(Math.PI - 0.30, pol));
-  dist = Math.max(5.2, Math.min(16, dist));
   cam.position.set(
     TGT.x + dist*Math.sin(pol)*Math.sin(az),
     TGT.y + dist*Math.cos(pol),
@@ -291,33 +289,17 @@ function bind(){
   addEventListener("pointermove", function(e){
     if(!drag) return;
     moved = true; lastTouch = performance.now();
+    /* Gira solo attorno all'asse verticale, cioè sul piano X-Z.
+       L'inclinazione resta quella di partenza: la catena di volo
+       si guarda sempre da davanti, mai da sopra o da sotto. */
     az -= (e.clientX - lx)*0.008;
-    pol -= (e.clientY - ly)*0.008;
     lx = e.clientX; ly = e.clientY;
     place();
   });
   addEventListener("pointerup", function(){ drag = false; });
-  cv.addEventListener("wheel", function(e){
-    e.preventDefault(); lastTouch = performance.now();
-    dist *= 1 + e.deltaY*0.0012; place();
-  }, {passive:false});
-  cv.addEventListener("touchstart", function(e){
-    lastTouch = performance.now();
-    if(e.touches.length === 2){
-      drag = false;
-      pinch = Math.hypot(e.touches[0].clientX - e.touches[1].clientX,
-                         e.touches[0].clientY - e.touches[1].clientY);
-    }
-  }, {passive:true});
-  cv.addEventListener("touchmove", function(e){
-    lastTouch = performance.now();
-    if(e.touches.length === 2){
-      const d = Math.hypot(e.touches[0].clientX - e.touches[1].clientX,
-                           e.touches[0].clientY - e.touches[1].clientY);
-      if(pinch){ dist *= pinch/d; place(); }
-      pinch = d;
-    }
-  }, {passive:true});
+  /* Niente zoom: la distanza resta quella scelta, e la rotella
+     serve a scorrere la pagina come su qualunque altra figura. */
+  cv.addEventListener("touchstart", function(){ lastTouch = performance.now(); }, {passive:true});
   cv.addEventListener("pointermove", function(e){ if(!drag) pick(e); });
   cv.addEventListener("pointerleave", function(){ setHover(null); });
 }
@@ -361,7 +343,7 @@ function setHover(k){
     tip.textContent = k ? label(k) : "";
     tip.classList.toggle("on", !!k && !!label(k));
   }
-  cv.style.cursor = k ? "grab" : "default";
+  cv.style.cursor = k ? "grab" : "ew-resize";
 }
 
 /* ---------- Ciclo ---------- */
