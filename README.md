@@ -2,9 +2,9 @@
 
 Sito del **Progetto COMETA** — Scuola Italiana di Montevideo.
 Un pallone stratosferico fino a 38 km di quota, progettato, costruito e
-programmato dagli studenti di III e IV Liceo.
+programmato dagli studenti di 2EMS, IIIS, 3EMS, IVL e IVS.
 
-🌐 https://cometa-sim.github.io
+🌐 https://cometa.scuolaitaliana.edu.uy
 
 ## Com'è fatto il sito
 
@@ -19,6 +19,7 @@ sonda.html · venti.html             rimandi ai vecchi indirizzi
 assets/cometa.css                   colori, caratteri, impaginazione
 assets/i18n.js                      i testi in italiano, spagnolo e inglese
 assets/sonda.js                     i 26 componenti + il modello 3D (Three.js)
+assets/catena.js                    la catena di volo in 3D, nella pagina Missione
 assets/app.js                       lingua, navigazione, salita, fisica, conto alla rovescia
 assets/vendor/three.min.js          Three.js r128, copia locale (vedi sotto)
 
@@ -42,18 +43,19 @@ Norme e autorizzazioni · Domande · Chi siamo.
 |---|---|
 | Un testo, in una qualsiasi delle tre lingue | `assets/i18n.js` |
 | Misure, peso o nota di un componente | l'elenco `PARTS` in `assets/sonda.js` |
+| Nomi delle cinque parti della catena di volo | la chiave `chain` in `assets/i18n.js` |
 | Colori e caratteri di tutto il sito | il blocco `:root` in `assets/cometa.css` |
 | Data del lancio (conto alla rovescia) | la costante `LAUNCH` in `assets/app.js` |
 | Numeri delle schede (quota, massa, deriva…) | direttamente in `index.html` |
 
 ### Dopo ogni modifica: il numero di versione
 
-In `index.html` i quattro file di `assets/` sono richiamati con un numero in
-coda — oggi `?v=35`:
+In `index.html` i cinque file di `assets/` sono richiamati con un numero in
+coda — oggi `?v=42`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=35">
-<script src="assets/i18n.js?v=35"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=42">
+<script src="assets/i18n.js?v=42"></script>
 ```
 
 Serve a costringere il browser a riscaricarli. **Chi modifica un file in
@@ -110,10 +112,11 @@ siti di partenza, i 240 atterraggi, le ellissi: il file resta com'è.
 
 ### Three.js
 
-Il modello 3D della sonda usa **Three.js r128**, tenuto in copia locale in
-`assets/vendor/` perché il sito non dipenda da una CDN. Se il file manca,
-`assets/sonda.js` ripiega da solo sulla stessa revisione servita da cdnjs
-(costante `THREE_CDN`). Aggiornando la libreria vanno allineati tre punti:
+I due modelli 3D — la sonda e la catena di volo — usano **Three.js r128**,
+tenuto in copia locale in `assets/vendor/` perché il sito non dipenda da una
+CDN. Se il file manca, `assets/sonda.js` e `assets/catena.js` ripiegano da
+soli sulla stessa revisione servita da cdnjs (costante `THREE_CDN`, presente
+in entrambi). Aggiornando la libreria vanno allineati tre punti:
 il file in `assets/vendor/`, la costante `THREE_CDN`, e la riga di three.js
 nella sezione 3 del `LICENSE`.
 
