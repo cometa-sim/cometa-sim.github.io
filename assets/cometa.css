@@ -687,13 +687,38 @@ td.mono{font-family:var(--mono);font-size:12.5px;letter-spacing:.01em;color:var(
 @media(prefers-reduced-motion:reduce){.probe-spin .spin-in{animation:none}}
 
 /* Missione — "Come funziona": testo a sinistra, catena di volo a destra */
-.hw-grid{display:grid;grid-template-columns:1fr minmax(200px,300px);gap:46px;align-items:center;margin-top:6px}
+.hw-grid{display:grid;grid-template-columns:1fr minmax(260px,380px);gap:46px;align-items:center;margin-top:6px}
 .hw-fig{margin:0}
 .hw-fig img{width:100%;height:auto;display:block;filter:drop-shadow(0 24px 60px rgba(0,0,0,.55))}
 @media(max-width:820px){
   .hw-grid{grid-template-columns:1fr;gap:28px}
-  .hw-fig{max-width:230px;margin:0 auto}
+  .hw-fig{max-width:340px;margin:0 auto}
 }
+
+/* ---------- Catena di volo in tre dimensioni ---------- */
+
+.catena-wrap{position:relative;margin:0}
+#catena3d{position:relative;width:100%;height:min(64vh,520px);
+  border:1px solid var(--line-soft);border-radius:20px;overflow:hidden;
+  background:radial-gradient(120% 92% at 50% 4%,rgba(95,227,255,.10),transparent 62%),rgba(4,12,24,.5);
+  opacity:0;transition:opacity .7s var(--ease)}
+#catena3d.on{opacity:1}
+#catena3d canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
+#catena3d canvas:active{cursor:grabbing}
+@media(max-width:820px){#catena3d{height:min(58vh,440px)}}
+
+.catena-load{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--faint)}
+.catena-hint{margin-top:10px;font-family:var(--mono);font-size:10px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--faint);text-align:center;line-height:1.6}
+.catena-tip{position:absolute;z-index:4;transform:translate(-50%,-165%);pointer-events:none;
+  padding:5px 11px;border-radius:999px;white-space:nowrap;
+  background:rgba(3,10,20,.86);border:1px solid var(--line);backdrop-filter:blur(8px);
+  font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--ink);
+  opacity:0;transition:opacity .18s var(--ease)}
+.catena-tip.on{opacity:1}
+.catena-fallback img{width:100%;height:auto;display:block;border-radius:20px;
+  filter:drop-shadow(0 24px 60px rgba(0,0,0,.55))}
 
 /* Icone social nella barra in alto, con i colori dei marchi */
 nav a.ig svg{transition:transform .2s var(--ease)}
