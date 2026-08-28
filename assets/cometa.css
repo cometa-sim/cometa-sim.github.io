@@ -313,20 +313,6 @@ h3.sub-head{font-family:var(--disp);font-weight:600;font-size:clamp(19px,2.4vw,2
 .teaser p{color:var(--muted);font-size:14px;line-height:1.55}
 .teaser .go{margin-top:18px;font-family:var(--mono);font-size:12px;letter-spacing:.1em;color:var(--cyan);display:inline-flex;align-items:center;gap:7px}
 
-/* Indice delle sezioni in preparazione */
-.index-list{list-style:none;margin-top:26px;border-top:1px solid var(--line-soft);max-width:74ch}
-.index-list li{border-bottom:1px solid var(--line-soft)}
-.entry{display:flex;align-items:baseline;gap:18px;padding:18px 6px;text-decoration:none;color:inherit;width:100%;
-  background:none;border:0;text-align:left;font:inherit;transition:background .3s,padding .3s}
-a.entry{cursor:pointer}
-a.entry:hover{background:var(--panel);padding-left:14px}
-.entry .et{font-family:var(--disp);font-size:17px;font-weight:600;display:block}
-.entry .en{color:var(--muted);font-size:14px;display:block;margin-top:2px}
-.entry .st{margin-left:auto;font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);white-space:nowrap;flex:none}
-.entry .st.on{color:var(--green)}
-li:has(.st:not(.on)) .entry{color:var(--faint)}
-li:has(.st:not(.on)) .entry .en{color:var(--faint)}
-
 /* Pagina interna: intestazione */
 .page-hero{padding:150px 0 30px}
 .page-hero .ttl{font-family:var(--disp);font-weight:300;font-size:clamp(38px,7.4vw,84px);line-height:1.02;letter-spacing:.012em;color:var(--ink)}
