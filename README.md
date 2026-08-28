@@ -46,16 +46,16 @@ Norme e autorizzazioni · Domande · Chi siamo.
 | Nomi delle cinque parti della catena di volo | la chiave `chain` in `assets/i18n.js` |
 | Colori e caratteri di tutto il sito | il blocco `:root` in `assets/cometa.css` |
 | Data del lancio (conto alla rovescia) | la costante `LAUNCH` in `assets/app.js` |
-| Numeri delle schede (quota, massa, deriva…) | direttamente in `index.html` |
+| Numeri delle quattro schede della pagina iniziale | direttamente in `index.html` |
 
 ### Dopo ogni modifica: il numero di versione
 
 In `index.html` i cinque file di `assets/` sono richiamati con un numero in
-coda — oggi `?v=46`:
+coda — oggi `?v=48`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=46">
-<script src="assets/i18n.js?v=46"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=48">
+<script src="assets/i18n.js?v=48"></script>
 ```
 
 Serve a costringere il browser a riscaricarli. **Chi modifica un file in

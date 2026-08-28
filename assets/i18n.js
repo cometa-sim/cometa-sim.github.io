@@ -29,7 +29,7 @@ it:{
   afterKicker:"Progetto COMETA",
   afterHead:"Da terra al bordo dello spazio.",
   homeLede:"La Fase 1 del progetto COMETA consiste nell'inviare nella stratosfera una sonda portata da un pallone riempito di elio. La sonda riprenderà in video tutto il volo e raccoglierà dati atmosferici attraverso i sensori montati a bordo.",
-  sAlt:"Quota prevista", sTemp:"Temperatura esterna", sSpan:"Durata del progetto", sSpanU:"anno scolastico", sStudents:"Studenti coinvolti",
+  sAlt:"Quota prevista", sTemp:"Temperatura esterna", sTeams:"Gruppi di lavoro", sStudents:"Studenti coinvolti",
 
   tzMission:"Obiettivi, profilo di volo e catena di volo.",
   tzProbe:"Modello tridimensionale esplorabile, con tutti i componenti.",
@@ -134,6 +134,7 @@ it:{
   /* — Contatti — */
   contactMailHead:"Scrivici", contactMailSub:"Per informazioni, collaborazioni, proposte.",
   mailCta:"Manda una mail", tiktokCta:"Seguici su TikTok", footContact:"Contatti",
+  groupsNote:"Il lavoro è diviso in sei gruppi: organizzazione, sonda e sensori, programmazione, analisi dei dati, audiovisivo e social. Ognuno ha un referente e una propria responsabilità, ma nessuno lavora da solo: chi sceglie i sensori dipende da chi programma la scheda, e chi programma dipende da chi ha deciso cosa misurare.",
   classesNote:"COMETA coinvolge diversi indirizzi dei due sistemi che convivono nella scuola, quello italiano e quello uruguaiano, insieme ai loro insegnanti. Oltre alle classi dell'ultimo anno, il progetto accoglie alunne e alunni del penultimo anno, che si formano per portarlo avanti nelle fasi successive. Con noi collaborano anche ex alunni: un legame con la scuola che continua.",
 
   bands:["Suolo","Troposfera","Tropopausa","Stratosfera"],
@@ -294,7 +295,7 @@ es:{
   afterKicker:"Proyecto COMETA",
   afterHead:"Desde tierra al borde del espacio.",
   homeLede:"La Fase 1 del proyecto COMETA consiste en enviar a la estratósfera una sonda llevada por un globo lleno de helio. La sonda filmará todo el vuelo y recogerá datos atmosféricos mediante los sensores montados a bordo.",
-  sAlt:"Altura prevista", sTemp:"Temperatura exterior", sSpan:"Duración del proyecto", sSpanU:"año lectivo", sStudents:"Estudiantes involucrados",
+  sAlt:"Altura prevista", sTemp:"Temperatura exterior", sTeams:"Equipos de trabajo", sStudents:"Estudiantes involucrados",
 
   tzMission:"Objetivos, perfil de vuelo y cadena de vuelo.",
   tzProbe:"Modelo tridimensional explorable, con todos los componentes.",
@@ -394,6 +395,7 @@ es:{
   /* — Contacto — */
   contactMailHead:"Escribinos", contactMailSub:"Para información, colaboraciones, propuestas.",
   mailCta:"Mandanos un correo", tiktokCta:"Seguinos en TikTok", footContact:"Contacto",
+  groupsNote:"El trabajo está dividido en seis equipos: organización, sonda y sensores, programación, análisis de datos, audiovisual y redes. Cada uno tiene un referente y su propia responsabilidad, pero ninguno trabaja solo: quien elige los sensores depende de quien programa la placa, y quien programa depende de quien decidió qué medir.",
   classesNote:"COMETA involucra varias orientaciones de los dos sistemas que conviven en la escuela, el italiano y el uruguayo, junto con sus docentes. Además de las clases del último año, el proyecto recibe a alumnas y alumnos del penúltimo año, que se forman para continuarlo en las fases siguientes. También colaboran con nosotros exalumnos: un vínculo con la escuela que se mantiene.",
 
   bands:["Suelo","Troposfera","Tropopausa","Estratósfera"],
@@ -554,7 +556,7 @@ en:{
   afterKicker:"Project COMETA",
   afterHead:"From the ground to the edge of space.",
   homeLede:"Phase 1 of the COMETA project consists of sending a probe into the stratosphere, carried by a balloon filled with helium. The probe will film the whole flight and gather atmospheric data through the sensors on board.",
-  sAlt:"Target altitude", sTemp:"Outside temperature", sSpan:"Project duration", sSpanU:"school year", sStudents:"Students involved",
+  sAlt:"Target altitude", sTemp:"Outside temperature", sTeams:"Working teams", sStudents:"Students involved",
 
   tzMission:"Objectives, flight profile and flight chain.",
   tzProbe:"Explorable three-dimensional model with every component.",
@@ -654,6 +656,7 @@ en:{
   /* — Contact — */
   contactMailHead:"Write to us", contactMailSub:"For information, collaborations, proposals.",
   mailCta:"Send us an email", tiktokCta:"Follow us on TikTok", footContact:"Contact",
+  groupsNote:"The work is split across six teams: organisation, probe and sensors, programming, data analysis, audiovisual and social media. Each has a coordinator and its own responsibility, but none works alone: whoever chooses the sensors depends on whoever programs the board, and they depend on whoever decided what to measure.",
   classesNote:"COMETA brings together several study tracks from the two systems that coexist in the school, the Italian one and the Uruguayan one, along with their teachers. Besides the final-year classes, the project takes in students from the second-to-last year, who are training to carry it forward in the phases ahead. Former students work with us too: a bond with the school that lasts.",
 
   bands:["Ground","Troposphere","Tropopause","Stratosphere"],
