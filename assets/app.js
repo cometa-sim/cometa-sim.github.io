@@ -742,12 +742,22 @@ function progBalloon(){
   set(".bal-n.n-wip", wip);
   set(".bal-key li:last-child .bal-n", rows.length - done - wip);
 
-  const salita = function(){
+  const pieno = function(){
     fill(".bal-wip", (done + wip) / rows.length);
     fill(".bal-done", done / rows.length);
   };
-  if(reduced) salita();
-  else setTimeout(salita, 260);                        /* parte da vuoto e si riempie */
+  const bal = document.querySelector(".bal");
+  if(reduced || !window.IntersectionObserver || !bal){ pieno(); return; }
+
+  /* Il livello sale una volta sola, quando il pallone entra nello schermo:
+     chi scorre fin qui lo vede riempirsi, chi torna indietro lo trova pieno. */
+  const io = new IntersectionObserver(function(voci){
+    if(!voci.some(function(v){ return v.isIntersecting; })) return;
+    io.disconnect();
+    fill(".bal-wip", (done + wip) / rows.length);
+    setTimeout(function(){ fill(".bal-done", done / rows.length); }, 220);
+  }, {threshold: .35});
+  io.observe(bal);
 }
 
 sfResize(); sfDraw();
