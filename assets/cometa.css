@@ -219,25 +219,33 @@ h3.sub-head{font-family:var(--disp);font-weight:600;font-size:clamp(19px,2.4vw,2
 .org p{color:var(--muted);font-size:14.5px;line-height:1.7;margin:0}
 
 /* Pallone di avanzamento: si riempie da solo contando le tappe qui sotto */
-.bal{display:flex;align-items:center;gap:40px;margin-top:34px;flex-wrap:wrap}
-.bal-art{flex:none;width:154px}
+.bal{display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-areas:"art key" "art tag";
+  justify-content:start;align-items:center;column-gap:40px;row-gap:16px;margin-top:34px}
+.bal-art{grid-area:art;width:154px}
 .bal-art svg{display:block;width:100%;height:auto}
 .bal-empty{fill:rgba(120,160,200,.09)}
 .bal-wip{fill:rgba(95,227,255,.20)}
-.bal-shine{fill:rgba(255,255,255,.10)}
+.bal-shine{fill:rgba(255,255,255,.055)}
 .bal-done{fill:url(#balFill);opacity:.9}
 .bal-wip,.bal-done{transition:y 1.1s var(--ease)}
-.bal-line{fill:none;stroke:rgba(255,255,255,.26);stroke-width:1.6;stroke-linejoin:round}
-.bal-side{display:grid;gap:16px}
-.bal-key{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.bal-line{fill:none;stroke:rgba(255,255,255,.24);stroke-width:1.4;stroke-linejoin:round}
+.bal-key{grid-area:key;list-style:none;margin:0;padding:0;display:grid;gap:12px}
 .bal-key li{display:flex;align-items:baseline;gap:12px;font-family:var(--mono);font-size:11px;
   letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
 .bal-n{font-family:var(--disp);font-size:24px;font-weight:500;letter-spacing:-.01em;
   color:var(--muted);min-width:1.3em;text-align:right}
 .bal-n.n-done{color:var(--green)}
 .bal-n.n-wip{color:var(--cyan)}
-.bal-tag{font-family:var(--disp);font-size:15px;font-weight:500;letter-spacing:.01em;color:var(--cyan);opacity:.8}
-@media(max-width:560px){.bal{gap:26px}.bal-art{width:124px}.bal-n{font-size:21px}.bal-tag{font-size:14px}}
+.bal-tag{grid-area:tag;font-family:var(--disp);font-size:15px;font-weight:500;letter-spacing:.01em;
+  color:var(--cyan);opacity:.8}
+@media(max-width:560px){
+  .bal{grid-template-columns:1fr;grid-template-areas:"tag" "art" "key";row-gap:18px;margin-top:30px}
+  .bal-art{width:100%}
+  .bal-tag{font-size:17px;opacity:.9}
+  .bal-key{grid-template-columns:repeat(3,auto);justify-content:space-between;gap:10px;width:100%}
+  .bal-key li{flex-direction:column;align-items:flex-start;gap:2px}
+  .bal-n{font-size:26px;text-align:left;min-width:0}
+}
 
 /* A che punto siamo: le tappe del lavoro (Missione).
    Lo stato di ogni riga e' la sua classe: pg-done, pg-wip oppure pg-todo.
