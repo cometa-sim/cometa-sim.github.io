@@ -52,11 +52,11 @@ Norme e autorizzazioni · Domande · Chi siamo.
 ### Dopo ogni modifica: il numero di versione
 
 In `index.html` i cinque file di `assets/` sono richiamati con un numero in
-coda — oggi `?v=55`:
+coda — oggi `?v=56`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=55">
-<script src="assets/i18n.js?v=55"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=56">
+<script src="assets/i18n.js?v=56"></script>
 ```
 
 Serve a costringere il browser a riscaricarli. **Chi modifica un file in
@@ -89,6 +89,18 @@ in fondo, nella forma `<strong>Etichetta:</strong>` (le chiavi `srcMeteo`,
 Nelle Domande, che non hanno quel blocco, la fonte si nomina dentro la frase.
 Il collegamento si mette all'ente o al servizio, non al documento: la DINACIA e
 Open-Meteo sono linkati, il regolamento LAR 91 no.
+
+### L'indice della pagina Missione
+
+Missione è la pagina più lunga, e in cima ha un indice. Non usa gli
+indirizzi — l'indirizzo qui sceglie la pagina, non un punto dentro —
+ma l'attributo `data-jump`, che `jumpTo()` in `assets/app.js` risolve
+in uno scorrimento morbido.
+
+Aggiungendo una sezione a Missione vanno fatte due cose: darle un
+`id="m-qualcosa"` e aggiungere una voce all'indice con lo stesso nome
+in `data-jump`. L'etichetta della voce riusa la chiave dell'occhiello
+della sezione, così la traduzione è già fatta.
 
 ### A che punto siamo
 

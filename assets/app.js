@@ -174,6 +174,24 @@ document.addEventListener("keydown", function(e){
   e.preventDefault(); go(el.dataset.page);
 });
 
+/* Indice della pagina Missione: salta a una sezione senza passare per
+   l'indirizzo, che qui seleziona la pagina e non un punto dentro. */
+function jumpTo(el){
+  const t = document.getElementById(el.dataset.jump);
+  if(t) t.scrollIntoView({behavior: reduced ? "auto" : "smooth", block: "start"});
+}
+document.addEventListener("click", function(e){
+  const el = e.target.closest("[data-jump]");
+  if(!el) return;
+  e.preventDefault(); jumpTo(el);
+});
+document.addEventListener("keydown", function(e){
+  if(e.key !== "Enter" && e.key !== " ") return;
+  const el = e.target.closest && e.target.closest("[data-jump]");
+  if(!el) return;
+  e.preventDefault(); jumpTo(el);
+});
+
 /* ---------- Menu per schermi stretti ---------- */
 const menu = $("#menu");
 function closeMenu(){ menu.classList.remove("open"); document.body.style.overflow = ""; }

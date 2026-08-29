@@ -23,7 +23,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@200;300;400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/cometa.css?v=55">
+<link rel="stylesheet" href="assets/cometa.css?v=56">
 </head>
 <body>
 
@@ -214,6 +214,23 @@
 
   <section class="section tight">
     <div class="wrap">
+      <div class="mindex reveal" role="navigation" aria-label="Indice della pagina">
+        <span class="mi-t" data-i18n="mIndex">In questa pagina</span>
+        <a data-jump="m-come" tabindex="0" data-i18n="hwKicker">Come funziona</a>
+        <a data-jump="m-dati" tabindex="0" data-i18n="pHead2">Dati del progetto</a>
+        <a data-jump="m-misure" tabindex="0" data-i18n="msKicker">Cosa misuriamo</a>
+        <a data-jump="m-nonmisure" tabindex="0" data-i18n="msNotKicker">Cosa non misuriamo</a>
+        <a data-jump="m-immagini" tabindex="0" data-i18n="msCamKicker">Le immagini e il ritrovamento</a>
+        <a data-jump="m-scheda" tabindex="0" data-i18n="msFwKicker">La scheda che programmiamo</a>
+        <a data-jump="m-scelte" tabindex="0" data-i18n="msEngKicker">Cinque scelte di progetto</a>
+        <a data-jump="m-gruppi" tabindex="0" data-i18n="orgKicker">Chi fa cosa</a>
+        <a data-jump="m-stato" tabindex="0" data-i18n="pgKicker">A che punto siamo</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section tight" id="m-come">
+    <div class="wrap">
       <div class="kicker reveal" data-i18n="hwKicker">Come funziona</div>
       <div class="hw-grid">
         <div class="hw-text">
@@ -234,7 +251,7 @@
       </div>
     </div>
   </section>
-  <section class="section tight">
+  <section class="section tight" id="m-dati">
     <div class="wrap">
       <div class="kicker reveal" data-i18n="pHead2">Dati del progetto</div>
       <div class="stat-wrap reveal d1">
@@ -259,7 +276,7 @@
 
 
 
-  <section class="section tight">
+  <section class="section tight" id="m-misure">
     <div class="wrap">
       <div class="kicker reveal" data-i18n="msKicker">Cosa misuriamo</div>
       <h2 class="head reveal d1" data-i18n="msHead">Dieci sensori e i loro limiti</h2>
@@ -292,28 +309,28 @@
     </div>
   </section>
 
-  <section class="section tight">
+  <section class="section tight" id="m-nonmisure">
     <div class="wrap">
       <div class="kicker reveal" data-i18n="msNotKicker">Cosa non misuriamo</div>
       <div class="body-col reveal d1"><p data-i18n-html="msNot1"></p></div>
     </div>
   </section>
 
-  <section class="section tight">
+  <section class="section tight" id="m-immagini">
     <div class="wrap">
       <div class="kicker reveal" data-i18n="msCamKicker">Le immagini e il ritrovamento</div>
       <div class="body-col reveal d1"><p data-i18n-html="msCam1"></p><p data-i18n-html="msCam2"></p></div>
     </div>
   </section>
 
-  <section class="section tight">
+  <section class="section tight" id="m-scheda">
     <div class="wrap">
       <div class="kicker reveal" data-i18n="msFwKicker">La scheda che programmiamo</div>
       <div class="body-col reveal d1"><p data-i18n-html="msFw1"></p></div>
     </div>
   </section>
 
-  <section class="section tight">
+  <section class="section tight" id="m-scelte">
     <div class="wrap">
       <div class="kicker reveal" data-i18n="msEngKicker">Cinque scelte di progetto</div>
       <div class="body-col reveal d1">
@@ -334,7 +351,7 @@
     </div>
   </section>
 
-  <section class="section tight">
+  <section class="section tight" id="m-gruppi">
     <div class="wrap">
       <div class="kicker reveal" data-i18n="orgKicker">Chi fa cosa</div>
       <h2 class="head reveal d1" data-i18n="orgHead">Sei gruppi, un unico obiettivo</h2>
@@ -347,10 +364,11 @@
         <div class="org"><h3 data-i18n="org5t">Audiovisivo</h3><p data-i18n="org5"></p></div>
         <div class="org"><h3 data-i18n="org6t">Social</h3><p data-i18n="org6"></p></div>
       </div>
+      <div class="body-col reveal d1" style="margin-top:26px"><p data-i18n="orgDiscord"></p></div>
     </div>
   </section>
 
-  <section class="section tight">
+  <section class="section tight" id="m-stato">
     <div class="wrap">
       <div class="kicker reveal" data-i18n="pgKicker">A che punto siamo</div>
       <h2 class="head reveal d1" data-i18n="pgHead">Il progetto mentre si fa</h2>
@@ -880,9 +898,9 @@
 
 </div>
 
-<script src="assets/i18n.js?v=55"></script>
-<script src="assets/sonda.js?v=55"></script>
-<script src="assets/catena.js?v=55"></script>
-<script src="assets/app.js?v=55"></script>
+<script src="assets/i18n.js?v=56"></script>
+<script src="assets/sonda.js?v=56"></script>
+<script src="assets/catena.js?v=56"></script>
+<script src="assets/app.js?v=56"></script>
 </body>
 </html>

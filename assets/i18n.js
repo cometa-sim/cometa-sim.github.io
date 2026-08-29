@@ -208,6 +208,8 @@ it:{
   /* — Chi fa cosa: i sei gruppi — */
   orgKicker:"Chi fa cosa",
   orgHead:"Sei gruppi, un unico obiettivo",
+  mIndex:"In questa pagina",
+  orgDiscord:"I gruppi si coordinano su un server Discord: un canale per le comunicazioni ufficiali, uno per ciascun gruppo, uno dove si registrano gli avanzamenti e uno per i dubbi tecnici, aperto a tutti. I referenti ne hanno uno loro. Serve a tenere il lavoro scritto: le decisioni restano, e chi arriva dopo può leggere come ci siamo arrivati.",
   orgIntro:"Il lavoro è diviso in sei gruppi, ognuno con una persona referente che coordina e fa da portavoce con gli altri. Ogni gruppo ha la sua area di competenza e si organizza come meglio crede, ma nessuno può lavorare in maniera indipendente dagli altri.",
   org1t:"Organizzazione", org1:"Controlla i costi e dove reperire il materiale, verifica la normativa e l'area di lancio, e segue l'andamento del lavoro degli altri gruppi nel rispetto dei tempi. Tiene il registro scritto di tutto quello che si fa.",
   org2t:"Assemblaggio", org2:"Stabilisce cosa è indispensabile portare a bordo e sceglie i sensori in base allo spazio a disposizione. È il gruppo che progetta la sonda e poi la monta.",
@@ -497,6 +499,8 @@ es:{
   /* — Quién hace qué: los seis equipos — */
   orgKicker:"Quién hace qué",
   orgHead:"Seis equipos, un único objetivo",
+  mIndex:"En esta página",
+  orgDiscord:"Los equipos se coordinan en un servidor de Discord: un canal para las comunicaciones oficiales, uno para cada equipo, uno donde se registran los avances y uno para las dudas técnicas, abierto a todos. Los referentes tienen uno propio. Sirve para que el trabajo quede escrito: las decisiones quedan, y quien llega después puede leer cómo se llegó a ellas.",
   orgIntro:"El trabajo está dividido en seis equipos, cada uno con una persona referente que coordina y hace de vocera con los demás. Cada equipo tiene su área de competencia y se organiza como mejor le parece, pero ninguno puede trabajar de manera independiente de los otros.",
   org1t:"Organización", org1:"Controla los costos y dónde conseguir el material, verifica la normativa y el área de lanzamiento, y sigue el avance del trabajo de los demás equipos respetando los plazos. Lleva el registro escrito de todo lo que se hace.",
   org2t:"Armado", org2:"Establece qué es indispensable llevar a bordo y elige los sensores según el espacio disponible. Es el equipo que diseña la sonda y después la arma.",
@@ -786,6 +790,8 @@ en:{
   /* — Who does what: the six teams — */
   orgKicker:"Who does what",
   orgHead:"Six teams, one single goal",
+  mIndex:"On this page",
+  orgDiscord:"The teams coordinate on a Discord server: one channel for official announcements, one per team, one where progress is logged and one for technical questions, open to everyone. The coordinators have one of their own. It keeps the work written down: decisions stay put, and whoever joins later can read how they were reached.",
   orgIntro:"The work is split across six teams, each with a coordinator who keeps order inside the group and speaks for it with the others. Every team has its own area and organises itself as it sees fit, but none of them can work independently of the rest.",
   org1t:"Organisation", org1:"Watches the costs and where to source the material, checks the regulations and the launch area, and follows the other teams' progress against the deadlines. It keeps the written log of everything that gets done.",
   org2t:"Assembly", org2:"Decides what has to be on board and chooses the sensors according to the space available. It is the team that designs the probe and then builds it.",
