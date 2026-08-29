@@ -23,7 +23,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@200;300;400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/cometa.css?v=52">
+<link rel="stylesheet" href="assets/cometa.css?v=53">
 </head>
 <body>
 
@@ -354,20 +354,46 @@
       <div class="kicker reveal" data-i18n="pgKicker">A che punto siamo</div>
       <h2 class="head reveal d1" data-i18n="pgHead">Il progetto mentre si fa</h2>
       <div class="body-col reveal d1"><p data-i18n="pgIntro"></p></div>
-      <!-- Lo stato di ogni tappa e' la classe della riga: done, wip oppure todo. -->
+      <div class="bal reveal d1">
+        <div class="bal-art" aria-hidden="true">
+          <svg viewBox="0 0 130 174">
+            <defs>
+              <clipPath id="balClip"><path d="M65 8C97 8 121 37 121 73c0 30-21 53-39 60H48C30 126 9 103 9 73 9 37 33 8 65 8Z"/></clipPath>
+              <linearGradient id="balFill" gradientUnits="userSpaceOnUse" x1="0" y1="133" x2="0" y2="8">
+                <stop offset="0" stop-color="#4ADE9B"/><stop offset="1" stop-color="#5FE3FF"/>
+              </linearGradient>
+            </defs>
+            <g clip-path="url(#balClip)">
+              <rect class="bal-empty" x="0" y="0" width="130" height="174"/>
+              <rect class="bal-wip"  x="0" y="133" width="130" height="174"/>
+              <rect class="bal-done" x="0" y="133" width="130" height="174"/>
+              <ellipse class="bal-shine" cx="44" cy="44" rx="16" ry="11"/>
+            </g>
+            <path class="bal-line" d="M65 8C97 8 121 37 121 73c0 30-21 53-39 60H48C30 126 9 103 9 73 9 37 33 8 65 8Z"/>
+            <path class="bal-line" d="M48 133l3 33h28l3-33"/>
+          </svg>
+        </div>
+        <ul class="bal-key">
+          <li><b class="bal-n n-done">0</b><span data-i18n="pgKDone">concluse</span></li>
+          <li><b class="bal-n n-wip">0</b><span data-i18n="pgKWip">in corso</span></li>
+          <li><b class="bal-n">0</b><span data-i18n="pgKTodo">da fare</span></li>
+        </ul>
+      </div>
+      <!-- Lo stato di ogni tappa e' la classe della riga: pg-done, pg-wip oppure pg-todo.
+           Il pallone qui sopra li conta da solo: non c'e' nessun numero da aggiornare a mano. -->
       <ol class="prog reveal d1">
-        <li class="done"><span class="ps" data-i18n="pgDone">Fatto</span><h3 data-i18n="pg1t"></h3><p data-i18n="pg1"></p></li>
-        <li class="done"><span class="ps" data-i18n="pgDone">Fatto</span><h3 data-i18n="pg3t"></h3><p data-i18n="pg3"></p></li>
-        <li class="done"><span class="ps" data-i18n="pgDone">Fatto</span><h3 data-i18n="pg4t"></h3><p data-i18n="pg4"></p></li>
-        <li class="wip"><span class="ps" data-i18n="pgWip">In corso</span><h3 data-i18n="pg2t"></h3><p data-i18n="pg2"></p></li>
-        <li class="wip"><span class="ps" data-i18n="pgWip">In corso</span><h3 data-i18n="pg5t"></h3><p data-i18n="pg5"></p></li>
-        <li class="wip"><span class="ps" data-i18n="pgWip">In corso</span><h3 data-i18n="pg6t"></h3><p data-i18n="pg6"></p></li>
-        <li class="wip"><span class="ps" data-i18n="pgWip">In corso</span><h3 data-i18n="pg7t"></h3><p data-i18n="pg7"></p></li>
-        <li class="wip"><span class="ps" data-i18n="pgWip">In corso</span><h3 data-i18n="pg10t"></h3><p data-i18n="pg10"></p></li>
-        <li class="todo"><span class="ps" data-i18n="pgTodo">Da fare</span><h3 data-i18n="pg8t"></h3><p data-i18n="pg8"></p></li>
-        <li class="todo"><span class="ps" data-i18n="pgTodo">Da fare</span><h3 data-i18n="pg9t"></h3><p data-i18n="pg9"></p></li>
-        <li class="todo"><span class="ps" data-i18n="pgTodo">Da fare</span><h3 data-i18n="pg11t"></h3><p data-i18n="pg11"></p></li>
-        <li class="todo"><span class="ps" data-i18n="pgTodo">Da fare</span><h3 data-i18n="pg12t"></h3><p data-i18n="pg12"></p></li>
+        <li class="pg-done"><span class="pg-state" data-i18n="pgDone">Fatto</span><h3 data-i18n="pg1t"></h3><p data-i18n="pg1"></p></li>
+        <li class="pg-done"><span class="pg-state" data-i18n="pgDone">Fatto</span><h3 data-i18n="pg3t"></h3><p data-i18n="pg3"></p></li>
+        <li class="pg-done"><span class="pg-state" data-i18n="pgDone">Fatto</span><h3 data-i18n="pg4t"></h3><p data-i18n="pg4"></p></li>
+        <li class="pg-wip"><span class="pg-state" data-i18n="pgWip">In corso</span><h3 data-i18n="pg2t"></h3><p data-i18n="pg2"></p></li>
+        <li class="pg-wip"><span class="pg-state" data-i18n="pgWip">In corso</span><h3 data-i18n="pg5t"></h3><p data-i18n="pg5"></p></li>
+        <li class="pg-wip"><span class="pg-state" data-i18n="pgWip">In corso</span><h3 data-i18n="pg6t"></h3><p data-i18n="pg6"></p></li>
+        <li class="pg-wip"><span class="pg-state" data-i18n="pgWip">In corso</span><h3 data-i18n="pg7t"></h3><p data-i18n="pg7"></p></li>
+        <li class="pg-wip"><span class="pg-state" data-i18n="pgWip">In corso</span><h3 data-i18n="pg10t"></h3><p data-i18n="pg10"></p></li>
+        <li class="pg-todo"><span class="pg-state" data-i18n="pgTodo">Da fare</span><h3 data-i18n="pg8t"></h3><p data-i18n="pg8"></p></li>
+        <li class="pg-todo"><span class="pg-state" data-i18n="pgTodo">Da fare</span><h3 data-i18n="pg9t"></h3><p data-i18n="pg9"></p></li>
+        <li class="pg-todo"><span class="pg-state" data-i18n="pgTodo">Da fare</span><h3 data-i18n="pg11t"></h3><p data-i18n="pg11"></p></li>
+        <li class="pg-todo"><span class="pg-state" data-i18n="pgTodo">Da fare</span><h3 data-i18n="pg12t"></h3><p data-i18n="pg12"></p></li>
       </ol>
     </div>
   </section>
@@ -850,9 +876,9 @@
 
 </div>
 
-<script src="assets/i18n.js?v=52"></script>
-<script src="assets/sonda.js?v=52"></script>
-<script src="assets/catena.js?v=52"></script>
-<script src="assets/app.js?v=52"></script>
+<script src="assets/i18n.js?v=53"></script>
+<script src="assets/sonda.js?v=53"></script>
+<script src="assets/catena.js?v=53"></script>
+<script src="assets/app.js?v=53"></script>
 </body>
 </html>

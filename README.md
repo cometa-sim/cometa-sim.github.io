@@ -52,11 +52,11 @@ Norme e autorizzazioni · Domande · Chi siamo.
 ### Dopo ogni modifica: il numero di versione
 
 In `index.html` i cinque file di `assets/` sono richiamati con un numero in
-coda — oggi `?v=52`:
+coda — oggi `?v=53`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=52">
-<script src="assets/i18n.js?v=52"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=53">
+<script src="assets/i18n.js?v=53"></script>
 ```
 
 Serve a costringere il browser a riscaricarli. **Chi modifica un file in
@@ -100,16 +100,24 @@ Lo stato di ogni tappa non sta nei testi: è la classe della riga in
 `index.html`, dentro l'elenco `<ol class="prog">`.
 
 ```html
-<li class="done">…   fatto      pallino verde
-<li class="wip">…    in corso   pallino azzurro
-<li class="todo">…   da fare    pallino vuoto
+<li class="pg-done">…   fatto      pallino verde
+<li class="pg-wip">…    in corso   pallino azzurro
+<li class="pg-todo">…   da fare    pallino vuoto
 ```
 
 Per aggiornare una tappa si cambia solo quella parola, e si sposta la riga
 nel punto giusto dell'elenco (fatto, poi in corso, poi da fare): l'etichetta
 visibile è già tradotta nelle tre lingue dalle chiavi `pgDone`, `pgWip` e
-`pgTodo`. **È l'unica parte del sito che invecchia da sola**: conviene
-rileggerla ogni volta che un gruppo chiude qualcosa.
+`pgTodo`. Il pallone che sta sopra l'elenco **conta le righe da solo** —
+`progBalloon()` in `assets/app.js` — quindi non c'è nessun numero né
+percentuale da aggiornare a mano.
+
+I nomi delle classi hanno il prefisso `pg-` di proposito: `.todo` senza
+prefisso è già un'altra cosa nel foglio di stile (il segnaposto giallo per
+i contenuti da completare), e usarlo qui rompeva l'impaginazione.
+
+**È l'unica parte del sito che invecchia da sola**: conviene rileggerla ogni
+volta che un gruppo chiude qualcosa.
 
 ### Il cielo della pagina iniziale
 
