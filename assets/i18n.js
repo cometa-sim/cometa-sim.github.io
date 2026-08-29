@@ -66,7 +66,7 @@ it:{
   catAtmo:"Atmosfera", catPos:"Posizione e controllo", catRad:"Radiazione e luce", catAlim:"Alimentazione", catKit:"Kit 2000 (già a bordo)",
   legNote:"Il disco chiaro sul coperchio è la finestra in PTFE che lascia passare l'ultravioletto fino al sensore. Le fasce color sabbia sono la coibentazione: fuori fa fino a −60 °C. I componenti 24, 25 e 26 stanno all'esterno della sonda, perché devono misurare l'aria vera.",
   uOn:"su", uParts:"pezzi",
-  massNote:"I {mass} g indicati sono la somma dei soli componenti disegnati dentro la scatola, di cui 379 g sono apparati del Kit 2000 già a bordo. Il payload completo è circa 1280 g: vanno aggiunti la scatola in polistirolo (200 g), il paracadute (80 g), il cordame (80 g), i ripiani con i tiranti (~70 g), cablaggio e isolamento (~90 g), riflettore radar ed etichette (~30 g). Il modello non sostituisce la prova di montaggio a secco né la pesata reale.",
+  massNote:"I {mass} g indicati sono la somma dei soli componenti disegnati dentro la scatola, di cui 379 g sono apparati del Kit 2000 già a bordo. Il payload completo pesa di più: vanno aggiunti la scatola in polistirolo, il paracadute, il cordame, i ripiani con i tiranti, il cablaggio, l'isolamento e il riflettore radar. La massa su cui sono tarati i calcoli di volo è quella indicata in Missione, stimata per eccesso; quella esatta si saprà dalla pesata in fase di assemblaggio. Il modello non sostituisce la prova di montaggio a secco.",
   webglFail:"Il modello tridimensionale non è disponibile su questo dispositivo. L'elenco dei componenti qui sotto resta consultabile.",
 
   /* — Studio dei venti — */
@@ -83,7 +83,9 @@ it:{
   mapHint:"Cliccando un punto compaiono deriva, rotta e durata di quel volo.",
 
   wApproxHead:"Le approssimazioni",
-  wApproxIntro:"Ogni simulazione è un modello, e ogni modello semplifica. Queste sono le tre semplificazioni che abbiamo fatto, e quanto pesano.",
+  wApproxIntro:"Ogni simulazione è un modello, e ogni modello semplifica. Queste sono le quattro semplificazioni che abbiamo fatto, e quanto pesano.",
+  wA0H:"La massa del payload è una stima",
+  wA0P:"Tutto il calcolo parte da quanto pesa la sonda, e oggi quel numero è una stima: i pezzi non sono ancora tutti montati né pesati. L'abbiamo tenuta volutamente alta, e questo ha una conseguenza precisa — una massa sovrastimata richiede più elio, e più elio significa scoppio più basso. La quota prevista è quindi semmai prudente: con il peso vero, il volo dovrebbe arrivare almeno lì. La massa esatta si saprà dalla pesata in fase di assemblaggio, e allora i conti verranno rifatti.",
   wA1H:"Il vento cambia anche in orizzontale",
   wA1P:"La sonda non sale e scende nella stessa colonna d'aria: mentre vola si sposta di quasi duecento chilometri, dove il vento è diverso. Abbiamo tenuto conto della salita e della discesa in due colonne distinte, e poi abbiamo misurato quanto pesa questa semplificazione rifacendo lo stesso calcolo con una colonna sola. La differenza è in media di <strong>4 km su 190</strong>, con un massimo di 17: circa il 2 %. Trascurabile per quello che ci serve.",
   wA2H:"Il vento non è misurato, è ricostruito",
@@ -360,7 +362,7 @@ es:{
   catAtmo:"Atmósfera", catPos:"Posición y control", catRad:"Radiación y luz", catAlim:"Alimentación", catKit:"Kit 2000 (ya a bordo)",
   legNote:"El disco claro sobre la tapa es la ventana de PTFE que deja pasar el ultravioleta hasta el sensor. Las franjas color arena son el aislamiento: afuera hace hasta −60 °C. Los componentes 24, 25 y 26 van fuera de la sonda, porque tienen que medir el aire de verdad.",
   uOn:"de", uParts:"piezas",
-  massNote:"Los {mass} g indicados son la suma de los componentes dibujados dentro de la caja, de los cuales 379 g son equipos del Kit 2000 que ya están a bordo. El payload completo es de unos 1280 g: hay que sumar la caja de poliestireno (200 g), el paracaídas (80 g), la cuerda (80 g), los estantes con sus tensores (~70 g), el cableado y el aislamiento (~90 g), el reflector de radar y las etiquetas (~30 g). El modelo no reemplaza la prueba de armado en seco ni el pesaje real.",
+  massNote:"Los {mass} g indicados son la suma de los componentes dibujados dentro de la caja, de los cuales 379 g son equipos del Kit 2000 que ya están a bordo. El payload completo pesa más: hay que sumar la caja de poliestireno, el paracaídas, la cuerda, los estantes con sus tensores, el cableado, la aislación y el reflector de radar. La masa con la que están calibrados los cálculos de vuelo es la que figura en Misión, estimada por exceso; la exacta se sabrá con el pesaje en la etapa de armado. El modelo no reemplaza la prueba de armado en seco.",
   webglFail:"El modelo tridimensional no está disponible en este dispositivo. La lista de componentes de abajo sigue disponible.",
 
   wKicker:"Fase 1 · Estudio preliminar", windsTitle:"Dónde va a caer la sonda",
@@ -376,7 +378,9 @@ es:{
   mapHint:"Al hacer clic en un punto aparecen la deriva, el rumbo y la duración de ese vuelo.",
 
   wApproxHead:"Las aproximaciones",
-  wApproxIntro:"Toda simulación es un modelo, y todo modelo simplifica. Estas son las tres simplificaciones que hicimos, y cuánto pesan.",
+  wApproxIntro:"Toda simulación es un modelo, y todo modelo simplifica. Estas son las cuatro simplificaciones que hicimos, y cuánto pesan.",
+  wA0H:"La masa de la carga útil es una estimación",
+  wA0P:"Todo el cálculo parte de cuánto pesa la sonda, y hoy ese número es una estimación: las piezas todavía no están todas armadas ni pesadas. La mantuvimos deliberadamente alta, y eso tiene una consecuencia precisa: una masa sobrestimada exige más helio, y más helio significa reventado más bajo. La altura prevista es entonces, si acaso, prudente: con el peso real el vuelo debería llegar al menos hasta ahí. La masa exacta se sabrá con el pesaje en la etapa de armado, y entonces los cálculos se rehacen.",
   wA1H:"El viento también cambia en horizontal",
   wA1P:"La sonda no sube y baja por la misma columna de aire: mientras vuela se desplaza casi doscientos kilómetros, donde el viento es distinto. Tuvimos en cuenta el ascenso y el descenso en dos columnas separadas, y después medimos cuánto pesa esta simplificación rehaciendo el mismo cálculo con una sola columna. La diferencia es en promedio de <strong>4 km sobre 190</strong>, con un máximo de 17: alrededor del 2 %. Despreciable para lo que necesitamos.",
   wA2H:"El viento no está medido, está reconstruido",
@@ -651,7 +655,7 @@ en:{
   catAtmo:"Atmosphere", catPos:"Position and control", catRad:"Radiation and light", catAlim:"Power", catKit:"Kit 2000 (already aboard)",
   legNote:"The pale disc on the lid is the PTFE window that lets ultraviolet through to the sensor. The sand-coloured bands are the insulation: outside it gets down to −60 °C. Components 24, 25 and 26 sit outside the probe, because they have to measure the real air.",
   uOn:"of", uParts:"parts",
-  massNote:"The {mass} g given here is the sum of the components drawn inside the box alone, of which 379 g are Kit 2000 units already aboard. The full payload is about 1280 g: add the polystyrene box (200 g), the parachute (80 g), the cordage (80 g), the decks with their tie rods (~70 g), wiring and insulation (~90 g), radar reflector and labels (~30 g). The model does not replace the dry-fit test or a real weigh-in.",
+  massNote:"The {mass} g given here is the sum of the components drawn inside the box alone, of which 379 g are Kit 2000 units already aboard. The full payload weighs more: add the polystyrene box, the parachute, the cordage, the decks with their tie rods, the wiring, the insulation and the radar reflector. The mass the flight calculations are based on is the one given under Mission, deliberately estimated high; the exact figure will come from the weigh-in at assembly. The model does not replace the dry-fit test.",
   webglFail:"The three-dimensional model is not available on this device. The component list below still works.",
 
   wKicker:"Phase 1 · Preliminary study", windsTitle:"Where the probe ends up",
@@ -667,7 +671,9 @@ en:{
   mapHint:"Clicking a dot shows the drift, bearing and duration of that flight.",
 
   wApproxHead:"The approximations",
-  wApproxIntro:"Every simulation is a model, and every model simplifies. These are the three simplifications we made, and how much they matter.",
+  wApproxIntro:"Every simulation is a model, and every model simplifies. These are the four simplifications we made, and how much they matter.",
+  wA0H:"The payload mass is an estimate",
+  wA0P:"The whole calculation starts from how much the probe weighs, and today that figure is an estimate: the parts are not all built or weighed yet. We kept it deliberately high, and that has a definite consequence — an overestimated mass calls for more helium, and more helium means a lower burst. So the predicted altitude is, if anything, a cautious one: at the real weight the flight should reach at least that high. The exact mass will come from the weigh-in at assembly, and the calculations will be redone then.",
   wA1H:"Wind changes horizontally too",
   wA1P:"The probe does not rise and fall through the same column of air: while flying it moves almost two hundred kilometres, where the wind is different. We treated the ascent and the descent as two separate columns, then measured how much this simplification costs by redoing the same calculation with a single column. The difference averages <strong>4 km out of 190</strong>, with a maximum of 17: about 2 %. Negligible for our purposes.",
   wA2H:"The wind is not measured, it is reconstructed",
