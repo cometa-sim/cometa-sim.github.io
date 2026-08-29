@@ -209,11 +209,11 @@ it:{
   orgKicker:"Chi fa cosa",
   orgIntro:"Il lavoro è diviso in sei gruppi, ognuno con una persona referente che coordina e fa da portavoce con gli altri. Ogni gruppo ha la sua area di competenza e si organizza come meglio crede, ma nessuno può lavorare in maniera indipendente dagli altri.",
   org1t:"Organizzazione", org1:"Controlla i costi e dove reperire il materiale, verifica la normativa e l'area di lancio, e segue l'andamento del lavoro degli altri gruppi nel rispetto dei tempi. Tiene il registro scritto di tutto quello che si fa.",
-  org2t:"Assemblaggio", org2:"Stabilisce cosa è indispensabile portare a bordo e sceglie i sensori in base allo spazio a disposizione. È il gruppo che poi monta la sonda.",
+  org2t:"Assemblaggio", org2:"Stabilisce cosa è indispensabile portare a bordo e sceglie i sensori in base allo spazio a disposizione. È il gruppo che progetta la sonda e poi la monta.",
   org3t:"Dati", org3:"Fa ricerca su cosa è interessante e fattibile misurare con un pallone stratosferico, studia la dinamica del pallone e come si determina la traiettoria. Dopo il volo, analizza i dati raccolti.",
-  org4t:"Programmazione", org4:"In base ai sensori sceglie la scheda necessaria e si assicura di saperla programmare: il codice che legge gli strumenti e registra tutto va provato a terra prima del volo.",
+  org4t:"Programmazione", org4:"In base ai sensori sceglie la scheda necessaria ed è responsabile di programmarla correttamente: il codice che legge gli strumenti e registra tutto va provato a terra prima del volo.",
   org5t:"Audiovisivo", org5:"Raccoglie quanto più materiale possibile — foto, video, audio — perché non è possibile tornare indietro e tutte le fasi vanno documentate. Si occupa anche degli aspetti creativi: logo, estetica, musiche.",
-  org6t:"Social", org6:"Sceglie la strategia, prepara i profili e pubblica: è il gruppo che racconta il progetto fuori dalla scuola, mentre si fa.",
+  org6t:"Social", org6:"Sceglie la strategia, prepara i profili, pubblica e cura questo sito: è il gruppo che racconta il progetto fuori dalla scuola, mentre si fa.",
 
   /* — A che punto siamo — */
   pgKicker:"A che punto siamo",
@@ -496,11 +496,11 @@ es:{
   orgKicker:"Quién hace qué",
   orgIntro:"El trabajo está dividido en seis equipos, cada uno con una persona referente que coordina y hace de vocera con los demás. Cada equipo tiene su área de competencia y se organiza como mejor le parece, pero ninguno puede trabajar de manera independiente de los otros.",
   org1t:"Organización", org1:"Controla los costos y dónde conseguir el material, verifica la normativa y el área de lanzamiento, y sigue el avance del trabajo de los demás equipos respetando los plazos. Lleva el registro escrito de todo lo que se hace.",
-  org2t:"Armado", org2:"Establece qué es indispensable llevar a bordo y elige los sensores según el espacio disponible. Es el equipo que después arma la sonda.",
+  org2t:"Armado", org2:"Establece qué es indispensable llevar a bordo y elige los sensores según el espacio disponible. Es el equipo que diseña la sonda y después la arma.",
   org3t:"Datos", org3:"Investiga qué es interesante y factible medir con un globo estratosférico, estudia la dinámica del globo y cómo se determina la trayectoria. Después del vuelo, analiza los datos recogidos.",
-  org4t:"Programación", org4:"Según los sensores elige la placa necesaria y se asegura de saber programarla: el código que lee los instrumentos y registra todo hay que probarlo en tierra antes del vuelo.",
+  org4t:"Programación", org4:"Según los sensores elige la placa necesaria y es responsable de programarla correctamente: el código que lee los instrumentos y registra todo hay que probarlo en tierra antes del vuelo.",
   org5t:"Audiovisual", org5:"Junta todo el material posible — fotos, videos, audio — porque no se puede volver atrás y todas las etapas tienen que quedar documentadas. Se ocupa también de lo creativo: logo, estética, músicas.",
-  org6t:"Redes", org6:"Elige la estrategia, prepara los perfiles y publica: es el equipo que cuenta el proyecto fuera de la escuela, mientras se hace.",
+  org6t:"Redes", org6:"Elige la estrategia, prepara los perfiles, publica y se ocupa de este sitio: es el equipo que cuenta el proyecto fuera de la escuela, mientras se hace.",
 
   /* — En qué punto estamos — */
   pgKicker:"En qué punto estamos",
@@ -783,11 +783,11 @@ en:{
   orgKicker:"Who does what",
   orgIntro:"The work is split across six teams, each with a coordinator who keeps order inside the group and speaks for it with the others. Every team has its own area and organises itself as it sees fit, but none of them can work independently of the rest.",
   org1t:"Organisation", org1:"Watches the costs and where to source the material, checks the regulations and the launch area, and follows the other teams' progress against the deadlines. It keeps the written log of everything that gets done.",
-  org2t:"Assembly", org2:"Decides what has to be on board and chooses the sensors according to the space available. It is the team that then builds the probe.",
+  org2t:"Assembly", org2:"Decides what has to be on board and chooses the sensors according to the space available. It is the team that designs the probe and then builds it.",
   org3t:"Data", org3:"Researches what is interesting and feasible to measure with a stratospheric balloon, studies the balloon's dynamics and how the trajectory is determined. After the flight, it analyses the data collected.",
-  org4t:"Programming", org4:"Given the sensors, it picks the board needed and makes sure it can program it: the code that reads the instruments and records everything has to be tested on the ground before the flight.",
+  org4t:"Programming", org4:"Given the sensors, it picks the board needed and is responsible for programming it correctly: the code that reads the instruments and records everything has to be tested on the ground before the flight.",
   org5t:"Audiovisual", org5:"Gathers as much material as possible — photos, video, audio — because there is no going back and every stage has to be documented. It also handles the creative side: logo, look, music.",
-  org6t:"Social media", org6:"Chooses the strategy, sets up the profiles and publishes: this is the team that tells the project outside school, while it happens.",
+  org6t:"Social media", org6:"Chooses the strategy, sets up the profiles, publishes and looks after this site: this is the team that tells the project outside school, while it happens.",
 
   /* — Where we are — */
   pgKicker:"Where we are",
