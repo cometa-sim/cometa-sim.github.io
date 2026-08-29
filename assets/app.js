@@ -711,7 +711,7 @@ function progBalloon(){
     else if(r.classList.contains("pg-wip")) wip++;
   });
 
-  const TOP = 8, BOT = 133, H = BOT - TOP;             /* solo il corpo del pallone, non il collo */
+  const TOP = 6, BOT = 140, H = BOT - TOP;             /* solo il corpo del pallone, non il collo */
   const fill = function(sel, frazione){
     const r = svg.querySelector(sel);
     if(r) r.setAttribute("y", (BOT - H * frazione).toFixed(1));
