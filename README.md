@@ -46,16 +46,17 @@ Norme e autorizzazioni · Domande · Chi siamo.
 | Nomi delle cinque parti della catena di volo | la chiave `chain` in `assets/i18n.js` |
 | Colori e caratteri di tutto il sito | il blocco `:root` in `assets/cometa.css` |
 | Data del lancio (conto alla rovescia) | la costante `LAUNCH` in `assets/app.js` |
-| Numeri delle schede (quota, massa, deriva…) | direttamente in `index.html` |
+| Numeri delle quattro schede della pagina iniziale | direttamente in `index.html` |
+| Stato di una tappa del progetto | la classe `done`, `wip` o `todo` della riga in `index.html` |
 
 ### Dopo ogni modifica: il numero di versione
 
 In `index.html` i cinque file di `assets/` sono richiamati con un numero in
-coda — oggi `?v=46`:
+coda — oggi `?v=52`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=46">
-<script src="assets/i18n.js?v=46"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=52">
+<script src="assets/i18n.js?v=52"></script>
 ```
 
 Serve a costringere il browser a riscaricarli. **Chi modifica un file in
@@ -88,6 +89,27 @@ in fondo, nella forma `<strong>Etichetta:</strong>` (le chiavi `srcMeteo`,
 Nelle Domande, che non hanno quel blocco, la fonte si nomina dentro la frase.
 Il collegamento si mette all'ente o al servizio, non al documento: la DINACIA e
 Open-Meteo sono linkati, il regolamento LAR 91 no.
+
+### A che punto siamo
+
+In fondo alla pagina Missione ci sono due blocchi che raccontano il progetto
+come processo: **Chi fa cosa**, i sei gruppi di lavoro (chiavi `org1t`…`org6`),
+e **A che punto siamo**, le tappe del lavoro (chiavi `pg1t`…`pg12`).
+
+Lo stato di ogni tappa non sta nei testi: è la classe della riga in
+`index.html`, dentro l'elenco `<ol class="prog">`.
+
+```html
+<li class="done">…   fatto      pallino verde
+<li class="wip">…    in corso   pallino azzurro
+<li class="todo">…   da fare    pallino vuoto
+```
+
+Per aggiornare una tappa si cambia solo quella parola, e si sposta la riga
+nel punto giusto dell'elenco (fatto, poi in corso, poi da fare): l'etichetta
+visibile è già tradotta nelle tre lingue dalle chiavi `pgDone`, `pgWip` e
+`pgTodo`. **È l'unica parte del sito che invecchia da sola**: conviene
+rileggerla ogni volta che un gruppo chiude qualcosa.
 
 ### Il cielo della pagina iniziale
 
