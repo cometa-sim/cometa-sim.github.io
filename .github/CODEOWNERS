@@ -1,0 +1,16 @@
+# Chi deve approvare le modifiche a questo sito.
+#
+# L'asterisco vale per ogni file del repository: qualunque cosa si
+# cambi, la richiesta di modifica ha bisogno dell'approvazione di
+# @petrolio1975 prima di poter entrare in main.
+#
+# Attenzione: questo file da solo non basta. Nella regola su main deve
+# essere attiva anche l'opzione «Require review from Code Owners», in
+# Settings -> Rules -> Rulesets -> la regola su main -> Require a pull
+# request before merging. Senza quella spunta il file e' solo un
+# suggerimento: GitHub chiede la revisione a chi e' nominato qui, ma
+# accetta l'approvazione di chiunque altro abbia accesso in scrittura.
+#
+# Chi e' nominato qui deve avere accesso in scrittura al repository.
+
+*   @petrolio1975

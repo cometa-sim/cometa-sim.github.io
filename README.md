@@ -168,6 +168,22 @@ Mettere le immagini in `assets/img/` e indicarle nella tabella `TEX` in
 `assets/sonda.js`, con chiave il numero del componente. Scatto dall'alto,
 sfondo bianco, luce diffusa, ritaglio esatto sul contorno del pezzo.
 
+## Chi approva le modifiche
+
+Nessuno scrive direttamente in `main`: si apre una richiesta di
+modifica e qualcuno la approva. La regola «serve un'approvazione», da
+sola, non dice **da chi**: vale quella di chiunque abbia accesso in
+scrittura, quindi due studenti possono approvarsi a vicenda.
+
+Per questo c'è `.github/CODEOWNERS`, che nomina @petrolio1975
+proprietario di ogni file. Perché sia vincolante deve essere attiva
+anche l'opzione **Require review from Code Owners** nella regola su
+`main` (Settings → Rules → Rulesets). Con le due cose insieme, niente
+entra nel sito senza l'approvazione di chi coordina il progetto.
+
+L'unica cosa che GitHub impedisce sempre, anche senza regole, è
+approvare la propria richiesta di modifica.
+
 ## Da completare
 
 - **La data definitiva del lancio**, quando la DINACIA autorizza. Oggi la
