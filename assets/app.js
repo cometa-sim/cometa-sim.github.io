@@ -174,6 +174,24 @@ document.addEventListener("keydown", function(e){
   e.preventDefault(); go(el.dataset.page);
 });
 
+/* Indice della pagina Missione: salta a una sezione senza passare per
+   l'indirizzo, che qui seleziona la pagina e non un punto dentro. */
+function jumpTo(el){
+  const t = document.getElementById(el.dataset.jump);
+  if(t) t.scrollIntoView({behavior: reduced ? "auto" : "smooth", block: "start"});
+}
+document.addEventListener("click", function(e){
+  const el = e.target.closest("[data-jump]");
+  if(!el) return;
+  e.preventDefault(); jumpTo(el);
+});
+document.addEventListener("keydown", function(e){
+  if(e.key !== "Enter" && e.key !== " ") return;
+  const el = e.target.closest && e.target.closest("[data-jump]");
+  if(!el) return;
+  e.preventDefault(); jumpTo(el);
+});
+
 /* ---------- Menu per schermi stretti ---------- */
 const menu = $("#menu");
 function closeMenu(){ menu.classList.remove("open"); document.body.style.overflow = ""; }
@@ -696,12 +714,49 @@ function onScroll(){
 addEventListener("scroll", onScroll, {passive:true});
 addEventListener("resize", function(){ sfResize(); moveThumb(); updateFlight(); updatePhys(); });
 
+/* Il pallone di avanzamento non ha un numero suo: conta le tappe dell'elenco
+   qui sotto, cosi' cambiare la classe di una riga basta e avanza. */
+function progBalloon(){
+  const ol = document.querySelector(".prog");
+  const svg = document.querySelector(".bal-art svg");
+  if(!ol || !svg) return;
+  const rows = Array.prototype.slice.call(ol.querySelectorAll("li"));
+  if(!rows.length) return;
+
+  let done = 0, wip = 0;
+  rows.forEach(function(r){
+    if(r.classList.contains("pg-done")) done++;
+    else if(r.classList.contains("pg-wip")) wip++;
+  });
+
+  const TOP = 6, BOT = 140, H = BOT - TOP;             /* solo il corpo del pallone, non il collo */
+  const fill = function(sel, frazione){
+    const r = svg.querySelector(sel);
+    if(r) r.setAttribute("y", (BOT - H * frazione).toFixed(1));
+  };
+  const set = function(sel, n){
+    const e = document.querySelector(sel);
+    if(e) e.textContent = n;
+  };
+  set(".bal-n.n-done", done);
+  set(".bal-n.n-wip", wip);
+  set(".bal-key li:last-child .bal-n", rows.length - done - wip);
+
+  const salita = function(){
+    fill(".bal-wip", (done + wip) / rows.length);
+    fill(".bal-done", done / rows.length);
+  };
+  if(reduced) salita();
+  else setTimeout(salita, 260);                        /* parte da vuoto e si riempie */
+}
+
 sfResize(); sfDraw();
 applyDaylight();
 setInterval(applyDaylight, 300000);      /* il cielo segue l'ora, anche a pagina aperta */
 setLang(detectLang(), false);
 showPage(location.hash.slice(1) || "home");
 darkenMap();
+progBalloon();
 updateCountdown();
 setInterval(updateCountdown, 1000);
 requestAnimationFrame(function(){ moveThumb(); onScroll(); updateFlight(); });
