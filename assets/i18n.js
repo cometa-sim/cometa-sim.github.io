@@ -40,13 +40,13 @@ it:{
   /* — Missione — */
   pKicker:"Fase 1 · Profilo di volo", missionTitle:"Missione",
   missionSub:"Cosa studiamo, come, e a che punto siamo.",
-  mBody:"Il progetto COMETA invia la sonda Klo-01 fino a circa 37,8 km di quota per studiare la stratosfera attraverso misure dirette, in una regione dell'atmosfera che gli aerei non raggiungono e i satelliti sorvolano.",
+  mBody:"Il progetto COMETA invia la sonda Klo-01 oltre i 37 km di quota per studiare la stratosfera attraverso misure dirette, in una regione dell'atmosfera che gli aerei non raggiungono e i satelliti sorvolano.",
 
   pHead2:"Dati del progetto",
   pAlt:"Quota prevista", pTemp:"Temperatura esterna", pPress:"Pressione atmosferica", pPressU:"del livello del mare",
   pGas:"Gas di riempimento", pGasMain:"Elio", pVel:"Velocità di salita", pDur:"Durata del volo",
   pHe:"Elio necessario", pMass:"Massa del payload", bKicker:"Il pallone", bHead:"Pallone 2000",
-  bBody:"La missione utilizza il pallone da 2000 g. Riempito con circa 4,5 m³ di elio, raggiunge una quota di scoppio intorno ai 37,8 km.",
+  bBody:"La missione utilizza il pallone da 2000 g. Riempito con circa 4,5 m³ di elio, raggiunge una quota di scoppio oltre i 37 km.",
   specDiam:"Diametro iniziale", specBurst:"Quota di scoppio", specHe:"Elio necessario",
   specMass:"Massa del payload",
 
@@ -66,7 +66,7 @@ it:{
   catAtmo:"Atmosfera", catPos:"Posizione e controllo", catRad:"Radiazione e luce", catAlim:"Alimentazione", catKit:"Kit 2000 (già a bordo)",
   legNote:"Il disco chiaro sul coperchio è la finestra in PTFE che lascia passare l'ultravioletto fino al sensore. Le fasce color sabbia sono la coibentazione: fuori fa fino a −60 °C. I componenti 24, 25 e 26 stanno all'esterno della sonda, perché devono misurare l'aria vera.",
   uOn:"su", uParts:"pezzi",
-  massNote:"I {mass} g indicati sono la somma dei soli componenti disegnati dentro la scatola, di cui 379 g sono apparati del Kit 2000 già a bordo. Il payload completo è circa 1280 g: vanno aggiunti la scatola in polistirolo (200 g), il paracadute (80 g), il cordame (80 g), i ripiani con i tiranti (~70 g), cablaggio e isolamento (~90 g), riflettore radar ed etichette (~30 g). Il modello non sostituisce la prova di montaggio a secco né la pesata reale.",
+  massNote:"I {mass} g indicati sono la somma dei soli componenti disegnati dentro la scatola, di cui 379 g sono apparati del Kit 2000 già a bordo. Il payload completo pesa di più: vanno aggiunti la scatola in polistirolo, il paracadute, il cordame, i ripiani con i tiranti, il cablaggio, l'isolamento e il riflettore radar. La massa su cui sono tarati i calcoli di volo è quella indicata in Missione, stimata per eccesso; quella esatta si saprà dalla pesata in fase di assemblaggio. Il modello non sostituisce la prova di montaggio a secco.",
   webglFail:"Il modello tridimensionale non è disponibile su questo dispositivo. L'elenco dei componenti qui sotto resta consultabile.",
 
   /* — Studio dei venti — */
@@ -82,6 +82,8 @@ it:{
   mDurazno:"Partenza da Durazno", mMercedes:"Partenza da Mercedes",
   mapHint:"Cliccando un punto compaiono deriva, rotta e durata di quel volo.",
 
+  wParH:"I parametri del calcolo",
+  wParP:"La simulazione è stata fatta usando una velocità di salita di <strong>5 m/s</strong> e una massa di <strong>1,5 kg</strong>. Con questi valori lo scoppio calcolato dà <strong>37,7 km</strong>, la quantità di elio richiesta <strong>4,5 m³</strong> e la velocità finale di caduta <strong>4,7 m/s</strong>. Il parametro della massa sarà definitivo in fase di assemblaggio, e la velocità di salita sarà stabilita anche a seconda delle condizioni meteorologiche: le stime delle variabili dipendenti, fra cui la quota di scoppio, sono quindi soggette a variazioni.",
   wApproxHead:"Le approssimazioni",
   wApproxIntro:"Ogni simulazione è un modello, e ogni modello semplifica. Queste sono le tre semplificazioni che abbiamo fatto, e quanto pesano.",
   wA1H:"Il vento cambia anche in orizzontale",
@@ -124,12 +126,12 @@ it:{
   ph4t:"Stratosfera, sopra i 18 km — l'aria finisce",
   ph4p:"A trentun chilometri il sensore di pressione arriva a fondo scala: 10 hPa, un <strong>centesimo</strong> della pressione al suolo. La temperatura ricomincia a salire, per la presenza dell'ozono che assorbe i raggi ultravioletti.",
   ph5t:"Il pallone si gonfia",
-  ph5p:"Fra il suolo e i 37,8 km la pressione esterna cala di <strong>oltre duecento volte</strong>, e il volume del pallone cresce nella stessa proporzione: il diametro passa da circa 2 m a più di dieci. Il pallone parte grande come un'automobile e arriva grande come una casa.",
-  ph6t:"Lo scoppio, 37,8 km",
-  ph6p:"Il lattice ha un limite di allungamento, e a un certo punto lo raggiunge. Per il nostro pallone riempito, il calcolo del progetto mette lo scoppio a <strong>37,8 chilometri</strong>. Da quell'istante la sonda comincia a cadere.",
+  ph5p:"Fra il suolo e la quota di scoppio la pressione esterna cala di <strong>oltre duecento volte</strong>, e il volume del pallone cresce nella stessa proporzione: il diametro passa da circa 2 m a più di dieci. Il pallone parte grande come un'automobile e arriva grande come una casa.",
+  ph6t:"Lo scoppio",
+  ph6p:"Il lattice ha un limite di allungamento, e a un certo punto lo raggiunge: è la <strong>quota di scoppio</strong>. Da quell'istante la sonda comincia a cadere.",
   ph7t:"La discesa",
   ph7p:"Il paracadute si apre da solo, tirato dall'aria. In alto frena poco, perché non c'è quasi niente su cui fare presa. Più si scende, più rallenta.",
-  ph8t:"Il recupero", ph8p:"Tre ore in tutto, fra salita e discesa. Poi la sonda è per terra, da qualche parte — circa <strong>190 chilometri più a est</strong> — e nel frattempo i GPS hanno ricominciato a inviarci la posizione. Parte la ricerca.",
+  ph8t:"Il recupero", ph8p:"Tre ore in tutto, fra salita e discesa. Poi la sonda è per terra, e nel frattempo i GPS hanno ricominciato a inviarci la posizione. Parte la ricerca.",
 
   /* — Contatti — */
   contactMailHead:"Scrivici", contactMailSub:"Per informazioni, collaborazioni, proposte.",
@@ -154,8 +156,8 @@ it:{
   lc1:"Massa complessiva del carico utile", lc1t:"sotto 4 kg",
   lc2:"Massa del collo più pesante", lc2t:"sotto 3 kg",
   lc3:"Colli da 2 kg o più con densità oltre 13 g/cm²", lc3t:"nessuno",
-  lc4:"Forza per separare il carico dal pallone", lc4t:"sotto 230 N", lc4v:"sotto soglia", lc3v:"1,3 kg · ≈ 3 g/cm²",
-  lClassOut:"Quattro criteri, quattro volte dentro. La sonda Klo-01 è un pallone <strong>«leggero»</strong>: pesa un terzo della soglia dei 4 kg, il collo è unico e ben sotto i 3 kg, la sua densità è quattro volte inferiore al limite, e il cordame cede prima dei 230 N. Quest'ultimo è il criterio meno intuitivo e vale la pena spiegarlo: 230 N sono circa 23 chili di forza, e un cordame più robusto renderebbe la sonda «pesante» anche pesando un chilo e mezzo.",
+  lc4:"Forza per separare il carico dal pallone", lc4t:"sotto 230 N", lc4v:"sotto soglia", lc3v:"1,5 kg · ≈ 3,6 g/cm²",
+  lClassOut:"Quattro criteri, quattro volte dentro. La sonda Klo-01 è un pallone <strong>«leggero»</strong>: pesa poco più di un terzo della soglia dei 4 kg, il collo è unico e ben sotto i 3 kg, la sua densità è quasi quattro volte inferiore al limite, e il cordame cede prima dei 230 N. Quest'ultimo è il criterio meno intuitivo e vale la pena spiegarlo: 230 N sono circa 23 chili di forza, e un cordame più robusto renderebbe la sonda «pesante» anche con il peso che ha.",
 
   lDutyHead:"Che cosa comporta",
   lDuty1:"Quasi tutti gli obblighi operativi del regolamento — due sistemi indipendenti per interrompere il volo, il transponder radar, il riflettore radar, le notifiche al controllo del traffico aereo sette giorni prima, i rapporti di posizione ogni due ore — riguardano i palloni <em>medi</em> e <em>pesanti</em>. A un pallone leggero non si applicano.",
@@ -335,13 +337,13 @@ es:{
 
   pKicker:"Fase 1 · Perfil de vuelo", missionTitle:"Misión",
   missionSub:"Qué estudiamos, cómo, y en qué punto estamos.",
-  mBody:"El proyecto COMETA envía la sonda Klo-01 hasta unos 37,8 km de altura para estudiar la estratósfera mediante mediciones directas, en una región de la atmósfera que los aviones no alcanzan y los satélites sobrevuelan.",
+  mBody:"El proyecto COMETA envía la sonda Klo-01 más allá de los 37 km de altura para estudiar la estratósfera mediante mediciones directas, en una región de la atmósfera que los aviones no alcanzan y los satélites sobrevuelan.",
 
   pHead2:"Datos del proyecto",
   pAlt:"Altura prevista", pTemp:"Temperatura exterior", pPress:"Presión atmosférica", pPressU:"del nivel del mar",
   pGas:"Gas de llenado", pGasMain:"Helio", pVel:"Velocidad de ascenso", pDur:"Duración del vuelo",
   pHe:"Helio necesario", pMass:"Masa de la carga útil", bKicker:"El globo", bHead:"Globo 2000",
-  bBody:"La misión usa el globo de 2000 g. Lleno con unos 4,5 m³ de helio, alcanza una altura de reventado en torno a los 37,8 km.",
+  bBody:"La misión usa el globo de 2000 g. Lleno con unos 4,5 m³ de helio, alcanza una altura de reventado por encima de los 37 km.",
   specDiam:"Diámetro inicial", specBurst:"Altura de reventado", specHe:"Helio necesario",
   specMass:"Masa del payload",
 
@@ -360,7 +362,7 @@ es:{
   catAtmo:"Atmósfera", catPos:"Posición y control", catRad:"Radiación y luz", catAlim:"Alimentación", catKit:"Kit 2000 (ya a bordo)",
   legNote:"El disco claro sobre la tapa es la ventana de PTFE que deja pasar el ultravioleta hasta el sensor. Las franjas color arena son el aislamiento: afuera hace hasta −60 °C. Los componentes 24, 25 y 26 van fuera de la sonda, porque tienen que medir el aire de verdad.",
   uOn:"de", uParts:"piezas",
-  massNote:"Los {mass} g indicados son la suma de los componentes dibujados dentro de la caja, de los cuales 379 g son equipos del Kit 2000 que ya están a bordo. El payload completo es de unos 1280 g: hay que sumar la caja de poliestireno (200 g), el paracaídas (80 g), la cuerda (80 g), los estantes con sus tensores (~70 g), el cableado y el aislamiento (~90 g), el reflector de radar y las etiquetas (~30 g). El modelo no reemplaza la prueba de armado en seco ni el pesaje real.",
+  massNote:"Los {mass} g indicados son la suma de los componentes dibujados dentro de la caja, de los cuales 379 g son equipos del Kit 2000 que ya están a bordo. El payload completo pesa más: hay que sumar la caja de poliestireno, el paracaídas, la cuerda, los estantes con sus tensores, el cableado, la aislación y el reflector de radar. La masa con la que están calibrados los cálculos de vuelo es la que figura en Misión, estimada por exceso; la exacta se sabrá con el pesaje en la etapa de armado. El modelo no reemplaza la prueba de armado en seco.",
   webglFail:"El modelo tridimensional no está disponible en este dispositivo. La lista de componentes de abajo sigue disponible.",
 
   wKicker:"Fase 1 · Estudio preliminar", windsTitle:"Dónde va a caer la sonda",
@@ -375,6 +377,8 @@ es:{
   mDurazno:"Partida desde Durazno", mMercedes:"Partida desde Mercedes",
   mapHint:"Al hacer clic en un punto aparecen la deriva, el rumbo y la duración de ese vuelo.",
 
+  wParH:"Los parámetros del cálculo",
+  wParP:"La simulación se hizo usando una velocidad de ascenso de <strong>5 m/s</strong> y una masa de <strong>1,5 kg</strong>. Con estos valores el reventado calculado da <strong>37,7 km</strong>, la cantidad de helio requerida <strong>4,5 m³</strong> y la velocidad final de caída <strong>4,7 m/s</strong>. El parámetro de la masa será definitivo en la etapa de armado, y la velocidad de ascenso se establecerá también según las condiciones meteorológicas: las estimaciones de las variables dependientes, entre ellas la altura de reventado, están por lo tanto sujetas a variaciones.",
   wApproxHead:"Las aproximaciones",
   wApproxIntro:"Toda simulación es un modelo, y todo modelo simplifica. Estas son las tres simplificaciones que hicimos, y cuánto pesan.",
   wA1H:"El viento también cambia en horizontal",
@@ -415,12 +419,12 @@ es:{
   ph4t:"Estratosfera, por encima de 18 km — el aire se acaba",
   ph4p:"A treinta y un kilómetros el sensor de presión llega al fondo de escala: 10 hPa, una <strong>centésima</strong> de la presión a nivel del suelo. La temperatura vuelve a subir, por el ozono que absorbe los rayos ultravioleta.",
   ph5t:"El globo se infla",
-  ph5p:"Entre el suelo y los 37,8 km la presión exterior baja <strong>más de doscientas veces</strong>, y el volumen del globo crece en la misma proporción: el diámetro pasa de unos 2 m a más de diez. El globo sale del tamaño de un auto y llega del tamaño de una casa.",
-  ph6t:"El estallido, 37,8 km",
-  ph6p:"El látex tiene un límite de estiramiento, y en algún momento lo alcanza. Para nuestro globo, con el llenado previsto, el cálculo del proyecto sitúa el estallido en <strong>37,8 kilómetros</strong>. Desde ese instante la sonda empieza a caer.",
+  ph5p:"Entre el suelo y la altura de reventado la presión exterior baja <strong>más de doscientas veces</strong>, y el volumen del globo crece en la misma proporción: el diámetro pasa de unos 2 m a más de diez. El globo sale del tamaño de un auto y llega del tamaño de una casa.",
+  ph6t:"El estallido",
+  ph6p:"El látex tiene un límite de estiramiento, y en algún momento lo alcanza: es la <strong>altura de reventado</strong>. Desde ese instante la sonda empieza a caer.",
   ph7t:"El descenso",
   ph7p:"El paracaídas se abre solo, tirado por el aire. Arriba frena poco, porque casi no hay nada de lo que agarrarse. Cuanto más baja, más frena.",
-  ph8t:"La recuperación", ph8p:"Tres horas en total, entre subida y bajada. Después la sonda está en el suelo, en algún lugar — unos <strong>190 kilómetros más al este</strong> — y mientras tanto los GPS han vuelto a enviarnos la posición. Empieza la búsqueda.",
+  ph8t:"La recuperación", ph8p:"Tres horas en total, entre subida y bajada. Después la sonda está en el suelo, y mientras tanto los GPS han vuelto a enviarnos la posición. Empieza la búsqueda.",
 
   /* — Contacto — */
   contactMailHead:"Escribinos", contactMailSub:"Para información, colaboraciones, propuestas.",
@@ -445,8 +449,8 @@ es:{
   lc1:"Masa combinada de la carga útil", lc1t:"menos de 4 kg",
   lc2:"Masa del bulto más pesado", lc2t:"menos de 3 kg",
   lc3:"Bultos de 2 kg o más con densidad superior a 13 g/cm²", lc3t:"ninguno",
-  lc4:"Fuerza para separar la carga del globo", lc4t:"menos de 230 N", lc4v:"bajo el umbral", lc3v:"1,3 kg · ≈ 3 g/cm²",
-  lClassOut:"Cuatro criterios, cuatro veces dentro. La sonda Klo-01 es un globo <strong>«ligero»</strong>: pesa un tercio del umbral de 4 kg, el bulto es único y muy por debajo de 3 kg, su densidad es cuatro veces menor que el límite, y el cordaje se corta antes de los 230 N. Este último es el criterio menos intuitivo y vale la pena explicarlo: 230 N son unos 23 kilos de fuerza, y un cordaje más resistente haría «pesada» a la sonda aun pesando kilo y medio.",
+  lc4:"Fuerza para separar la carga del globo", lc4t:"menos de 230 N", lc4v:"bajo el umbral", lc3v:"1,5 kg · ≈ 3,6 g/cm²",
+  lClassOut:"Cuatro criterios, cuatro veces dentro. La sonda Klo-01 es un globo <strong>«ligero»</strong>: pesa poco más de un tercio del umbral de 4 kg, el bulto es único y muy por debajo de 3 kg, su densidad es casi cuatro veces menor que el límite, y el cordaje se corta antes de los 230 N. Este último es el criterio menos intuitivo y vale la pena explicarlo: 230 N son unos 23 kilos de fuerza, y un cordaje más resistente haría «pesada» a la sonda aun con el peso que tiene.",
 
   lDutyHead:"Qué implica",
   lDuty1:"Casi todas las obligaciones operativas del reglamento — dos sistemas independientes para interrumpir el vuelo, el transpondedor de radar, el reflector radar, la notificación al control de tránsito aéreo siete días antes, los informes de posición cada dos horas — corresponden a los globos <em>medianos</em> y <em>pesados</em>. A un globo ligero no se le aplican.",
@@ -626,13 +630,13 @@ en:{
 
   pKicker:"Phase 1 · Flight profile", missionTitle:"Mission",
   missionSub:"What we study, how, and where we are.",
-  mBody:"Project COMETA sends the Klo-01 probe to about 37.8 km to study the stratosphere through direct measurements, in a region of the atmosphere that aircraft do not reach and satellites fly over.",
+  mBody:"Project COMETA sends the Klo-01 probe beyond 37 km to study the stratosphere through direct measurements, in a region of the atmosphere that aircraft do not reach and satellites fly over.",
 
   pHead2:"Project data",
   pAlt:"Target altitude", pTemp:"External temperature", pPress:"Atmospheric pressure", pPressU:"of sea level",
   pGas:"Fill gas", pGasMain:"Helium", pVel:"Ascent rate", pDur:"Flight duration",
   pHe:"Helium required", pMass:"Payload mass", bKicker:"The balloon", bHead:"Balloon 2000",
-  bBody:"The mission uses the 2000 g balloon. Filled with about 4.5 m³ of helium, it reaches a burst altitude of around 37.8 km.",
+  bBody:"The mission uses the 2000 g balloon. Filled with about 4.5 m³ of helium, it reaches a burst altitude above 37 km.",
   specDiam:"Initial diameter", specBurst:"Burst altitude", specHe:"Helium required",
   specMass:"Payload mass",
 
@@ -651,7 +655,7 @@ en:{
   catAtmo:"Atmosphere", catPos:"Position and control", catRad:"Radiation and light", catAlim:"Power", catKit:"Kit 2000 (already aboard)",
   legNote:"The pale disc on the lid is the PTFE window that lets ultraviolet through to the sensor. The sand-coloured bands are the insulation: outside it gets down to −60 °C. Components 24, 25 and 26 sit outside the probe, because they have to measure the real air.",
   uOn:"of", uParts:"parts",
-  massNote:"The {mass} g given here is the sum of the components drawn inside the box alone, of which 379 g are Kit 2000 units already aboard. The full payload is about 1280 g: add the polystyrene box (200 g), the parachute (80 g), the cordage (80 g), the decks with their tie rods (~70 g), wiring and insulation (~90 g), radar reflector and labels (~30 g). The model does not replace the dry-fit test or a real weigh-in.",
+  massNote:"The {mass} g given here is the sum of the components drawn inside the box alone, of which 379 g are Kit 2000 units already aboard. The full payload weighs more: add the polystyrene box, the parachute, the cordage, the decks with their tie rods, the wiring, the insulation and the radar reflector. The mass the flight calculations are based on is the one given under Mission, deliberately estimated high; the exact figure will come from the weigh-in at assembly. The model does not replace the dry-fit test.",
   webglFail:"The three-dimensional model is not available on this device. The component list below still works.",
 
   wKicker:"Phase 1 · Preliminary study", windsTitle:"Where the probe ends up",
@@ -666,6 +670,8 @@ en:{
   mDurazno:"Launched from Durazno", mMercedes:"Launched from Mercedes",
   mapHint:"Clicking a dot shows the drift, bearing and duration of that flight.",
 
+  wParH:"The parameters behind the calculation",
+  wParP:"The simulation was run using an ascent rate of <strong>5 m/s</strong> and a mass of <strong>1.5 kg</strong>. With these values the calculated burst comes out at <strong>37.7 km</strong>, the helium required at <strong>4.5 m³</strong> and the final descent speed at <strong>4.7 m/s</strong>. The mass will be final at the assembly stage, and the ascent rate will also be set according to the weather conditions: the estimates of the dependent variables, burst altitude among them, are therefore subject to change.",
   wApproxHead:"The approximations",
   wApproxIntro:"Every simulation is a model, and every model simplifies. These are the three simplifications we made, and how much they matter.",
   wA1H:"Wind changes horizontally too",
@@ -706,12 +712,12 @@ en:{
   ph4t:"Stratosphere, above 18 km — the air runs out",
   ph4p:"At thirty-one kilometres the pressure sensor reaches the end of its scale: 10 hPa, one <strong>hundredth</strong> of the pressure at ground level. The temperature starts rising again, because of the ozone that absorbs ultraviolet light.",
   ph5t:"The balloon inflates",
-  ph5p:"Between the ground and 37.8 km the outside pressure falls by <strong>more than two hundred times</strong>, and the balloon's volume grows in the same proportion: the diameter goes from about 2 m to more than ten. The balloon leaves the ground the size of a car and arrives the size of a house.",
-  ph6t:"The burst, 37.8 km",
-  ph6p:"Latex has a stretching limit, and at some point it reaches it. For our balloon, filled as planned, the project calculation puts the burst at <strong>37.8 kilometres</strong>. From that instant the probe begins to fall.",
+  ph5p:"Between the ground and the burst altitude the outside pressure falls by <strong>more than two hundred times</strong>, and the balloon's volume grows in the same proportion: the diameter goes from about 2 m to more than ten. The balloon leaves the ground the size of a car and arrives the size of a house.",
+  ph6t:"The burst",
+  ph6p:"Latex has a stretching limit, and at some point it reaches it: that is the <strong>burst altitude</strong>. From that instant the probe begins to fall.",
   ph7t:"The descent",
   ph7p:"The parachute opens by itself, pulled open by the air. High up it slows the fall very little, because there is almost nothing to push against. The lower it gets, the more it brakes.",
-  ph8t:"The recovery", ph8p:"Three hours in all, up and down. Then the probe is on the ground somewhere — about <strong>190 kilometres further east</strong> — and by then the GPS units have started sending us the position again. The search begins.",
+  ph8t:"The recovery", ph8p:"Three hours in all, up and down. Then the probe is on the ground, and by then the GPS units have started sending us the position again. The search begins.",
 
   /* — Contact — */
   contactMailHead:"Write to us", contactMailSub:"For information, collaborations, proposals.",
@@ -736,8 +742,8 @@ en:{
   lc1:"Combined payload mass", lc1t:"under 4 kg",
   lc2:"Mass of the heaviest package", lc2t:"under 3 kg",
   lc3:"Packages of 2 kg or more with density above 13 g/cm²", lc3t:"none",
-  lc4:"Force needed to separate payload from balloon", lc4t:"under 230 N", lc4v:"below threshold", lc3v:"1.3 kg · ≈ 3 g/cm²",
-  lClassOut:"Four criteria, inside on all four. The Klo-01 probe is a <strong>«light»</strong> balloon: it weighs a third of the 4 kg threshold, it is a single package well under 3 kg, its density is four times below the limit, and the cord breaks before 230 N. That last one is the least intuitive and worth explaining: 230 N is roughly 23 kilograms of force, and a stronger cord would make the probe «heavy» even at one and a half kilos.",
+  lc4:"Force needed to separate payload from balloon", lc4t:"under 230 N", lc4v:"below threshold", lc3v:"1.5 kg · ≈ 3.6 g/cm²",
+  lClassOut:"Four criteria, inside on all four. The Klo-01 probe is a <strong>«light»</strong> balloon: it weighs a little over a third of the 4 kg threshold, it is a single package well under 3 kg, its density is almost four times below the limit, and the cord breaks before 230 N. That last one is the least intuitive and worth explaining: 230 N is roughly 23 kilograms of force, and a stronger cord would make the probe «heavy» even at the weight it has.",
 
   lDutyHead:"What it means in practice",
   lDuty1:"Almost every operational obligation in the regulation — two independent flight termination systems, a radar transponder, a radar reflector, notification to air traffic control seven days ahead, position reports every two hours — applies to <em>medium</em> and <em>heavy</em> balloons. A light balloon is exempt.",

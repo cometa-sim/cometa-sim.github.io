@@ -46,17 +46,18 @@ Norme e autorizzazioni · Domande · Chi siamo.
 | Nomi delle cinque parti della catena di volo | la chiave `chain` in `assets/i18n.js` |
 | Colori e caratteri di tutto il sito | il blocco `:root` in `assets/cometa.css` |
 | Data del lancio (conto alla rovescia) | la costante `LAUNCH` in `assets/app.js` |
+| Quota di scoppio | la costante `QUOTA_SCOPPIO` in `assets/app.js` |
 | Numeri delle quattro schede della pagina iniziale | direttamente in `index.html` |
 | Stato di una tappa del progetto | la classe `done`, `wip` o `todo` della riga in `index.html` |
 
 ### Dopo ogni modifica: il numero di versione
 
 In `index.html` i cinque file di `assets/` sono richiamati con un numero in
-coda — oggi `?v=58`:
+coda — oggi `?v=62`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=58">
-<script src="assets/i18n.js?v=58"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=62">
+<script src="assets/i18n.js?v=62"></script>
 ```
 
 Serve a costringere il browser a riscaricarli. **Chi modifica un file in
@@ -162,6 +163,29 @@ i contenuti da completare), e usarlo qui rompeva l'impaginazione.
 
 **È l'unica parte del sito che invecchia da sola**: conviene rileggerla ogni
 volta che un gruppo chiude qualcosa.
+
+### I numeri del volo
+
+I numeri che escono dal calcolo — quota di scoppio, elio, velocità di
+discesa, durata — cambieranno ancora: dipendono dalla massa del payload,
+che sarà definitiva solo dopo la pesata in fase di assemblaggio, e dalla
+velocità di salita, che si decide anche in base al meteo del giorno.
+
+Per questo il sito li usa a due livelli diversi. Nei testi divulgativi
+sono **arrotondati e non impegnativi** — «oltre 37 km», «la quota di
+scoppio», «poco meno di 5 m/s» — così restano veri anche quando il
+calcolo cambia. I valori esatti stanno in **un punto solo**, la chiave
+`wParP` nello studio dei venti, insieme ai parametri da cui escono e
+all'avvertenza che sono provvisori.
+
+Dove serve un numero per forza — la scala della pagina della fisica e la
+cifra grande in fondo a Missione — non c'è niente scritto a mano: quegli
+elementi hanno l'attributo `data-quota` e li riempie `assets/app.js`
+leggendo la costante `QUOTA_SCOPPIO`. **Cambiando quella costante si
+aggiornano tutti**, nelle tre lingue, col punto o la virgola giusti.
+
+Quando il calcolo verrà rifatto, quindi, i posti da toccare sono due:
+la costante in `app.js` e la chiave `wParP` in `i18n.js`.
 
 ### Il cielo della pagina iniziale
 
