@@ -52,11 +52,11 @@ Norme e autorizzazioni · Domande · Chi siamo.
 ### Dopo ogni modifica: il numero di versione
 
 In `index.html` i cinque file di `assets/` sono richiamati con un numero in
-coda — oggi `?v=57`:
+coda — oggi `?v=58`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=57">
-<script src="assets/i18n.js?v=57"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=58">
+<script src="assets/i18n.js?v=58"></script>
 ```
 
 Serve a costringere il browser a riscaricarli. **Chi modifica un file in
