@@ -213,7 +213,7 @@ it:{
   org3t:"Dati", org3:"Fa ricerca su cosa è interessante e fattibile misurare con un pallone stratosferico, studia la dinamica del pallone e come si determina la traiettoria. Dopo il volo, analizza i dati raccolti.",
   org4t:"Programmazione", org4:"In base ai sensori sceglie la scheda necessaria ed è responsabile di programmarla correttamente: il codice che legge gli strumenti e registra tutto va provato a terra prima del volo.",
   org5t:"Audiovisivo", org5:"Raccoglie quanto più materiale possibile — foto, video, audio — perché non è possibile tornare indietro e tutte le fasi vanno documentate. Si occupa anche degli aspetti creativi: logo, estetica, musiche.",
-  org6t:"Social", org6:"Sceglie la strategia, prepara i profili, pubblica e cura questo sito: è il gruppo che racconta il progetto fuori dalla scuola, mentre si fa.",
+  org6t:"Social", org6:"Sceglie la strategia, prepara e cura i profili e il sito web: è il gruppo che racconta il progetto fuori dalla scuola, mentre si fa.",
 
   /* — A che punto siamo — */
   pgKicker:"A che punto siamo",
@@ -500,7 +500,7 @@ es:{
   org3t:"Datos", org3:"Investiga qué es interesante y factible medir con un globo estratosférico, estudia la dinámica del globo y cómo se determina la trayectoria. Después del vuelo, analiza los datos recogidos.",
   org4t:"Programación", org4:"Según los sensores elige la placa necesaria y es responsable de programarla correctamente: el código que lee los instrumentos y registra todo hay que probarlo en tierra antes del vuelo.",
   org5t:"Audiovisual", org5:"Junta todo el material posible — fotos, videos, audio — porque no se puede volver atrás y todas las etapas tienen que quedar documentadas. Se ocupa también de lo creativo: logo, estética, músicas.",
-  org6t:"Redes", org6:"Elige la estrategia, prepara los perfiles, publica y se ocupa de este sitio: es el equipo que cuenta el proyecto fuera de la escuela, mientras se hace.",
+  org6t:"Redes", org6:"Elige la estrategia, prepara y mantiene los perfiles y el sitio web: es el equipo que cuenta el proyecto fuera de la escuela, mientras se hace.",
 
   /* — En qué punto estamos — */
   pgKicker:"En qué punto estamos",
@@ -787,7 +787,7 @@ en:{
   org3t:"Data", org3:"Researches what is interesting and feasible to measure with a stratospheric balloon, studies the balloon's dynamics and how the trajectory is determined. After the flight, it analyses the data collected.",
   org4t:"Programming", org4:"Given the sensors, it picks the board needed and is responsible for programming it correctly: the code that reads the instruments and records everything has to be tested on the ground before the flight.",
   org5t:"Audiovisual", org5:"Gathers as much material as possible — photos, video, audio — because there is no going back and every stage has to be documented. It also handles the creative side: logo, look, music.",
-  org6t:"Social media", org6:"Chooses the strategy, sets up the profiles, publishes and looks after this site: this is the team that tells the project outside school, while it happens.",
+  org6t:"Social media", org6:"Chooses the strategy, sets up and looks after the profiles and the website: this is the team that tells the project outside school, while it happens.",
 
   /* — Where we are — */
   pgKicker:"Where we are",
