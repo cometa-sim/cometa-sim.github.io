@@ -207,6 +207,7 @@ it:{
   msE5:"Le masse pesanti — pacco pile e power bank — stanno sul ripiano più basso, e la disposizione di ogni componente è stata calcolata perché il centro di massa cada sull'<strong>asse di sospensione</strong>. Ottimizzare il baricentro serve a stabilizzare la sonda ed evitare rotazioni.",
   /* — Chi fa cosa: i sei gruppi — */
   orgKicker:"Chi fa cosa",
+  orgHead:"Sei gruppi, un unico obiettivo",
   orgIntro:"Il lavoro è diviso in sei gruppi, ognuno con una persona referente che coordina e fa da portavoce con gli altri. Ogni gruppo ha la sua area di competenza e si organizza come meglio crede, ma nessuno può lavorare in maniera indipendente dagli altri.",
   org1t:"Organizzazione", org1:"Controlla i costi e dove reperire il materiale, verifica la normativa e l'area di lancio, e segue l'andamento del lavoro degli altri gruppi nel rispetto dei tempi. Tiene il registro scritto di tutto quello che si fa.",
   org2t:"Assemblaggio", org2:"Stabilisce cosa è indispensabile portare a bordo e sceglie i sensori in base allo spazio a disposizione. È il gruppo che progetta la sonda e poi la monta.",
@@ -495,6 +496,7 @@ es:{
   msE5:"Las masas pesadas — el paquete de pilas y la batería externa — van en el estante más bajo, y la posición de cada componente se calculó para que el centro de masa caiga sobre el <strong>eje de suspensión</strong>. Optimizar el centro de masa sirve para estabilizar la sonda y evitar rotaciones.",
   /* — Quién hace qué: los seis equipos — */
   orgKicker:"Quién hace qué",
+  orgHead:"Seis equipos, un único objetivo",
   orgIntro:"El trabajo está dividido en seis equipos, cada uno con una persona referente que coordina y hace de vocera con los demás. Cada equipo tiene su área de competencia y se organiza como mejor le parece, pero ninguno puede trabajar de manera independiente de los otros.",
   org1t:"Organización", org1:"Controla los costos y dónde conseguir el material, verifica la normativa y el área de lanzamiento, y sigue el avance del trabajo de los demás equipos respetando los plazos. Lleva el registro escrito de todo lo que se hace.",
   org2t:"Armado", org2:"Establece qué es indispensable llevar a bordo y elige los sensores según el espacio disponible. Es el equipo que diseña la sonda y después la arma.",
@@ -783,6 +785,7 @@ en:{
   msE5:"The heavy masses — battery pack and power bank — sit on the lowest deck, and every component's position was calculated so that the centre of mass falls on the <strong>suspension axis</strong>. Optimising the centre of mass keeps the probe steady and stops it rotating.",
   /* — Who does what: the six teams — */
   orgKicker:"Who does what",
+  orgHead:"Six teams, one single goal",
   orgIntro:"The work is split across six teams, each with a coordinator who keeps order inside the group and speaks for it with the others. Every team has its own area and organises itself as it sees fit, but none of them can work independently of the rest.",
   org1t:"Organisation", org1:"Watches the costs and where to source the material, checks the regulations and the launch area, and follows the other teams' progress against the deadlines. It keeps the written log of everything that gets done.",
   org2t:"Assembly", org2:"Decides what has to be on board and chooses the sensors according to the space available. It is the team that designs the probe and then builds it.",
