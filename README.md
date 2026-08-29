@@ -90,6 +90,38 @@ Nelle Domande, che non hanno quel blocco, la fonte si nomina dentro la frase.
 Il collegamento si mette all'ente o al servizio, non al documento: la DINACIA e
 Open-Meteo sono linkati, il regolamento LAR 91 no.
 
+### Come si aggiunge uno stile
+
+`assets/cometa.css` è cresciuto insieme al sito, e ha due abitudini su cui
+è facile inciampare.
+
+**Nomi di classe generici.** `.todo` non è «da fare»: è il segnaposto giallo
+tratteggiato per i contenuti incompleti, e contiene `white-space:nowrap`.
+`.bk` non è «blocco»: sono le quattro parentesi angolari agli angoli dei
+riquadri, in posizione assoluta. Riusarli per altro non dà nessun errore —
+il testo semplicemente smette di andare a capo, o compaiono trattini
+azzurri dove non dovrebbero.
+
+**Stili su elementi nudi.** `nav`, `table`, `th`, `td`, `a`, `body`, `html`,
+`footer` e `img,svg,iframe` hanno una regola propria. Un `<nav>` scritto in
+buona fede dentro una pagina diventa una seconda barra fissa in cima allo
+schermo, sovrapposta al titolo.
+
+Quindi, prima di scrivere una classe o un elemento nuovo:
+
+```
+grep -n '\.nomeclasse[^a-zA-Z0-9_-]' assets/cometa.css
+grep -oE '^[a-z]+(,[a-z]+)*\{' assets/cometa.css | sort -u
+```
+
+Il primo dice se il nome è già preso, il secondo elenca tutti gli elementi
+che hanno già uno stile. Le classi nuove di una sezione conviene prefissarle
+— `pg-done`, `bal-tag`, `org-grid` — così il problema non si ripresenta.
+
+Vale la pena controllare anche il risultato a schermo stretto: quasi tutti
+questi guasti si vedono solo lì, come testo che esce dal riquadro o come una
+pagina più larga dello schermo, che il telefono mostra rimpicciolita.
+
 ### L'indice della pagina Missione
 
 Missione è la pagina più lunga, e in cima ha un indice. Non usa gli
