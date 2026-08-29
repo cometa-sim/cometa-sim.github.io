@@ -39,7 +39,7 @@ it:{
 
   /* — Missione — */
   pKicker:"Fase 1 · Profilo di volo", missionTitle:"Missione",
-  missionSub:"Cosa studiamo e come.",
+  missionSub:"Cosa studiamo, come, e a che punto siamo.",
   mBody:"Il progetto COMETA invia la sonda Klo-01 fino a circa 37,8 km di quota per studiare la stratosfera attraverso misure dirette, in una regione dell'atmosfera che gli aerei non raggiungono e i satelliti sorvolano.",
 
   pHead2:"Dati del progetto",
@@ -134,7 +134,6 @@ it:{
   /* — Contatti — */
   contactMailHead:"Scrivici", contactMailSub:"Per informazioni, collaborazioni, proposte.",
   mailCta:"Manda una mail", tiktokCta:"Seguici su TikTok", footContact:"Contatti",
-  groupsNote:"Il lavoro è diviso in sei gruppi: organizzazione, sonda e sensori, programmazione, analisi dei dati, audiovisivo e social. Ognuno ha un referente e una propria responsabilità, ma nessuno lavora da solo: chi sceglie i sensori dipende da chi programma la scheda, e chi programma dipende da chi ha deciso cosa misurare.",
   classesNote:"COMETA coinvolge diversi indirizzi dei due sistemi che convivono nella scuola, quello italiano e quello uruguaiano, insieme ai loro insegnanti. Oltre alle classi dell'ultimo anno, il progetto accoglie alunne e alunni del penultimo anno, che si formano per portarlo avanti nelle fasi successive. Con noi collaborano anche ex alunni: un legame con la scuola che continua.",
 
   bands:["Suolo","Troposfera","Tropopausa","Stratosfera"],
@@ -206,6 +205,33 @@ it:{
   msE4:"Il tubo Geiger, che rivela radiazione ionizzante, lavora a circa 400 volt. Fra il suo circuito e il piedino del calcolatore che conta gli impulsi abbiamo messo un <strong>optoisolatore</strong>: il segnale passa come luce, non come corrente, e i due lati restano elettricamente separati.",
   msE5t:"Il baricentro sull'asse",
   msE5:"Le masse pesanti — pacco pile e power bank — stanno sul ripiano più basso, e la disposizione di ogni componente è stata calcolata perché il centro di massa cada sull'<strong>asse di sospensione</strong>. Ottimizzare il baricentro serve a stabilizzare la sonda ed evitare rotazioni.",
+  /* — Chi fa cosa: i sei gruppi — */
+  orgKicker:"Chi fa cosa",
+  orgIntro:"Il lavoro è diviso in sei gruppi, ognuno con un referente e una propria responsabilità. Nessuno però lavora da solo: chi sceglie i sensori dipende da chi programma la scheda, e chi programma dipende da chi ha deciso cosa misurare.",
+  org1t:"Organizzazione", org1:"Tiene insieme il calendario e i rapporti con la scuola: le scadenze, il materiale da ordinare, i permessi da chiedere, e il collegamento fra i gruppi.",
+  org2t:"Assemblaggio", org2:"Sceglie i sensori e costruisce la sonda: la scatola in polistirolo, la disposizione interna, l'isolamento e i fissaggi.",
+  org3t:"Dati", org3:"Decide cosa misurare e con quale precisione, e prepara l'analisi: dopo il volo saranno loro a trasformare i file registrati in profili verticali dell'atmosfera.",
+  org4t:"Programmazione", org4:"Scrive il programma che gira sulla scheda: legge i sensori e registra tutto. Va provato a terra molte volte, per volare una volta sola.",
+  org5t:"Audiovisivo", org5:"Cura le immagini: le riprese a bordo, quelle da terra il giorno del lancio, e il montaggio che resterà del volo.",
+  org6t:"Social", org6:"Racconta il progetto fuori dalla scuola mentre si fa: gli avanzamenti, le prove riuscite e quelle no.",
+
+  /* — A che punto siamo — */
+  pgKicker:"A che punto siamo",
+  pgHead:"Il progetto mentre si fa",
+  pgIntro:"COMETA non comincia il giorno del lancio. Queste sono le tappe del lavoro, con il punto in cui siamo: quello che è fatto, quello che stiamo facendo e quello che manca.",
+  pgDone:"Fatto", pgWip:"In corso", pgTodo:"Da fare",
+  pg1t:"Obiettivi scientifici", pg1:"Cosa ha senso misurare con un pallone stratosferico, e perché. Da qui è partito tutto il resto.",
+  pg2t:"Scelta dei sensori", pg2:"Ogni grandezza ha il suo strumento, e ogni strumento un limite di quota oltre il quale il dato non vale più. L'elenco è ancora in movimento.",
+  pg3t:"La fisica del volo", pg3:"Spinta, salita, scoppio e discesa: i conti che dicono quanto elio serve e a che quota il pallone cede.",
+  pg4t:"Studio dei venti", pg4:"Traiettorie simulate su dati atmosferici reali, per scegliere il sito di partenza e il periodo dell'anno.",
+  pg5t:"Progettazione della sonda", pg5:"Dove va ogni componente dentro la scatola, come si isola dal freddo e come si fissa perché non si muova.",
+  pg6t:"Ordine del materiale", pg6:"Pallone, paracadute, catena di volo, sensori, elettronica: quello che si compra e quello che costruiamo noi.",
+  pg7t:"Programmazione della scheda", pg7:"Il programma che legge i sensori e registra tutto su microSD, più il secondo registratore indipendente.",
+  pg8t:"Assemblaggio e prove a terra", pg8:"Montaggio della sonda e collaudo: tenuta al freddo, alimentazione, registrazione continua per tutta la durata del volo.",
+  pg9t:"Autorizzazione al volo", pg9:"La domanda alla DINACIA, con la zona di lancio e la finestra di date.",
+  pg10t:"Racconto del progetto", pg10:"Questo sito, i video e i social: il progetto raccontato mentre succede, non dopo.",
+  pg11t:"Lancio e recupero", pg11:"Il giorno del volo, e l'inseguimento della sonda fino al punto in cui atterra.",
+  pg12t:"Analisi dei dati", pg12:"I file recuperati diventano profili verticali dell'atmosfera, da leggere e da confrontare con i modelli.",
   msWipTag:"In lavorazione",
   msWip:"La lista dei componenti <strong>non è definitiva</strong>. Il progetto è ancora in corso, e cambierà sia prima delle prove a terra sia dopo.",
 
@@ -304,7 +330,7 @@ es:{
   teaserMore:"Ver más →", ix3n:"Por qué sube, por qué revienta, por qué hace tanto frío", ix7n:"¿La sonda va al espacio? Averigüémoslo.",
 
   pKicker:"Fase 1 · Perfil de vuelo", missionTitle:"Misión",
-  missionSub:"Qué estudiamos y cómo.",
+  missionSub:"Qué estudiamos, cómo, y en qué punto estamos.",
   mBody:"El proyecto COMETA envía la sonda Klo-01 hasta unos 37,8 km de altura para estudiar la estratósfera mediante mediciones directas, en una región de la atmósfera que los aviones no alcanzan y los satélites sobrevuelan.",
 
   pHead2:"Datos del proyecto",
@@ -395,7 +421,6 @@ es:{
   /* — Contacto — */
   contactMailHead:"Escribinos", contactMailSub:"Para información, colaboraciones, propuestas.",
   mailCta:"Mandanos un correo", tiktokCta:"Seguinos en TikTok", footContact:"Contacto",
-  groupsNote:"El trabajo está dividido en seis equipos: organización, sonda y sensores, programación, análisis de datos, audiovisual y redes. Cada uno tiene un referente y su propia responsabilidad, pero ninguno trabaja solo: quien elige los sensores depende de quien programa la placa, y quien programa depende de quien decidió qué medir.",
   classesNote:"COMETA involucra varias orientaciones de los dos sistemas que conviven en la escuela, el italiano y el uruguayo, junto con sus docentes. Además de las clases del último año, el proyecto recibe a alumnas y alumnos del penúltimo año, que se forman para continuarlo en las fases siguientes. También colaboran con nosotros exalumnos: un vínculo con la escuela que se mantiene.",
 
   bands:["Suelo","Troposfera","Tropopausa","Estratósfera"],
@@ -467,6 +492,33 @@ es:{
   msE4:"El tubo Geiger, que detecta radiación ionizante, trabaja a unos 400 voltios. Entre su circuito y el pin del computador que cuenta los pulsos pusimos un <strong>optoacoplador</strong>: la señal pasa como luz, no como corriente, y los dos lados quedan eléctricamente separados.",
   msE5t:"El centro de masa sobre el eje",
   msE5:"Las masas pesadas — el paquete de pilas y la batería externa — van en el estante más bajo, y la posición de cada componente se calculó para que el centro de masa caiga sobre el <strong>eje de suspensión</strong>. Optimizar el centro de masa sirve para estabilizar la sonda y evitar rotaciones.",
+  /* — Quién hace qué: los seis equipos — */
+  orgKicker:"Quién hace qué",
+  orgIntro:"El trabajo está dividido en seis equipos, cada uno con un referente y su propia responsabilidad. Pero ninguno trabaja solo: quien elige los sensores depende de quien programa la placa, y quien programa depende de quien decidió qué medir.",
+  org1t:"Organización", org1:"Sostiene el calendario y la relación con la escuela: los plazos, el material a pedir, los permisos a solicitar y la conexión entre los equipos.",
+  org2t:"Armado", org2:"Elige los sensores y construye la sonda: la caja de poliestireno, la disposición interna, la aislación y las sujeciones.",
+  org3t:"Datos", org3:"Decide qué medir y con qué precisión, y prepara el análisis: después del vuelo serán ellos quienes conviertan los archivos registrados en perfiles verticales de la atmósfera.",
+  org4t:"Programación", org4:"Escribe el programa que corre en la placa: lee los sensores y registra todo. Hay que probarlo muchas veces en tierra, para volar una sola vez.",
+  org5t:"Audiovisual", org5:"Se ocupa de las imágenes: las tomas a bordo, las de tierra el día del lanzamiento y el montaje que quedará del vuelo.",
+  org6t:"Redes", org6:"Cuenta el proyecto fuera de la escuela mientras se hace: los avances, las pruebas que salen bien y las que no.",
+
+  /* — En qué punto estamos — */
+  pgKicker:"En qué punto estamos",
+  pgHead:"El proyecto mientras se hace",
+  pgIntro:"COMETA no empieza el día del lanzamiento. Estas son las etapas del trabajo, con el punto en el que estamos: lo que está hecho, lo que estamos haciendo y lo que falta.",
+  pgDone:"Hecho", pgWip:"En curso", pgTodo:"Pendiente",
+  pg1t:"Objetivos científicos", pg1:"Qué tiene sentido medir con un globo estratosférico, y por qué. De acá salió todo lo demás.",
+  pg2t:"Elección de los sensores", pg2:"Cada magnitud tiene su instrumento, y cada instrumento un límite de altura más allá del cual el dato ya no vale. La lista todavía se mueve.",
+  pg3t:"La física del vuelo", pg3:"Empuje, ascenso, reventado y descenso: las cuentas que dicen cuánto helio hace falta y a qué altura cede el globo.",
+  pg4t:"Estudio de los vientos", pg4:"Trayectorias simuladas sobre datos atmosféricos reales, para elegir el sitio de partida y la época del año.",
+  pg5t:"Diseño de la sonda", pg5:"Dónde va cada componente dentro de la caja, cómo se aísla del frío y cómo se fija para que no se mueva.",
+  pg6t:"Pedido del material", pg6:"Globo, paracaídas, cadena de vuelo, sensores, electrónica: lo que se compra y lo que construimos nosotros.",
+  pg7t:"Programación de la placa", pg7:"El programa que lee los sensores y registra todo en la microSD, más el segundo registrador independiente.",
+  pg8t:"Armado y pruebas en tierra", pg8:"Montaje de la sonda y ensayo: resistencia al frío, alimentación, registro continuo durante todo el vuelo.",
+  pg9t:"Autorización de vuelo", pg9:"La solicitud a la DINACIA, con la zona de lanzamiento y la ventana de fechas.",
+  pg10t:"Relato del proyecto", pg10:"Este sitio, los videos y las redes: el proyecto contado mientras pasa, no después.",
+  pg11t:"Lanzamiento y recuperación", pg11:"El día del vuelo, y la persecución de la sonda hasta el punto donde aterriza.",
+  pg12t:"Análisis de los datos", pg12:"Los archivos recuperados se vuelven perfiles verticales de la atmósfera, para leer y comparar con los modelos.",
   msWipTag:"En proceso",
   msWip:"La lista de componentes <strong>no es definitiva</strong>. El proyecto sigue en curso y cambiará tanto antes de los ensayos en tierra como después.",
 
@@ -565,7 +617,7 @@ en:{
   teaserMore:"Explore →", ix3n:"Why it rises, why it bursts, why it gets so cold", ix7n:"Does the probe reach space? Let's find out.",
 
   pKicker:"Phase 1 · Flight profile", missionTitle:"Mission",
-  missionSub:"What we study, and how.",
+  missionSub:"What we study, how, and where we are.",
   mBody:"Project COMETA sends the Klo-01 probe to about 37.8 km to study the stratosphere through direct measurements, in a region of the atmosphere that aircraft do not reach and satellites fly over.",
 
   pHead2:"Project data",
@@ -656,7 +708,6 @@ en:{
   /* — Contact — */
   contactMailHead:"Write to us", contactMailSub:"For information, collaborations, proposals.",
   mailCta:"Send us an email", tiktokCta:"Follow us on TikTok", footContact:"Contact",
-  groupsNote:"The work is split across six teams: organisation, probe and sensors, programming, data analysis, audiovisual and social media. Each has a coordinator and its own responsibility, but none works alone: whoever chooses the sensors depends on whoever programs the board, and they depend on whoever decided what to measure.",
   classesNote:"COMETA brings together several study tracks from the two systems that coexist in the school, the Italian one and the Uruguayan one, along with their teachers. Besides the final-year classes, the project takes in students from the second-to-last year, who are training to carry it forward in the phases ahead. Former students work with us too: a bond with the school that lasts.",
 
   bands:["Ground","Troposphere","Tropopause","Stratosphere"],
@@ -728,6 +779,33 @@ en:{
   msE4:"The Geiger tube, which detects ionising radiation, runs at about 400 volts. Between its circuit and the computer pin that counts the pulses we placed an <strong>optoisolator</strong>: the signal crosses as light rather than as current, and the two sides stay electrically separate.",
   msE5t:"The centre of mass on the axis",
   msE5:"The heavy masses — battery pack and power bank — sit on the lowest deck, and every component's position was calculated so that the centre of mass falls on the <strong>suspension axis</strong>. Optimising the centre of mass keeps the probe steady and stops it rotating.",
+  /* — Who does what: the six teams — */
+  orgKicker:"Who does what",
+  orgIntro:"The work is split across six teams, each with a coordinator and its own responsibility. But none of them works alone: whoever chooses the sensors depends on whoever programs the board, and they depend on whoever decided what to measure.",
+  org1t:"Organisation", org1:"Holds the calendar and the relationship with the school: deadlines, material to order, permits to request, and the link between the teams.",
+  org2t:"Assembly", org2:"Chooses the sensors and builds the probe: the polystyrene box, the internal layout, the insulation and the mountings.",
+  org3t:"Data", org3:"Decides what to measure and to what precision, and prepares the analysis: after the flight they are the ones who turn the recorded files into vertical profiles of the atmosphere.",
+  org4t:"Programming", org4:"Writes the program that runs on the board: it reads the sensors and records everything. It has to be tested on the ground many times, to fly just once.",
+  org5t:"Audiovisual", org5:"Takes care of the images: the onboard footage, the ground footage on launch day, and the edit that will remain of the flight.",
+  org6t:"Social media", org6:"Tells the project outside school while it happens: the progress, the tests that work and the ones that don't.",
+
+  /* — Where we are — */
+  pgKicker:"Where we are",
+  pgHead:"The project as it is being made",
+  pgIntro:"COMETA does not begin on launch day. These are the stages of the work, with the point we have reached: what is done, what we are doing, and what is still missing.",
+  pgDone:"Done", pgWip:"In progress", pgTodo:"To do",
+  pg1t:"Scientific objectives", pg1:"What is worth measuring with a stratospheric balloon, and why. Everything else started here.",
+  pg2t:"Choice of sensors", pg2:"Every quantity has its instrument, and every instrument an altitude limit beyond which the reading no longer holds. The list is still moving.",
+  pg3t:"The physics of the flight", pg3:"Lift, ascent, burst and descent: the calculations that say how much helium is needed and at what altitude the balloon gives way.",
+  pg4t:"Wind study", pg4:"Trajectories simulated on real atmospheric data, to choose the launch site and the time of year.",
+  pg5t:"Probe design", pg5:"Where each component goes inside the box, how it is insulated from the cold and how it is fixed so it cannot move.",
+  pg6t:"Ordering the material", pg6:"Balloon, parachute, flight chain, sensors, electronics: what is bought and what we build ourselves.",
+  pg7t:"Programming the board", pg7:"The program that reads the sensors and records everything to microSD, plus the second independent logger.",
+  pg8t:"Assembly and ground testing", pg8:"Building the probe and testing it: resistance to cold, power, continuous recording for the whole duration of the flight.",
+  pg9t:"Flight authorisation", pg9:"The application to DINACIA, with the launch area and the window of dates.",
+  pg10t:"Telling the project", pg10:"This site, the videos and social media: the project told as it happens, not afterwards.",
+  pg11t:"Launch and recovery", pg11:"The day of the flight, and the chase after the probe to the point where it lands.",
+  pg12t:"Data analysis", pg12:"The recovered files become vertical profiles of the atmosphere, to read and compare with the models.",
   msWipTag:"Work in progress",
   msWip:"The component list is <strong>not final</strong>. The project is still under way, and it will change both before the ground tests and after them.",
 
