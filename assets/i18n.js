@@ -43,7 +43,7 @@ it:{
   mBody:"Il progetto COMETA invia la sonda Klo-01 oltre i 37 km di quota per studiare la stratosfera attraverso misure dirette, in una regione dell'atmosfera che gli aerei non raggiungono e i satelliti sorvolano.",
 
   pHead2:"Dati del progetto",
-  pAlt:"Quota prevista", pTemp:"Temperatura esterna", pPress:"Pressione atmosferica", pPressU:"del livello del mare",
+  pAlt:"Quota prevista", pTemp:"Temperatura esterna minima", pPress:"Pressione atmosferica minima", pPressU:"del livello del mare",
   pGas:"Gas di riempimento", pGasMain:"Elio", pVel:"Velocità di salita", pDur:"Durata del volo",
   pHe:"Elio necessario", pMass:"Massa del payload", bKicker:"Il pallone", bHead:"Pallone 2000",
   bBody:"La missione utilizza il pallone da 2000 g. Riempito con circa 4,5 m³ di elio, raggiunge una quota di scoppio oltre i 37 km.",
@@ -53,7 +53,7 @@ it:{
   cKicker:"Catena di volo", cHead:"Come è assemblata",
   chain:["Pallone","Corda","Paracadute","Corda antitorsione","Payload"],
 
-  burstLbl:"Quota di scoppio prevista · Pallone 2000",
+  burstLbl:"Quota di scoppio prevista",
 
   /* — La sonda — */
   probeKicker:"Fase 1 · Modello 3D", probeTitle:"Dentro la sonda Klo-01",
@@ -262,7 +262,7 @@ it:{
   q6:"Decidendo quanto elio mettere. Il peso da sollevare è fisso; l'elio in più è spinta in eccesso, e quella eccedenza diventa velocità di salita. Con più elio si sale più in fretta ma si scoppia più in basso, perché il pallone parte già più gonfio e raggiunge prima il suo limite di allungamento. Con meno elio si sale più lentamente e si arriva più in alto, ma si resta in aria più a lungo — e più tempo significa più deriva. La velocità di salita tiene conto di questo compromesso.",
 
   q7t:"A che velocità cade?",
-  q7:"Dipende dalla quota e dalla massa del payload. Il paracadute frena grazie all'aria che incontra: dove l'aria è duecento volte più rada, frena duecento volte meno, quindi nei primi minuti dopo lo scoppio la sonda scende molto rapidamente e poi rallenta man mano che entra in aria più densa. A parità di paracadute, una sonda più pesante arriva più veloce: la forza di gravità cresce con la massa, mentre la frenata del paracadute no — dipende solo dalla sua superficie e dalla velocità — quindi per pareggiarle serve una velocità maggiore. Con la nostra massa e un paracadute da 1,2 m si tocca terra a circa 4,5 m/s: la velocità di chi salta da un paio di metri. In generale la discesa è comunque più rapida della salita; nel nostro caso durerà circa la metà.",
+  q7:"Dipende dalla quota e dalla massa del payload. Il paracadute frena grazie all'aria che incontra: dove l'aria è duecento volte più rada, frena duecento volte meno, quindi nei primi minuti dopo lo scoppio la sonda scende molto rapidamente e poi rallenta man mano che entra in aria più densa. A parità di paracadute, una sonda più pesante arriva più veloce: la forza di gravità cresce con la massa, mentre la frenata del paracadute no — dipende solo dalla sua superficie e dalla velocità — quindi per pareggiarle serve una velocità maggiore. Con la nostra massa e un paracadute da 1,2 m si tocca terra a circa 4,5 m/s: la velocità di un oggetto che cade da circa un metro. In generale la discesa è comunque più rapida della salita; nel nostro caso durerà circa la metà.",
 
   q8t:"La scatola è isolata rispetto all'esterno?",
   q8:"La scatola non è sigillata: pressione e composizione dentro seguono quelle esterne, altrimenti la differenza di pressione la deformerebbe e la romperebbe. È però <em>coibentata</em>, e i componenti elettronici al suo interno dissipano calore, che in una scatola di polistirolo fatica a uscire. In più, salendo, l'aria si dirada e il raffreddamento per convezione diventa sempre meno efficace: in pratica il movimento d'aria è sufficiente a riequilibrare la pressione, ma insufficiente a trasportare energia. In alto la scatola perde calore quasi soltanto per irraggiamento, che è molto più lento. Il risultato è che l'interno resta decine di gradi sopra l'esterno, permettendo alla sonda di funzionare anche nei punti più freddi dell'atmosfera.",
@@ -340,7 +340,7 @@ es:{
   mBody:"El proyecto COMETA envía la sonda Klo-01 más allá de los 37 km de altura para estudiar la estratósfera mediante mediciones directas, en una región de la atmósfera que los aviones no alcanzan y los satélites sobrevuelan.",
 
   pHead2:"Datos del proyecto",
-  pAlt:"Altura prevista", pTemp:"Temperatura exterior", pPress:"Presión atmosférica", pPressU:"del nivel del mar",
+  pAlt:"Altura prevista", pTemp:"Temperatura exterior mínima", pPress:"Presión atmosférica mínima", pPressU:"del nivel del mar",
   pGas:"Gas de llenado", pGasMain:"Helio", pVel:"Velocidad de ascenso", pDur:"Duración del vuelo",
   pHe:"Helio necesario", pMass:"Masa de la carga útil", bKicker:"El globo", bHead:"Globo 2000",
   bBody:"La misión usa el globo de 2000 g. Lleno con unos 4,5 m³ de helio, alcanza una altura de reventado por encima de los 37 km.",
@@ -350,7 +350,7 @@ es:{
   cKicker:"Cadena de vuelo", cHead:"Cómo está armada",
   chain:["Globo","Cuerda","Paracaídas","Cuerda antitorsión","Payload"],
 
-  burstLbl:"Altura de reventado prevista · Globo 2000",
+  burstLbl:"Altura de reventado prevista",
 
   probeKicker:"Fase 1 · Modelo 3D", probeTitle:"Dentro de la sonda Klo-01",
   modeBench:"Banco", modeFlight:"Vuelo",
@@ -543,7 +543,7 @@ es:{
   q6:"Decidiendo cuánto helio poner. El peso a levantar es fijo; el helio de más es empuje sobrante, y ese sobrante se convierte en velocidad de ascenso. Con más helio se sube más rápido pero se estalla más abajo, porque el globo sale ya más inflado y alcanza antes su límite de estiramiento. Con menos helio se sube más lento y se llega más alto, pero se está más tiempo en el aire — y más tiempo significa más deriva. La velocidad de ascenso tiene en cuenta este compromiso.",
 
   q7t:"¿A qué velocidad cae?",
-  q7:"Depende de la altura y de la masa de la carga útil. El paracaídas frena gracias al aire que encuentra: donde el aire es doscientas veces más tenue, frena doscientas veces menos, así que en los primeros minutos tras el estallido la sonda baja muy rápido y después va frenando a medida que entra en aire más denso. Con el mismo paracaídas, una sonda más pesada llega más rápido: la fuerza de gravedad crece con la masa, mientras que el frenado del paracaídas no — depende sólo de su superficie y de la velocidad — así que para igualarlas hace falta más velocidad. Con nuestra masa y un paracaídas de 1,2 m se toca el suelo a unos 4,5 m/s: la velocidad de quien salta desde un par de metros. En general el descenso es de todos modos más rápido que el ascenso; en nuestro caso durará aproximadamente la mitad.",
+  q7:"Depende de la altura y de la masa de la carga útil. El paracaídas frena gracias al aire que encuentra: donde el aire es doscientas veces más tenue, frena doscientas veces menos, así que en los primeros minutos tras el estallido la sonda baja muy rápido y después va frenando a medida que entra en aire más denso. Con el mismo paracaídas, una sonda más pesada llega más rápido: la fuerza de gravedad crece con la masa, mientras que el frenado del paracaídas no — depende sólo de su superficie y de la velocidad — así que para igualarlas hace falta más velocidad. Con nuestra masa y un paracaídas de 1,2 m se toca el suelo a unos 4,5 m/s: la velocidad de un objeto que cae desde alrededor de un metro. En general el descenso es de todos modos más rápido que el ascenso; en nuestro caso durará aproximadamente la mitad.",
 
   q4t:"¿Por qué el cielo es azul, y más arriba se vuelve negro?",
   q4:"La luz es una onda electromagnética, y su frecuencia de oscilación corresponde al color: el violeta tiene la frecuencia más alta, después vienen el azul, el verde, el amarillo y el rojo. El proceso que desvía la luz del Sol en la atmósfera — la <em>dispersión de Rayleigh</em> — favorece decididamente las frecuencias altas, es decir el azul, y ese azul repartido en todas las direcciones es lo que vemos al mirar hacia arriba. ¿Y por qué no violeta? Porque en la luz del Sol el violeta está menos presente, y nuestros ojos lo perciben mucho menos. Al subir, las moléculas disminuyen, la luz desviada disminuye con ellas, y el cielo se apaga: a treinta kilómetros queda por encima menos del 1 % del aire, y aparece el negro del espacio — con el Sol brillando al lado, porque ya no hay nada que disperse su luz.",
@@ -633,7 +633,7 @@ en:{
   mBody:"Project COMETA sends the Klo-01 probe beyond 37 km to study the stratosphere through direct measurements, in a region of the atmosphere that aircraft do not reach and satellites fly over.",
 
   pHead2:"Project data",
-  pAlt:"Target altitude", pTemp:"External temperature", pPress:"Atmospheric pressure", pPressU:"of sea level",
+  pAlt:"Target altitude", pTemp:"Minimum external temperature", pPress:"Minimum atmospheric pressure", pPressU:"of sea level",
   pGas:"Fill gas", pGasMain:"Helium", pVel:"Ascent rate", pDur:"Flight duration",
   pHe:"Helium required", pMass:"Payload mass", bKicker:"The balloon", bHead:"Balloon 2000",
   bBody:"The mission uses the 2000 g balloon. Filled with about 4.5 m³ of helium, it reaches a burst altitude above 37 km.",
@@ -643,7 +643,7 @@ en:{
   cKicker:"Flight chain", cHead:"How it is assembled",
   chain:["Balloon","Cord","Parachute","Anti-torsion cord","Payload"],
 
-  burstLbl:"Predicted burst altitude · Balloon 2000",
+  burstLbl:"Predicted burst altitude",
 
   probeKicker:"Phase 1 · 3D model", probeTitle:"Inside the Klo-01 probe",
   modeBench:"Bench", modeFlight:"Flight",
@@ -836,7 +836,7 @@ en:{
   q6:"By deciding how much helium to put in. The weight to be lifted is fixed; extra helium is surplus lift, and that surplus becomes ascent speed. More helium means climbing faster but bursting lower, because the balloon leaves the ground already fuller and reaches its stretching limit sooner. Less helium means climbing more slowly and reaching higher, but staying airborne longer — and longer means more drift. The ascent rate reflects that trade-off.",
 
   q7t:"How fast does it fall?",
-  q7:"It depends on altitude and on the payload mass. A parachute brakes thanks to the air it meets: where the air is two hundred times thinner, it brakes two hundred times less, so in the first minutes after the burst the probe drops very fast and then slows as it enters denser air. With the same parachute, a heavier probe lands faster: gravity grows with mass, while the parachute's braking does not — it depends only on its area and on speed — so a higher speed is needed to balance them. With our mass and a 1.2 m parachute it touches down at about 4.5 m/s: the speed of someone jumping off a couple of metres. In general the descent is faster than the climb anyway; in our case it will take about half as long.",
+  q7:"It depends on altitude and on the payload mass. A parachute brakes thanks to the air it meets: where the air is two hundred times thinner, it brakes two hundred times less, so in the first minutes after the burst the probe drops very fast and then slows as it enters denser air. With the same parachute, a heavier probe lands faster: gravity grows with mass, while the parachute's braking does not — it depends only on its area and on speed — so a higher speed is needed to balance them. With our mass and a 1.2 m parachute it touches down at about 4.5 m/s: the speed of an object falling from about a metre. In general the descent is faster than the climb anyway; in our case it will take about half as long.",
 
   q4t:"Why is the sky blue, and black higher up?",
   q4:"Light is an electromagnetic wave, and its frequency of oscillation corresponds to colour: violet has the highest frequency, then blue, green, yellow and red. The process that deflects sunlight in the atmosphere — <em>Rayleigh scattering</em> — strongly favours high frequencies, that is blue, and it is that blue scattered in every direction that we see looking up. So why not violet? Because there is less violet in sunlight, and our eyes are far less sensitive to it. As you climb, molecules become fewer, less light is deflected, and the sky fades: at thirty kilometres less than 1 % of the air is left above you, and what remains is the black of space — with the Sun still shining beside it, because there is nothing left to spread its light around.",
