@@ -156,7 +156,7 @@ it:{
   lc1:"Massa complessiva del carico utile", lc1t:"sotto 4 kg",
   lc2:"Massa del collo più pesante", lc2t:"sotto 3 kg",
   lc3:"Colli da 2 kg o più con densità oltre 13 g/cm²", lc3t:"nessuno",
-  lc4:"Forza per separare il carico dal pallone", lc4t:"sotto 230 N", lc4v:"sotto soglia", lc3v:"1,5 kg · ≈ 3,5 g/cm²",
+  lc4:"Forza per separare il carico dal pallone", lc4t:"sotto 230 N", lc4v:"sotto soglia", lc3v:"1,5 kg · ≈ 3,6 g/cm²",
   lClassOut:"Quattro criteri, quattro volte dentro. La sonda Klo-01 è un pallone <strong>«leggero»</strong>: pesa poco più di un terzo della soglia dei 4 kg, il collo è unico e ben sotto i 3 kg, la sua densità è quasi quattro volte inferiore al limite, e il cordame cede prima dei 230 N. Quest'ultimo è il criterio meno intuitivo e vale la pena spiegarlo: 230 N sono circa 23 chili di forza, e un cordame più robusto renderebbe la sonda «pesante» anche con il peso che ha.",
 
   lDutyHead:"Che cosa comporta",
@@ -449,7 +449,7 @@ es:{
   lc1:"Masa combinada de la carga útil", lc1t:"menos de 4 kg",
   lc2:"Masa del bulto más pesado", lc2t:"menos de 3 kg",
   lc3:"Bultos de 2 kg o más con densidad superior a 13 g/cm²", lc3t:"ninguno",
-  lc4:"Fuerza para separar la carga del globo", lc4t:"menos de 230 N", lc4v:"bajo el umbral", lc3v:"1,5 kg · ≈ 3,5 g/cm²",
+  lc4:"Fuerza para separar la carga del globo", lc4t:"menos de 230 N", lc4v:"bajo el umbral", lc3v:"1,5 kg · ≈ 3,6 g/cm²",
   lClassOut:"Cuatro criterios, cuatro veces dentro. La sonda Klo-01 es un globo <strong>«ligero»</strong>: pesa poco más de un tercio del umbral de 4 kg, el bulto es único y muy por debajo de 3 kg, su densidad es casi cuatro veces menor que el límite, y el cordaje se corta antes de los 230 N. Este último es el criterio menos intuitivo y vale la pena explicarlo: 230 N son unos 23 kilos de fuerza, y un cordaje más resistente haría «pesada» a la sonda aun con el peso que tiene.",
 
   lDutyHead:"Qué implica",
@@ -742,7 +742,7 @@ en:{
   lc1:"Combined payload mass", lc1t:"under 4 kg",
   lc2:"Mass of the heaviest package", lc2t:"under 3 kg",
   lc3:"Packages of 2 kg or more with density above 13 g/cm²", lc3t:"none",
-  lc4:"Force needed to separate payload from balloon", lc4t:"under 230 N", lc4v:"below threshold", lc3v:"1.5 kg · ≈ 3.5 g/cm²",
+  lc4:"Force needed to separate payload from balloon", lc4t:"under 230 N", lc4v:"below threshold", lc3v:"1.5 kg · ≈ 3.6 g/cm²",
   lClassOut:"Four criteria, inside on all four. The Klo-01 probe is a <strong>«light»</strong> balloon: it weighs a little over a third of the 4 kg threshold, it is a single package well under 3 kg, its density is almost four times below the limit, and the cord breaks before 230 N. That last one is the least intuitive and worth explaining: 230 N is roughly 23 kilograms of force, and a stronger cord would make the probe «heavy» even at the weight it has.",
 
   lDutyHead:"What it means in practice",
