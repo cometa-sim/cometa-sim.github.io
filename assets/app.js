@@ -595,6 +595,20 @@ function darkenMap(){
         const k = Object.keys(w).filter(function(n){ return n.indexOf("map_") === 0 && w[n] && w[n].eachLayer; })[0];
         if(k){
           const map = w[k], bb = w.L.latLngBounds([]);
+
+          /* La mappa disegna un sito alla volta: prima le ellissi di Durazno
+             e i suoi punti, poi le ellissi di Mercedes e i suoi. Le ellissi
+             di Mercedes finiscono cosi' sopra i punti di Durazno, e cliccando
+             uno di quei punti rispondeva l'ellisse invece dell'atterraggio.
+             Qui rimettiamo tutti i punti davanti a tutte le ellissi. La cura
+             vera e' nell'ordine di disegno di cometa_venti.py; questa serve
+             finche' la mappa non viene rigenerata, e dopo non fa danno. */
+          const avanti = function(l){
+            if(l.eachLayer){ l.eachLayer(avanti); return; }
+            if(l.getLatLng && l.bringToFront) l.bringToFront();
+          };
+          map.eachLayer(avanti);
+
           map.eachLayer(function(l){
             if(l.getBounds) { try{ bb.extend(l.getBounds()); }catch(e2){} }
             else if(l.getLatLng) { try{ bb.extend(l.getLatLng()); }catch(e2){} }
