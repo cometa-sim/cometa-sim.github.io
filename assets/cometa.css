@@ -319,6 +319,15 @@ h3.sub-head{font-family:var(--disp);font-weight:600;font-size:clamp(19px,2.4vw,2
 .intro{position:absolute;inset:0;z-index:10;display:flex;flex-direction:column;justify-content:center;align-items:center;
   text-align:center;padding:90px 24px 24px;transition:opacity .4s var(--ease)}
 .intro-eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--intro-dim,rgba(15,40,60,.7));margin-bottom:18px;transition:color .8s linear}
+/* Scuola e indirizzi: sulla stessa riga finche' ci stanno, separati dal
+   punto. Su schermo stretto gli indirizzi vanno tutti a capo insieme,
+   invece di spezzarsi dove capita. */
+.intro-eyebrow .eb-classi::before{content:"·";margin:0 .6em;opacity:.65}
+@media(max-width:700px){
+  .intro-eyebrow span{display:block}
+  .intro-eyebrow .eb-classi{margin-top:7px}
+  .intro-eyebrow .eb-classi::before{content:none}
+}
 .intro .wordmark{font-family:var(--disp);font-weight:300;font-size:clamp(42px,10.5vw,116px);line-height:1;letter-spacing:.19em;
   color:var(--intro-ink,#0e2a40);margin-bottom:14px;padding-left:.19em;transition:color .8s linear}
 .intro .motto{font-family:var(--disp);font-weight:400;font-style:italic;font-size:clamp(16px,2.3vw,23px);color:var(--intro-ink,#123a52);margin-bottom:6px;opacity:.92;transition:color .8s linear}

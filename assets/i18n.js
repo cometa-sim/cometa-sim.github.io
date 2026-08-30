@@ -21,8 +21,9 @@ it:{
   navHome:"Inizio", navMission:"Missione", navPhysics:"La fisica", navProbe:"La sonda", navWinds:"Studio dei venti", navAbout:"Chi siamo e contatti",
 
   /* — Inizio — */
-  heroEyebrow:"Scuola Italiana di Montevideo · 2EMS · IIIS · 3EMS · IVL · IVS",
-  introSub:"Sonda Klo-01 · un pallone stratosferico fino a più di 37 chilometri di quota.",
+  heroSchool:"Scuola Italiana di Montevideo",
+  heroClasses:"2EMS · IIIS · 3EMS · IVL · IVS",
+  introSub:"Sonda Klo-01 · un pallone stratosferico a più di 37 chilometri di quota.",
   launchBtn:"Simula il decollo", scrollCue:"Scorri per salire",
   countHead:"Lancio tra", cDays:"Giorni", cHours:"Ore", cMins:"Minuti", cSecs:"Secondi",
   cUnit:"g",
@@ -318,8 +319,10 @@ es:{
 
   navHome:"Inicio", navMission:"Misión", navPhysics:"La física", navProbe:"La sonda", navWinds:"Estudio de vientos", navAbout:"Quiénes somos y contacto",
 
-  heroEyebrow:"Scuola Italiana di Montevideo · 2EMS · IIIS · 3EMS · IVL · IVS",
-  introSub:"Sonda Klo-01 · un globo estratosférico hasta más de 37 kilómetros de altura.",
+  heroSchool:"Scuola Italiana di Montevideo",
+
+  heroClasses:"2EMS · IIIS · 3EMS · IVL · IVS",
+  introSub:"Sonda Klo-01 · un globo estratosférico a más de 37 kilómetros de altura.",
   launchBtn:"Simular el despegue", scrollCue:"Desplazate para subir",
   countHead:"Lanzamiento en", cDays:"Días", cHours:"Horas", cMins:"Minutos", cSecs:"Segundos",
   cUnit:"d",
@@ -610,8 +613,10 @@ en:{
 
   navHome:"Home", navMission:"Mission", navPhysics:"The physics", navProbe:"The probe", navWinds:"Wind study", navAbout:"About and contact",
 
-  heroEyebrow:"Scuola Italiana di Montevideo · 2EMS · IIIS · 3EMS · IVL · IVS",
-  introSub:"Klo-01 probe · a stratospheric balloon to over 37 kilometres.",
+  heroSchool:"Scuola Italiana di Montevideo",
+
+  heroClasses:"2EMS · IIIS · 3EMS · IVL · IVS",
+  introSub:"Klo-01 probe · a stratospheric balloon more than 37 kilometres up.",
   launchBtn:"Simulate the launch", scrollCue:"Scroll to ascend",
   countHead:"Launch in", cDays:"Days", cHours:"Hours", cMins:"Minutes", cSecs:"Seconds",
   cUnit:"d",
