@@ -53,11 +53,11 @@ Norme e autorizzazioni · Domande · Chi siamo.
 ### Dopo ogni modifica: il numero di versione
 
 In `index.html` i cinque file di `assets/` sono richiamati con un numero in
-coda — oggi `?v=66`:
+coda — oggi `?v=67`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=66">
-<script src="assets/i18n.js?v=66"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=67">
+<script src="assets/i18n.js?v=67"></script>
 ```
 
 Serve a costringere il browser a riscaricarli. **Chi modifica un file in
@@ -130,10 +130,16 @@ indirizzi — l'indirizzo qui sceglie la pagina, non un punto dentro —
 ma l'attributo `data-jump`, che `jumpTo()` in `assets/app.js` risolve
 in uno scorrimento morbido.
 
-Aggiungendo una sezione a Missione vanno fatte due cose: darle un
-`id="m-qualcosa"` e aggiungere una voce all'indice con lo stesso nome
-in `data-jump`. L'etichetta della voce riusa la chiave dell'occhiello
-della sezione, così la traduzione è già fatta.
+L'indice ha quattro voci — in sintesi, cosa misuriamo e come, chi fa
+cosa, a che punto siamo — e non una per sezione: le sezioni sono nove,
+ma non sono tutte dello stesso livello, e un elenco che mette «la
+scheda che programmiamo» accanto a «a che punto siamo» non aiuta a
+orientarsi. Ogni voce porta all'inizio del blocco che la riguarda.
+
+Le sezioni hanno tutte il loro `id="m-qualcosa"`, anche quelle che
+l'indice non nomina: servono se un giorno si vuole rimandare lì da
+un'altra pagina. Aggiungendo una sezione, quindi, basta darle un id;
+si aggiunge una voce all'indice solo se è di quel livello lì.
 
 ### A che punto siamo
 
