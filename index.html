@@ -341,7 +341,7 @@
   <section class="burst">
     <div class="rings" aria-hidden="true"><span class="ring"></span><span class="ring"></span><span class="ring"></span></div>
     <div class="wrap">
-      <div class="bnum reveal"><span class="scr" data-quota>37,7</span> km</div>
+      <div class="bnum reveal"><span class="scr">37–38</span> km</div>
       <div class="blbl reveal d1" data-i18n="burstLbl">Quota di scoppio prevista</div>
     </div>
   </section>
@@ -373,14 +373,11 @@
           <svg viewBox="0 0 130 160">
             <defs>
               <clipPath id="balClip"><path d="M65 6C98 6 125 33 125 67c0 24-13 44-31 55l-21 18H57L36 122C18 111 5 91 5 67 5 33 32 6 65 6Z"/></clipPath>
-              <linearGradient id="balFill" gradientUnits="userSpaceOnUse" x1="0" y1="140" x2="0" y2="6">
-                <stop offset="0" stop-color="#4ADE9B"/><stop offset="1" stop-color="#5FE3FF"/>
-              </linearGradient>
             </defs>
             <g clip-path="url(#balClip)">
               <rect class="bal-empty" x="0" y="0" width="130" height="160"/>
-              <rect class="bal-wip"  x="0" y="140" width="130" height="160"/>
-              <rect class="bal-done" x="0" y="140" width="130" height="160"/>
+              <rect class="bal-wip"  x="0" y="6" width="130" height="134"/>
+              <rect class="bal-done" x="0" y="6" width="130" height="134"/>
               <ellipse class="bal-shine" cx="43" cy="41" rx="17" ry="12"/>
             </g>
             <path class="bal-line" vector-effect="non-scaling-stroke" d="M65 6C98 6 125 33 125 67c0 24-13 44-31 55l-21 18H57L36 122C18 111 5 91 5 67 5 33 32 6 65 6Z"/>
@@ -512,7 +509,7 @@
         </div>
         <div class="pstep" data-step="6">
           <div class="pcard">
-            <div class="pn">06 · <span data-quota>37,7</span> km</div>
+            <div class="pn">06 · 37+ km</div>
             <h3 data-i18n="ph6t"></h3>
             <p data-i18n-html="ph6p"></p>
           </div>
@@ -606,10 +603,10 @@
       <div class="stat-wrap reveal d1">
         <i class="bk tl"></i><i class="bk tr"></i><i class="bk bl"></i><i class="bk br"></i>
         <div class="stat-grid">
-          <div class="stat"><div class="sl" data-i18n="wTraj">Traiettorie simulate</div><div class="sv"><span class="scr">240</span></div></div>
-          <div class="stat"><div class="sl" data-i18n="wDrift">Deriva media</div><div class="sv"><span class="scr">189</span> <small>km</small></div></div>
-          <div class="stat"><div class="sl" data-i18n="wBearing">Rotta media</div><div class="sv"><span class="scr">95°</span> <small><span data-i18n="wBearingU">(est)</span></small></div></div>
-          <div class="stat"><div class="sl" data-i18n="wDur">Durata media</div><div class="sv"><span class="scr">179</span> <small>min</small></div></div>
+          <div class="stat"><div class="sl" data-i18n="wTraj">Traiettorie simulate</div><div class="sv"><span class="scr">600</span></div></div>
+          <div class="stat"><div class="sl" data-i18n="wDrift">Deriva media</div><div class="sv"><span class="scr">180</span> <small>km</small></div></div>
+          <div class="stat"><div class="sl" data-i18n="wBearing">Rotta media</div><div class="sv"><span class="scr">93°</span> <small><span data-i18n="wBearingU">(est)</span></small></div></div>
+          <div class="stat"><div class="sl" data-i18n="wDur">Durata media</div><div class="sv"><span class="scr">177</span> <small>min</small></div></div>
         </div>
       </div>
     </div>
@@ -621,6 +618,7 @@
       <div class="body-col reveal d1">
         <p data-i18n-html="wSimP1">Abbiamo simulato il volo della sonda nel periodo <strong>15 settembre – 15 ottobre</strong>, un lancio al giorno, per quattro anni diversi: 2021-2024. Centoventi date, ripetute per due punti di partenza — <strong>Durazno</strong> e <strong>Mercedes</strong> — per un totale di 240 voli simulati.</p>
         <p data-i18n-html="wSimP2">Ogni punto sulla mappa è l'atterraggio di uno di questi voli. Le ellissi riassumono la dispersione: partendo dallo stesso luogo in quello stesso periodo dell'anno, un nuovo lancio avrebbe circa il <strong>50 % di probabilità di cadere nell'ellisse piccola</strong> e il <strong>90 % nell'ellisse grande</strong>.</p>
+        <p data-i18n-html="wSimP3"></p>
       </div>
 
       <div class="body-col reveal d2" style="margin-top:26px">
@@ -637,6 +635,45 @@
         <span class="mark durazno" data-i18n="mDurazno">Partenza da Durazno</span>
         <span class="mark mercedes" data-i18n="mMercedes">Partenza da Mercedes</span>
         <span data-i18n="mapHint">Cliccando un punto compaiono deriva, rotta e durata di quel volo.</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="section tight">
+    <div class="wrap">
+      <div class="kicker reveal" data-i18n="wStagH">La stagione conta</div>
+      <div class="body-col reveal d1"><p data-i18n="wStagP"></p></div>
+      <div class="table-wrap reveal d1" style="max-width:44ch">
+        <table>
+          <thead><tr>
+            <th scope="col" data-i18n="wStPer">Periodo</th>
+            <th scope="col" data-i18n="wStDrift">Deriva mediana</th>
+          </tr></thead>
+          <tbody>
+            <tr><td data-i18n="wSt1">10–19 settembre</td><td class="mono">173 km</td></tr>
+            <tr><td data-i18n="wSt2">20–29 settembre</td><td class="mono">176 km</td></tr>
+            <tr><td data-i18n="wSt3">30 settembre – 9 ottobre</td><td class="mono">176 km</td></tr>
+            <tr><td data-i18n="wSt4">10–19 ottobre</td><td class="mono">156 km</td></tr>
+            <tr><td data-i18n="wSt5">20–29 ottobre</td><td class="mono">114 km</td></tr>
+            <tr><td data-i18n="wSt6">30 ottobre – 8 novembre</td><td class="mono">76 km</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="body-col reveal d2" style="margin-top:24px"><p data-i18n-html="wStagP2"></p></div>
+    </div>
+  </section>
+
+  <section class="section tight">
+    <div class="wrap">
+      <div class="kicker reveal" data-i18n="wOpH">Le conclusioni operative</div>
+      <div class="body-col reveal d1">
+        <p data-i18n="wOpP"></p>
+        <ul class="plain">
+          <li data-i18n-html="wOp1"></li>
+          <li data-i18n-html="wOp2"></li>
+          <li data-i18n-html="wOp3"></li>
+        </ul>
+        <p data-i18n-html="wOpP2"></p>
       </div>
     </div>
   </section>
@@ -664,6 +701,11 @@
         <p data-i18n-html="wA2P">Sopra l'Uruguay, a venti chilometri di quota, non c'è nessuno strumento che misuri il vento ora per ora. Quello che usiamo sono le previsioni archiviate di un modello meteorologico: com'era il vento secondo il modello, non com'era davvero. È una ricostruzione affidabile, ma resta una ricostruzione.</p>
         <h3 class="sub-head" data-i18n="wA3H">Le ellissi assumono una distribuzione gaussiana</h3>
         <p data-i18n-html="wA3P">I dati mostrano che le ipotesi su cui si basa il modello gaussiano sono ragionevolmente soddisfatte. Tuttavia, va detto che i dati non sono tutti veramente indipendenti perché lo stesso sistema meteorologico governa più giorni consecutivi.</p>
+        <h3 class="sub-head" data-i18n="wA4H">La quota di scoppio non è un dato certo</h3>
+        <p data-i18n-html="wA4P"></p>
+        <p data-i18n-html="wA4P2"></p>
+        <p data-i18n-html="wA4P3"></p>
+        <p data-i18n-html="wA4P4"></p>
       </div>
     </div>
   </section>
@@ -783,6 +825,7 @@
         <h3 data-i18n="q1t"></h3><p data-i18n-html="q1"></p>
         <h3 data-i18n="q2t"></h3><p data-i18n-html="q2"></p>
         <h3 data-i18n="q3t"></h3><p data-i18n-html="q3"></p>
+        <h3 data-i18n="q14t"></h3><p data-i18n-html="q14"></p>
         <h3 data-i18n="q4t"></h3><p data-i18n-html="q4"></p>
         <h3 data-i18n="q5t"></h3><p data-i18n-html="q5"></p>
         <h3 data-i18n="q6t"></h3><p data-i18n-html="q6"></p>

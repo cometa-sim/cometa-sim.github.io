@@ -46,7 +46,7 @@ Norme e autorizzazioni · Domande · Chi siamo.
 | Nomi delle cinque parti della catena di volo | la chiave `chain` in `assets/i18n.js` |
 | Colori e caratteri di tutto il sito | il blocco `:root` in `assets/cometa.css` |
 | Data del lancio (conto alla rovescia) | la costante `LAUNCH` in `assets/app.js` |
-| Quota di scoppio | la costante `QUOTA_SCOPPIO` in `assets/app.js` |
+| Fondo scala delle animazioni | la costante `SCALA_KM` in `assets/app.js` |
 | Numeri delle quattro schede della pagina iniziale | direttamente in `index.html` |
 | Stato di una tappa del progetto | la classe `done`, `wip` o `todo` della riga in `index.html` |
 
@@ -177,21 +177,23 @@ discesa, durata — cambieranno ancora: dipendono dalla massa del payload,
 che sarà definitiva solo dopo la pesata in fase di assemblaggio, e dalla
 velocità di salita, che si decide anche in base al meteo del giorno.
 
-Per questo il sito li usa a due livelli diversi. Nei testi divulgativi
-sono **arrotondati e non impegnativi** — «oltre 37 km», «la quota di
-scoppio», «poco meno di 5 m/s» — così restano veri anche quando il
-calcolo cambia. I valori esatti stanno in **un punto solo**, la chiave
-`wParP` nello studio dei venti, insieme ai parametri da cui escono e
-all'avvertenza che sono provvisori.
+Per questo il sito li usa a due livelli. Nei testi la quota **non compare
+mai come cifra precisa**: si scrive «più di 37 km», «oltre 37 km», «37+»,
+«la quota di scoppio». Così restano veri anche quando il calcolo cambia.
 
-Dove serve un numero per forza — la scala della pagina della fisica e la
-cifra grande in fondo a Missione — non c'è niente scritto a mano: quegli
-elementi hanno l'attributo `data-quota` e li riempie `assets/app.js`
-leggendo la costante `QUOTA_SCOPPIO`. **Cambiando quella costante si
-aggiornano tutti**, nelle tre lingue, col punto o la virgola giusti.
+I **valori esatti stanno solo nello studio dei venti**, dove c'è la
+discussione che li giustifica: la chiave `wParP` per i parametri della
+simulazione, e le chiavi `wA4P`…`wA4P4` per il bilancio d'incertezza.
 
-Quando il calcolo verrà rifatto, quindi, i posti da toccare sono due:
-la costante in `app.js` e la chiave `wParP` in `i18n.js`.
+Nelle due animazioni con la scala — la pagina iniziale e la fisica — il
+punto di scoppio è un numero tondo, **38 km**, che sta nella costante
+`SCALA_KM` di `assets/app.js`. È un fondo scala, non una dichiarazione:
+non compare in nessuna etichetta né didascalia. La cifra grande in fondo
+a Missione dice `37–38 km`, che è l'intervallo effettivo dei voli
+simulati, e la tappa 06 della fisica dice `37+ km`.
+
+Quando il calcolo verrà rifatto, i posti da toccare sono tre: la
+costante in `app.js`, `wParP` e il blocco `wA4P` in `i18n.js`.
 
 ### Il cielo della pagina iniziale
 
@@ -212,7 +214,11 @@ lungo lo scorrimento sono l'elenco `PH_BANDS` in `assets/app.js`.
 `mappe/uru2000_footprint.html` è prodotta da `cometa_venti.py` e va sostituita
 rigenerandola, non modificandola. Il sito la scurisce dall'esterno, ne
 ritinge i punti e la inquadra da solo su tutto quello che disegna — i due
-siti di partenza, i 240 atterraggi, le ellissi: il file resta com'è.
+siti di partenza, i 600 atterraggi, le ellissi: il file resta com'è.
+
+Lo script produce un nome che contiene la data della corsa
+(`010926_footprint.html`): rinominarlo in `uru2000_footprint.html`, che è
+il nome che `index.html` cerca.
 
 ### Three.js
 

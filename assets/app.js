@@ -81,7 +81,6 @@ function applyTexts(){
     const k = el.getAttribute("data-i18n-html");
     if(d[k] !== undefined) el.innerHTML = expand(d[k]);
   });
-  $$("[data-quota]").forEach(function(el){ el.textContent = quotaScoppioTesto(); });
   $$(".scr").forEach(function(el){ delete el.dataset.final; });
   document.documentElement.lang = d.code;
   document.title = d.title;
@@ -193,20 +192,14 @@ document.addEventListener("keydown", function(e){
   e.preventDefault(); jumpTo(el);
 });
 
-/* ---------- Quota di scoppio ----------
-   Il valore che esce dal calcolo di volo. Cambiandolo qui si aggiornano
-   da soli la scala della fisica, l'animazione della pagina iniziale e
-   ogni numero marcato con data-quota nell'HTML: non c'e' nessun 37,7
-   scritto a mano da cercare. I testi invece non lo nominano di proposito
-   — dicono "oltre 37 km" o "la quota di scoppio" — perche' restino veri
-   anche quando questo numero cambia. Il valore esatto, con i parametri
-   da cui esce, sta nello studio dei venti (chiave wParP in i18n.js). */
-const QUOTA_SCOPPIO = 37.7;
-
-function quotaScoppioTesto(){
-  const n = QUOTA_SCOPPIO.toFixed(1);
-  return LANG === "en" ? n : n.replace(".", ",");
-}
+/* ---------- Fondo scala delle animazioni ----------
+   Il punto in cui il pallone scoppia nell'animazione della pagina
+   iniziale e nella scala della fisica. E' un numero tondo, non una
+   dichiarazione: la quota calcolata varia giorno per giorno, e sul sito
+   non compare mai come cifra precisa fuori dallo studio dei venti, dove
+   c'e' la discussione che la giustifica (chiavi wParP e wA4P in
+   i18n.js). Nei testi si dice "piu' di 37 km" o "la quota di scoppio". */
+const SCALA_KM = 38;
 
 /* ---------- Menu per schermi stretti ---------- */
 const menu = $("#menu");
@@ -477,7 +470,7 @@ function updateFlight(){
   if(hCord)  hCord.style.opacity  = scoppiato ? "0" : "1";
 }
 
-const BURST_KM = QUOTA_SCOPPIO;
+const BURST_KM = SCALA_KM;
 function homeFlash(){
   if(!homeBurst || reduced) return;
   homeBurst.style.transition = "none";
@@ -618,7 +611,7 @@ const phys      = $("#phys"),      physStage = $("#physStage"),
       pEnv = $("#pEnv"), pChute = $("#pChute"), pRig = $("#pRig"), pCord = $("#pCord"),
       physSf = $("#physSf"), physSx = physSf ? physSf.getContext("2d") : null;
 
-const PH_TOP = QUOTA_SCOPPIO;     /* la scala della fisica segue la stessa variabile */
+const PH_TOP = SCALA_KM;          /* la scala della fisica segue la stessa variabile */
 const PH_BURST = 0.80;            /* dove cade lo scoppio lungo lo scorrimento */
 /* Confini delle sette tappe lungo lo scorrimento */
 /* Otto tappe. La sesta parte esattamente a PH_BURST, cosi' il testo
@@ -745,10 +738,9 @@ function progBalloon(){
     else if(r.classList.contains("pg-wip")) wip++;
   });
 
-  const TOP = 6, BOT = 140, H = BOT - TOP;             /* solo il corpo del pallone, non il collo */
   const fill = function(sel, frazione){
     const r = svg.querySelector(sel);
-    if(r) r.setAttribute("y", (BOT - H * frazione).toFixed(1));
+    if(r) r.style.transform = "scaleY(" + frazione.toFixed(3) + ")";
   };
   const set = function(sel, n){
     const e = document.querySelector(sel);
