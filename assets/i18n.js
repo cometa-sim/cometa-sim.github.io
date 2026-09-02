@@ -150,6 +150,7 @@ it:{
   ph6p:"Il lattice ha un limite di allungamento, e a un certo punto lo raggiunge: è la <strong>quota di scoppio</strong>. Da quell'istante la sonda comincia a cadere.",
   ph7t:"La discesa",
   ph7p:"Il paracadute si apre da solo, tirato dall'aria. In alto frena poco, perché non c'è quasi niente su cui fare presa. Più si scende, più rallenta.",
+  pn5:"05 · durante la salita", pn7:"07 · ↓ discesa",
   ph8t:"Il recupero", ph8p:"Tre ore in tutto, fra salita e discesa. Poi la sonda è per terra, e nel frattempo i GPS hanno ricominciato a inviarci la posizione. Parte la ricerca.",
 
   /* — Contatti — */
@@ -252,7 +253,7 @@ it:{
   pg3t:"La fisica del volo", pg3:"Spinta, salita, scoppio e discesa: i conti che dicono quanto elio serve e a che quota il pallone cede.",
   pg4t:"Studio dei venti", pg4:"Traiettorie simulate su dati atmosferici reali, per scegliere il sito di partenza e sapere dove può atterrare la sonda.",
   pg5t:"Progettazione della sonda", pg5:"Dove va ogni componente dentro la scatola, come si isola dal freddo e come si fissa perché non si muova.",
-  pg6t:"Ordine del materiale", pg6:"Non è stato un ordine solo. Il materiale di volo — pallone, paracadute, scatola, videocamera e i due tracciatori — arriva da StratoFlights ed è già qui. I sensori e l'elettronica sono ordinati e li stiamo aspettando. L'elio, che si compra in Uruguay, è ancora da definire.",
+  pg6t:"Ordine del materiale", pg6:"Non è stato un ordine solo. Il materiale di volo — pallone, paracadute, scatola, videocamera e i due tracciatori — arriva da StratoFlights ed è già qui. Anche l'elio, che si compra in Uruguay, è arrivato: una bombola da 40 litri a circa 200 bar, cioè 8,3 m³ di gas, quasi il doppio dei 4,5 m³ che servono per il riempimento. È elio di purezza 5.0, cioè 99,999 %. I sensori e l'elettronica sono ordinati e li stiamo aspettando.",
   pg7t:"Programmazione della scheda", pg7:"Il programma che legge i sensori e registra tutto su microSD, più il secondo registratore indipendente.",
   pg8t:"Assemblaggio e prove a terra", pg8:"Montaggio della sonda e collaudo: tenuta al freddo, alimentazione, registrazione continua per tutta la durata del volo, e test dei GPS.",
   pg9t:"Autorizzazione al volo", pg9:"La DINACIA ha già approvato il lancio e ci ha dato il regolamento e le condizioni da rispettare. L'autorizzazione formale arriva quando saranno fissati il luogo e la data effettivi.",
@@ -466,6 +467,7 @@ es:{
   ph6p:"El látex tiene un límite de estiramiento, y en algún momento lo alcanza: es la <strong>altura de reventado</strong>. Desde ese instante la sonda empieza a caer.",
   ph7t:"El descenso",
   ph7p:"El paracaídas se abre solo, tirado por el aire. Arriba frena poco, porque casi no hay nada de lo que agarrarse. Cuanto más baja, más frena.",
+  pn5:"05 · durante el ascenso", pn7:"07 · ↓ descenso",
   ph8t:"La recuperación", ph8p:"Tres horas en total, entre subida y bajada. Después la sonda está en el suelo, y mientras tanto los GPS han vuelto a enviarnos la posición. Empieza la búsqueda.",
 
   /* — Contacto — */
@@ -568,7 +570,7 @@ es:{
   pg3t:"La física del vuelo", pg3:"Empuje, ascenso, reventado y descenso: las cuentas que dicen cuánto helio hace falta y a qué altura cede el globo.",
   pg4t:"Estudio de los vientos", pg4:"Trayectorias simuladas sobre datos atmosféricos reales, para elegir el sitio de partida y saber dónde puede aterrizar la sonda.",
   pg5t:"Diseño de la sonda", pg5:"Dónde va cada componente dentro de la caja, cómo se aísla del frío y cómo se fija para que no se mueva.",
-  pg6t:"Pedido del material", pg6:"No fue un solo pedido. El material de vuelo — globo, paracaídas, caja, cámara y los dos rastreadores — viene de StratoFlights y ya está acá. Los sensores y la electrónica están pedidos y los estamos esperando. El helio, que se compra en Uruguay, todavía está por definirse.",
+  pg6t:"Pedido del material", pg6:"No fue un solo pedido. El material de vuelo — globo, paracaídas, caja, cámara y los dos rastreadores — viene de StratoFlights y ya está acá. El helio, que se compra en Uruguay, también llegó: un tubo de 40 litros a unos 200 bar, es decir 8,3 m³ de gas, casi el doble de los 4,5 m³ que hacen falta para el llenado. Es helio de pureza 5.0, o sea 99,999 %. Los sensores y la electrónica están pedidos y los estamos esperando.",
   pg7t:"Programación de la placa", pg7:"El programa que lee los sensores y registra todo en la microSD, más el segundo registrador independiente.",
   pg8t:"Armado y pruebas en tierra", pg8:"Montaje de la sonda y ensayo: resistencia al frío, alimentación, registro continuo durante todo el vuelo, y prueba de los GPS.",
   pg9t:"Autorización de vuelo", pg9:"La DINACIA ya aprobó el lanzamiento y nos dio el reglamento y las condiciones a cumplir. La autorización formal llega cuando estén fijados el lugar y la fecha efectivos.",
@@ -782,6 +784,7 @@ en:{
   ph6p:"Latex has a stretching limit, and at some point it reaches it: that is the <strong>burst altitude</strong>. From that instant the probe begins to fall.",
   ph7t:"The descent",
   ph7p:"The parachute opens by itself, pulled open by the air. High up it slows the fall very little, because there is almost nothing to push against. The lower it gets, the more it brakes.",
+  pn5:"05 · during the ascent", pn7:"07 · ↓ descent",
   ph8t:"The recovery", ph8p:"Three hours in all, up and down. Then the probe is on the ground, and by then the GPS units have started sending us the position again. The search begins.",
 
   /* — Contact — */
@@ -884,7 +887,7 @@ en:{
   pg3t:"The physics of the flight", pg3:"Lift, ascent, burst and descent: the calculations that say how much helium is needed and at what altitude the balloon gives way.",
   pg4t:"Wind study", pg4:"Trajectories simulated on real atmospheric data, to choose the launch site and know where the probe can land.",
   pg5t:"Probe design", pg5:"Where each component goes inside the box, how it is insulated from the cold and how it is fixed so it cannot move.",
-  pg6t:"Ordering the material", pg6:"It was not one single order. The flight material — balloon, parachute, box, camera and the two trackers — comes from StratoFlights and is already here. The sensors and the electronics are ordered and we are waiting for them. The helium, bought in Uruguay, is still to be settled.",
+  pg6t:"Ordering the material", pg6:"It was not one single order. The flight material — balloon, parachute, box, camera and the two trackers — comes from StratoFlights and is already here. The helium, bought in Uruguay, has arrived too: a 40-litre cylinder at about 200 bar, that is 8.3 m³ of gas, almost twice the 4.5 m³ needed to fill the balloon. It is 5.0 grade helium, 99.999 %. The sensors and the electronics are ordered and we are waiting for them.",
   pg7t:"Programming the board", pg7:"The program that reads the sensors and records everything to microSD, plus the second independent logger.",
   pg8t:"Assembly and ground testing", pg8:"Building the probe and testing it: resistance to cold, power, continuous recording for the whole duration of the flight, and testing the GPS units.",
   pg9t:"Flight authorisation", pg9:"DINACIA has already approved the launch and given us the regulations and the conditions to meet. The formal authorisation comes once the actual place and date are fixed.",
