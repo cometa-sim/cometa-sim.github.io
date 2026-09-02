@@ -150,6 +150,7 @@ it:{
   ph6p:"Il lattice ha un limite di allungamento, e a un certo punto lo raggiunge: è la <strong>quota di scoppio</strong>. Da quell'istante la sonda comincia a cadere.",
   ph7t:"La discesa",
   ph7p:"Il paracadute si apre da solo, tirato dall'aria. In alto frena poco, perché non c'è quasi niente su cui fare presa. Più si scende, più rallenta.",
+  pn5:"05 · durante la salita", pn7:"07 · ↓ discesa",
   ph8t:"Il recupero", ph8p:"Tre ore in tutto, fra salita e discesa. Poi la sonda è per terra, e nel frattempo i GPS hanno ricominciato a inviarci la posizione. Parte la ricerca.",
 
   /* — Contatti — */
@@ -466,6 +467,7 @@ es:{
   ph6p:"El látex tiene un límite de estiramiento, y en algún momento lo alcanza: es la <strong>altura de reventado</strong>. Desde ese instante la sonda empieza a caer.",
   ph7t:"El descenso",
   ph7p:"El paracaídas se abre solo, tirado por el aire. Arriba frena poco, porque casi no hay nada de lo que agarrarse. Cuanto más baja, más frena.",
+  pn5:"05 · durante el ascenso", pn7:"07 · ↓ descenso",
   ph8t:"La recuperación", ph8p:"Tres horas en total, entre subida y bajada. Después la sonda está en el suelo, y mientras tanto los GPS han vuelto a enviarnos la posición. Empieza la búsqueda.",
 
   /* — Contacto — */
@@ -782,6 +784,7 @@ en:{
   ph6p:"Latex has a stretching limit, and at some point it reaches it: that is the <strong>burst altitude</strong>. From that instant the probe begins to fall.",
   ph7t:"The descent",
   ph7p:"The parachute opens by itself, pulled open by the air. High up it slows the fall very little, because there is almost nothing to push against. The lower it gets, the more it brakes.",
+  pn5:"05 · during the ascent", pn7:"07 · ↓ descent",
   ph8t:"The recovery", ph8p:"Three hours in all, up and down. Then the probe is on the ground, and by then the GPS units have started sending us the position again. The search begins.",
 
   /* — Contact — */
