@@ -23,7 +23,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@200;300;400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/cometa.css?v=74">
+<link rel="stylesheet" href="assets/cometa.css?v=76">
 </head>
 <body>
 
@@ -47,7 +47,8 @@
     <a data-page="venti" data-i18n="navWinds" tabindex="0">Studio dei venti</a>
     <a data-page="legale" data-i18n="navLegal" tabindex="0">Aspetti legali</a>
     <a data-page="qa" data-i18n="navQA" tabindex="0">Q&amp;A</a>
-    <a data-page="about" data-i18n="navAbout" tabindex="0">Chi siamo e contatti</a>
+    <a data-page="about" data-i18n="navAbout" tabindex="0">Chi siamo</a>
+    <a data-page="contatti" data-i18n="navContact" tabindex="0">Contatti</a>
   </div>
   <a class="ig" href="https://instagram.com/cometa.sim" target="_blank" rel="noopener" aria-label="Instagram @cometa.sim">
     <svg class="soc-ig" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none"/></svg>
@@ -73,7 +74,8 @@
   <a data-page="venti" data-i18n="navWinds" tabindex="0">Studio dei venti</a>
     <a data-page="legale" data-i18n="navLegal" tabindex="0">Aspetti legali</a>
     <a data-page="qa" data-i18n="navQA" tabindex="0">Q&amp;A</a>
-  <a data-page="about" data-i18n="navAbout" tabindex="0">Chi siamo e contatti</a>
+  <a data-page="about" data-i18n="navAbout" tabindex="0">Chi siamo</a>
+    <a data-page="contatti" data-i18n="navContact" tabindex="0">Contatti</a>
   <div class="menu-foot">
     <a class="ig" href="https://instagram.com/cometa.sim" target="_blank" rel="noopener" style="font-family:var(--mono);font-size:13px">Instagram</a>
     <a class="ig" href="https://www.tiktok.com/@cometa.sim" target="_blank" rel="noopener" style="font-family:var(--mono);font-size:13px">TikTok</a>
@@ -186,8 +188,11 @@
           <a class="teaser reveal d1" data-page="missione" tabindex="0"><div class="tn">01</div><h3 data-i18n="navMission">Missione</h3><p data-i18n="tzMission">Obiettivi, profilo di volo e catena di volo.</p><span class="go" data-i18n="teaserMore">Scopri →</span></a>
           <a class="teaser reveal d2" data-page="fisica" tabindex="0"><div class="tn">02</div><h3 data-i18n="navPhysics">La fisica</h3><p data-i18n="ix3n">Perché sale, perché scoppia, perché fa così freddo</p><span class="go" data-i18n="teaserMore">Scopri →</span></a>
           <a class="teaser reveal d3" data-page="sonda" tabindex="0"><div class="tn">03</div><h3 data-i18n="navProbe">La sonda</h3><p data-i18n="tzProbe">Modello tridimensionale esplorabile, con tutti i componenti.</p><span class="go" data-i18n="teaserMore">Scopri →</span></a>
-          <a class="teaser reveal d4" data-page="venti" tabindex="0"><div class="tn">04</div><h3 data-i18n="navWinds">Studio dei venti</h3><p data-i18n="tzWinds">240 voli simulati per scegliere da dove partire.</p><span class="go" data-i18n="teaserMore">Scopri →</span></a>
+          <a class="teaser reveal d4" data-page="venti" tabindex="0"><div class="tn">04</div><h3 data-i18n="navWinds">Studio dei venti</h3><p data-i18n="tzWinds">600 voli simulati per scegliere da dove partire.</p><span class="go" data-i18n="teaserMore">Scopri →</span></a>
           <a class="teaser reveal d4" data-page="qa" tabindex="0"><div class="tn">05</div><h3 data-i18n="tzQaT">Domande</h3><p data-i18n="ix7n">La sonda va nello spazio? Scopriamolo.</p><span class="go" data-i18n="teaserMore">Scopri →</span></a>
+          <a class="teaser reveal d4" data-page="legale" tabindex="0"><div class="tn">06</div><h3 data-i18n="navLegal">Aspetti legali</h3><p data-i18n="tzLegal">Che cosa dice la norma aeronautica, e come si applica a noi.</p><span class="go" data-i18n="teaserMore">Scopri →</span></a>
+          <a class="teaser reveal d4" data-page="about" tabindex="0"><div class="tn">07</div><h3 data-i18n="navAbout">Chi siamo</h3><p data-i18n="tzAbout">Le studentesse e gli studenti dietro COMETA.</p><span class="go" data-i18n="teaserMore">Scopri →</span></a>
+          <a class="teaser reveal d4" data-page="contatti" tabindex="0"><div class="tn">08</div><h3 data-i18n="navContact">Contatti</h3><p data-i18n="tzContact">Scrivici, seguici, condividi la missione.</p><span class="go" data-i18n="teaserMore">Scopri →</span></a>
         </div>
 
         <div class="note note-date reveal d2">
@@ -594,7 +599,7 @@
   <div class="wrap page-hero">
     <div class="kicker reveal" data-i18n="wKicker">Fase 1 · Studio preliminare</div>
     <h1 class="ttl reveal d1" data-i18n="windsTitle">Dove va a finire la sonda</h1>
-    <p class="psub reveal d2" data-i18n="windsSub">240 traiettorie simulate per scegliere da dove partire.</p>
+    <p class="psub reveal d2" data-i18n="windsSub">600 traiettorie simulate per scegliere da dove partire.</p>
   </div>
 
   <section class="section" style="padding-top:20px">
@@ -629,7 +634,7 @@
 
       <div class="map-frame reveal d1">
         <iframe id="mapFrame" src="mappe/uru2000_footprint.html"
-                title="Mappa interattiva dei 240 punti di atterraggio simulati con le ellissi di dispersione"
+                title="Mappa interattiva dei 600 punti di atterraggio simulati con le ellissi di dispersione"
                 loading="lazy"></iframe>
       </div>
       <div class="map-legend">
@@ -862,6 +867,16 @@
     </div>
   </section>
 
+</section>
+
+<!-- ======================= CONTATTI ======================= -->
+<section class="page" id="page-contatti">
+  <div class="wrap page-hero">
+    <div class="kicker reveal" data-i18n="contKicker">Fase 1 · Contatti</div>
+    <h1 class="ttl reveal d1" data-i18n="contTitle">Resta in contatto</h1>
+    <p class="psub reveal d2" data-i18n="contSub">Scrivi, segui, condividi.</p>
+  </div>
+
   <section class="section tight">
     <div class="wrap">
       <div class="contact-grid">
@@ -924,7 +939,8 @@
       <a data-page="venti" data-i18n="navWinds" tabindex="0">Studio dei venti</a>
     <a data-page="legale" data-i18n="navLegal" tabindex="0">Aspetti legali</a>
     <a data-page="qa" data-i18n="navQA" tabindex="0">Q&amp;A</a>
-      <a data-page="about" data-i18n="navAbout" tabindex="0">Chi siamo e contatti</a>
+      <a data-page="about" data-i18n="navAbout" tabindex="0">Chi siamo</a>
+    <a data-page="contatti" data-i18n="navContact" tabindex="0">Contatti</a>
     </div>
     <div class="foot-col">
       <h4 data-i18n="footContact">Contatti</h4>
@@ -940,9 +956,9 @@
 
 </div>
 
-<script src="assets/i18n.js?v=74"></script>
-<script src="assets/sonda.js?v=74"></script>
-<script src="assets/catena.js?v=74"></script>
-<script src="assets/app.js?v=74"></script>
+<script src="assets/i18n.js?v=76"></script>
+<script src="assets/sonda.js?v=76"></script>
+<script src="assets/catena.js?v=76"></script>
+<script src="assets/app.js?v=76"></script>
 </body>
 </html>
