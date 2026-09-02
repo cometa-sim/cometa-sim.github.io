@@ -53,17 +53,30 @@ Norme e autorizzazioni · Domande · Chi siamo.
 ### Dopo ogni modifica: il numero di versione
 
 In `index.html` i cinque file di `assets/` sono richiamati con un numero in
-coda — oggi `?v=68`:
+coda — oggi `?v=73`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=68">
-<script src="assets/i18n.js?v=68"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=73">
+<script src="assets/i18n.js?v=73"></script>
 ```
 
 Serve a costringere il browser a riscaricarli. **Chi modifica un file in
 `assets/` deve alzare quel numero di uno**, altrimenti i visitatori che hanno
 già aperto il sito continuano a vedere la versione vecchia, e la modifica
 sembra non aver funzionato.
+
+Il guasto è subdolo, perché colpisce **solo chi il sito l'ha già visto**: a
+chi arriva per la prima volta il server manda comunque i file nuovi, quindi
+provando da una finestra pulita sembra tutto a posto. Il sintomo tipico è una
+pagina mezza rotta — l'impaginazione nuova con i testi vecchi, o un grafico
+senza il suo foglio di stile. Prima di pubblicare conviene quindi controllare
+che il numero sia davvero cambiato:
+
+```
+grep -o '?v=[0-9]*' index.html | sort -u
+```
+
+Deve uscire un solo valore, e diverso da quello di prima.
 
 Riguarda solo `index.html`: `sonda.html` e `venti.html` sono rimandi con il
 foglio di stile scritto dentro, e non richiamano nessun file di `assets/`.
