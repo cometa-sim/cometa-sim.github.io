@@ -110,10 +110,10 @@ it:{
 
   srcMeteo:"<strong>Dati meteorologici:</strong> previsioni archiviate dell'Historical Forecast API di <a href=\"https://open-meteo.com/\" target=\"_blank\" rel=\"noopener\">Open-Meteo</a>, distribuite con licenza CC BY 4.0.",
   srcMap:"<strong>Mappa:</strong> Leaflet su sfondo cartografico OpenStreetMap, © contributori OpenStreetMap.",
-  srcCalc:"<strong>Calcolo:</strong> <code>cometa_venti.py</code>, sviluppato all'interno del progetto — profilo atmosferico del giorno da Open-Meteo fino a 30 hPa, <strong>NRLMSIS 2.1</strong> per l'estrapolazione al di sopra, integrazione della traiettoria strato per strato, ellissi da matrice di covarianza. Il codice è pubblico.",
+  srcCalc:"<strong>Calcolo:</strong> <code>cometa_venti.py</code>, sviluppato all'interno del progetto — profilo atmosferico del giorno da Open-Meteo fino a 30 hPa, <strong>NRLMSIS 2.1</strong> per l'estrapolazione al di sopra, integrazione della traiettoria strato per strato, ellissi da matrice di covarianza.",
   srcExcl:"<strong>Area di esclusione:</strong> poligono approssimato.",
   srcUpdated:"<strong>Simulazione eseguita nel:</strong> {date}",
-  wDate:"giugno 2026",
+  wDate:"settembre 2026",
 
   /* — Chi siamo — */
   aboutKicker:"Fase 1 · Chi siamo", aboutTitle:"Chi siamo", aboutSub:"Le persone dietro COMETA.",
@@ -419,10 +419,10 @@ es:{
 
   srcMeteo:"<strong>Datos meteorológicos:</strong> previsiones archivadas de la Historical Forecast API de <a href=\"https://open-meteo.com/\" target=\"_blank\" rel=\"noopener\">Open-Meteo</a>, distribuidas con licencia CC BY 4.0.",
   srcMap:"<strong>Mapa:</strong> Leaflet sobre cartografía de OpenStreetMap, © colaboradores de OpenStreetMap.",
-  srcCalc:"<strong>Cálculo:</strong> <code>cometa_venti.py</code>, desarrollado dentro del proyecto — perfil atmosférico del día desde Open-Meteo hasta 30 hPa, <strong>NRLMSIS 2.1</strong> para la extrapolación por encima, integración de la trayectoria capa por capa, elipses a partir de la matriz de covarianza. El código es público.",
+  srcCalc:"<strong>Cálculo:</strong> <code>cometa_venti.py</code>, desarrollado dentro del proyecto — perfil atmosférico del día desde Open-Meteo hasta 30 hPa, <strong>NRLMSIS 2.1</strong> para la extrapolación por encima, integración de la trayectoria capa por capa, elipses a partir de la matriz de covarianza.",
   srcExcl:"<strong>Área de exclusión:</strong> polígono aproximado.",
   srcUpdated:"<strong>Simulación realizada en:</strong> {date}",
-  wDate:"junio de 2026",
+  wDate:"setiembre de 2026",
 
   aboutKicker:"Fase 1 · Quiénes somos", aboutTitle:"Nosotros", aboutSub:"Las personas detrás de COMETA.",
   aboutBody:"Somos estudiantes de 2EMS, IIIS, 3EMS, IVL y IVS de la Scuola Italiana di Montevideo.",
@@ -726,10 +726,10 @@ en:{
 
   srcMeteo:"<strong>Weather data:</strong> archived forecasts from the Historical Forecast API of <a href=\"https://open-meteo.com/\" target=\"_blank\" rel=\"noopener\">Open-Meteo</a>, distributed under CC BY 4.0.",
   srcMap:"<strong>Map:</strong> Leaflet over OpenStreetMap cartography, © OpenStreetMap contributors.",
-  srcCalc:"<strong>Calculation:</strong> <code>cometa_venti.py</code>, developed inside the project — atmospheric profile of the day from Open-Meteo up to 30 hPa, <strong>NRLMSIS 2.1</strong> for the extrapolation above it, layer-by-layer trajectory integration, ellipses from the covariance matrix. The code is public.",
+  srcCalc:"<strong>Calculation:</strong> <code>cometa_venti.py</code>, developed inside the project — atmospheric profile of the day from Open-Meteo up to 30 hPa, <strong>NRLMSIS 2.1</strong> for the extrapolation above it, layer-by-layer trajectory integration, ellipses from the covariance matrix.",
   srcExcl:"<strong>Exclusion area:</strong> approximate polygon.",
   srcUpdated:"<strong>Simulation run in:</strong> {date}",
-  wDate:"June 2026",
+  wDate:"September 2026",
 
   aboutKicker:"Phase 1 · About us", aboutTitle:"About us", aboutSub:"The people behind COMETA.",
   aboutBody:"We are students of 2EMS, IIIS, 3EMS, IVL and IVS at the Scuola Italiana di Montevideo.",
