@@ -730,7 +730,9 @@ td.ok{color:var(--ice);font-variant-numeric:tabular-nums}
 
 /* «Aspetti legali» è lungo: il menù passa alla versione
    a scomparsa un po' prima, per non andare a capo. */
-@media(max-width:1180px){.nav-links,.cbadge{display:none}.menu-btn{display:flex}}
+/* Nove voci nella barra: in spagnolo a 1180px non ci stavano piu'.
+   Sotto questa soglia si passa al menu a panino. */
+@media(max-width:1220px){.nav-links,.cbadge{display:none}.menu-btn{display:flex}}
 
 /* Lo scoppio sulla pagina iniziale: stesso lampo della sezione
    della fisica, centrato sul pallone. */

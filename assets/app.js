@@ -129,7 +129,8 @@ const pages = {
   venti:    $("#page-venti"),
   legale:   $("#page-legale"),
   qa:       $("#page-qa"),
-  about:    $("#page-about")
+  about:    $("#page-about"),
+  contatti: $("#page-contatti")
 };
 
 function showPage(id){

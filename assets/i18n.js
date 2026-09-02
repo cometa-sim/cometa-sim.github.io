@@ -17,7 +17,7 @@ it:{
   code:"it", title:"COMETA · Sonda Klo-01 — Scuola Italiana di Montevideo",
   metaDesc:"COMETA è un programma di palloni stratosferici della Scuola Italiana di Montevideo: misure atmosferiche fino a più di 37 km di quota, progettate e realizzate dagli studenti.",
 
-  navHome:"Inizio", navMission:"Missione", navPhysics:"La fisica", navProbe:"La sonda", navWinds:"Studio dei venti", navAbout:"Chi siamo e contatti",
+  navHome:"Inizio", navMission:"Missione", navPhysics:"La fisica", navProbe:"La sonda", navWinds:"Studio dei venti", navAbout:"Chi siamo", navContact:"Contatti",
 
   /* — Inizio — */
   heroSchool:"Scuola Italiana di Montevideo",
@@ -33,8 +33,10 @@ it:{
 
   tzMission:"Obiettivi, profilo di volo e catena di volo.",
   tzProbe:"Modello tridimensionale esplorabile, con tutti i componenti.",
-  tzWinds:"240 voli simulati per scegliere da dove partire.", tzQaT:"Domande",
+  tzWinds:"600 voli simulati per scegliere da dove partire.", tzQaT:"Domande",
   tzAbout:"Le studentesse e gli studenti dietro COMETA.",
+  tzLegal:"Che cosa dice la norma aeronautica, e come si applica a noi.",
+  tzContact:"Scrivici, seguici, condividi la missione.",
   teaserMore:"Scopri →", ix3n:"Perché sale, perché scoppia, perché fa così freddo", ix7n:"La sonda va nello spazio? Scopriamolo.",
 
   /* — Missione — */
@@ -142,6 +144,7 @@ it:{
   ph8t:"Il recupero", ph8p:"Tre ore in tutto, fra salita e discesa. Poi la sonda è per terra, e nel frattempo i GPS hanno ricominciato a inviarci la posizione. Parte la ricerca.",
 
   /* — Contatti — */
+  contKicker:"Fase 1 · Contatti", contTitle:"Resta in contatto", contSub:"Scrivi, segui, condividi.",
   contactMailHead:"Scrivici", contactMailSub:"Per informazioni, collaborazioni, proposte.",
   mailCta:"Manda una mail", tiktokCta:"Seguici su TikTok", footContact:"Contatti",
   classesNote:"COMETA coinvolge diversi indirizzi dei due sistemi che convivono nella scuola, quello italiano e quello uruguaiano, insieme ai loro insegnanti. Oltre alle classi dell'ultimo anno, il progetto accoglie alunne e alunni del penultimo anno, che si formano per portarlo avanti nelle fasi successive. Con noi collaborano anche ex alunni: un legame con la scuola che continua.",
@@ -327,7 +330,7 @@ es:{
   code:"es", title:"COMETA · Sonda Klo-01 — Scuola Italiana di Montevideo",
   metaDesc:"COMETA es un programa de globos estratosféricos de la Scuola Italiana di Montevideo: mediciones atmosféricas hasta más de 37 km de altura, diseñadas y construidas por los estudiantes.",
 
-  navHome:"Inicio", navMission:"Misión", navPhysics:"La física", navProbe:"La sonda", navWinds:"Estudio de vientos", navAbout:"Quiénes somos y contacto",
+  navHome:"Inicio", navMission:"Misión", navPhysics:"La física", navProbe:"La sonda", navWinds:"Estudio de vientos", navAbout:"Quiénes somos", navContact:"Contacto",
 
   heroSchool:"Scuola Italiana di Montevideo",
 
@@ -343,8 +346,10 @@ es:{
 
   tzMission:"Objetivos, perfil de vuelo y cadena de vuelo.",
   tzProbe:"Modelo tridimensional explorable, con todos los componentes.",
-  tzWinds:"240 vuelos simulados para elegir desde dónde partir.", tzQaT:"Preguntas",
+  tzWinds:"600 vuelos simulados para elegir desde dónde partir.", tzQaT:"Preguntas",
   tzAbout:"Las y los estudiantes detrás de COMETA.",
+  tzLegal:"Qué dice la norma aeronáutica, y cómo se aplica a nosotros.",
+  tzContact:"Escribinos, seguinos, compartí la misión.",
   teaserMore:"Ver más →", ix3n:"Por qué sube, por qué revienta, por qué hace tanto frío", ix7n:"¿La sonda va al espacio? Averigüémoslo.",
 
   pKicker:"Fase 1 · Perfil de vuelo", missionTitle:"Misión",
@@ -446,6 +451,7 @@ es:{
   ph8t:"La recuperación", ph8p:"Tres horas en total, entre subida y bajada. Después la sonda está en el suelo, y mientras tanto los GPS han vuelto a enviarnos la posición. Empieza la búsqueda.",
 
   /* — Contacto — */
+  contKicker:"Fase 1 · Contacto", contTitle:"Mantenete en contacto", contSub:"Escribinos, seguinos, compartí.",
   contactMailHead:"Escribinos", contactMailSub:"Para información, colaboraciones, propuestas.",
   mailCta:"Mandanos un correo", tiktokCta:"Seguinos en TikTok", footContact:"Contacto",
   classesNote:"COMETA involucra varias orientaciones de los dos sistemas que conviven en la escuela, el italiano y el uruguayo, junto con sus docentes. Además de las clases del último año, el proyecto recibe a alumnas y alumnos del penúltimo año, que se forman para continuarlo en las fases siguientes. También colaboran con nosotros exalumnos: un vínculo con la escuela que se mantiene.",
@@ -631,7 +637,7 @@ en:{
   code:"en", title:"COMETA · Klo-01 Probe — Scuola Italiana di Montevideo",
   metaDesc:"COMETA is a stratospheric balloon programme at the Scuola Italiana di Montevideo: atmospheric measurements up to over 37 km, designed and built by students.",
 
-  navHome:"Home", navMission:"Mission", navPhysics:"The physics", navProbe:"The probe", navWinds:"Wind study", navAbout:"About and contact",
+  navHome:"Home", navMission:"Mission", navPhysics:"The physics", navProbe:"The probe", navWinds:"Wind study", navAbout:"About us", navContact:"Contact",
 
   heroSchool:"Scuola Italiana di Montevideo",
 
@@ -647,8 +653,10 @@ en:{
 
   tzMission:"Objectives, flight profile and flight chain.",
   tzProbe:"Explorable three-dimensional model with every component.",
-  tzWinds:"240 simulated flights to choose the launch site.", tzQaT:"Questions",
+  tzWinds:"600 simulated flights to choose the launch site.", tzQaT:"Questions",
   tzAbout:"The students behind COMETA.",
+  tzLegal:"What the aviation rules say, and how they apply to us.",
+  tzContact:"Write to us, follow us, share the mission.",
   teaserMore:"Explore →", ix3n:"Why it rises, why it bursts, why it gets so cold", ix7n:"Does the probe reach space? Let's find out.",
 
   pKicker:"Phase 1 · Flight profile", missionTitle:"Mission",
@@ -750,6 +758,7 @@ en:{
   ph8t:"The recovery", ph8p:"Three hours in all, up and down. Then the probe is on the ground, and by then the GPS units have started sending us the position again. The search begins.",
 
   /* — Contact — */
+  contKicker:"Phase 1 · Contact", contTitle:"Stay in touch", contSub:"Write, follow, share.",
   contactMailHead:"Write to us", contactMailSub:"For information, collaborations, proposals.",
   mailCta:"Send us an email", tiktokCta:"Follow us on TikTok", footContact:"Contact",
   classesNote:"COMETA brings together several study tracks from the two systems that coexist in the school, the Italian one and the Uruguayan one, along with their teachers. Besides the final-year classes, the project takes in students from the second-to-last year, who are training to carry it forward in the phases ahead. Former students work with us too: a bond with the school that lasts.",
