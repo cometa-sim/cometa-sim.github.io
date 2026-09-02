@@ -201,6 +201,36 @@ document.addEventListener("keydown", function(e){
    i18n.js). Nei testi si dice "piu' di 37 km" o "la quota di scoppio". */
 const SCALA_KM = 38;
 
+/* ---------- Come si legge la quota nelle animazioni ----------
+   Sotto i 37 km il contatore mostra i decimali, sopra si ferma su "37+".
+   La scala arriva a SCALA_KM, ma il numero preciso di scoppio non va
+   dichiarato: nei testi si dice "piu' di 37 km", e il contatore fa lo
+   stesso invece di scrivere 38,0 a fine corsa. */
+function quotaLetta(alt){
+  return alt >= 37 ? "37+" : alt.toFixed(1);
+}
+
+/* La cifra grande in fondo a Missione sale con i decimali fino a 37 e poi
+   resta "37+": la quota vera cambia giorno per giorno, e un numero che si
+   ferma su un piu' dice quello che una cifra esatta direbbe a torto. */
+function bnumSale(){
+  const el = document.getElementById("bnumN");
+  if(!el) return;
+  if(reduced || !window.IntersectionObserver){ el.textContent = "37+"; return; }
+  const io = new IntersectionObserver(function(voci){
+    if(!voci.some(function(v){ return v.isIntersecting; })) return;
+    io.disconnect();
+    const st = performance.now(), dur = 1500;
+    (function f(now){
+      const p = Math.min(1, (now - st)/dur);
+      const e = 1 - Math.pow(1 - p, 3);
+      el.textContent = p < 1 ? (37 * e).toFixed(1) : "37+";
+      if(p < 1) requestAnimationFrame(f);
+    })(performance.now());
+  }, {threshold: .6});
+  io.observe(el);
+}
+
 /* ---------- Menu per schermi stretti ---------- */
 const menu = $("#menu");
 function closeMenu(){ menu.classList.remove("open"); document.body.style.overflow = ""; }
@@ -447,7 +477,7 @@ function updateFlight(){
   const bob  = reduced ? 0 : Math.sin(performance.now()/1600)*4;
   balloon.style.transform = "translate(-50%,-50%) translate(" + sway + "px," + (lerp(groundY, 0, lift) + bob) + "px)";
 
-  altN.textContent = alt.toFixed(1);
+  altN.textContent = quotaLetta(alt);
   altLay.textContent = bands[alt < 0.6 ? 0 : alt < 11 ? 1 : alt < 18 ? 2 : 3];
   altFill.style.height = (p*100) + "%";
   altMark.style.bottom = (p*100) + "%";
@@ -680,7 +710,7 @@ function updatePhys(){
   const down = rising ? 0 : 8*(1 - alt/PH_TOP);
   physCraft.style.transform = "translate(-50%,-50%) translateY(" + (up + swell + down + bob) + "vh)";
 
-  if(pAltN) pAltN.textContent = alt.toFixed(1);
+  if(pAltN) pAltN.textContent = quotaLetta(alt);
   if(pAltL) pAltL.textContent = bands[alt < 0.6 ? 0 : alt < 11 ? 1 : alt < 18 ? 2 : 3];
 
   if(!physFlashed && p >= PH_BURST){ physFlashed = true; physFlash(); }
@@ -775,6 +805,7 @@ setLang(detectLang(), false);
 showPage(location.hash.slice(1) || "home");
 darkenMap();
 progBalloon();
+bnumSale();
 updateCountdown();
 setInterval(updateCountdown, 1000);
 requestAnimationFrame(function(){ moveThumb(); onScroll(); updateFlight(); });

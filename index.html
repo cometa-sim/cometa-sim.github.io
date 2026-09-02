@@ -341,7 +341,7 @@
   <section class="burst">
     <div class="rings" aria-hidden="true"><span class="ring"></span><span class="ring"></span><span class="ring"></span></div>
     <div class="wrap">
-      <div class="bnum reveal"><span class="scr">37–38</span> km</div>
+      <div class="bnum reveal"><span id="bnumN">37+</span> km</div>
       <div class="blbl reveal d1" data-i18n="burstLbl">Quota di scoppio prevista</div>
     </div>
   </section>
@@ -604,11 +604,12 @@
         <i class="bk tl"></i><i class="bk tr"></i><i class="bk bl"></i><i class="bk br"></i>
         <div class="stat-grid">
           <div class="stat"><div class="sl" data-i18n="wTraj">Traiettorie simulate</div><div class="sv"><span class="scr">600</span></div></div>
-          <div class="stat"><div class="sl" data-i18n="wDrift">Deriva media</div><div class="sv"><span class="scr">180</span> <small>km</small></div></div>
+          <div class="stat"><div class="sl" data-i18n="wDrift">Deriva tipica</div><div class="sv"><span class="scr">173</span> <small>km</small></div></div>
           <div class="stat"><div class="sl" data-i18n="wBearing">Rotta media</div><div class="sv"><span class="scr">93°</span> <small><span data-i18n="wBearingU">(est)</span></small></div></div>
           <div class="stat"><div class="sl" data-i18n="wDur">Durata media</div><div class="sv"><span class="scr">177</span> <small>min</small></div></div>
         </div>
       </div>
+      <p class="fig-note reveal d2" data-i18n="wStatNote"></p>
     </div>
   </section>
 
@@ -618,12 +619,12 @@
       <div class="body-col reveal d1">
         <p data-i18n-html="wSimP1">Abbiamo simulato il volo della sonda nel periodo <strong>15 settembre – 15 ottobre</strong>, un lancio al giorno, per quattro anni diversi: 2021-2024. Centoventi date, ripetute per due punti di partenza — <strong>Durazno</strong> e <strong>Mercedes</strong> — per un totale di 240 voli simulati.</p>
         <p data-i18n-html="wSimP2">Ogni punto sulla mappa è l'atterraggio di uno di questi voli. Le ellissi riassumono la dispersione: partendo dallo stesso luogo in quello stesso periodo dell'anno, un nuovo lancio avrebbe circa il <strong>50 % di probabilità di cadere nell'ellisse piccola</strong> e il <strong>90 % nell'ellisse grande</strong>.</p>
-        <p data-i18n-html="wSimP3"></p>
       </div>
 
       <div class="body-col reveal d2" style="margin-top:26px">
         <h3 class="sub-head" data-i18n="wParH">I parametri del calcolo</h3>
         <p data-i18n-html="wParP"></p>
+        <p data-i18n-html="wParP2"></p>
       </div>
 
       <div class="map-frame reveal d1">
@@ -643,40 +644,42 @@
     <div class="wrap">
       <div class="kicker reveal" data-i18n="wStagH">La stagione conta</div>
       <div class="body-col reveal d1"><p data-i18n="wStagP"></p></div>
-      <div class="table-wrap reveal d1" style="max-width:44ch">
-        <table>
-          <thead><tr>
-            <th scope="col" data-i18n="wStPer">Periodo</th>
-            <th scope="col" data-i18n="wStDrift">Deriva mediana</th>
-          </tr></thead>
-          <tbody>
-            <tr><td data-i18n="wSt1">10–19 settembre</td><td class="mono">173 km</td></tr>
-            <tr><td data-i18n="wSt2">20–29 settembre</td><td class="mono">176 km</td></tr>
-            <tr><td data-i18n="wSt3">30 settembre – 9 ottobre</td><td class="mono">176 km</td></tr>
-            <tr><td data-i18n="wSt4">10–19 ottobre</td><td class="mono">156 km</td></tr>
-            <tr><td data-i18n="wSt5">20–29 ottobre</td><td class="mono">114 km</td></tr>
-            <tr><td data-i18n="wSt6">30 ottobre – 8 novembre</td><td class="mono">76 km</td></tr>
-          </tbody>
-        </table>
-      </div>
+      <figure class="graf reveal d1">
+        <svg viewBox="0 0 520 224" role="img" aria-labelledby="grafAlt">
+          <title id="grafAlt" data-i18n="wGAlt">La deriva tipica scende da 173 km a metà settembre a 76 km a fine ottobre.</title>
+          <line class="gg" x1="52" y1="190.0" x2="512" y2="190.0"/>
+          <text class="gy" x="44" y="193.5">0</text>
+          <line class="gg" x1="52" y1="147.5" x2="512" y2="147.5"/>
+          <text class="gy" x="44" y="151.0">50</text>
+          <line class="gg" x1="52" y1="105.0" x2="512" y2="105.0"/>
+          <text class="gy" x="44" y="108.5">100</text>
+          <line class="gg" x1="52" y1="62.5" x2="512" y2="62.5"/>
+          <text class="gy" x="44" y="66.0">150</text>
+          <line class="gg" x1="52" y1="20.0" x2="512" y2="20.0"/>
+          <text class="gy" x="44" y="23.5">200</text>
+          <text class="gy gu" x="44" y="14">km</text>
+          <polyline class="gl" points="60,43.0 148,40.4 236,40.4 324,57.4 412,93.1 500,125.4"/>
+            <circle class="gp" cx="60" cy="43.0" r="4.5"><title>173 km</title></circle>
+            <circle class="gp" cx="148" cy="40.4" r="4.5"><title>176 km</title></circle>
+            <circle class="gp" cx="236" cy="40.4" r="4.5"><title>176 km</title></circle>
+            <circle class="gp" cx="324" cy="57.4" r="4.5"><title>156 km</title></circle>
+            <circle class="gp" cx="412" cy="93.1" r="4.5"><title>114 km</title></circle>
+            <circle class="gp" cx="500" cy="125.4" r="4.5"><title>76 km</title></circle>
+          <text class="gv gv-start" x="72" y="34">173</text>
+          <text class="gv gv-end" x="500" y="145">76</text>
+            <text class="gx" x="60" y="212" data-i18n="wGx1">10 set</text>
+            <text class="gx" x="148" y="212" data-i18n="wGx2">20 set</text>
+            <text class="gx" x="236" y="212" data-i18n="wGx3">30 set</text>
+            <text class="gx" x="324" y="212" data-i18n="wGx4">10 ott</text>
+            <text class="gx" x="412" y="212" data-i18n="wGx5">20 ott</text>
+            <text class="gx" x="500" y="212" data-i18n="wGx6">30 ott</text>
+        </svg>
+        <figcaption class="fig-note" data-i18n="wGCap"></figcaption>
+      </figure>
       <div class="body-col reveal d2" style="margin-top:24px"><p data-i18n-html="wStagP2"></p></div>
     </div>
   </section>
 
-  <section class="section tight">
-    <div class="wrap">
-      <div class="kicker reveal" data-i18n="wOpH">Le conclusioni operative</div>
-      <div class="body-col reveal d1">
-        <p data-i18n="wOpP"></p>
-        <ul class="plain">
-          <li data-i18n-html="wOp1"></li>
-          <li data-i18n-html="wOp2"></li>
-          <li data-i18n-html="wOp3"></li>
-        </ul>
-        <p data-i18n-html="wOpP2"></p>
-      </div>
-    </div>
-  </section>
 
     <section class="section tight">
     <div class="wrap">
@@ -705,7 +708,6 @@
         <p data-i18n-html="wA4P"></p>
         <p data-i18n-html="wA4P2"></p>
         <p data-i18n-html="wA4P3"></p>
-        <p data-i18n-html="wA4P4"></p>
       </div>
     </div>
   </section>

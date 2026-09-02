@@ -186,11 +186,13 @@ discussione che li giustifica: la chiave `wParP` per i parametri della
 simulazione, e le chiavi `wA4P`…`wA4P4` per il bilancio d'incertezza.
 
 Nelle due animazioni con la scala — la pagina iniziale e la fisica — il
-punto di scoppio è un numero tondo, **38 km**, che sta nella costante
-`SCALA_KM` di `assets/app.js`. È un fondo scala, non una dichiarazione:
-non compare in nessuna etichetta né didascalia. La cifra grande in fondo
-a Missione dice `37–38 km`, che è l'intervallo effettivo dei voli
-simulati, e la tappa 06 della fisica dice `37+ km`.
+punto di scoppio è un numero tondo, **38 km**, nella costante `SCALA_KM`
+di `assets/app.js`. È un fondo scala, non una dichiarazione, e non
+compare in nessuna etichetta: il contatore che segue la salita mostra i
+decimali fino a 37 e poi si ferma su `37+`, con la funzione
+`quotaLetta()`. La cifra grande in fondo a Missione fa la stessa cosa —
+sale con i decimali e resta `37+` — e la tappa 06 della fisica dice
+`37+ km`.
 
 Quando il calcolo verrà rifatto, i posti da toccare sono tre: la
 costante in `app.js`, `wParP` e il blocco `wA4P` in `i18n.js`.
