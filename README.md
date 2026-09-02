@@ -53,11 +53,11 @@ Norme e autorizzazioni · Domande · Chi siamo.
 ### Dopo ogni modifica: il numero di versione
 
 In `index.html` i cinque file di `assets/` sono richiamati con un numero in
-coda — oggi `?v=77`:
+coda — oggi `?v=80`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=77">
-<script src="assets/i18n.js?v=77"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=80">
+<script src="assets/i18n.js?v=80"></script>
 ```
 
 Serve a costringere il browser a riscaricarli. **Chi modifica un file in
@@ -279,3 +279,20 @@ Codice: MIT (vedi `LICENSE`). Testi e immagini: CC BY 4.0.
 I materiali di terze parti — Three.js, Leaflet, OpenStreetMap, Open-Meteo,
 i caratteri — sono elencati con le rispettive licenze nella sezione 3 del
 `LICENSE`.
+
+## I dati dello studio dei venti
+
+`dati/atterraggi.csv` è l'uscita della simulazione: una riga per volo, 600 in
+tutto, con sito, data, coordinate di atterraggio, deriva, rotta, durata e quota
+di scoppio. Tutti i numeri pubblicati nella pagina dei venti vengono da qui, e
+si ricalcolano con qualunque strumento sappia leggere un CSV.
+
+I sei punti dei due grafici sono le **medie** su blocchi di dieci giorni
+(10-19 set, 20-29 set, 30 set-9 ott, 10-19 ott, 20-29 ott, 30 ott-8 nov),
+calcolate su tutti i 600 voli, senza filtrare per `stato`. Le schede in cima
+alla pagina si riferiscono invece ai soli primi tre blocchi, cioè al periodo
+10 settembre - 9 ottobre, quello della data prevista di lancio.
+
+Se la simulazione viene rifatta, si sostituisce il file e si ricalcolano i
+dodici numeri; le coordinate delle spezzate stanno in `index.html`, dentro le
+due `<figure class="graf">`.
