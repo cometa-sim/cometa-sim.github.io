@@ -42,7 +42,7 @@ const PARTS = [
   it:"400 V a bordo: la sorgente di guasto più pericolosa. Optoaccoppiatore sulla linea impulsi e polyfuse sull'alimentazione. Tubo di vetro: imbottire su tutta la lunghezza.",
   es:"400 V a bordo: la fuente de falla más peligrosa. Optoacoplador en la línea de pulsos y polyfuse en la alimentación. Tubo de vidrio: acolcharlo en todo su largo.",
   en:"400 V aboard: the most dangerous failure source. Optocoupler on the pulse line and a polyfuse on the supply. Glass tube: pad it along its whole length."}},
-{id:2, deck:1, cat:"kit", x:48, y:58, z:0, w:103, d:41, h:28, g:126,
+{id:2, deck:1, cat:"kit", x:57, y:58, z:0, w:103, d:41, h:28, g:126,
  n:{it:"Power bank Space Cam", es:"Power bank Space Cam", en:"Space Cam power bank"},
  note:{
   it:"Misure reali. Cella 21700 Li-ion da 4500 mAh, 16,6 Wh. StratoFlights la fa volare in questa scatola: è un dato utile sulla temperatura interna.",
@@ -54,7 +54,7 @@ const PARTS = [
   it:"INCASSATO NELLA PARETE −X, la stessa della staffa ma a quota diversa: la staffa esce a z≈80, il PMS sta sul ripiano 1 (z 0-21). Faccia a filo esterno, perimetro sigillato con silicone NEUTRO, bocche sulla faccia stretta 50 × 21 inclinate in basso con visiera anti-ghiaccio. Ruotato 90°. Le pareti ±Y restano libere per le alette centrate, la +X per la camera. Sporge 8 mm all'interno, da fasciare con un collare di XPS. Ponte termico ~0,3 W.",
   es:"EMPOTRADO EN LA PARED −X, la misma que la ménsula pero a otra altura: la ménsula sale a z≈80, el PMS va en el estante 1 (z 0-21). Cara a ras del exterior, perímetro sellado con silicona NEUTRA, bocas en la cara angosta de 50 × 21 inclinadas hacia abajo con visera antihielo. Rotado 90°. Las paredes ±Y quedan libres para las aletas centradas, y la +X para la cámara. Sobresale 8 mm hacia adentro: envolverlo con un collar de XPS. Puente térmico ~0,3 W.",
   en:"RECESSED INTO THE −X WALL, the same one as the bracket but at a different height: the bracket exits at z≈80, the PMS sits on deck 1 (z 0-21). Face flush with the outside, perimeter sealed with NEUTRAL silicone, inlets on the narrow 50 × 21 face angled downwards with an anti-icing visor. Rotated 90°. The ±Y walls stay free for the centred fins, and +X for the camera. It protrudes 8 mm inwards and must be wrapped in an XPS collar. Thermal bridge ~0.3 W."}},
-{id:4, deck:1, cat:"alim", x:85, y:102, z:0, w:60, d:48, h:18, g:90,
+{id:4, deck:1, cat:"alim", x:86, y:100, z:0, w:60, d:48, h:18, g:90,
  n:{it:"Pacco 6 × AA litio L91", es:"Pack 6 × AA litio L91", en:"6 × AA lithium pack L91"},
  note:{
   it:"Massa pesante in basso. Fili saldati ai contatti e pile compresse con nastro: un micro-spostamento all'impatto riavvia il sistema.",
@@ -108,25 +108,25 @@ const PARTS = [
   it:"Isolamento guasti concentrato su una sola scheda: optoaccoppiatore del Geiger, polyfuse, driver MOSFET e morsettiere.",
   es:"Aislamiento de fallas concentrado en una sola placa: optoacoplador del Geiger, polyfuse, driver MOSFET y borneras.",
   en:"Fault isolation concentrated on a single board: the Geiger optocoupler, polyfuse, MOSFET driver and terminal blocks."}},
-{id:13, deck:3, cat:"kit", x:87, y:62, z:80, w:68, d:51, h:21, g:88,
+{id:13, deck:3, cat:"kit", x:87, y:79, z:80, w:68, d:51, h:21, g:88,
  n:{it:"SPOT Trace", es:"SPOT Trace", en:"SPOT Trace"},
  note:{
   it:"Misure reali, 87,9 g. Trasmette verso l'alto: niente sopra di lui. Copre la salita fino al limite COCOM.",
   es:"Medidas reales, 87,9 g. Transmite hacia arriba: nada por encima. Cubre el ascenso hasta el límite COCOM.",
   en:"Real measurements, 87.9 g. Transmits upwards: nothing above it. Covers the ascent up to the COCOM limit."}},
-{id:14, deck:3, cat:"pos", x:17, y:3, z:80, w:41, d:41, h:6, g:8,
+{id:14, deck:3, cat:"pos", x:24, y:90, z:80, w:41, d:41, h:6, g:8,
  n:{it:"GPS SAM-M8Q (principale)", es:"GPS SAM-M8Q (principal)", en:"SAM-M8Q GPS (main)"},
  note:{
   it:"Antenna integrata verso il cielo. Il polistirolo è trasparente alle radiofrequenze: non serve forare. Modo Airborne <1g salvato in flash.",
   es:"Antena integrada hacia el cielo. El poliestireno es transparente a las radiofrecuencias: no hace falta perforar. Modo Airborne <1g guardado en flash.",
   en:"Integrated antenna facing the sky. Polystyrene is transparent to radio frequencies: no need to drill. Airborne <1g mode saved to flash."}},
-{id:15, deck:3, cat:"pos", x:116, y:18, z:80, w:41, d:41, h:6, g:8,
+{id:15, deck:3, cat:"pos", x:116, y:20, z:80, w:41, d:41, h:6, g:8,
  n:{it:"GPS SAM-M8Q (livello 2)", es:"GPS SAM-M8Q (nivel 2)", en:"SAM-M8Q GPS (level 2)"},
  note:{
   it:"MONTATO, non di scorta: è il GPS dell'Adalogger. Quota e istante di scoppio registrati su due catene che non condividono nulla.",
   es:"MONTADO, no de repuesto: es el GPS del Adalogger. Altura e instante del reventado registrados en dos cadenas que no comparten nada.",
   en:"FITTED, not a spare: it is the Adalogger's GPS. Altitude and burst instant recorded on two chains that share nothing."}},
-{id:16, deck:3, cat:"atmo", x:61, y:3, z:80, w:25, d:17, h:3, g:3,
+{id:16, deck:3, cat:"atmo", x:14, y:10, z:80, w:25, d:17, h:3, g:3,
  n:{it:"MS8607 p/T/RH", es:"MS8607 p/T/HR", en:"MS8607 p/T/RH"},
  note:{
   it:"Fondo scala 10 hPa: dato valido fino a ~31 km. Sopra, l'altimetria è solo GPS.",
@@ -138,13 +138,13 @@ const PARTS = [
   it:"Sotto la finestra in PTFE sul coperchio: il PTFE diffonde la luce e riduce la dipendenza dall'angolo su una sonda che ruota; policarbonato e acrilico assorbono l'UV. Banda singola UVA: NON consente di ricavare l'ozono.",
   es:"Bajo la ventana de PTFE en la tapa: el PTFE difunde la luz y reduce la dependencia del ángulo en una sonda que rota; el policarbonato y el acrílico absorben el UV. Banda única UVA: NO permite deducir el ozono.",
   en:"Under the PTFE window on the lid: PTFE diffuses the light and reduces the angular dependence on a rotating probe; polycarbonate and acrylic absorb UV. Single UVA band: it does NOT allow ozone to be derived."}},
-{id:18, deck:3, cat:"pos", x:87, y:42, z:80, w:26, d:18, h:5, g:3,
+{id:18, deck:3, cat:"pos", x:63, y:13, z:80, w:26, d:18, h:5, g:3,
  n:{it:"ICM-20948 IMU", es:"ICM-20948 IMU", en:"ICM-20948 IMU"},
  note:{
   it:"Il ripiano più lontano dai pacchi pile e dai cavi di potenza: il magnetometro va calibrato hard/soft iron a sonda chiusa.",
   es:"El estante más lejano de los packs de pilas y de los cables de potencia: el magnetómetro se calibra hard/soft iron con la sonda cerrada.",
   en:"The deck farthest from the battery packs and power cables: the magnetometer must be hard/soft-iron calibrated with the probe closed."}},
-{id:20, deck:3, cat:"alim", x:75, y:22, z:80, w:18, d:18, h:8, g:5,
+{id:20, deck:3, cat:"alim", x:44, y:4, z:80, w:18, d:18, h:8, g:5,
  n:{it:"MPM3610 buck 5 V", es:"MPM3610 buck 5 V", en:"MPM3610 buck 5 V"},
  note:{
   it:"Da 9-10,8 V a 5 V. Senza questo il Teensy, che accetta al massimo 5,5 V, si distrugge.",
@@ -168,7 +168,7 @@ const PARTS = [
   it:"In punta al braccetto, in aria libera e senza schermatura completa: è il TERMINE DI PARAGONE del tubo aspirato. Da verniciare di BIANCO OPACO, non lasciare l'acciaio lucido: il metallo riflette bene il sole ma irradia male, mentre il bianco opaco riflette e irradia. Il piattino ripara solo dall'alto, perché la sonda ruota e il sole arriva da ogni azimut: il bias residuo si dichiara e il tubo dice quanto vale.",
   es:"En la punta del brazo, en aire libre y sin blindaje completo: es el TÉRMINO DE COMPARACIÓN del tubo. Pintarlo de BLANCO MATE, no dejar el acero pulido: el metal refleja bien el sol pero irradia mal, mientras que el blanco mate refleja e irradia. El platillo protege solo desde arriba, porque la sonda rota y el sol llega desde cualquier azimut: el sesgo residual se declara y el tubo dice cuánto vale.",
   en:"At the tip of the arm, in free air and without full shielding: it is the REFERENCE against which the aspirated tube is judged. Paint it MATT WHITE, do not leave the steel polished: metal reflects the sun well but radiates poorly, whereas matt white both reflects and radiates. The small plate shields only from above, because the probe rotates and the sun arrives from every azimuth: the residual bias is declared, and the tube tells you how large it is."}},
-{id:26, deck:3, cat:"atmo", x:-79, y:51, z:7, w:10, d:8, h:8, g:19,
+{id:26, deck:3, cat:"atmo", x:-88, y:51, z:41, w:10, d:8, h:8, g:19,
  n:{it:"PT1000 nel tubo (confronto)", es:"PT1000 en el tubo (comparación)", en:"PT1000 in the tube (comparison)"},
  note:{
   it:"Condotto INTERAMENTE ESTERNO con CURVA A 90°, orientato verso il vento relativo della salita: PRESA RIVOLTA IN ALTO, gomito in basso con foro di scarico da 2 mm nel punto più basso, sensore nel tratto ORIZZONTALE a valle del gomito, uscita laterale inclinata in basso. In salita l'aria investe la sonda dall'alto: entra dalla presa, svolta il gomito; le goccioline sopraffuse (St≈0,5 a 20 µm) non svoltano, impattano e drenano. In discesa il flusso si inverte e la separazione non opera: dato dichiarato non protetto, come per il PMS. Solo i fili entrano nella sonda, da un foro da 3 mm sigillato: nessun ponte termico.",
@@ -180,7 +180,7 @@ const PARTS = [
   it:"Incollato alla faccia interna della parete: misura la temperatura della cassa. I quattro DS18B20 condividono un solo pin (bus 1-Wire, pull-up 4,7 kΩ verso 3,3 V).",
   es:"Pegado a la cara interna de la pared: mide la temperatura de la caja. Los cuatro DS18B20 comparten un solo pin (bus 1-Wire, pull-up de 4,7 kΩ a 3,3 V).",
   en:"Glued to the inner face of the wall: it measures the temperature of the shell. The four DS18B20 share a single pin (1-Wire bus, 4.7 kΩ pull-up to 3.3 V)."}},
-{id:28, deck:1, cat:"atmo", x:115, y:115, z:18, w:10, d:4, h:6, g:1,
+{id:28, deck:1, cat:"atmo", x:116, y:118, z:18, w:10, d:4, h:6, g:1,
  n:{it:"DS18B20 — pacco pile", es:"DS18B20 — paquete de pilas", en:"DS18B20 — battery pack"},
  note:{
   it:"Sul pacco principale: la capacità delle L91 dipende dalla temperatura, ed è questo dato — con la prova in congelatore — a dire se un riscaldamento sarà necessario.",
@@ -365,22 +365,24 @@ function buildScene(){
     if(tp){
       const tm = new THREE.MeshStandardMaterial({color:0x9FB0BF, roughness:.6, metalness:.2,
         transparent:true, opacity:.55, side:THREE.DoubleSide});
-      const yy = tp.y + tp.d/2, zh = tp.z + tp.h/2, zc = zh + 34, XT = -WALL - 24;
-      const th = new THREE.Mesh(new THREE.CylinderGeometry(6*S, 6*S, 40*S, 16), tm);
-      th.rotation.z = Math.PI/2; th.position.copy(V(XT - 20, yy, zh)); extHW.add(th);
-      const elb = new THREE.Mesh(new THREE.SphereGeometry(6.5*S, 14, 12), tm);
-      elb.position.copy(V(XT, yy, zh)); extHW.add(elb);
+      const yy = 55, XT = -WALL - 24, zEl = 45;
+      /* Tratto verticale di PRESA: bocca aperta in alto, scende fino al gomito */
       const tv = new THREE.Mesh(new THREE.CylinderGeometry(6*S, 6*S, 72*S, 16), tm);
-      tv.position.copy(V(XT, yy, zc)); extHW.add(tv);
+      tv.position.copy(V(XT, yy, zEl + 36)); extHW.add(tv);
+      const elb = new THREE.Mesh(new THREE.SphereGeometry(6.5*S, 14, 12), tm);
+      elb.position.copy(V(XT, yy, zEl)); extHW.add(elb);
+      /* Tratto ORIZZONTALE: il sensore n. 26 sta qui, a valle della curva */
+      const th = new THREE.Mesh(new THREE.CylinderGeometry(6*S, 6*S, 40*S, 16), tm);
+      th.rotation.z = Math.PI/2; th.position.copy(V(XT - 20, yy, zEl)); extHW.add(th);
       const hm3 = new THREE.MeshStandardMaterial({color:0x1a2733, roughness:.8, side:THREE.DoubleSide});
       const inlet = new THREE.Mesh(new THREE.CylinderGeometry(6*S, 6*S, 3*S, 16), hm3);
-      inlet.position.copy(V(XT, yy, zc + 36)); holes.add(inlet);
+      inlet.position.copy(V(XT, yy, zEl + 73)); holes.add(inlet);
       const outlet = new THREE.Mesh(new THREE.CylinderGeometry(6*S, 6*S, 3*S, 16), hm3);
-      outlet.rotation.z = Math.PI/2; outlet.position.copy(V(XT - 41, yy, zh)); holes.add(outlet);
+      outlet.rotation.z = Math.PI/2; outlet.position.copy(V(XT - 41, yy, zEl)); holes.add(outlet);
       const drain = new THREE.Mesh(new THREE.CylinderGeometry(1.6*S, 1.6*S, 4*S, 10), hm3);
-      drain.position.copy(V(XT, yy, zh - 7)); holes.add(drain);
+      drain.position.copy(V(XT, yy, zEl - 7)); holes.add(drain);
       const wire = new THREE.Mesh(new THREE.CylinderGeometry(1.5*S, 1.5*S, WALL*S, 10), hm3);
-      wire.rotation.z = Math.PI/2; wire.position.copy(V(-WALL/2, yy, zc)); holes.add(wire);
+      wire.rotation.z = Math.PI/2; wire.position.copy(V(-WALL/2, yy, zEl)); holes.add(wire);
     }
 
     /* Obiettivo della camera e passaggio del cavo */
@@ -507,8 +509,9 @@ function loop(){
 
   groups.forEach(g => {
     const p = g.userData.part;
-    g.position.y = g.userData.y0 + (p.deck - 1)*ex*.9;
-    g.visible = banco && state.decks[p.deck - 1];
+    const fuori = EXT_IDS.indexOf(p.id) >= 0;
+    g.position.y = g.userData.y0 + (fuori ? 0 : (p.deck - 1)*ex*.9);
+    g.visible = banco && (fuori || state.decks[p.deck - 1]);
     const on = (state.sel && state.sel.id === p.id) || (state.hover && state.hover.id === p.id);
     g.userData.side.opacity = state.sel ? (state.sel.id === p.id ? 1 : .3) : (on ? 1 : .94);
     g.userData.side.emissive.set(on ? PAL[p.cat] : 0x000000);
