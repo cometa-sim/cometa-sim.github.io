@@ -168,7 +168,7 @@ const PARTS = [
   it:"In punta al braccetto, in aria libera e senza schermatura completa: è il TERMINE DI PARAGONE del tubo aspirato. Da verniciare di BIANCO OPACO, non lasciare l'acciaio lucido: il metallo riflette bene il sole ma irradia male, mentre il bianco opaco riflette e irradia. Il piattino ripara solo dall'alto, perché la sonda ruota e il sole arriva da ogni azimut: il bias residuo si dichiara e il tubo dice quanto vale.",
   es:"En la punta del brazo, en aire libre y sin blindaje completo: es el TÉRMINO DE COMPARACIÓN del tubo. Pintarlo de BLANCO MATE, no dejar el acero pulido: el metal refleja bien el sol pero irradia mal, mientras que el blanco mate refleja e irradia. El platillo protege solo desde arriba, porque la sonda rota y el sol llega desde cualquier azimut: el sesgo residual se declara y el tubo dice cuánto vale.",
   en:"At the tip of the arm, in free air and without full shielding: it is the REFERENCE against which the aspirated tube is judged. Paint it MATT WHITE, do not leave the steel polished: metal reflects the sun well but radiates poorly, whereas matt white both reflects and radiates. The small plate shields only from above, because the probe rotates and the sun arrives from every azimuth: the residual bias is declared, and the tube tells you how large it is."}},
-{id:26, deck:3, cat:"atmo", x:-88, y:51, z:41, w:10, d:8, h:8, g:19,
+{id:26, deck:3, cat:"atmo", x:-79, y:51, z:7, w:10, d:8, h:8, g:19,
  n:{it:"PT1000 nel tubo (confronto)", es:"PT1000 en el tubo (comparación)", en:"PT1000 in the tube (comparison)"},
  note:{
   it:"Condotto INTERAMENTE ESTERNO con CURVA A 90°, orientato verso il vento relativo della salita: PRESA RIVOLTA IN ALTO, gomito in basso con foro di scarico da 2 mm nel punto più basso, sensore nel tratto ORIZZONTALE a valle del gomito, uscita laterale inclinata in basso. In salita l'aria investe la sonda dall'alto: entra dalla presa, svolta il gomito; le goccioline sopraffuse (St≈0,5 a 20 µm) non svoltano, impattano e drenano. In discesa il flusso si inverte e la separazione non opera: dato dichiarato non protetto, come per il PMS. Solo i fili entrano nella sonda, da un foro da 3 mm sigillato: nessun ponte termico.",
@@ -365,20 +365,20 @@ function buildScene(){
     if(tp){
       const tm = new THREE.MeshStandardMaterial({color:0x9FB0BF, roughness:.6, metalness:.2,
         transparent:true, opacity:.55, side:THREE.DoubleSide});
-      const yy = tp.y + tp.d/2, zc = tp.z + 4, XT = -WALL - 24;
+      const yy = tp.y + tp.d/2, zh = tp.z + tp.h/2, zc = zh + 34, XT = -WALL - 24;
       const th = new THREE.Mesh(new THREE.CylinderGeometry(6*S, 6*S, 40*S, 16), tm);
-      th.rotation.z = Math.PI/2; th.position.copy(V(XT - 20, yy, zc - 34)); extHW.add(th);
+      th.rotation.z = Math.PI/2; th.position.copy(V(XT - 20, yy, zh)); extHW.add(th);
       const elb = new THREE.Mesh(new THREE.SphereGeometry(6.5*S, 14, 12), tm);
-      elb.position.copy(V(XT, yy, zc - 34)); extHW.add(elb);
+      elb.position.copy(V(XT, yy, zh)); extHW.add(elb);
       const tv = new THREE.Mesh(new THREE.CylinderGeometry(6*S, 6*S, 72*S, 16), tm);
       tv.position.copy(V(XT, yy, zc)); extHW.add(tv);
       const hm3 = new THREE.MeshStandardMaterial({color:0x1a2733, roughness:.8, side:THREE.DoubleSide});
       const inlet = new THREE.Mesh(new THREE.CylinderGeometry(6*S, 6*S, 3*S, 16), hm3);
-      inlet.rotation.z = Math.PI/2; inlet.position.copy(V(XT - 41, yy, zc - 34)); holes.add(inlet);
+      inlet.position.copy(V(XT, yy, zc + 36)); holes.add(inlet);
       const outlet = new THREE.Mesh(new THREE.CylinderGeometry(6*S, 6*S, 3*S, 16), hm3);
-      outlet.position.copy(V(XT, yy, zc + 36)); holes.add(outlet);
+      outlet.rotation.z = Math.PI/2; outlet.position.copy(V(XT - 41, yy, zh)); holes.add(outlet);
       const drain = new THREE.Mesh(new THREE.CylinderGeometry(1.6*S, 1.6*S, 4*S, 10), hm3);
-      drain.position.copy(V(XT, yy, zc - 41)); holes.add(drain);
+      drain.position.copy(V(XT, yy, zh - 7)); holes.add(drain);
       const wire = new THREE.Mesh(new THREE.CylinderGeometry(1.5*S, 1.5*S, WALL*S, 10), hm3);
       wire.rotation.z = Math.PI/2; wire.position.copy(V(-WALL/2, yy, zc)); holes.add(wire);
     }
