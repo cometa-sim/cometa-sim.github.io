@@ -192,7 +192,7 @@ const PARTS = [
   it:"Sospeso a metà altezza, lontano da ogni componente: misura l'ARIA interna, non una scheda. Con uno scarto di ~40 K fra modello stazionario e dato di volo, il profilo termico interno è fra le misure più interessanti del volo.",
   es:"Suspendido a media altura, lejos de todo componente: mide el AIRE interior, no una placa. Con una diferencia de ~40 K entre el modelo estacionario y el dato de vuelo, el perfil térmico interno está entre las medidas más interesantes del vuelo.",
   en:"Suspended at mid-height, away from every component: it measures the internal AIR, not a board. With a spread of about 40 K between the steady-state model and the flight data, the internal thermal profile is among the most interesting measurements of the flight."}},
-{id:30, deck:1, cat:"atmo", x:122, y:27, z:7, w:10, d:4, h:6, g:1,
+{id:30, deck:1, cat:"atmo", x:125, y:10, z:7, w:10, d:4, h:6, g:1,
  n:{it:"DS18B20 — SCD30", es:"DS18B20 — SCD30", en:"DS18B20 — SCD30"},
  note:{
   it:"A contatto con l'SCD30: fornisce l'offset di autoriscaldamento e la temperatura del gas per la correzione di densità dell'NDIR — le ppm richiedono T e p del gas effettivamente misurato.",
