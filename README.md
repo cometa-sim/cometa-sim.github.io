@@ -21,7 +21,9 @@ assets/i18n.js                      i testi in italiano, spagnolo e inglese
 assets/sonda.js                     i 26 componenti + il modello 3D (Three.js)
 assets/catena.js                    la catena di volo in 3D, nella pagina Missione
 assets/app.js                       lingua, navigazione, salita, fisica, conto alla rovescia
+assets/previsione.js                la previsione del giorno (Tawhiri), nello studio dei venti
 assets/vendor/three.min.js          Three.js r128, copia locale (vedi sotto)
+assets/vendor/leaflet/              Leaflet 1.9.4, copia locale, per la previsione del giorno
 
 assets/img/cometa-logo.png          marchio COMETA, fondo trasparente
 assets/img/sim-logo.png             stemma della Scuola, fondo trasparente
@@ -30,6 +32,7 @@ assets/img/zona-exclusion-dinacia.jpg   area di esclusione aeronautica
 assets/img/og.png                   anteprima per social e messaggistica
 
 mappe/uru2000_footprint.html        mappa generata da cometa_venti.py — NON modificare a mano
+calcolo/cometa_venti.py             lo script della simulazione e della previsione
 
 LICENSE · README.md · .gitignore
 ```
@@ -52,12 +55,12 @@ Norme e autorizzazioni · Domande · Chi siamo.
 
 ### Dopo ogni modifica: il numero di versione
 
-In `index.html` i cinque file di `assets/` sono richiamati con un numero in
-coda — oggi `?v=86`:
+In `index.html` i sei file di `assets/` sono richiamati con un numero in
+coda — oggi `?v=87`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=86">
-<script src="assets/i18n.js?v=86"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=87">
+<script src="assets/i18n.js?v=87"></script>
 ```
 
 Serve a costringere il browser a riscaricarli. **Chi modifica un file in
@@ -234,6 +237,37 @@ siti di partenza, i 600 atterraggi, le ellissi: il file resta com'è.
 Lo script produce un nome che contiene la data della corsa
 (`010926_footprint.html`): rinominarlo in `uru2000_footprint.html`, che è
 il nome che `index.html` cerca.
+
+### La previsione del giorno
+
+In fondo allo studio dei venti c'è la previsione per i prossimi giorni.
+Il browser di chi guarda chiede a **Tawhiri**, il predittore di
+traiettorie di [SondeHub](https://sondehub.org/), la traiettoria prevista
+dai due siti di lancio sui venti dell'ultima corsa del modello **GFS**
+della NOAA, e la disegna sulla mappa. Nessun server nostro, niente di
+salvato: la pagina resta statica.
+
+Tawhiri integra solo i venti. Quota di scoppio e velocità di discesa le
+diamo noi: i valori proposti nel modulo (5 m/s, 37,8 km, 4,7 m/s) sono
+quelli della simulazione, scritti in `index.html` nei campi `twAsc`,
+`twBurst`, `twDesc`. Quando la chiave `wParP2` cambia, vanno allineati.
+
+La previsione copre circa una settimana: il calendario del modulo si
+apre solo su quei giorni. Il giorno proposto è la data di `LAUNCH` in
+`assets/app.js`, quando ci rientra, altrimenti domani.
+
+I siti, i colori e l'area di esclusione sono ripetuti in cima a
+`assets/previsione.js`, e sono gli stessi di `cometa_venti.py`: se si
+cambia un sito, va cambiato nei due posti.
+
+Lo stesso calcolo si fa dal terminale, con i parametri del pallone:
+
+```
+python3 calcolo/cometa_venti.py --tawhiri --pallone 2000 --payload 1.5 --lancio 2026-10-07T11:00 --giorni-prev 3 --html
+```
+
+Leaflet (`assets/vendor/leaflet/`) si scarica solo quando la mappa entra
+nello schermo.
 
 ### Three.js
 

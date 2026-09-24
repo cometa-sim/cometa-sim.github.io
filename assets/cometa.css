@@ -563,6 +563,57 @@ tbody tr:hover td{background:rgba(95,227,255,.04)}
 td.durazno{color:var(--durazno)}
 td.mercedes{color:var(--mercedes)}
 
+/* Previsione del giorno (Tawhiri) — assets/previsione.js.
+   Mappa Leaflet disegnata direttamente nella pagina, non in un iframe:
+   lo sfondo si scurisce con lo stesso filtro della mappa storica. */
+.tw-form{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px;align-items:end;
+  margin-top:30px;padding:22px;border:1px solid var(--line-soft);border-radius:18px;background:var(--panel-solid)}
+.tw-f{display:flex;flex-direction:column;gap:8px;min-width:0;font-family:var(--mono);font-size:10.5px;
+  letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+.tw-f input{width:100%;min-width:0;padding:10px 12px;border:1px solid var(--line);border-radius:10px;
+  background:rgba(2,6,15,.6);color:var(--ink);font-family:var(--mono);font-size:15px;letter-spacing:0;
+  text-transform:none;color-scheme:dark}
+.tw-f input:hover{border-color:rgba(255,255,255,.22)}
+.tw-f input:focus{border-color:var(--cyan)}
+.tw-acts{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:12px;margin-top:4px}
+.tw-acts .btn[disabled]{opacity:.5;cursor:progress;transform:none}
+.tw-status{min-height:1.6em;margin-top:16px;font-family:var(--mono);font-size:12.5px;color:var(--muted)}
+.tw-status.err{color:var(--beacon)}
+.tw-res{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-top:6px}
+.tw-card{padding:20px 22px;border:1px solid var(--line-soft);border-top:2px solid var(--site,var(--cyan));
+  border-radius:16px;background:var(--panel-solid)}
+.tw-card h4{margin-bottom:10px;font-family:var(--disp);font-size:19px;font-weight:600;color:var(--site,var(--ink))}
+.tw-card dl{display:grid;grid-template-columns:auto 1fr;gap:7px 14px;margin:16px 0 14px}
+.tw-card dt{align-self:center;font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+.tw-card dd{text-align:right;font-family:var(--mono);font-size:13.5px;color:var(--ink);font-variant-numeric:tabular-nums}
+.tw-card a{font-size:13px;color:var(--cyan);text-decoration:none;border-bottom:1px solid rgba(95,227,255,.3)}
+.tw-card a:hover{border-bottom-color:var(--cyan)}
+.tw-err{font-size:13.5px;color:var(--beacon)}
+.tw-badge{display:inline-block;padding:3px 10px;border:1px solid currentColor;border-radius:999px;
+  font-family:var(--mono);font-size:11px;letter-spacing:.05em}
+.tw-badge.ok{color:var(--green)}
+.tw-badge.escl,.tw-badge.fuori{color:var(--beacon)}
+.tw-canvas{height:min(72vh,620px);background:#02060f}
+@media(max-width:720px){.tw-canvas{height:64vh}}
+.tw-map .leaflet-container{background:#02060f;font-family:var(--text)}
+.tw-map .leaflet-tile-pane{filter:invert(1) hue-rotate(180deg) brightness(.85) contrast(1.06) saturate(.55)}
+.tw-map .leaflet-container .leaflet-control-attribution{background:rgba(2,6,15,.72);color:var(--muted);font-size:10px}
+.tw-map .leaflet-control-attribution a{color:var(--cyan)}
+.tw-map .leaflet-bar a{background:#0b1726;color:var(--ink);border-color:rgba(255,255,255,.12)}
+.tw-map .leaflet-bar a:hover{background:#132234}
+.tw-map .leaflet-control-scale-line{background:rgba(2,6,15,.72);color:var(--ink);border-color:rgba(255,255,255,.25);
+  font-family:var(--mono);font-size:10px}
+.tw-map .leaflet-tooltip{background:#0b1726;color:var(--ink);border-color:rgba(255,255,255,.14);
+  box-shadow:0 8px 24px rgba(0,0,0,.45);font-family:var(--mono);font-size:11.5px}
+.tw-map .leaflet-tooltip-top:before{border-top-color:#0b1726}
+.tw-star{background:none;border:0}
+.tw-star span{display:block;font-size:22px;line-height:22px;text-align:center;
+  text-shadow:0 0 3px #02060f,0 0 10px currentColor}
+.tw-week .table-wrap{margin-top:26px}
+.tw-week th.durazno{color:var(--durazno)}
+.tw-week th.mercedes{color:var(--mercedes)}
+.tw-week tbody tr{cursor:pointer}
+
 /* ---------- 6. Chiusura ---------- */
 
 .about-body{font-size:clamp(18px,2.4vw,26px);line-height:1.5;max-width:26ch;font-family:var(--disp);font-weight:500}

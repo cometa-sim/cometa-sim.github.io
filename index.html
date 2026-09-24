@@ -23,7 +23,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@200;300;400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/cometa.css?v=86">
+<link rel="stylesheet" href="assets/cometa.css?v=87">
 </head>
 <body>
 
@@ -762,9 +762,55 @@
         <p data-i18n-html="wUseP1">Questa analisi serve a <strong>scegliere il luogo di partenza</strong>. Non dice dove cadrà la nostra sonda.</p>
         <p data-i18n-html="wUseP2">Per quello useremo uno strumento previsionale molto più preciso, che però funziona solo pochi giorni prima del lancio. Il luogo di lancio è condizionato anche dalle <a data-page="legale" tabindex="0">disposizioni delle autorità aeronautiche</a>.</p>
       </div>
+    </div>
+  </section>
+
+  <!-- Previsione del giorno: Tawhiri (SondeHub) sui venti NOAA GFS.
+       La logica sta in assets/previsione.js; Leaflet viene caricato
+       solo quando la mappa entra nello schermo. -->
+  <section class="section tight" id="v-previsione">
+    <div class="wrap">
+      <div class="kicker reveal" data-i18n="twHead">La previsione del giorno</div>
+      <div class="body-col reveal d1">
+        <p data-i18n-html="twP1"></p>
+        <p data-i18n-html="twP2"></p>
+      </div>
+
+      <form class="tw-form reveal d1" id="twForm" novalidate>
+        <label class="tw-f"><span data-i18n="twDate">Giorno</span><input type="date" id="twDate" required></label>
+        <label class="tw-f"><span data-i18n="twTime">Ora di lancio (Uruguay)</span><input type="time" id="twTime" value="09:00" step="900" required></label>
+        <label class="tw-f"><span data-i18n="twAsc">Salita · m/s</span><input type="number" id="twAsc" value="5" min="1" max="10" step="0.1" inputmode="decimal"></label>
+        <label class="tw-f"><span data-i18n="twBurst">Scoppio · km</span><input type="number" id="twBurst" value="37.8" min="10" max="45" step="0.1" inputmode="decimal"></label>
+        <label class="tw-f"><span data-i18n="twDesc">Discesa al suolo · m/s</span><input type="number" id="twDesc" value="4.7" min="1" max="15" step="0.1" inputmode="decimal"></label>
+        <div class="tw-acts">
+          <button type="submit" class="btn primary" data-i18n="twRun">Calcola le traiettorie</button>
+          <button type="button" class="btn" id="twWeekBtn" data-i18n="twWeek">Confronta i prossimi giorni</button>
+        </div>
+      </form>
+      <p class="tw-status" id="twStatus" role="status" aria-live="polite"></p>
+      <div class="tw-res" id="twRes"></div>
+
+      <div class="map-frame tw-map"><div class="tw-canvas" id="twMap"></div></div>
+      <div class="map-legend">
+        <span class="mark durazno" data-i18n="mDurazno">Partenza da Durazno</span>
+        <span class="mark mercedes" data-i18n="mMercedes">Partenza da Mercedes</span>
+        <span data-i18n="twLegend">Linea piena: salita · tratteggio: discesa · cerchio bianco: scoppio.</span>
+      </div>
+
+      <div class="tw-week" id="twWeekBox" hidden>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th data-i18n="twWDay">Giorno</th><th class="durazno">Durazno</th><th class="mercedes">Mercedes</th></tr></thead>
+            <tbody id="twWeekBody"></tbody>
+          </table>
+        </div>
+        <p class="fig-note" data-i18n="twWeekNote"></p>
+      </div>
+      <p class="fig-note" data-i18n="twNote"></p>
 
       <div class="sources reveal d2">
         <p data-i18n-html="srcMeteo"></p>
+        <p data-i18n-html="srcTw"></p>
         <p data-i18n-html="srcMap"></p>
         <p data-i18n-html="srcCalc"></p>
         <p data-i18n-html="srcExcl"></p>
@@ -993,9 +1039,10 @@
 
 </div>
 
-<script src="assets/i18n.js?v=86"></script>
-<script src="assets/sonda.js?v=86"></script>
-<script src="assets/catena.js?v=86"></script>
-<script src="assets/app.js?v=86"></script>
+<script src="assets/i18n.js?v=87"></script>
+<script src="assets/sonda.js?v=87"></script>
+<script src="assets/catena.js?v=87"></script>
+<script src="assets/app.js?v=87"></script>
+<script src="assets/previsione.js?v=87"></script>
 </body>
 </html>
