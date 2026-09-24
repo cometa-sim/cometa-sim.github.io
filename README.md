@@ -21,7 +21,7 @@ assets/i18n.js                      i testi in italiano, spagnolo e inglese
 assets/sonda.js                     i 26 componenti + il modello 3D (Three.js)
 assets/catena.js                    la catena di volo in 3D, nella pagina Missione
 assets/app.js                       lingua, navigazione, salita, fisica, conto alla rovescia
-assets/previsione.js                la previsione del giorno (Tawhiri), nello studio dei venti
+assets/previsione.js                prevedere il volo: pallone, partenza, Tawhiri
 assets/vendor/three.min.js          Three.js r128, copia locale (vedi sotto)
 assets/vendor/leaflet/              Leaflet 1.9.4, copia locale, per la previsione del giorno
 
@@ -37,7 +37,7 @@ calcolo/cometa_venti.py             lo script della simulazione e della previsio
 LICENSE · README.md · .gitignore
 ```
 
-Sezioni: Inizio · Missione · La fisica del volo · La sonda · Studio dei venti ·
+Sezioni: Inizio · Missione · La fisica del volo · La sonda · Studio della traiettoria ·
 Norme e autorizzazioni · Domande · Chi siamo.
 
 ## Dove si modificano le cose
@@ -56,11 +56,11 @@ Norme e autorizzazioni · Domande · Chi siamo.
 ### Dopo ogni modifica: il numero di versione
 
 In `index.html` i sei file di `assets/` sono richiamati con un numero in
-coda — oggi `?v=87`:
+coda — oggi `?v=88`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=87">
-<script src="assets/i18n.js?v=87"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=88">
+<script src="assets/i18n.js?v=88"></script>
 ```
 
 Serve a costringere il browser a riscaricarli. **Chi modifica un file in
@@ -238,32 +238,44 @@ Lo script produce un nome che contiene la data della corsa
 (`010926_footprint.html`): rinominarlo in `uru2000_footprint.html`, che è
 il nome che `index.html` cerca.
 
-### La previsione del giorno
+### Studio della traiettoria: prevedere il volo
 
-In fondo allo studio dei venti c'è la previsione per i prossimi giorni.
-Il browser di chi guarda chiede a **Tawhiri**, il predittore di
-traiettorie di [SondeHub](https://sondehub.org/), la traiettoria prevista
-dai due siti di lancio sui venti dell'ultima corsa del modello **GFS**
-della NOAA, e la disegna sulla mappa. Nessun server nostro, niente di
-salvato: la pagina resta statica.
+La pagina `#venti` si chiama «Studio della traiettoria» e ha un indice in
+cima, come Missione (`data-jump` verso `v-previsione`, `v-studio`,
+`v-calcolo`, `v-approx`). Prima viene lo strumento per prevedere il volo,
+poi lo studio dei venti che ci ha fatto scegliere il sito.
 
-Tawhiri integra solo i venti. Quota di scoppio e velocità di discesa le
-diamo noi: i valori proposti nel modulo (5 m/s, 37,8 km, 4,7 m/s) sono
-quelli della simulazione, scritti in `index.html` nei campi `twAsc`,
-`twBurst`, `twDesc`. Quando la chiave `wParP2` cambia, vanno allineati.
+Lo strumento sta tutto in `assets/previsione.js` e lavora nel browser di
+chi guarda, senza server nostri:
 
-La previsione copre circa una settimana: il calendario del modulo si
-apre solo su quei giorni. Il giorno proposto è la data di `LAUNCH` in
-`assets/app.js`, quando ci rientra, altrimenti domani.
+1. **Il pallone.** Da modello (1600 g, 2000 g o personalizzato),
+   payload, velocità di salita e paracadute calcola elio necessario,
+   portanza al collo, quota di scoppio e velocità di discesa al suolo.
+   È il porting delle funzioni di `cometa_venti.py` con l'atmosfera
+   standard, e dà gli stessi numeri. Quota di scoppio e discesa si
+   possono anche imporre a mano.
+2. **La partenza.** Si scrive una località (suggerimenti mentre si
+   scrive: prima Durazno e Mercedes, poi il geocoder di Open-Meteo),
+   oppure le coordinate, oppure si tocca la mappa o si usa la posizione
+   del telefono. La stella sulla mappa si può trascinare. L'ultimo luogo
+   scelto resta nel `localStorage` del dispositivo.
+3. **La traiettoria.** La chiede a **Tawhiri**, il predittore di
+   [SondeHub](https://sondehub.org/), sui venti dell'ultima corsa del
+   modello **GFS** della NOAA. La quota di partenza non la passiamo:
+   Tawhiri usa quella del terreno nel punto scelto, e la scheda la
+   mostra. «Confronta i prossimi giorni» ripete il calcolo per ogni
+   giorno della settimana coperta dalla previsione.
 
-I siti, i colori e l'area di esclusione sono ripetuti in cima a
-`assets/previsione.js`, e sono gli stessi di `cometa_venti.py`: se si
-cambia un sito, va cambiato nei due posti.
+Il giorno proposto è la data di `LAUNCH` in `assets/app.js`, quando cade
+nella settimana della previsione, altrimenti domani. L'area di esclusione
+e il contorno dell'Uruguay sono ripetuti in cima a `assets/previsione.js`
+e sono gli stessi di `cometa_venti.py`: se cambiano, vanno cambiati nei
+due posti. Così i preset dei palloni.
 
-Lo stesso calcolo si fa dal terminale, con i parametri del pallone:
+Lo stesso calcolo si fa dal terminale:
 
 ```
-python3 calcolo/cometa_venti.py --tawhiri --pallone 2000 --payload 1.5 --lancio 2026-10-07T11:00 --giorni-prev 3 --html
+python3 calcolo/cometa_venti.py --tawhiri --pallone 2000 --payload 1.5 --sito "Durazno,-33.38,-56.52" --lancio 2026-10-07T11:00 --giorni-prev 3 --html
 ```
 
 Leaflet (`assets/vendor/leaflet/`) si scarica solo quando la mappa entra
