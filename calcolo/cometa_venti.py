@@ -857,11 +857,7 @@ def get_args():
 # ==========================================================================
 def tabella_pallone(cfg):
     print("PRESTAZIONI DEL PALLONE")
-    if cfg.vrec:
-        print(f"  Velocita di salita consigliata: {cfg.vrec[0]}-{cfg.vrec[1]} m/s "
-              f"(minimo -> quota massima; massimo -> meno deriva)")
-    else:
-        print("  Velocita di salita consigliata: ~4-5 m/s (palloni piccoli), ~3-4 m/s (grandi)")
+    print("  Salita piu' lenta -> scoppio piu' alto ma volo piu' lungo e piu' deriva; piu' veloce -> meno deriva.")
     pmax=cfg.pmax or 2.0
     pls=[]; x=0.6
     while x<=pmax+1e-9: pls.append(round(x,2)); x+=0.2
@@ -888,11 +884,13 @@ def avvisi(cfg,V,burst,neck):
               f"(massa {cfg.massa} kg): impossibile salire a {cfg.vsalita} m/s.\n"); sys.exit(1)
     if cfg.pmax and cfg.payload>cfg.pmax:
         A.append(f"payload {cfg.payload*1000:.0f} g supera il massimo nominale del pallone ({cfg.pmax*1000:.0f} g).")
-    if cfg.vrec and not (cfg.vrec[0]<=cfg.vsalita<=cfg.vrec[1]):
-        A.append(f"velocita {cfg.vsalita} m/s fuori dal range consigliato per questo pallone "
-                 f"({cfg.vrec[0]}-{cfg.vrec[1]} m/s).")
+    # Gli stessi avvisi del sito (assets/traiettoria.js): solo cio' che compromette il volo.
     if cfg.vsalita<3:   A.append("salita <3 m/s: volo molto lungo, deriva ampia, rischio di galleggiamento.")
-    if cfg.vsalita>6:   A.append("salita >6 m/s: spreco di elio e quota di scoppio piu' bassa.")
+    if cfg.vatt>6:
+        m=getattr(cfg,"m_disc",cfg.payload)
+        d5=math.sqrt(8*m*G/(RHO0*(cfg.cd_paracadute or 1.0)*math.pi*25))
+        A.append(f"discesa al suolo {cfg.vatt:.1f} m/s: oltre 6 m/s l'urto rischia di danneggiare la sonda "
+                 f"(per 5 m/s serve un paracadute di almeno {d5:.1f} m).")
     if V>cfg.elio:      A.append(f"elio necessario {V*1000:.0f} L ({V:.2f} m3) SUPERA il disponibile "
                                  f"({cfg.elio:.2f} m3). Riduci payload o velocita'.")
     if burst<30000:     A.append(f"quota di scoppio attesa bassa ({burst/1000:.1f} km).")

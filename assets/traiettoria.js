@@ -52,7 +52,7 @@ if(!form || !$("#twWhere") || !$("#twBal")) return;
 const elWhere = $("#twWhere"), elSugg = $("#twSugg"), elGeo = $("#twGeo"),
       elDate = $("#twDate"), elTime = $("#twTime"),
       elBal = $("#twBal"), elDiam = $("#twDiam"), elMass = $("#twMass"), elPay = $("#twPay"),
-      elAsc = $("#twAsc"), elChute = $("#twChute"), elHeAv = $("#twHeAv"),
+      elAsc = $("#twAsc"), elChute = $("#twChute"),
       elBurst = $("#twBurst"), elDesc = $("#twDesc"), elWarn = $("#twWarn"),
       elStatus = $("#twStatus"), elRes = $("#twRes"), elMap = $("#twMap"),
       elWeekBtn = $("#twWeekBtn"), elWeekBox = $("#twWeekBox"), elWeekBody = $("#twWeekBody");
@@ -88,10 +88,13 @@ function el(tag, cls, text){
 const G = 9.80665, CD_ASC = 0.25, R_ARIA = 287.05, R_ELIO = 2077.1, P_STD = 101325, T_RIF = 288.15;
 const DRATIO = P_STD/(R_ARIA*T_RIF) - P_STD/(R_ELIO*T_RIF);   /* aria - elio a 15 °C, kg/m³ */
 const PRESET = {   /* StratoFlights; paracadute del kit: 1,2 m, Cd 1,0, 80 g */
-  "1600": {diam:11.1, mass:1.6, pmax:1.6, vmin:4, vmax:5},
-  "2000": {diam:12.5, mass:2.0, pmax:2.0, vmin:3, vmax:4}
+  "1600": {diam:11.1, mass:1.6, pmax:1.6},
+  "2000": {diam:12.5, mass:2.0, pmax:2.0}
 };
 const PARA_CD = 1.0, PARA_M = 0.08;
+/* Soglie degli avvisi. Discesa: oltre 6 m/s al suolo l'urto rischia di
+   rompere la sonda; il paracadute consigliato e' quello che da' 5 m/s. */
+const DESC_MAX = 6, DESC_OBJ = 5, ASC_MIN = 3, BURST_MIN = 30000;
 
 function densitaISA(h){
   let T, p;
@@ -129,6 +132,9 @@ function quotaScoppio(V, d){
 function vAtterraggio(m, d){
   return Math.sqrt(2*m*G/(RHO0*PARA_CD*Math.PI*(d/2)*(d/2)));
 }
+function diamPerDiscesa(m, v){      /* l'inversa: il paracadute che da' v al suolo */
+  return Math.sqrt(8*m*G/(RHO0*PARA_CD*Math.PI*v*v));
+}
 
 function readBalloon(){
   const pr = PRESET[elBal.value];
@@ -136,22 +142,24 @@ function readBalloon(){
     diam: pr ? pr.diam : parseFloat(elDiam.value),
     mass: pr ? pr.mass : parseFloat(elMass.value),
     pay: parseFloat(elPay.value), asc: parseFloat(elAsc.value),
-    chute: parseFloat(elChute.value), heAv: parseFloat(elHeAv.value), pr: pr
+    chute: parseFloat(elChute.value), pr: pr, warn: []
   };
-  if(!(b.diam > 0 && b.mass > 0 && b.pay > 0 && b.asc >= 1 && b.asc <= 10 && b.chute > 0)) return null;
+  /* Avvisi solo per cio' che compromette il volo: parametri mancanti o
+     incompatibili, peso eccessivo, salita troppo lenta, discesa troppo veloce. */
+  if(!(b.diam > 0 && b.mass > 0 && b.pay > 0 && b.asc >= 1 && b.asc <= 10 && b.chute > 0)){
+    b.warn.push(t("twWBad")); return b;
+  }
   b.V = volumePerSalita(b.mass, b.pay, b.asc);
-  b.warn = [];
   if(!b.V){ b.warn.push(t("twWHeavy")); return b; }
   b.burst = quotaScoppio(b.V, b.diam);
   b.neck = (b.V*DRATIO - b.mass)*1000;
   b.desc = vAtterraggio(b.pay + PARA_M, b.chute);
   if(pr && b.pay > pr.pmax + 1e-9) b.warn.push(t("twWPay").replace("{max}", Math.round(pr.pmax*1000)));
-  if(pr && (b.asc < pr.vmin || b.asc > pr.vmax))
-    b.warn.push(t("twWVel").replace("{a}", pr.vmin).replace("{b}", pr.vmax));
-  if(b.asc < 3) b.warn.push(t("twWSlow"));
-  if(b.asc > 6) b.warn.push(t("twWFast"));
-  if(b.heAv > 0 && b.V > b.heAv) b.warn.push(t("twWHe"));
-  if(b.burst < 30000) b.warn.push(t("twWBurst"));
+  if(b.burst < BURST_MIN) b.warn.push(t("twWBurst"));
+  if(b.asc < ASC_MIN) b.warn.push(t("twWSlow"));
+  const md = parseFloat(elDesc.value), desc = elDesc.value !== "" && md > 0 ? md : b.desc;
+  if(desc > DESC_MAX) b.warn.push(t("twWDesc").replace("{v}", num(desc, 1))
+    .replace("{d}", num(diamPerDiscesa(b.pay + PARA_M, DESC_OBJ), 1)));
   return b;
 }
 function renderBalloon(){
@@ -161,9 +169,9 @@ function renderBalloon(){
   const b = readBalloon();
   const set = function(id, v){ $(id).textContent = v; };
   elWarn.innerHTML = "";
-  if(!b || !b.V){
+  if(!b.V){
     ["#twCHe","#twCNeck","#twCBurst","#twCDesc"].forEach(function(id){ set(id, "—"); });
-    if(b) b.warn.forEach(function(w){ elWarn.appendChild(el("li", null, w)); });
+    b.warn.forEach(function(w){ elWarn.appendChild(el("li", null, w)); });
     return b;
   }
   set("#twCHe", num(b.V*1000, 0) + " L · " + num(b.V, 2) + " m³");
@@ -173,14 +181,14 @@ function renderBalloon(){
   b.warn.forEach(function(w){ elWarn.appendChild(el("li", null, w)); });
   return b;
 }
-[elBal, elDiam, elMass, elPay, elAsc, elChute, elHeAv].forEach(function(e){
+[elBal, elDiam, elMass, elPay, elAsc, elChute, elBurst, elDesc].forEach(function(e){
   e.addEventListener("input", renderBalloon);
 });
 
 /* Parametri del volo: quelli del pallone, salvo quelli imposti a mano */
 function flightParams(){
   const b = readBalloon();
-  if(!b || !b.V) return null;
+  if(!b.V) return null;
   const mb = parseFloat(elBurst.value), md = parseFloat(elDesc.value);
   const p = {asc:b.asc, burst:b.burst/1000, desc:b.desc};
   if(elBurst.value !== ""){ if(!(mb >= 10 && mb <= 45)) return null; p.burst = mb; }
