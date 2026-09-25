@@ -57,11 +57,11 @@ Norme e autorizzazioni · Domande · Chi siamo.
 ### Dopo ogni modifica: il numero di versione
 
 In `index.html` i sette file di `assets/` sono richiamati con un numero in
-coda — oggi `?v=93`:
+coda — oggi `?v=94`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=93">
-<script src="assets/i18n.js?v=93"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=94">
+<script src="assets/i18n.js?v=94"></script>
 ```
 
 Serve a costringere il browser a riscaricarli. **Chi modifica un file in
@@ -250,9 +250,11 @@ fatto scegliere il sito.
 Lo strumento sta tutto in `assets/traiettoria.js` e lavora nel browser di
 chi guarda, senza server nostri:
 
-1. **Il pallone.** Da modello (Strato 1600 o Strato 2000),
-   payload, velocità di salita e paracadute calcola elio necessario,
-   portanza al collo, quota di scoppio e velocità di discesa al suolo.
+1. **Il pallone.** Da modello (Strato 1600 o Strato 2000), payload,
+   velocità di salita e bombola (20-50 L a 200 bar) calcola elio
+   necessario — in m³ e in bar da consumare, con l'elio trattato come
+   gas reale (secondo coefficiente del viriale) —, portanza al collo,
+   quota di scoppio e velocità di discesa al suolo.
    È il porting delle funzioni di `cometa_venti.py`, e dà gli stessi
    numeri. La quota di scoppio usa l'atmosfera prevista per il luogo, il
    giorno e l'ora (Forecast API di Open-Meteo fino a 30 hPa, ~24 km) e
@@ -262,7 +264,8 @@ chi guarda, senza server nostri:
    ogni 10°) e mese, da
    `calcolo/genera_msis.py` — non si modifica a mano. Senza dati del
    giorno si usa l'ISA, e la pagina lo dice. Nella tendina «Imposta a mano i
-   parametri» si cambiano diametro di scoppio e massa del pallone, o si
+   parametri» si cambiano diametro di scoppio e massa del pallone e il
+   paracadute (quello del kit, 1,2 m, se resta vuoto), o si
    impongono quota di scoppio e discesa: vuoti, valgono quelli del
    modello e quelli calcolati.
 2. **La partenza.** Si scrive una località (suggerimenti mentre si

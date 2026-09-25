@@ -59,7 +59,7 @@ if(!form || !$("#twWhere") || !$("#twBal")) return;
 const elWhere = $("#twWhere"), elSugg = $("#twSugg"), elGeo = $("#twGeo"),
       elDate = $("#twDate"), elTime = $("#twTime"),
       elBal = $("#twBal"), elDiam = $("#twDiam"), elMass = $("#twMass"), elPay = $("#twPay"),
-      elAsc = $("#twAsc"), elChute = $("#twChute"),
+      elAsc = $("#twAsc"), elChute = $("#twChute"), elCyl = $("#twCyl"),
       elBurst = $("#twBurst"), elDesc = $("#twDesc"), elWarn = $("#twWarn"),
       elStatus = $("#twStatus"), elRes = $("#twRes"), elMap = $("#twMap"),
       elWeekBtn = $("#twWeekBtn"), elWeekBox = $("#twWeekBox"), elWeekBody = $("#twWeekBody");
@@ -98,7 +98,13 @@ const PRESET = {   /* StratoFlights; paracadute del kit: 1,2 m, Cd 1,0, 80 g */
   "1600": {diam:11.1, mass:1.6, pmax:1.6},
   "2000": {diam:12.5, mass:2.0, pmax:2.0}
 };
-const PARA_CD = 1.0, PARA_M = 0.08;
+const PARA_CD = 1.0, PARA_M = 0.08, PARA_D = 1.2;   /* paracadute del kit */
+/* Bombola: 200 bar a 15 °C. A quella pressione l'elio non e' ideale:
+   con il secondo coefficiente del viriale, P (V - n B) = n R T, cioe'
+   Z = 1 + B P/(R T) ~ 1,10. Una 50 L contiene ~9,0 m³ a 1 atm, non 9,9. */
+const R_GAS = 8.314462, B_ELIO = 11.8e-6, P_BOMB = 200e5;   /* J/(mol K), m³/mol, Pa */
+function moliBombola(Vb, P){ return P*Vb/(R_GAS*T_RIF + B_ELIO*P); }
+function pressioneBombola(Vb, n){ return n*R_GAS*T_RIF/(Vb - n*B_ELIO); }
 /* Soglie degli avvisi. Discesa: oltre 6 m/s al suolo l'urto rischia di
    rompere la sonda; il paracadute consigliato e' quello che da' 5 m/s. */
 const DESC_MAX = 6, DESC_OBJ = 5, ASC_MIN = 3, BURST_MIN = 30000;
@@ -233,7 +239,8 @@ function readBalloon(){
     diam: elDiam.value !== "" ? parseFloat(elDiam.value) : pr.diam,     /* a mano, o del modello */
     mass: elMass.value !== "" ? parseFloat(elMass.value) : pr.mass,
     pay: parseFloat(elPay.value), asc: parseFloat(elAsc.value),
-    chute: parseFloat(elChute.value), pr: pr, warn: []
+    chute: elChute.value !== "" ? parseFloat(elChute.value) : PARA_D,   /* a mano, o quello del kit */
+    cyl: parseFloat(elCyl.value)/1000, pr: pr, warn: []
   };
   /* Avvisi solo per cio' che compromette il volo: parametri mancanti o
      incompatibili, peso eccessivo, salita troppo lenta, discesa troppo veloce. */
@@ -245,6 +252,11 @@ function readBalloon(){
   b.burst = quotaScoppio(b.V, b.diam);
   b.neck = (b.V*DRATIO - b.mass)*1000;
   b.desc = vAtterraggio(b.pay + PARA_M, b.chute);
+  /* elio in bombola: moli necessarie (V e' a 15 °C e 1 atm, gas ideale) e pressione che resta */
+  const nNec = P_STD*b.V/(R_GAS*T_RIF), nTot = moliBombola(b.cyl, P_BOMB);
+  b.pRest = nNec < nTot ? pressioneBombola(b.cyl, nTot - nNec) : null;
+  b.cylM3 = nTot*R_GAS*T_RIF/P_STD;
+  if(b.pRest === null) b.warn.push(t("twWCyl").replace("{v}", num(b.V, 2)).replace("{c}", num(b.cylM3, 1)));
   if(pr && b.pay > pr.pmax + 1e-9) b.warn.push(t("twWPay").replace("{max}", Math.round(pr.pmax*1000)));
   if(b.burst < BURST_MIN) b.warn.push(t("twWBurst"));
   if(b.asc < ASC_MIN) b.warn.push(t("twWSlow"));
@@ -255,16 +267,21 @@ function readBalloon(){
 }
 function renderBalloon(){
   const pr = PRESET[elBal.value];
-  elDiam.placeholder = pr.diam; elMass.placeholder = pr.mass;
+  elDiam.placeholder = pr.diam; elMass.placeholder = pr.mass; elChute.placeholder = PARA_D;
   const b = readBalloon();
   const set = function(id, v){ $(id).textContent = v; };
   elWarn.innerHTML = "";
   if(!b.V){
-    ["#twCHe","#twCNeck","#twCBurst","#twCDesc","#twCBurstSrc"].forEach(function(id){ set(id, id === "#twCBurstSrc" ? "" : "—"); });
+    ["#twCHe","#twCNeck","#twCBurst","#twCDesc","#twCBurstSrc","#twCHeSrc"].forEach(function(id){ set(id, /Src$/.test(id) ? "" : "—"); });
     b.warn.forEach(function(w){ elWarn.appendChild(el("li", null, w)); });
     return b;
   }
-  set("#twCHe", num(b.V*1000, 0) + " L · " + num(b.V, 2) + " m³");
+  if(b.pRest !== null){
+    set("#twCHe", num(b.V, 2) + " m³ · " + num((P_BOMB - b.pRest)/1e5, 0) + " bar");
+    set("#twCHeSrc", t("twCylLeft").replace("{p}", num(b.pRest/1e5, 0)));
+  } else {
+    set("#twCHe", num(b.V, 2) + " m³"); set("#twCHeSrc", "");
+  }
   set("#twCNeck", num(b.neck, 0) + " g");
   /* le tessere mostrano i valori che userà il calcolo: quelli a mano, se ci sono */
   const mb = parseFloat(elBurst.value), md = parseFloat(elDesc.value);
@@ -277,7 +294,7 @@ function renderBalloon(){
   b.warn.forEach(function(w){ elWarn.appendChild(el("li", null, w)); });
   return b;
 }
-[elBal, elDiam, elMass, elPay, elAsc, elChute, elBurst, elDesc, elDate, elTime].forEach(function(e){
+[elBal, elDiam, elMass, elPay, elAsc, elCyl, elChute, elBurst, elDesc, elDate, elTime].forEach(function(e){
   e.addEventListener("input", renderBalloon);
 });
 
