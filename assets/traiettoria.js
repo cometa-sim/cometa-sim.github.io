@@ -105,13 +105,6 @@ const PARA_CD = 1.0, PARA_M = 0.08, PARA_D = 1.2;   /* paracadute del kit */
 const R_GAS = 8.314462, B_ELIO = 11.8e-6, P_BOMB = 200e5;   /* J/(mol K), m³/mol, Pa; 200 bar se non si imposta a mano */
 function moliBombola(Vb, P){ return P*Vb/(R_GAS*T_RIF + B_ELIO*P); }
 function pressioneBombola(Vb, n){ return n*R_GAS*T_RIF/(Vb - n*B_ELIO); }
-/* Bombola descritta dal contenuto dichiarato (m³ a 1 atm e 15 °C alla
-   pressione nominale): se ne ricava il volume interno equivalente, e da
-   li' i bar come per le altre. La nostra: 8,3 m³ a 200 bar -> ~46 L. */
-function volumeDaContenuto(m3, P){ return (P_STD*m3/(R_GAS*T_RIF))*(R_GAS*T_RIF + B_ELIO*P)/P; }
-function volumeBombola(v){
-  return v.indexOf("m3:") === 0 ? volumeDaContenuto(parseFloat(v.slice(3)), P_BOMB) : parseFloat(v)/1000;
-}
 /* Soglie degli avvisi. Discesa: oltre 6 m/s al suolo l'urto rischia di
    rompere la sonda; il paracadute consigliato e' quello che da' 5 m/s. */
 const DESC_MAX = 6, DESC_OBJ = 5, ASC_MIN = 3, BURST_MIN = 30000;
@@ -247,7 +240,7 @@ function readBalloon(){
     mass: elMass.value !== "" ? parseFloat(elMass.value) : pr.mass,
     pay: parseFloat(elPay.value), asc: parseFloat(elAsc.value),
     chute: elChute.value !== "" ? parseFloat(elChute.value) : PARA_D,   /* a mano, o quello del kit */
-    cyl: volumeBombola(elCyl.value),
+    cyl: parseFloat(elCyl.value)/1000,
     pCyl: elPCyl.value !== "" ? parseFloat(elPCyl.value)*1e5 : P_BOMB, pr: pr, warn: []
   };
   /* Avvisi solo per cio' che compromette il volo: parametri mancanti o
