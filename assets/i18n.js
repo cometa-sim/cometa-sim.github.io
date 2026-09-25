@@ -33,7 +33,7 @@ it:{
 
   tzMission:"Obiettivi, profilo di volo e catena di volo.",
   tzProbe:"Modello tridimensionale esplorabile, con tutti i componenti.",
-  tzWinds:"Prevedi il volo e scopri dove va a finire la sonda.", tzQaT:"Domande",
+  tzWinds:"Strumento per predire la traiettoria e analisi del vento per scegliere il punto di partenza.", tzQaT:"Domande",
   tzAbout:"Le studentesse e gli studenti dietro COMETA.",
   tzLegal:"Che cosa dice la norma aeronautica, e come si applica a noi.",
   tzContact:"Scrivici, seguici, condividi la missione.",
@@ -435,7 +435,7 @@ es:{
 
   tzMission:"Objetivos, perfil de vuelo y cadena de vuelo.",
   tzProbe:"Modelo tridimensional explorable, con todos los componentes.",
-  tzWinds:"Pronosticá el vuelo y descubrí dónde termina la sonda.", tzQaT:"Preguntas",
+  tzWinds:"Herramienta para predecir la trayectoria y análisis del viento para elegir el punto de partida.", tzQaT:"Preguntas",
   tzAbout:"Las y los estudiantes detrás de COMETA.",
   tzLegal:"Qué dice la norma aeronáutica, y cómo se aplica a nosotros.",
   tzContact:"Escribinos, seguinos, compartí la misión.",
@@ -831,7 +831,7 @@ en:{
 
   tzMission:"Objectives, flight profile and flight chain.",
   tzProbe:"Explorable three-dimensional model with every component.",
-  tzWinds:"Forecast the flight and find out where the probe ends up.", tzQaT:"Questions",
+  tzWinds:"A tool to predict the trajectory, and a wind analysis to choose the launch site.", tzQaT:"Questions",
   tzAbout:"The students behind COMETA.",
   tzLegal:"What the aviation rules say, and how they apply to us.",
   tzContact:"Write to us, follow us, share the mission.",
