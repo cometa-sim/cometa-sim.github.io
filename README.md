@@ -38,7 +38,7 @@ calcolo/cometa_venti.py             lo script della simulazione e della previsio
 LICENSE · README.md · .gitignore
 ```
 
-Sezioni: Inizio · Missione · La fisica del volo · La sonda · Studio della traiettoria ·
+Sezioni: Inizio · Missione · La fisica del volo · La sonda · La traiettoria ·
 Norme e autorizzazioni · Domande · Chi siamo.
 
 ## Dove si modificano le cose
@@ -57,11 +57,11 @@ Norme e autorizzazioni · Domande · Chi siamo.
 ### Dopo ogni modifica: il numero di versione
 
 In `index.html` i sette file di `assets/`, e la mappa, sono richiamati con un numero in
-coda — oggi `?v=102`:
+coda — oggi `?v=104`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=102">
-<script src="assets/i18n.js?v=102"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=104">
+<script src="assets/i18n.js?v=104"></script>
 ```
 
 Serve a costringere il browser a riscaricarli. **Chi modifica un file in
@@ -246,9 +246,9 @@ da `calcolo/date_nei_popup.py`, che le ricava dall'ordine in cui lo script
 scrive i punti e si ferma se i conteggi non tornano: non va rifatto, a
 meno di rimettere una mappa vecchia.
 
-### Studio della traiettoria: prevedere il volo
+### La traiettoria: prevedere il volo
 
-La pagina `#venti` si chiama «Studio della traiettoria» e ha un indice in
+La pagina `#venti` si chiama «La traiettoria» e ha un indice in
 cima, come Missione (`data-jump` verso `v-previsione`, `v-calcolo`,
 `v-studio`, `v-approx`). Prima viene lo strumento per prevedere il volo,
 poi come si calcolano salita e discesa, poi lo studio dei venti che ci ha

@@ -1,5 +1,5 @@
 /* ============================================================
-   COMETA — prevedere il volo (pagina Studio della traiettoria)
+   COMETA — prevedere il volo (pagina La traiettoria)
 
    1. Il pallone: dallo stesso modello di calcolo/cometa_venti.py
       ricava elio necessario, portanza al collo, quota di scoppio e
@@ -318,6 +318,15 @@ function flightParams(iso, hhmm){
    ========================================================== */
 let launch = null;            /* {name, lat, lon} */
 let map = null, layer = null, launchMk = null, mapReady = null;   /* la mappa nasce dopo */
+let last = null;          /* ultimo calcolo, per ridisegnare al cambio di lingua */
+let week = null;          /* confronto dei prossimi giorni: {iso: risultato} */
+/* Risultati di un altro luogo non devono restare a schermo */
+function clearResults(){
+  last = null; week = null;
+  elRes.innerHTML = ""; elWeekBody.innerHTML = ""; elWeekBox.hidden = true;
+  if(layer) layer.clearLayers();
+  if(elLegend){ elLegend.setAttribute("data-i18n", "twLegend"); elLegend.textContent = t("twLegend"); }
+}
 function saveLaunch(){
   try { localStorage.setItem(KEY, JSON.stringify(launch)); } catch(e){ /* navigazione privata */ }
 }
@@ -330,6 +339,7 @@ function loadLaunch(){
 }
 function coordLabel(lat, lon){ return lat.toFixed(4) + ", " + lon.toFixed(4); }
 function setLaunch(pl, keepText, noSave){
+  if(last && (last.from.lat !== pl.lat || last.from.lon !== pl.lon)) clearResults();
   launch = {name:pl.name || coordLabel(pl.lat, pl.lon), lat:pl.lat, lon:pl.lon};
   if(!keepText) elWhere.value = launch.name;
   if(!noSave) saveLaunch();            /* si ricorda solo cio' che ha scelto il visitatore */
@@ -394,7 +404,7 @@ function suggest(all){
       }, function(){ /* senza rete restano i suggerimenti locali */ });
   }, 280);
 }
-elWhere.addEventListener("input", function(){ launch = null; suggest(); });
+elWhere.addEventListener("input", function(){ launch = null; clearResults(); suggest(); });
 /* Toccando il campo con un luogo gia' scelto si vedono tutti i suggerimenti,
    e il testo e' selezionato: scrivendo lo si sostituisce. */
 elWhere.addEventListener("focus", function(){
@@ -733,7 +743,6 @@ function show(x, noFit){
 }
 
 /* ---------- Risultati ---------- */
-let last = null;          /* ultimo calcolo, per ridisegnare al cambio di lingua */
 function renderCard(r){
   elRes.innerHTML = "";
   if(!r) return;
@@ -793,7 +802,8 @@ function ready(){
   if(!launch){
     const c = parseCoords(elWhere.value);
     if(c) setLaunch(c);
-    else { setStatus(t("twNoPlace"), true); elWhere.focus(); return null; }
+    else if(elWhere.value.trim() && sugg.length && !sugg[0].coords) setLaunch(sugg[0]);
+    else { clearResults(); setStatus(t("twNoPlace"), true); elWhere.focus(); return null; }
   }
   const p = flightParams();
   if(!p){ setStatus(t("twBad"), true); return null; }
@@ -840,7 +850,6 @@ function runBand(pl, list){
 }
 
 /* ---------- Confronto fra i prossimi giorni ---------- */
-let week = null;          /* {iso: risultato} */
 function renderWeek(){
   if(!week) return;
   elWeekBody.innerHTML = "";

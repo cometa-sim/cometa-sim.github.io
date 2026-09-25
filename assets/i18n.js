@@ -17,7 +17,7 @@ it:{
   code:"it", title:"COMETA · Sonda Klo-01 — Scuola Italiana di Montevideo",
   metaDesc:"COMETA è un programma di palloni stratosferici della Scuola Italiana di Montevideo: misure atmosferiche fino a più di 37 km di quota, progettate e realizzate dagli studenti.",
 
-  navHome:"Inizio", navMission:"Missione", navPhysics:"La fisica", navProbe:"La sonda", navWinds:"Studio della traiettoria", navAbout:"Chi siamo", navContact:"Contatti",
+  navHome:"Inizio", navMission:"Missione", navPhysics:"La fisica", navProbe:"La sonda", navWinds:"La traiettoria", navAbout:"Chi siamo", navContact:"Contatti",
 
   /* — Inizio — */
   heroSchool:"Scuola Italiana di Montevideo",
@@ -419,7 +419,7 @@ es:{
   code:"es", title:"COMETA · Sonda Klo-01 — Scuola Italiana di Montevideo",
   metaDesc:"COMETA es un programa de globos estratosféricos de la Scuola Italiana di Montevideo: mediciones atmosféricas hasta más de 37 km de altura, diseñadas y construidas por los estudiantes.",
 
-  navHome:"Inicio", navMission:"Misión", navPhysics:"La física", navProbe:"La sonda", navWinds:"Estudio de la trayectoria", navAbout:"Quiénes somos", navContact:"Contacto",
+  navHome:"Inicio", navMission:"Misión", navPhysics:"La física", navProbe:"La sonda", navWinds:"La trayectoria", navAbout:"Quiénes somos", navContact:"Contacto",
 
   heroSchool:"Scuola Italiana di Montevideo",
 
@@ -815,7 +815,7 @@ en:{
   code:"en", title:"COMETA · Klo-01 Probe — Scuola Italiana di Montevideo",
   metaDesc:"COMETA is a stratospheric balloon programme at the Scuola Italiana di Montevideo: atmospheric measurements up to over 37 km, designed and built by students.",
 
-  navHome:"Home", navMission:"Mission", navPhysics:"The physics", navProbe:"The probe", navWinds:"Trajectory study", navAbout:"About us", navContact:"Contact",
+  navHome:"Home", navMission:"Mission", navPhysics:"The physics", navProbe:"The probe", navWinds:"The trajectory", navAbout:"About us", navContact:"Contact",
 
   heroSchool:"Scuola Italiana di Montevideo",
 
