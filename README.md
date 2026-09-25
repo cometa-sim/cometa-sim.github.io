@@ -248,7 +248,7 @@ poi lo studio dei venti che ci ha fatto scegliere il sito.
 Lo strumento sta tutto in `assets/traiettoria.js` e lavora nel browser di
 chi guarda, senza server nostri:
 
-1. **Il pallone.** Da modello (1600 g o Stratoflights 2000 g),
+1. **Il pallone.** Da modello (Strato 1600 o Strato 2000),
    payload, velocità di salita e paracadute calcola elio necessario,
    portanza al collo, quota di scoppio e velocità di discesa al suolo.
    È il porting delle funzioni di `cometa_venti.py` con l'atmosfera
