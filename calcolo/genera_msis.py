@@ -6,7 +6,7 @@ sito usa sopra l'ultimo livello di pressione dei dati meteorologici (~24 km),
 come fa cometa_venti.py con --rif msis.
 
 Il browser non puo' far girare NRLMSIS, quindi qui lo si tabula una volta:
-ln(rho) [kg/m3] da 10 a 50 km ogni 2 km, per latitudini da -60 a +60 ogni 10
+ln(rho) [kg/m3] da 10 a 50 km ogni 2 km, per latitudini da -90 a +90 ogni 10
 gradi e per il giorno 15 di ogni mese, alle 12 UTC, longitudine -56. Sotto i
 50 km la dipendenza da longitudine e ora e' trascurabile rispetto a quella da
 latitudine e stagione. Indici solari fissi (F10.7 = 150, Ap = 4): in
@@ -19,7 +19,7 @@ import json, os
 import numpy as np, pymsis
 
 ALT = list(range(10, 51, 2))          # km
-LAT = list(range(-60, 61, 10))        # gradi
+LAT = list(range(-90, 91, 10))        # gradi, tutto il globo
 MESI = list(range(1, 13))
 
 tab = []

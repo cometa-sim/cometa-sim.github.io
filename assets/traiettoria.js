@@ -33,13 +33,16 @@ const TZ_OFF = "-03:00";            /* l'Uruguay non ha ora legale dal 2015 */
 const GIORNI_MAX = 7;               /* orizzonte della corsa GFS di Tawhiri */
 const LEAFLET = "assets/vendor/leaflet/";
 const COL = "#5FE3FF";              /* --cyan */
-const KEY = "cometa-partenza";
+/* v2: la prima versione salvava anche la partenza predefinita (Durazno)
+   come se l'avesse scelta il visitatore; con una chiave nuova si riparte */
+const KEY = "cometa-partenza-v2";
 
 /* I due siti dello studio: proposti per primi fra i suggerimenti */
 const SUGGERITI = [
-  {name:"Durazno",            lat:-33.380, lon:-56.520, studied:true},
-  {name:"Mercedes (Soriano)", lat:-33.249, lon:-58.030, studied:true}
+  {name:"Mercedes (Soriano)", lat:-33.249, lon:-58.030, studied:true},
+  {name:"Durazno",            lat:-33.380, lon:-56.520, studied:true}
 ];
+const PREDEFINITO = SUGGERITI[0];   /* Mercedes: la partenza proposta a chi arriva */
 /* [lon, lat], gli stessi poligoni di cometa_venti.py */
 const EXCL = [[-56.78,-34.55],[-56.75,-34.20],[-56.20,-34.12],[-55.74,-34.18],
   [-55.10,-34.15],[-54.60,-34.35],[-54.30,-34.62],[-54.63,-34.84],
@@ -152,7 +155,8 @@ function msisLn(z, lat, doy){
   const M = window.COMETA_MSIS;
   if(!M) return Math.log(densitaISA(z));
   const cl = function(x, a, b){ return Math.max(a, Math.min(b, x)); };
-  const fi = (cl(lat, -60, 60) + 60)/10, i0 = Math.min(Math.floor(fi), M.lat.length - 2), fl = fi - i0;
+  const L0 = M.lat[0], L1 = M.lat[M.lat.length - 1], dL = M.lat[1] - M.lat[0];   /* dalla tabella */
+  const fi = (cl(lat, L0, L1) - L0)/dL, i0 = Math.min(Math.floor(fi), M.lat.length - 2), fl = fi - i0;
   let fm = (doy - 15)/30.44; fm = ((fm % 12) + 12) % 12;
   const j0 = Math.floor(fm) % 12, j1 = (j0 + 1) % 12, fj = fm - Math.floor(fm);
   const fk = (cl(z/1000, 10, 50) - 10)/2, k0 = Math.min(Math.floor(fk), M.alt_km.length - 2), fz = fk - k0;
@@ -305,10 +309,11 @@ function loadLaunch(){
   return null;
 }
 function coordLabel(lat, lon){ return lat.toFixed(4) + ", " + lon.toFixed(4); }
-function setLaunch(pl, keepText){
+function setLaunch(pl, keepText, noSave){
   launch = {name:pl.name || coordLabel(pl.lat, pl.lon), lat:pl.lat, lon:pl.lon};
   if(!keepText) elWhere.value = launch.name;
-  saveLaunch(); closeSugg();
+  if(!noSave) saveLaunch();            /* si ricorda solo cio' che ha scelto il visitatore */
+  closeSugg();
   if(map) placeLaunchMarker(true);
   loadAtmo(launch).then(renderBalloon);
 }
@@ -346,8 +351,8 @@ function showSugg(list, msg){
   const open = list.length > 0 || !!msg;
   elSugg.hidden = !open; elWhere.setAttribute("aria-expanded", String(open));
 }
-function suggest(){
-  const q = elWhere.value.trim();
+function suggest(all){
+  const q = all ? "" : elWhere.value.trim();
   const c = parseCoords(q);
   if(c){ showSugg([{name:coordLabel(c.lat, c.lon), lat:c.lat, lon:c.lon, coords:true}]); return; }
   const local = SUGGERITI.filter(function(s){ return !q || norm(s.name).indexOf(norm(q)) >= 0; });
@@ -370,7 +375,13 @@ function suggest(){
   }, 280);
 }
 elWhere.addEventListener("input", function(){ launch = null; suggest(); });
-elWhere.addEventListener("focus", suggest);
+/* Toccando il campo con un luogo gia' scelto si vedono tutti i suggerimenti,
+   e il testo e' selezionato: scrivendo lo si sostituisce. */
+elWhere.addEventListener("focus", function(){
+  const chosen = launch && elWhere.value === launch.name;
+  if(chosen) elWhere.select();
+  suggest(chosen);
+});
 elWhere.addEventListener("blur", function(){ setTimeout(closeSugg, 120); });
 elWhere.addEventListener("keydown", function(e){
   const n = sugg.length;
@@ -418,9 +429,10 @@ elDate.min = today; elDate.max = lastDay;
     elDate.value = addDays(today, 1);
   }
   /* Si parte dall'ultimo luogo scelto su questo dispositivo, altrimenti
-     dal sito scelto con lo studio: con i valori proposti il calcolo
+     da Mercedes, uno dei due siti dello studio: con i valori proposti il calcolo
      funziona subito, e il luogo si cambia scrivendo sopra. */
-  setLaunch(loadLaunch() || SUGGERITI[0]);
+  const saved = loadLaunch();
+  if(saved) setLaunch(saved); else setLaunch(PREDEFINITO, false, true);
 })();
 
 /* ---------- Geometria ---------- */

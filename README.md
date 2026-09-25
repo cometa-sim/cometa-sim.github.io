@@ -57,11 +57,11 @@ Norme e autorizzazioni · Domande · Chi siamo.
 ### Dopo ogni modifica: il numero di versione
 
 In `index.html` i sette file di `assets/` sono richiamati con un numero in
-coda — oggi `?v=92`:
+coda — oggi `?v=93`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=92">
-<script src="assets/i18n.js?v=92"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=93">
+<script src="assets/i18n.js?v=93"></script>
 ```
 
 Serve a costringere il browser a riscaricarli. **Chi modifica un file in
@@ -258,17 +258,19 @@ chi guarda, senza server nostri:
    giorno e l'ora (Forecast API di Open-Meteo fino a 30 hPa, ~24 km) e
    più in alto la forma di NRLMSIS 2.1, ancorata all'ultimo livello: la
    stessa `Colonna` dello script. Il browser non può far girare NRLMSIS,
-   quindi è tabulato in `assets/msis.js` per latitudine e mese, da
+   quindi è tabulato in `assets/msis.js` per latitudine (tutto il globo,
+   ogni 10°) e mese, da
    `calcolo/genera_msis.py` — non si modifica a mano. Senza dati del
    giorno si usa l'ISA, e la pagina lo dice. Nella tendina «Imposta a mano i
    parametri» si cambiano diametro di scoppio e massa del pallone, o si
    impongono quota di scoppio e discesa: vuoti, valgono quelli del
    modello e quelli calcolati.
 2. **La partenza.** Si scrive una località (suggerimenti mentre si
-   scrive: prima Durazno e Mercedes, poi il geocoder di Open-Meteo),
+   scrive: prima Mercedes e Durazno, poi il geocoder di Open-Meteo),
    oppure le coordinate, oppure si tocca la mappa o si usa la posizione
-   del telefono. La stella sulla mappa si può trascinare. L'ultimo luogo
-   scelto resta nel `localStorage` del dispositivo.
+   del telefono. La stella sulla mappa si può trascinare. Chi arriva
+   trova Mercedes; l'ultimo luogo scelto dal visitatore resta nel
+   `localStorage` del dispositivo (chiave `cometa-partenza-v2`).
 3. **La traiettoria.** La chiede a **Tawhiri**, il predittore di
    [SondeHub](https://sondehub.org/), sui venti dell'ultima corsa del
    modello **GFS** della NOAA. La quota di partenza non la passiamo:
@@ -285,7 +287,7 @@ due posti. Così i preset dei palloni.
 Lo stesso calcolo si fa dal terminale:
 
 ```
-python3 calcolo/cometa_venti.py --tawhiri --pallone 2000 --payload 1.5 --sito "Durazno,-33.38,-56.52" --lancio 2026-10-07T11:00 --giorni-prev 3 --html
+python3 calcolo/cometa_venti.py --tawhiri --pallone 2000 --payload 1.5 --sito "Mercedes,-33.249,-58.030" --lancio 2026-10-07T11:00 --giorni-prev 3 --html
 ```
 
 Leaflet (`assets/vendor/leaflet/`) si scarica solo quando la mappa entra
