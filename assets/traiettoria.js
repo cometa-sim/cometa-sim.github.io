@@ -46,7 +46,9 @@ const URU = [[-57.65,-30.20],[-55.55,-30.90],[-53.90,-32.10],[-53.40,-33.70],
 
 const $ = function(s){ return document.querySelector(s); };
 const form = $("#twForm");
-if(!form) return;
+/* Se la pagina e lo script non sono della stessa versione (una cache
+   che ne ha aggiornato uno solo) meglio non fare niente che fare danni. */
+if(!form || !$("#twWhere") || !$("#twBal")) return;
 const elWhere = $("#twWhere"), elSugg = $("#twSugg"), elGeo = $("#twGeo"),
       elDate = $("#twDate"), elTime = $("#twTime"),
       elBal = $("#twBal"), elDiam = $("#twDiam"), elMass = $("#twMass"), elPay = $("#twPay"),
@@ -282,11 +284,14 @@ elWhere.addEventListener("keydown", function(e){
   elWhere.setAttribute("aria-activedescendant", active >= 0 ? "twSg" + active : "");
 });
 elGeo.addEventListener("click", function(){
-  if(!navigator.geolocation){ setStatus(t("twGeoErr"), true); return; }
+  if(!navigator.geolocation || !window.isSecureContext){ setStatus(t("twGeoErr"), true); return; }
+  setStatus(t("twGeoWait"));
   navigator.geolocation.getCurrentPosition(function(pos){
     setLaunch({lat:pos.coords.latitude, lon:pos.coords.longitude}); setStatus("");
-    if(map) map.setView([launch.lat, launch.lon], 9);
-  }, function(){ setStatus(t("twGeoErr"), true); }, {enableHighAccuracy:true, timeout:15000});
+    ensureMap().then(function(){ map.setView([launch.lat, launch.lon], 9); });
+  }, function(err){
+    setStatus(t(err && err.code === 1 ? "twGeoDenied" : "twGeoErr"), true);
+  }, {enableHighAccuracy:false, maximumAge:60000, timeout:20000});
 });
 
 /* ---------- Date: il calendario e' quello di Montevideo ---------- */
@@ -310,8 +315,10 @@ elDate.min = today; elDate.max = lastDay;
   } else {
     elDate.value = addDays(today, 1);
   }
-  const saved = loadLaunch();
-  if(saved) setLaunch(saved);
+  /* Si parte dall'ultimo luogo scelto su questo dispositivo, altrimenti
+     dal sito scelto con lo studio: con i valori proposti il calcolo
+     funziona subito, e il luogo si cambia scrivendo sopra. */
+  setLaunch(loadLaunch() || SUGGERITI[0]);
 })();
 
 /* ---------- Geometria ---------- */

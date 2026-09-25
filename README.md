@@ -21,7 +21,7 @@ assets/i18n.js                      i testi in italiano, spagnolo e inglese
 assets/sonda.js                     i 26 componenti + il modello 3D (Three.js)
 assets/catena.js                    la catena di volo in 3D, nella pagina Missione
 assets/app.js                       lingua, navigazione, salita, fisica, conto alla rovescia
-assets/previsione.js                prevedere il volo: pallone, partenza, Tawhiri
+assets/traiettoria.js               prevedere il volo: pallone, partenza, Tawhiri
 assets/vendor/three.min.js          Three.js r128, copia locale (vedi sotto)
 assets/vendor/leaflet/              Leaflet 1.9.4, copia locale, per la previsione del giorno
 
@@ -56,11 +56,11 @@ Norme e autorizzazioni · Domande · Chi siamo.
 ### Dopo ogni modifica: il numero di versione
 
 In `index.html` i sei file di `assets/` sono richiamati con un numero in
-coda — oggi `?v=88`:
+coda — oggi `?v=89`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=88">
-<script src="assets/i18n.js?v=88"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=89">
+<script src="assets/i18n.js?v=89"></script>
 ```
 
 Serve a costringere il browser a riscaricarli. **Chi modifica un file in
@@ -245,7 +245,7 @@ cima, come Missione (`data-jump` verso `v-previsione`, `v-studio`,
 `v-calcolo`, `v-approx`). Prima viene lo strumento per prevedere il volo,
 poi lo studio dei venti che ci ha fatto scegliere il sito.
 
-Lo strumento sta tutto in `assets/previsione.js` e lavora nel browser di
+Lo strumento sta tutto in `assets/traiettoria.js` e lavora nel browser di
 chi guarda, senza server nostri:
 
 1. **Il pallone.** Da modello (1600 g, 2000 g o personalizzato),
@@ -268,7 +268,7 @@ chi guarda, senza server nostri:
 
 Il giorno proposto è la data di `LAUNCH` in `assets/app.js`, quando cade
 nella settimana della previsione, altrimenti domani. L'area di esclusione
-e il contorno dell'Uruguay sono ripetuti in cima a `assets/previsione.js`
+e il contorno dell'Uruguay sono ripetuti in cima a `assets/traiettoria.js`
 e sono gli stessi di `cometa_venti.py`: se cambiano, vanno cambiati nei
 due posti. Così i preset dei palloni.
 
