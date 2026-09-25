@@ -59,9 +59,12 @@ Restano soggetti alle rispettive licenze e NON sono coperti da quanto
 sopra:
 
 - three.js r128 (assets/vendor/) ......... MIT — https://threejs.org
-- Leaflet, incluso nella mappa ........... BSD-2-Clause
+- Leaflet 1.9.4 (assets/vendor/leaflet/),
+  incluso anche nella mappa .............. BSD-2-Clause — https://leafletjs.com
 - Sfondo cartografico .................... (c) contributori OpenStreetMap, ODbL
 - Dati meteorologici ..................... Open-Meteo, CC BY 4.0
+- Previsione del giorno .................. Tawhiri, servizio di SondeHub;
+                                           venti del modello GFS della NOAA
 - Caratteri Space Grotesk, Inter,
   JetBrains Mono ......................... SIL Open Font License 1.1
 - Stemma della Scuola Italiana di
