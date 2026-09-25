@@ -57,11 +57,11 @@ Norme e autorizzazioni · Domande · Chi siamo.
 ### Dopo ogni modifica: il numero di versione
 
 In `index.html` i sette file di `assets/` sono richiamati con un numero in
-coda — oggi `?v=95`:
+coda — oggi `?v=96`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=95">
-<script src="assets/i18n.js?v=95"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=96">
+<script src="assets/i18n.js?v=96"></script>
 ```
 
 Serve a costringere il browser a riscaricarli. **Chi modifica un file in
@@ -251,7 +251,8 @@ Lo strumento sta tutto in `assets/traiettoria.js` e lavora nel browser di
 chi guarda, senza server nostri:
 
 1. **Il pallone.** Da modello (Strato 1600 o Strato 2000), payload,
-   velocità di salita e bombola (20-50 L, proposta la nostra da 40 L)
+   velocità di salita e bombola (20-50 L, oppure la nostra, venduta come
+   8,3 m³ a 200 bar nominali: equivale a ~46 L interni)
    calcola elio necessario — in m³ e in bar da consumare, con l'elio
    trattato come gas reale (secondo coefficiente del viriale) —,
    portanza al collo, quota di scoppio, tempo allo scoppio (salita a
