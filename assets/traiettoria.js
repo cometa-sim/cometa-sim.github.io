@@ -62,7 +62,8 @@ const elWhere = $("#twWhere"), elSugg = $("#twSugg"), elGeo = $("#twGeo"),
       elAsc = $("#twAsc"), elChute = $("#twChute"), elCyl = $("#twCyl"), elPCyl = $("#twPCyl"),
       elBurst = $("#twBurst"), elDesc = $("#twDesc"), elWarn = $("#twWarn"),
       elStatus = $("#twStatus"), elRes = $("#twRes"), elMap = $("#twMap"),
-      elWeekBtn = $("#twWeekBtn"), elWeekBox = $("#twWeekBox"), elWeekBody = $("#twWeekBody");
+      elWeekBtn = $("#twWeekBtn"), elWeekBox = $("#twWeekBox"), elWeekBody = $("#twWeekBody"),
+      elToDay = $("#twToDay"), elToTime = $("#twToTime"), elEvery = $("#twEvery"), elLegend = $("#twLegendTxt");
 
 /* ---------- Testi: seguono la lingua scelta nel sito ---------- */
 function lang(){ return document.documentElement.lang || "it"; }
@@ -440,6 +441,7 @@ function addDays(iso, n){
 const today = isoDay(new Date());
 const lastDay = addDays(today, GIORNI_MAX);
 elDate.min = today; elDate.max = lastDay;
+if(elToDay){ elToDay.min = today; elToDay.max = lastDay; }
 (function defaults(){
   const L = window.COMETA_LAUNCH;
   const ld = L ? isoDay(L) : null;
@@ -573,8 +575,14 @@ function ensureMap(){
     L.control.scale({imperial:false}).addTo(map);
     L.polygon(EXCL.map(function(p){ return [p[1], p[0]]; }),
               {color:"#FF7A5C", weight:1.5, fillColor:"#FF7A5C", fillOpacity:.16, interactive:false}).addTo(map);
+    /* Fascia di piu' partenze: i poligoni si disegnano opachi in un pannello
+       reso trasparente per intero, cosi' le sovrapposizioni non si sommano. */
+    map.createPane("twBand").style.cssText = "z-index:395;opacity:.3";
+    map.createPane("twLandZ").style.cssText = "z-index:396;opacity:.7";
     layer = L.layerGroup().addTo(map);
-    map.fitBounds([[-35.1,-58.6],[-30.1,-53.1]]);
+    /* il contenitore cambia misura (rotazione del telefono, pagina che
+       si riassesta): Leaflet va avvisato, o centra su misure vecchie */
+    if("ResizeObserver" in window) new ResizeObserver(function(){ map.invalidateSize(); }).observe(elMap);
     /* toccare la mappa sceglie il punto di partenza, e abilita la rotella */
     map.on("click", function(e){
       map.scrollWheelZoom.enable();
@@ -582,7 +590,10 @@ function ensureMap(){
     });
     map.on("mouseout", function(){ map.scrollWheelZoom.disable(); });
     placeLaunchMarker(false);
+    /* una sola vista iniziale: due spostamenti di fila avviano
+       un'animazione che, finendo dopo, annullerebbe il primo disegno */
     if(launch) map.setView([launch.lat, launch.lon], 8);
+    else map.fitBounds([[-35.1,-58.6],[-30.1,-53.1]]);
   });
   return mapReady;
 }
@@ -600,7 +611,7 @@ if("IntersectionObserver" in window){
   ensureMap();
 }
 
-function draw(r){
+function draw(r, noFit){
   const L = window.L;
   layer.clearLayers();
   if(!r || !r.ok) return;
@@ -615,7 +626,107 @@ function draw(r){
     .bindTooltip(t("twLand") + " " + fmtTime(r.end.t, false)).addTo(layer);
   const bb = L.latLngBounds(up.concat(down));
   bb.extend([r.from.lat, r.from.lon]);
-  map.fitBounds(bb, {padding:[30,30], maxZoom:10});
+  if(!noFit){ map.invalidateSize(); map.fitBounds(bb, {padding:[30,30], maxZoom:10}); }
+}
+
+/* ---------- Piu' partenze: una fascia sola ----------
+   Ogni traiettoria si ricampiona in N+1 punti a frazioni uguali della
+   sua durata; la fascia e' l'unione degli involucri convessi di due
+   «fette» consecutive: segue le curve, non riempie a ventaglio. */
+const FETTE = 48;
+function resample(r, N){
+  const P = r.pts, t0 = P[0].t.getTime(), t1 = P[P.length - 1].t.getTime(), out = [];
+  let j = 0;
+  for(let k = 0; k <= N; k++){
+    const tt = t0 + (t1 - t0)*k/N;
+    while(j < P.length - 2 && P[j + 1].t.getTime() < tt) j++;
+    const a = P[j], b = P[j + 1], span = b.t - a.t;
+    const f = span > 0 ? Math.min(1, Math.max(0, (tt - a.t)/span)) : 0;
+    out.push([a.lon + f*(b.lon - a.lon), a.lat + f*(b.lat - a.lat)]);
+  }
+  return out;
+}
+function hull(P){      /* catena monotona di Andrew, punti [x, y] */
+  const pts = P.slice().sort(function(a, b){ return a[0] - b[0] || a[1] - b[1]; });
+  if(pts.length < 3) return pts;
+  const cross = function(o, a, b){ return (a[0] - o[0])*(b[1] - o[1]) - (a[1] - o[1])*(b[0] - o[0]); };
+  const lo = [], hi = [];
+  pts.forEach(function(p){ while(lo.length >= 2 && cross(lo[lo.length - 2], lo[lo.length - 1], p) <= 0) lo.pop(); lo.push(p); });
+  for(let i = pts.length - 1; i >= 0; i--){
+    const p = pts[i];
+    while(hi.length >= 2 && cross(hi[hi.length - 2], hi[hi.length - 1], p) <= 0) hi.pop();
+    hi.push(p);
+  }
+  return lo.slice(0, -1).concat(hi.slice(0, -1));
+}
+function drawBand(x, noFit){
+  const L = window.L, ok = x.list.filter(function(r){ return r.ok; });
+  layer.clearLayers();
+  if(ok.length < 2){ if(ok.length) draw(ok[0], noFit); return; }
+  const R = ok.map(function(r){ return resample(r, FETTE); });
+  const bb = L.latLngBounds([[x.from.lat, x.from.lon]]);
+  const ll = function(p){ return [p[1], p[0]]; };
+  for(let k = 0; k < FETTE; k++){
+    const h = hull(R.map(function(r){ return r[k]; }).concat(R.map(function(r){ return r[k + 1]; })));
+    if(h.length < 3) continue;
+    L.polygon(h.map(ll), {pane:"twBand", color:COL, weight:2, opacity:1, fillColor:COL, fillOpacity:1, interactive:false}).addTo(layer);
+    h.forEach(function(p){ bb.extend(ll(p)); });
+  }
+  const land = hull(ok.map(function(r){ return [r.end.lon, r.end.lat]; }));
+  const st = {pane:"twLandZ", color:"#FFB84D", weight:land.length < 3 ? 8 : 2, opacity:1, fillColor:"#FFB84D", fillOpacity:1, interactive:false};
+  (land.length < 3 ? L.polyline(land.map(ll), st) : L.polygon(land.map(ll), st)).addTo(layer);
+  if(!noFit){ map.invalidateSize(); map.fitBounds(bb, {padding:[30,30], maxZoom:10}); }
+}
+function rng(v, dec, unit){
+  const a = Math.min.apply(null, v), b = Math.max.apply(null, v);
+  return (b - a < Math.pow(10, -dec)/2 ? num(a, dec) : num(a, dec) + "–" + num(b, dec)) + unit;
+}
+function renderBand(x){
+  elRes.innerHTML = "";
+  const ok = x.list.filter(function(r){ return r.ok; });
+  const card = el("div", "tw-card");
+  card.appendChild(el("h4", null, x.from.name));
+  if(!ok.length){
+    const e = x.list.filter(function(r){ return !r.ok; })[0];
+    card.appendChild(el("p", "tw-err", t("twErr").replace("{msg}", e ? e.err : "—")));
+    elRes.appendChild(card); return;
+  }
+  const n = ok.length, cnt = {ok:0, escl:0, fuori:0};
+  ok.forEach(function(r){ cnt[r.stato]++; });
+  const worst = cnt.fuori ? "fuori" : (cnt.escl ? "escl" : "ok");
+  const ofN = function(k){ return t("twOfN").replace("{k}", k).replace("{n}", n); };
+  card.appendChild(el("span", "tw-badge " + worst, worst === "ok" ? t("twOk") :
+    t(worst === "escl" ? "twEscl" : "twFuori") + " · " + ofN(cnt[worst])));
+  const mLat = ok.reduce(function(s, r){ return s + r.end.lat; }, 0)/n;
+  const mLon = ok.reduce(function(s, r){ return s + r.end.lon; }, 0)/n;
+  const spread = Math.max.apply(null, ok.map(function(r){ return distKm(mLat, mLon, r.end.lat, r.end.lon); }));
+  const rows = [
+    [t("twNFlights"),  n === x.n ? String(n) : t("twOfN").replace("{k}", n).replace("{n}", x.n)],
+    [t("twLandMid"),   num(mLat, 4) + ", " + num(mLon, 4)],
+    [t("twSpread"),    t("twSpreadV").replace("{d}", num(spread, 0))],
+    [t("twDrift"),     rng(ok.map(function(r){ return r.drift; }), 0, " km")],
+    [t("twBear"),      rng(ok.map(function(r){ return r.bear; }), 0, "°")],
+    [t("twDur"),       rng(ok.map(function(r){ return r.dur; }), 0, " min")],
+    [t("twBurstC"),    rng(ok.map(function(r){ return r.burst.alt/1000; }), 1, " km")]
+  ];
+  if(cnt.escl && worst !== "escl") rows.push([t("twEscl"), ofN(cnt.escl)]);
+  const dl = el("dl");
+  rows.forEach(function(row){ dl.appendChild(el("dt", null, row[0])); dl.appendChild(el("dd", null, row[1])); });
+  card.appendChild(dl);
+  if(ok[0].atmo) card.appendChild(el("p", "tw-hint tw-card-note",
+    t({day:"twCardDay", std:"twCardStd", hand:"twCardHand"}[ok[0].atmo])));
+  const a = el("a", null, t("twMapsMid") + " →");
+  a.href = "https://www.google.com/maps/search/?api=1&query=" + mLat.toFixed(5) + "," + mLon.toFixed(5);
+  a.target = "_blank"; a.rel = "noopener";
+  card.appendChild(a);
+  elRes.appendChild(card);
+}
+/* Mostra un risultato, singolo o fascia; noFit: non cambiare l'inquadratura */
+function show(x, noFit){
+  const band = !!(x && x.band);
+  if(elLegend){ elLegend.setAttribute("data-i18n", band ? "twLegendBand" : "twLegend"); elLegend.textContent = t(band ? "twLegendBand" : "twLegend"); }
+  if(band){ renderBand(x); statusDone(x.list); if(map) drawBand(x, noFit); }
+  else { renderCard(x); statusDone([x]); if(map) draw(x, noFit); }
 }
 
 /* ---------- Risultati ---------- */
@@ -658,6 +769,20 @@ function statusDone(results){
   setStatus(ok.length ? t("twDone").replace("{run}", fmtTime(ok[0].run, true)) : "");
 }
 function launchAt(iso, hhmm){ return new Date(iso + "T" + hhmm + ":00" + TZ_OFF); }
+const MAX_VOLI = 48;
+function aMin(s){ return parseInt(s.slice(0, 2), 10)*60 + parseInt(s.slice(3, 5), 10); }
+function aHhmm(m){ return String(Math.floor(m/60)).padStart(2, "0") + ":" + String(m % 60).padStart(2, "0"); }
+function launchList(){
+  const d0 = elDate.value, d1 = (elToDay && elToDay.value) || d0;
+  const m0 = aMin(elTime.value), m1 = elToTime && elToTime.value ? aMin(elToTime.value) : m0;
+  if(d1 < d0 || m1 < m0) return {err:"twBadRange"};
+  const step = parseInt(elEvery ? elEvery.value : "60", 10), list = [];
+  for(let iso = d0; iso <= d1; iso = addDays(iso, 1)){
+    for(let m = m0; m <= m1; m += step) list.push({iso:iso, hhmm:aHhmm(m)});
+  }
+  if(list.length > MAX_VOLI) return {err:"twTooMany", n:list.length};
+  return {list:list};
+}
 
 /* Prima di calcolare: un luogo scelto (o coordinate appena scritte) e parametri validi */
 function ready(){
@@ -675,6 +800,9 @@ form.addEventListener("submit", function(e){
   e.preventDefault();
   if(!ready()) return;
   if(!elDate.value || !elTime.value) return;
+  const LL = launchList();
+  if(LL.err){ setStatus(t(LL.err).replace("{n}", LL.n).replace("{m}", MAX_VOLI), true); return; }
+  if(LL.list.length > 1){ runBand(launch, LL.list); return; }
   const pl = launch, iso = elDate.value, hhmm = elTime.value, when = launchAt(iso, hhmm);
   setStatus(t("twLoading"));
   Promise.all([ensureMap(), loadAtmo(pl).then(function(){
@@ -683,9 +811,29 @@ form.addEventListener("submit", function(e){
   }).catch(function(e){ return {ok:false, from:pl, err:e.message}; })])
     .then(function(res){
       last = res[1];
-      renderCard(last); draw(last); statusDone([last]);
+      show(last);
     }, function(){ setStatus(t("twErr").replace("{msg}", "Leaflet"), true); });
 });
+
+function runBand(pl, list){
+  const out = [];
+  let i = 0;
+  const prog = function(){ setStatus(t("twProgress").replace("{i}", out.length).replace("{n}", list.length)); };
+  prog();
+  function next(){
+    if(i >= list.length) return Promise.resolve();
+    const j = list[i++], p = flightParams(j.iso, j.hhmm);
+    return predict(pl, launchAt(j.iso, j.hhmm), p)
+      .then(function(r){ r.atmo = p.atmo; return r; }, function(e){ return {ok:false, from:pl, err:e.message}; })
+      .then(function(r){ out.push(r); prog(); return next(); });
+  }
+  /* tre richieste alla volta: il servizio e' gratuito e condiviso */
+  Promise.all([ensureMap(), loadAtmo(pl).then(function(){ return Promise.all([next(), next(), next()]); })])
+    .then(function(){
+      last = {band:true, from:pl, list:out, n:list.length};
+      show(last);
+    }, function(){ setStatus(t("twErr").replace("{msg}", "Leaflet"), true); });
+}
 
 /* ---------- Confronto fra i prossimi giorni ---------- */
 let week = null;          /* {iso: risultato} */
@@ -710,7 +858,7 @@ function renderWeek(){
     const pick = function(){
       if(!r || !r.ok) return;
       elDate.value = iso; last = r;
-      renderCard(r); ensureMap().then(function(){ draw(r); }); statusDone([r]);
+      ensureMap().then(function(){ show(r); });
       form.scrollIntoView({behavior:"smooth", block:"end"});
     };
     tr.addEventListener("click", pick);
@@ -752,7 +900,7 @@ elWeekBtn.addEventListener("click", function(){
 function relabel(){
   elWhere.placeholder = t("twWherePh");
   renderBalloon();
-  if(last){ renderCard(last); statusDone([last]); if(map) draw(last); }
+  if(last) show(last, true);
   renderWeek();
 }
 new MutationObserver(relabel).observe(document.documentElement, {attributes:true, attributeFilter:["lang"]});

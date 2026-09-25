@@ -612,6 +612,7 @@ td.mercedes{color:var(--mercedes)}
 .tw-man{margin:0 0 22px}
 .tw-man summary{cursor:pointer;font-size:14px;color:var(--muted)}
 .tw-man summary:hover{color:var(--ink)}
+.tw-man-h{margin:22px 0 0;padding-top:16px;border-top:1px solid var(--line-soft);font-family:var(--disp);font-size:15px;font-weight:600;color:var(--ink)}
 .tw-man-f{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,220px));gap:16px;margin:14px 0 8px}
 .tw-acts{display:flex;flex-wrap:wrap;gap:12px;margin-top:24px}
 .tw-acts .btn[disabled]{opacity:.5;cursor:progress;transform:none}
@@ -634,6 +635,9 @@ td.mercedes{color:var(--mercedes)}
 .tw-canvas{height:min(72vh,620px);background:#02060f}
 @media(max-width:720px){.tw-canvas{height:64vh}}
 .tw-map .leaflet-container{background:#02060f;font-family:var(--text);cursor:crosshair}
+/* img,svg{max-width:100%} del sito: Leaflet lo annulla solo nel suo overlayPane,
+   non nei pannelli della fascia, che altrimenti restano larghi zero */
+.tw-map .leaflet-pane svg{max-width:none!important;max-height:none!important}
 .tw-map .leaflet-tile-pane{filter:invert(1) hue-rotate(180deg) brightness(.85) contrast(1.06) saturate(.55)}
 .tw-map .leaflet-container .leaflet-control-attribution{background:rgba(2,6,15,.72);color:var(--muted);font-size:10px}
 .tw-map .leaflet-control-attribution a{color:var(--cyan)}

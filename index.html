@@ -23,7 +23,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@200;300;400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/cometa.css?v=97">
+<link rel="stylesheet" href="assets/cometa.css?v=98">
 </head>
 <body>
 
@@ -668,7 +668,7 @@
         <!-- Valori a mano: vuoti = quelli del modello scelto e quelli calcolati.
              I segnaposto mostrano il valore che vale in quel momento. -->
         <details class="tw-man" id="twMan">
-          <summary data-i18n="twManual">Imposta a mano i parametri</summary>
+          <summary data-i18n="twManual">Impostazioni avanzate</summary>
           <div class="tw-man-f">
             <label class="tw-f"><span data-i18n="twDiam">Ø di scoppio · m</span><input type="number" id="twDiam" min="1" max="30" step="0.1" inputmode="decimal"></label>
             <label class="tw-f"><span data-i18n="twMass">Massa pallone · kg</span><input type="number" id="twMass" min="0.1" max="5" step="0.05" inputmode="decimal"></label>
@@ -678,6 +678,21 @@
             <label class="tw-f"><span data-i18n="twDesc">Discesa al suolo · m/s</span><input type="number" id="twDesc" min="1" max="15" step="0.1" inputmode="decimal"></label>
           </div>
           <p class="tw-hint" data-i18n="twManHint">Se restano vuoti valgono i dati del modello scelto e i valori calcolati.</p>
+          <!-- Più partenze: dal giorno e dall'ora scelti sopra fino a questi,
+               disegnate sulla mappa come un'unica fascia. -->
+          <p class="tw-man-h" data-i18n="twMulti">Più partenze</p>
+          <div class="tw-man-f">
+            <label class="tw-f"><span data-i18n="twToDay">Fino al giorno</span><input type="date" id="twToDay"></label>
+            <label class="tw-f"><span data-i18n="twToTime">Fino alle ore</span><input type="time" id="twToTime" step="900"></label>
+            <label class="tw-f"><span data-i18n="twEvery">Ogni</span>
+              <select id="twEvery">
+                <option value="30">30 min</option>
+                <option value="60" selected>1 h</option>
+                <option value="120">2 h</option>
+                <option value="180">3 h</option>
+              </select></label>
+          </div>
+          <p class="tw-hint" data-i18n="twMultiHint">Dal giorno e dall'ora scelti sopra fino a questi. Se restano vuoti si calcola una sola partenza.</p>
         </details>
 
         <div class="tw-calc" id="twCalc" aria-live="polite">
@@ -700,7 +715,7 @@
 
       <div class="map-frame tw-map"><div class="tw-canvas" id="twMap"></div></div>
       <div class="map-legend">
-        <span data-i18n="twLegend">Stella: partenza · linea piena: salita · tratteggio: discesa · cerchio bianco: scoppio.</span>
+        <span id="twLegendTxt" data-i18n="twLegend">Stella: partenza · linea piena: salita · tratteggio: discesa · cerchio bianco: scoppio.</span>
       </div>
 
       <div class="tw-week" id="twWeekBox" hidden>
@@ -1110,11 +1125,11 @@
 
 </div>
 
-<script src="assets/i18n.js?v=97"></script>
-<script src="assets/sonda.js?v=97"></script>
-<script src="assets/catena.js?v=97"></script>
-<script src="assets/app.js?v=97"></script>
-<script src="assets/msis.js?v=97"></script>
-<script src="assets/traiettoria.js?v=97"></script>
+<script src="assets/i18n.js?v=98"></script>
+<script src="assets/sonda.js?v=98"></script>
+<script src="assets/catena.js?v=98"></script>
+<script src="assets/app.js?v=98"></script>
+<script src="assets/msis.js?v=98"></script>
+<script src="assets/traiettoria.js?v=98"></script>
 </body>
 </html>

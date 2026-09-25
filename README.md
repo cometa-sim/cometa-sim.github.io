@@ -57,11 +57,11 @@ Norme e autorizzazioni · Domande · Chi siamo.
 ### Dopo ogni modifica: il numero di versione
 
 In `index.html` i sette file di `assets/` sono richiamati con un numero in
-coda — oggi `?v=97`:
+coda — oggi `?v=98`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=97">
-<script src="assets/i18n.js?v=97"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=98">
+<script src="assets/i18n.js?v=98"></script>
 ```
 
 Serve a costringere il browser a riscaricarli. **Chi modifica un file in
@@ -266,8 +266,8 @@ chi guarda, senza server nostri:
    quindi è tabulato in `assets/msis.js` per latitudine (tutto il globo,
    ogni 10°) e mese, da
    `calcolo/genera_msis.py` — non si modifica a mano. Senza dati del
-   giorno si usa l'ISA, e la pagina lo dice. Nella tendina «Imposta a mano i
-   parametri» si cambiano diametro di scoppio e massa del pallone e il
+   giorno si usa l'ISA, e la pagina lo dice. Nelle «Impostazioni
+   avanzate» si cambiano diametro di scoppio e massa del pallone e il
    paracadute (quello del kit, 1,2 m, se resta vuoto), o si
    impongono quota di scoppio e discesa: vuoti, valgono quelli del
    modello e quelli calcolati.
@@ -283,6 +283,11 @@ chi guarda, senza server nostri:
    Tawhiri usa quella del terreno nel punto scelto, e la scheda la
    mostra. «Confronta i prossimi giorni» ripete il calcolo per ogni
    giorno della settimana coperta dalla previsione.
+   Nelle «Impostazioni avanzate» si possono chiedere più partenze
+   (fino a un giorno e a un'ora, ogni 30 min-3 h, al massimo 48): la
+   mappa le disegna come un'unica fascia — per ogni frazione del volo,
+   l'involucro convesso delle posizioni di tutte le partenze — con in
+   arancione la zona di atterraggio, e la scheda dà gli intervalli.
 
 Il giorno proposto è la data di `LAUNCH` in `assets/app.js`, quando cade
 nella settimana della previsione, altrimenti domani. L'area di esclusione
