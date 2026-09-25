@@ -603,6 +603,8 @@ td.mercedes{color:var(--mercedes)}
 .tw-cv{padding:16px 18px;background:rgba(2,6,15,.55)}
 .tw-cv .sl{margin-bottom:8px;font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
 .tw-cv .sv{font-family:var(--disp);font-size:19px;font-weight:500;color:var(--ice);font-variant-numeric:tabular-nums}
+.tw-cv .tw-cs{margin-top:4px;font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;color:var(--faint)}
+.tw-card-note{margin:-4px 0 12px}
 .tw-warn{margin:12px 0 0;padding:0;list-style:none}
 .tw-warn li{position:relative;padding-left:18px;margin-bottom:4px;font-size:13.5px;color:var(--beacon)}
 .tw-warn li::before{content:"!";position:absolute;left:0;font-family:var(--mono);font-weight:600}

@@ -22,6 +22,7 @@ assets/sonda.js                     i 26 componenti + il modello 3D (Three.js)
 assets/catena.js                    la catena di volo in 3D, nella pagina Missione
 assets/app.js                       lingua, navigazione, salita, fisica, conto alla rovescia
 assets/traiettoria.js               prevedere il volo: pallone, partenza, Tawhiri
+assets/msis.js                      NRLMSIS 2.1 tabulato, generato da calcolo/genera_msis.py
 assets/vendor/three.min.js          Three.js r128, copia locale (vedi sotto)
 assets/vendor/leaflet/              Leaflet 1.9.4, copia locale, per la previsione del giorno
 
@@ -55,12 +56,12 @@ Norme e autorizzazioni · Domande · Chi siamo.
 
 ### Dopo ogni modifica: il numero di versione
 
-In `index.html` i sei file di `assets/` sono richiamati con un numero in
-coda — oggi `?v=91`:
+In `index.html` i sette file di `assets/` sono richiamati con un numero in
+coda — oggi `?v=92`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=91">
-<script src="assets/i18n.js?v=91"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=92">
+<script src="assets/i18n.js?v=92"></script>
 ```
 
 Serve a costringere il browser a riscaricarli. **Chi modifica un file in
@@ -198,7 +199,7 @@ mai come cifra precisa**: si scrive «più di 37 km», «oltre 37 km», «37+»,
 «la quota di scoppio». Così restano veri anche quando il calcolo cambia.
 
 I **valori esatti stanno solo nello studio dei venti**, dove c'è la
-discussione che li giustifica: la chiave `wParP` per i parametri della
+discussione che li giustifica: la chiave `wParP2` per i parametri della
 simulazione, e le chiavi `wA4P`…`wA4P4` per il bilancio d'incertezza.
 
 Nelle due animazioni con la scala — la pagina iniziale e la fisica — il
@@ -211,7 +212,7 @@ sale con i decimali e resta `37+` — e la tappa 06 della fisica dice
 `37+ km`.
 
 Quando il calcolo verrà rifatto, i posti da toccare sono tre: la
-costante in `app.js`, `wParP` e il blocco `wA4P` in `i18n.js`.
+costante in `app.js`, `wParP2` e il blocco `wA4P` in `i18n.js`.
 
 ### Il cielo della pagina iniziale
 
@@ -241,9 +242,10 @@ il nome che `index.html` cerca.
 ### Studio della traiettoria: prevedere il volo
 
 La pagina `#venti` si chiama «Studio della traiettoria» e ha un indice in
-cima, come Missione (`data-jump` verso `v-previsione`, `v-studio`,
-`v-calcolo`, `v-approx`). Prima viene lo strumento per prevedere il volo,
-poi lo studio dei venti che ci ha fatto scegliere il sito.
+cima, come Missione (`data-jump` verso `v-previsione`, `v-calcolo`,
+`v-studio`, `v-approx`). Prima viene lo strumento per prevedere il volo,
+poi come si calcolano salita e discesa, poi lo studio dei venti che ci ha
+fatto scegliere il sito.
 
 Lo strumento sta tutto in `assets/traiettoria.js` e lavora nel browser di
 chi guarda, senza server nostri:
@@ -251,8 +253,14 @@ chi guarda, senza server nostri:
 1. **Il pallone.** Da modello (Strato 1600 o Strato 2000),
    payload, velocità di salita e paracadute calcola elio necessario,
    portanza al collo, quota di scoppio e velocità di discesa al suolo.
-   È il porting delle funzioni di `cometa_venti.py` con l'atmosfera
-   standard, e dà gli stessi numeri. Nella tendina «Imposta a mano i
+   È il porting delle funzioni di `cometa_venti.py`, e dà gli stessi
+   numeri. La quota di scoppio usa l'atmosfera prevista per il luogo, il
+   giorno e l'ora (Forecast API di Open-Meteo fino a 30 hPa, ~24 km) e
+   più in alto la forma di NRLMSIS 2.1, ancorata all'ultimo livello: la
+   stessa `Colonna` dello script. Il browser non può far girare NRLMSIS,
+   quindi è tabulato in `assets/msis.js` per latitudine e mese, da
+   `calcolo/genera_msis.py` — non si modifica a mano. Senza dati del
+   giorno si usa l'ISA, e la pagina lo dice. Nella tendina «Imposta a mano i
    parametri» si cambiano diametro di scoppio e massa del pallone, o si
    impongono quota di scoppio e discesa: vuoti, valgono quelli del
    modello e quelli calcolati.

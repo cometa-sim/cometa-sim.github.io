@@ -259,7 +259,8 @@ def carica_zone(percorso):
 # ==========================================================================
 def base_url(ep):
     return {"era5":"https://archive-api.open-meteo.com/v1/archive",
-            "hist_forecast":"https://historical-forecast-api.open-meteo.com/v1/forecast"}[ep]
+            "hist_forecast":"https://historical-forecast-api.open-meteo.com/v1/forecast",
+            "forecast":"https://api.open-meteo.com/v1/forecast"}[ep]     # solo per --tawhiri
 def finestra(cfg,anno):
     """Restituisce (start, end, [date di lancio]) per la finestra dell'anno, o None
     se la data di inizio non esiste in quell'anno (es. 29/02 in anno non bisestile)."""
@@ -492,10 +493,36 @@ def riassunto_volo(sito,lat,lon,quando,punti,info,cfg):
                 scoppio_lat=apo[1],scoppio_lon=apo[2],quota_max=apo[3],
                 dist_scoppio=dist_km(lat,lon,apo[1],apo[2]),stato=stato(cfg,la,lo))
 
+def atmosfera_prevista(cfg,lat,lon,istanti):
+    """Previsione Open-Meteo (T e quota geopotenziale fino a 30 hPa) per i giorni dei lanci,
+    o None. E' la stessa atmosfera del giorno dello studio storico, ma dalla previsione."""
+    if cfg.quota_forzata is not None or cfg.atm!="reale": return None
+    giorni=[q.astimezone(TZ_LANCIO).date() for q in istanti]
+    ep=cfg.endpoint; cfg.endpoint="forecast"
+    try: return scarica_finestra(cfg,lat,lon,min(giorni),max(giorni))
+    except Exception as e:
+        print(f"  [!] atmosfera del giorno non disponibile ({e}): quota di scoppio sull'ISA.")
+        return None
+    finally: cfg.endpoint=ep
+
+def quota_del_giorno(cfg,h,lat,lon,q):
+    """(quota di scoppio [m], fonte) per l'istante q: atmosfera del giorno, o il valore di cfg.quota."""
+    if cfg.quota_forzata is not None: return cfg.quota,"imposta"
+    if h is None: return cfg.quota,"isa"
+    ql=q.astimezone(TZ_LANCIO); ora=cfg.ora
+    cfg.ora=min(23,ql.hour+(1 if ql.minute>=30 else 0))          # colonna() legge l'ora da cfg
+    try: col=colonna(cfg,h,ql.date().isoformat(),lat,lon)
+    finally: cfg.ora=ora
+    if col is None: return cfg.quota,"isa"
+    return quota_scoppio(cfg.V_elio,cfg.diametro,col.rho),"giorno+"+cfg.rif
+
 def previsione_tawhiri(cfg):
     istanti=istanti_lancio(cfg)
     print(f"PREVISIONE TAWHIRI (SondeHub, venti NOAA GFS){' [MOCK]' if cfg.mock else ''}")
-    print(f"  scoppio {cfg.quota/1000:.1f} km | salita {cfg.vsalita} m/s | discesa al suolo {cfg.vatt:.1f} m/s")
+    print(f"  salita {cfg.vsalita} m/s | discesa al suolo {cfg.vatt:.1f} m/s | scoppio {cfg.quota/1000:.1f} km con l'ISA")
+    if cfg.quota_forzata is None and cfg.atm=="reale":
+        print(f"  La quota di scoppio si ricalcola per ogni lancio con l'atmosfera prevista (Open-Meteo fino a"
+              f" 30 hPa, sopra {cfg.rif.upper()}).")
     print("  Quota di scoppio e discesa vengono dal modello del pallone: Tawhiri integra solo i venti.")
     ora=datetime.now(timezone.utc)
     if not cfg.mock and max(istanti)-ora>timedelta(days=7):
@@ -505,14 +532,16 @@ def previsione_tawhiri(cfg):
               "ripetere il calcolo nei giorni successivi.")
     print()
     print(f"{'SITO':22s}{'lancio (ora UY)':>18}{'atterraggio':>21}{'deriva':>8}{'rotta':>7}"
-          f"{'durata':>8}{'scoppio a':>11}{'stato':>7}")
+          f"{'durata':>8}{'scoppio a':>11}{'quota':>8}{'stato':>7}")
     voli=[]
     for sito,(lat,lon) in cfg.siti.items():
+        h=atmosfera_prevista(cfg,lat,lon,istanti)
         for q in istanti:
             ql=q.astimezone(TZ_LANCIO)
+            qb,fonte=quota_del_giorno(cfg,h,lat,lon,q)
             try:
-                punti,info=(_mock_tawhiri(cfg,lat,lon,q,cfg.quota,cfg.vatt) if cfg.mock else
-                            tawhiri(lat,lon,q,cfg.vsalita,cfg.quota,cfg.vatt,cfg.alt_lancio,cfg.tawhiri_url))
+                punti,info=(_mock_tawhiri(cfg,lat,lon,q,qb,cfg.vatt) if cfg.mock else
+                            tawhiri(lat,lon,q,cfg.vsalita,qb,cfg.vatt,cfg.alt_lancio,cfg.tawhiri_url))
             except Exception as e:
                 print(f"  [!] {sito} {ql:%d/%m %H:%M}: {e}"); continue
             if len(punti)<2:
@@ -521,7 +550,8 @@ def previsione_tawhiri(cfg):
             etq=f"{GIORNI_SETT[ql.weekday()]} {ql:%d/%m %H:%M}"
             print(f"{sito:22s}{etq:>18}{v['lat']:>10.3f},{v['lon']:>9.3f}"
                   f"{v['deriva']:>6.0f}km{v['rotta']:>6.0f}°{v['durata']:>5.0f}min"
-                  f"{v['dist_scoppio']:>8.0f} km{v['stato']:>7}")
+                  f"{v['dist_scoppio']:>8.0f} km{v['quota_max']/1000:>6.2f}km{v['stato']:>7}"
+                  f"{'' if fonte.startswith('giorno') else '  ('+fonte+')'}")
     print()
     if not voli:
         print("Nessuna traiettoria: la data e' fuori dalla previsione GFS (circa una settimana"
@@ -775,9 +805,10 @@ def get_args():
     p.add_argument("--atm",choices=["isa","reale"],default="reale",
                    help="profilo di densita': 'reale' usa T e quota geopotenziale del giorno "
                         "(Open-Meteo, fino a 30 hPa ~24 km); 'isa' usa l'atmosfera standard")
-    p.add_argument("--rif",choices=["isa","msis"],default="isa",
+    p.add_argument("--rif",choices=["isa","msis","auto"],default="auto",
                    help="forma verticale usata SOPRA l'ultimo livello disponibile "
-                        "('msis' richiede pymsis; tiene conto di latitudine e stagione)")
+                        "('msis' richiede pymsis; tiene conto di latitudine e stagione). "
+                        "Default: msis con --tawhiri se pymsis c'e' (come il sito), altrimenti isa")
     p.add_argument("--esclusione",help="file lon,lat del poligono di esclusione")
     p.add_argument("--zone",help="file JSON con zone di esclusione (poligoni e cerchi); vale anche fuori Uruguay")
     p.add_argument("--territorio",help='file lon,lat del territorio recuperabile ("none" per disattivare)')
@@ -834,6 +865,7 @@ def get_args():
         a.vatt=v_atterraggio(a.m_disc,a.paracadute,a.cd_paracadute); a.vatt_src="paracadute"
     else:
         a.vatt=5.0; a.vatt_src="default"; a.paracadute=getattr(a,"paracadute",None)
+    if a.rif=="auto": a.rif="msis" if (a.tawhiri and msis_disponibile()) else "isa"
     a.anni=parse_range(a.anni)
     try: mm,dd=a.data_inizio.split("-"); a.mm=int(mm); a.dd=int(dd)
     except Exception: print('\nErrore: --data-inizio deve essere MM-DD (es. 10-01).\n'); sys.exit(1)

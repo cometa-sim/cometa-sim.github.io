@@ -2,8 +2,11 @@
    COMETA — prevedere il volo (pagina Studio della traiettoria)
 
    1. Il pallone: dallo stesso modello di calcolo/cometa_venti.py
-      (atmosfera standard ISA) ricava elio necessario, portanza al
-      collo, quota di scoppio e velocita' di discesa al suolo.
+      ricava elio necessario, portanza al collo, quota di scoppio e
+      velocita' di discesa al suolo. La quota di scoppio usa
+      l'atmosfera prevista per il luogo, il giorno e l'ora: Open-Meteo
+      fino a 30 hPa (~24 km), NRLMSIS 2.1 piu' in alto (assets/msis.js).
+      Senza quei dati, l'atmosfera standard ISA.
    2. La partenza: una localita' (suggerimenti mentre si scrive),
       le coordinate, un punto toccato sulla mappa o la posizione
       del telefono.
@@ -24,6 +27,7 @@
 
 const API = "https://api.v2.sondehub.org/tawhiri";
 const GEO = "https://geocoding-api.open-meteo.com/v1/search";
+const METEO = "https://api.open-meteo.com/v1/forecast";
 const TZ = "America/Montevideo";
 const TZ_OFF = "-03:00";            /* l'Uruguay non ha ora legale dal 2015 */
 const GIORNI_MAX = 7;               /* orizzonte della corsa GFS di Tawhiri */
@@ -136,6 +140,89 @@ function diamPerDiscesa(m, v){      /* l'inversa: il paracadute che da' v al suo
   return Math.sqrt(8*m*G/(RHO0*PARA_CD*Math.PI*v*v));
 }
 
+/* ---------- L'atmosfera del giorno ----------
+   Come Colonna in cometa_venti.py: fra i livelli di pressione la densita'
+   e' quella osservata, rho = p/(R T); sopra l'ultimo livello si prende
+   da NRLMSIS solo la forma, ancorata al valore osservato in cima,
+   cosi' la colonna sottostante resta quella vera. */
+const LIVELLI = [1000,925,850,700,500,400,300,250,200,150,100,70,50,30];
+const RE_GEO = 6356766;
+function zGeom(hgp){ return RE_GEO*hgp/(RE_GEO - hgp); }
+function msisLn(z, lat, doy){
+  const M = window.COMETA_MSIS;
+  if(!M) return Math.log(densitaISA(z));
+  const cl = function(x, a, b){ return Math.max(a, Math.min(b, x)); };
+  const fi = (cl(lat, -60, 60) + 60)/10, i0 = Math.min(Math.floor(fi), M.lat.length - 2), fl = fi - i0;
+  let fm = (doy - 15)/30.44; fm = ((fm % 12) + 12) % 12;
+  const j0 = Math.floor(fm) % 12, j1 = (j0 + 1) % 12, fj = fm - Math.floor(fm);
+  const fk = (cl(z/1000, 10, 50) - 10)/2, k0 = Math.min(Math.floor(fk), M.alt_km.length - 2), fz = fk - k0;
+  const v = function(i, j){ const r = M.lnrho[i][j]; return r[k0] + fz*(r[k0 + 1] - r[k0]); };
+  const a = v(i0, j0) + fj*(v(i0, j1) - v(i0, j0));
+  const b = v(i0 + 1, j0) + fj*(v(i0 + 1, j1) - v(i0 + 1, j0));
+  return a + fl*(b - a);
+}
+function dayOfYear(iso){
+  const d = new Date(iso + "T12:00:00Z");
+  return Math.round((d - Date.UTC(d.getUTCFullYear(), 0, 1))/864e5) + 1;
+}
+/* Colonna di densita' del giorno, o null se i dati non bastano */
+function dayColumn(h, iso, hhmm, lat){
+  if(!h || !h.time) return null;
+  const hh = Math.min(23, Math.round(parseInt(hhmm.slice(0, 2), 10) + parseInt(hhmm.slice(3, 5), 10)/60));
+  const idx = h.time.indexOf(iso + "T" + String(hh).padStart(2, "0") + ":00");
+  if(idx < 0) return null;
+  const pts = [];
+  LIVELLI.forEach(function(l){
+    const T = h["temperature_" + l + "hPa"], Z = h["geopotential_height_" + l + "hPa"];
+    if(!T || !Z || T[idx] == null || Z[idx] == null) return;
+    const TK = T[idx] + 273.15;
+    if(TK <= 150 || TK >= 350) return;                  /* valori assurdi */
+    pts.push([zGeom(Z[idx]), Math.log(l*100/(R_ARIA*TK))]);
+  });
+  if(pts.length < 4) return null;
+  pts.sort(function(a, b){ return a[0] - b[0]; });
+  const zs = pts.map(function(p){ return p[0]; }), ln = pts.map(function(p){ return p[1]; });
+  const doy = dayOfYear(iso), top = zs[zs.length - 1], bot = zs[0];
+  const kTop = ln[ln.length - 1] - msisLn(top, lat, doy);
+  const kBot = ln[0] - Math.log(densitaISA(bot));
+  return function(z){
+    if(z > top) return Math.exp(msisLn(z, lat, doy) + kTop);
+    if(z < bot) return Math.exp(Math.log(densitaISA(z)) + kBot);
+    for(let i = 0; i < zs.length - 1; i++){
+      if(z <= zs[i + 1]) return Math.exp(ln[i] + (z - zs[i])/(zs[i + 1] - zs[i])*(ln[i + 1] - ln[i]));
+    }
+    return Math.exp(ln[ln.length - 1]);
+  };
+}
+function quotaScoppioCol(V, d, rho){
+  const rb = RHO0*V/((Math.PI/6)*d*d*d);          /* l'invariante e' rho*V, come in quotaScoppio */
+  if(rho(0) < rb) return 0;
+  return bisez(function(h){ return rho(h) - rb; }, 0, 50000);
+}
+/* Una richiesta per luogo copre tutta la settimana della previsione */
+let atmo = {key:null, promise:null, h:null};
+function atmoKey(pl){ return pl.lat.toFixed(2) + "," + pl.lon.toFixed(2); }
+function loadAtmo(pl){
+  if(!pl) return Promise.resolve(null);
+  const k = atmoKey(pl);
+  if(atmo.key === k && atmo.promise) return atmo.promise;
+  const hourly = [];
+  LIVELLI.forEach(function(l){ hourly.push("temperature_" + l + "hPa", "geopotential_height_" + l + "hPa"); });
+  const q = new URLSearchParams({latitude:pl.lat.toFixed(4), longitude:pl.lon.toFixed(4),
+    hourly:hourly.join(","), timezone:TZ, start_date:today, end_date:lastDay});
+  const cur = {key:k, h:null, promise:null};
+  atmo = cur;
+  cur.promise = fetch(METEO + "?" + q.toString())
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(d){ cur.h = d && d.hourly ? d.hourly : null; return cur.h; }, function(){ return null; });
+  return cur.promise;
+}
+/* Quota di scoppio per un giorno e un'ora: {m, day} con day=false se ISA */
+function burstFor(b, iso, hhmm){
+  const col = launch && atmo.key === atmoKey(launch) ? dayColumn(atmo.h, iso, hhmm, launch.lat) : null;
+  return col ? {m:quotaScoppioCol(b.V, b.diam, col), day:true} : {m:b.burst, day:false};
+}
+
 function readBalloon(){
   const pr = PRESET[elBal.value];
   const b = {
@@ -169,7 +256,7 @@ function renderBalloon(){
   const set = function(id, v){ $(id).textContent = v; };
   elWarn.innerHTML = "";
   if(!b.V){
-    ["#twCHe","#twCNeck","#twCBurst","#twCDesc"].forEach(function(id){ set(id, "—"); });
+    ["#twCHe","#twCNeck","#twCBurst","#twCDesc","#twCBurstSrc"].forEach(function(id){ set(id, id === "#twCBurstSrc" ? "" : "—"); });
     b.warn.forEach(function(w){ elWarn.appendChild(el("li", null, w)); });
     return b;
   }
@@ -178,23 +265,26 @@ function renderBalloon(){
   /* le tessere mostrano i valori che userà il calcolo: quelli a mano, se ci sono */
   const mb = parseFloat(elBurst.value), md = parseFloat(elDesc.value);
   const hand = " · " + t("twHand");
-  set("#twCBurst", elBurst.value !== "" && mb > 0 ? num(mb, 1) + " km" + hand : num(b.burst/1000, 1) + " km");
+  const bd = burstFor(b, elDate.value, elTime.value || "09:00");
+  set("#twCBurst", elBurst.value !== "" && mb > 0 ? num(mb, 1) + " km" + hand : num(bd.m/1000, 1) + " km");
+  set("#twCBurstSrc", elBurst.value !== "" && mb > 0 ? "" : t(bd.day ? "twAtmoDay" : "twAtmoStd"));
   set("#twCDesc", elDesc.value !== "" && md > 0 ? num(md, 1) + " m/s" + hand : num(b.desc, 1) + " m/s");
-  elBurst.placeholder = (b.burst/1000).toFixed(1); elDesc.placeholder = b.desc.toFixed(1);
+  elBurst.placeholder = (bd.m/1000).toFixed(1); elDesc.placeholder = b.desc.toFixed(1);
   b.warn.forEach(function(w){ elWarn.appendChild(el("li", null, w)); });
   return b;
 }
-[elBal, elDiam, elMass, elPay, elAsc, elChute, elBurst, elDesc].forEach(function(e){
+[elBal, elDiam, elMass, elPay, elAsc, elChute, elBurst, elDesc, elDate, elTime].forEach(function(e){
   e.addEventListener("input", renderBalloon);
 });
 
 /* Parametri del volo: quelli del pallone, salvo quelli imposti a mano */
-function flightParams(){
+function flightParams(iso, hhmm){
   const b = readBalloon();
   if(!b.V) return null;
   const mb = parseFloat(elBurst.value), md = parseFloat(elDesc.value);
-  const p = {asc:b.asc, burst:b.burst/1000, desc:b.desc};
-  if(elBurst.value !== ""){ if(!(mb >= 10 && mb <= 45)) return null; p.burst = mb; }
+  const bd = burstFor(b, iso || elDate.value, hhmm || elTime.value || "09:00");
+  const p = {asc:b.asc, burst:bd.m/1000, desc:b.desc, atmo:bd.day ? "day" : "std"};
+  if(elBurst.value !== ""){ if(!(mb >= 10 && mb <= 45)) return null; p.burst = mb; p.atmo = "hand"; }
   if(elDesc.value !== ""){ if(!(md >= 1 && md <= 15)) return null; p.desc = md; }
   return p;
 }
@@ -220,6 +310,7 @@ function setLaunch(pl, keepText){
   if(!keepText) elWhere.value = launch.name;
   saveLaunch(); closeSugg();
   if(map) placeLaunchMarker(true);
+  loadAtmo(launch).then(renderBalloon);
 }
 
 /* Coordinate scritte a mano: "-33.38, -56.52", "-33.38 -56.52",
@@ -517,6 +608,8 @@ function renderCard(r){
    [t("twBurstDist"), num(r.burstDist, 0) + " km · " + num(r.burst.alt/1000, 1) + " km"]
   ].forEach(function(row){ dl.appendChild(el("dt", null, row[0])); dl.appendChild(el("dd", null, row[1])); });
   card.appendChild(dl);
+  if(r.atmo) card.appendChild(el("p", "tw-hint tw-card-note",
+    t({day:"twCardDay", std:"twCardStd", hand:"twCardHand"}[r.atmo])));
   const a = el("a", null, t("twMaps") + " →");
   a.href = "https://www.google.com/maps/search/?api=1&query=" + r.end.lat.toFixed(5) + "," + r.end.lon.toFixed(5);
   a.target = "_blank"; a.rel = "noopener";
@@ -547,11 +640,14 @@ function ready(){
 
 form.addEventListener("submit", function(e){
   e.preventDefault();
-  const p = ready(); if(!p) return;
+  if(!ready()) return;
   if(!elDate.value || !elTime.value) return;
-  const pl = launch, when = launchAt(elDate.value, elTime.value);
+  const pl = launch, iso = elDate.value, hhmm = elTime.value, when = launchAt(iso, hhmm);
   setStatus(t("twLoading"));
-  Promise.all([ensureMap(), predict(pl, when, p).catch(function(e){ return {ok:false, from:pl, err:e.message}; })])
+  Promise.all([ensureMap(), loadAtmo(pl).then(function(){
+    const p = flightParams(iso, hhmm);
+    return predict(pl, when, p).then(function(r){ r.atmo = p.atmo; return r; });
+  }).catch(function(e){ return {ok:false, from:pl, err:e.message}; })])
     .then(function(res){
       last = res[1];
       renderCard(last); draw(last); statusDone([last]);
@@ -567,14 +663,15 @@ function renderWeek(){
     const r = week[iso], tr = el("tr");
     tr.tabIndex = 0;
     tr.appendChild(el("td", null, fmtDay(iso)));
-    if(!r){ for(let i = 0; i < 4; i++) tr.appendChild(el("td", null, "…")); }
+    if(!r){ for(let i = 0; i < 5; i++) tr.appendChild(el("td", null, "…")); }
     else if(!r.ok){
-      for(let i = 0; i < 3; i++) tr.appendChild(el("td", null, "—"));
+      for(let i = 0; i < 4; i++) tr.appendChild(el("td", null, "—"));
       const td = el("td", "tw-w-err", "—"); td.title = r.err; tr.appendChild(td);
     } else {
       tr.appendChild(el("td", null, num(r.drift, 0) + " km"));
       tr.appendChild(el("td", null, num(r.bear, 0) + "°"));
       tr.appendChild(el("td", null, num(r.dur, 0) + " min"));
+      tr.appendChild(el("td", null, num(r.burst.alt/1000, 1) + " km"));
       tr.appendChild(el("td", "tw-w-" + r.stato, t({ok:"twOk", escl:"twEscl", fuori:"twFuori"}[r.stato])));
     }
     const pick = function(){
@@ -589,7 +686,7 @@ function renderWeek(){
   });
 }
 elWeekBtn.addEventListener("click", function(){
-  const p = ready(); if(!p) return;
+  if(!ready()) return;
   const pl = launch, hhmm = elTime.value || "09:00";
   week = {};
   const days = [];
@@ -606,11 +703,13 @@ elWeekBtn.addEventListener("click", function(){
   function next(){
     if(i >= days.length) return Promise.resolve();
     const iso = days[i++];
+    const p = flightParams(iso, hhmm);                     /* ogni giorno la sua atmosfera */
     return predict(pl, launchAt(iso, hhmm), p)
+      .then(function(r){ r.atmo = p.atmo; return r; })
       .catch(function(e){ return {ok:false, from:pl, err:e.message}; })
       .then(function(r){ week[iso] = r; renderWeek(); return next(); });
   }
-  Promise.all([next(), next()]).then(function(){
+  loadAtmo(pl).then(function(){ return Promise.all([next(), next()]); }).then(function(){
     elWeekBtn.disabled = false;
     statusDone(Object.keys(week).map(function(k){ return week[k]; }));
   });
