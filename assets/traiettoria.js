@@ -476,8 +476,10 @@ function bearing(la1, lo1, la2, lo2){
   const x = Math.cos(la1*RAD)*Math.sin(la2*RAD) - Math.sin(la1*RAD)*Math.cos(la2*RAD)*Math.cos((lo2 - lo1)*RAD);
   return (Math.atan2(y, x)/RAD + 360) % 360;
 }
-function stato(lat, lon){
-  if(!inPoly(lon, lat, URU)) return "fuori";
+/* «Fuori dall'Uruguay» ha senso solo se si parte dall'Uruguay,
+   come in cometa_venti.py */
+function stato(lat, lon, from){
+  if(from && inPoly(from.lon, from.lat, URU) && !inPoly(lon, lat, URU)) return "fuori";
   if(inPoly(lon, lat, EXCL)) return "escl";
   return "ok";
 }
@@ -528,7 +530,7 @@ function parse(pl, d){
     dur: (end.t - t0)/6e4,
     tBurst: (burst.t - t0)/6e4,
     burstDist: distKm(pl.lat, pl.lon, burst.lat, burst.lon),
-    stato: stato(end.lat, end.lon)
+    stato: stato(end.lat, end.lon, pl)
   };
 }
 

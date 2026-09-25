@@ -127,10 +127,15 @@ nav.scrolled::before{opacity:0}
 .menu-btn span{width:22px;height:2px;background:var(--ink);border-radius:2px}
 @media(max-width:1040px){.nav-links,.cbadge{display:none}.menu-btn{display:flex}}
 
+/* Chiuso, il menu e' spinto sopra lo schermo; ma su uno schermo basso le
+   voci sono piu' alte della finestra e il fondo (Instagram, TikTok, Mail)
+   sbordava in cima alla pagina. Da chiuso quindi e' anche invisibile, e da
+   aperto si scorre se non ci sta («safe center» non taglia la cima). */
 .menu-overlay{position:fixed;inset:0;z-index:60;background:rgba(2,6,15,.97);backdrop-filter:blur(12px);
-  display:flex;flex-direction:column;justify-content:center;align-items:center;gap:6px;
-  transform:translateY(-100%);transition:transform .5s var(--ease)}
-.menu-overlay.open{transform:none}
+  display:flex;flex-direction:column;justify-content:center;justify-content:safe center;align-items:center;gap:6px;
+  overflow-y:auto;padding:64px 0 32px;visibility:hidden;
+  transform:translateY(-100%);transition:transform .5s var(--ease),visibility 0s linear .5s}
+.menu-overlay.open{transform:none;visibility:visible;transition:transform .5s var(--ease),visibility 0s}
 .menu-overlay a{font-family:var(--disp);font-size:clamp(24px,6vw,30px);font-weight:600;color:var(--muted);text-decoration:none;padding:10px;cursor:pointer}
 .menu-overlay a.active{color:var(--ink)}
 .menu-close{position:absolute;top:20px;right:24px;background:none;border:0;color:var(--ink);font-size:30px;cursor:pointer;line-height:1}
