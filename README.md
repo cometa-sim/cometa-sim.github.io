@@ -56,12 +56,12 @@ Norme e autorizzazioni · Domande · Chi siamo.
 
 ### Dopo ogni modifica: il numero di versione
 
-In `index.html` i sette file di `assets/` sono richiamati con un numero in
-coda — oggi `?v=98`:
+In `index.html` i sette file di `assets/`, e la mappa, sono richiamati con un numero in
+coda — oggi `?v=99`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=98">
-<script src="assets/i18n.js?v=98"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=99">
+<script src="assets/i18n.js?v=99"></script>
 ```
 
 Serve a costringere il browser a riscaricarli. **Chi modifica un file in
@@ -238,6 +238,13 @@ siti di partenza, i 600 atterraggi, le ellissi: il file resta com'è.
 Lo script produce un nome che contiene la data della corsa
 (`010926_footprint.html`): rinominarlo in `uru2000_footprint.html`, che è
 il nome che `index.html` cerca.
+
+Cliccando un punto compare solo la data del volo: deriva e rotta si
+leggono dalla mappa, la data serve a confrontare. Le mappe nuove escono
+già così. In quella pubblicata, generata prima, le date sono state messe
+da `calcolo/date_nei_popup.py`, che le ricava dall'ordine in cui lo script
+scrive i punti e si ferma se i conteggi non tornano: non va rifatto, a
+meno di rimettere una mappa vecchia.
 
 ### Studio della traiettoria: prevedere il volo
 

@@ -1125,9 +1125,11 @@ def disegna_mappa_html(cfg,dati):
                 ex,ey=ellisse_punti(*ellisse(xs,ys,pp))
                 folium.Polygon(list(zip(ey,ex)),color=c,weight=1,fill=True,fill_color=c,
                                fill_opacity=op,popup=f"{sito} - zona {int(pp*100)}%").add_to(fg)
-        for (lo,la,dist,rotta,tmin,st,inc,*_) in L:
-            folium.CircleMarker([la,lo],radius=2,color=c,fill=True,fill_opacity=0.55,
-                                popup=f"deriva {dist:.0f} km, rotta {rotta:.0f}, {tmin:.0f} min, inc.adv {inc:.0f} km").add_to(fg)
+        # nel punto solo la data del volo: deriva e rotta si leggono dalla mappa,
+        # la data serve a confrontare (e a ritrovare il giorno nel CSV)
+        for r in L:
+            folium.CircleMarker([r[1],r[0]],radius=2,color=c,fill=True,fill_opacity=0.55,
+                                popup=f"{r[9]:%d/%m/%Y}").add_to(fg)
         cx=media(xs); cy=media(ys)
         folium.CircleMarker([cy,cx],radius=6,color=c,fill=True,fill_opacity=1.0,
                             popup=f"{sito}: atterraggio medio").add_to(fg)
