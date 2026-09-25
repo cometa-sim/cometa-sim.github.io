@@ -57,11 +57,11 @@ Norme e autorizzazioni · Domande · Chi siamo.
 ### Dopo ogni modifica: il numero di versione
 
 In `index.html` i sette file di `assets/` sono richiamati con un numero in
-coda — oggi `?v=94`:
+coda — oggi `?v=95`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=94">
-<script src="assets/i18n.js?v=94"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=95">
+<script src="assets/i18n.js?v=95"></script>
 ```
 
 Serve a costringere il browser a riscaricarli. **Chi modifica un file in
@@ -251,10 +251,13 @@ Lo strumento sta tutto in `assets/traiettoria.js` e lavora nel browser di
 chi guarda, senza server nostri:
 
 1. **Il pallone.** Da modello (Strato 1600 o Strato 2000), payload,
-   velocità di salita e bombola (20-50 L a 200 bar) calcola elio
-   necessario — in m³ e in bar da consumare, con l'elio trattato come
-   gas reale (secondo coefficiente del viriale) —, portanza al collo,
-   quota di scoppio e velocità di discesa al suolo.
+   velocità di salita e bombola (20-50 L, proposta la nostra da 40 L)
+   calcola elio necessario — in m³ e in bar da consumare, con l'elio
+   trattato come gas reale (secondo coefficiente del viriale) —,
+   portanza al collo, quota di scoppio, tempo allo scoppio (salita a
+   velocità costante, come in Tawhiri) e velocità di discesa al suolo.
+   La bombola si considera a 200 bar e 15 °C; la pressione letta sul
+   manometro si può impostare a mano.
    È il porting delle funzioni di `cometa_venti.py`, e dà gli stessi
    numeri. La quota di scoppio usa l'atmosfera prevista per il luogo, il
    giorno e l'ora (Forecast API di Open-Meteo fino a 30 hPa, ~24 km) e

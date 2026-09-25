@@ -23,7 +23,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@200;300;400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/cometa.css?v=94">
+<link rel="stylesheet" href="assets/cometa.css?v=95">
 </head>
 <body>
 
@@ -655,12 +655,12 @@
               </select></label>
             <label class="tw-f"><span data-i18n="twPayload">Payload · kg</span><input type="number" id="twPay" value="1.5" min="0.05" max="6" step="0.05" inputmode="decimal"></label>
             <label class="tw-f"><span data-i18n="twAsc">Salita · m/s</span><input type="number" id="twAsc" value="5" min="1" max="10" step="0.1" inputmode="decimal"></label>
-            <label class="tw-f"><span data-i18n="twCyl">Bombola · 200 bar</span>
+            <label class="tw-f"><span data-i18n="twCyl">Bombola</span>
               <select id="twCyl">
                 <option value="20">20 L</option>
                 <option value="30">30 L</option>
-                <option value="40">40 L</option>
-                <option value="50" selected>50 L</option>
+                <option value="40" selected>40 L</option>
+                <option value="50">50 L</option>
               </select></label>
           </div>
         </fieldset>
@@ -673,6 +673,7 @@
             <label class="tw-f"><span data-i18n="twDiam">Ø di scoppio · m</span><input type="number" id="twDiam" min="1" max="30" step="0.1" inputmode="decimal"></label>
             <label class="tw-f"><span data-i18n="twMass">Massa pallone · kg</span><input type="number" id="twMass" min="0.1" max="5" step="0.05" inputmode="decimal"></label>
             <label class="tw-f"><span data-i18n="twChute">Paracadute Ø · m</span><input type="number" id="twChute" min="0.3" max="5" step="0.1" inputmode="decimal"></label>
+            <label class="tw-f"><span data-i18n="twPCyl">Pressione bombola · bar</span><input type="number" id="twPCyl" min="20" max="300" step="1" inputmode="decimal"></label>
             <label class="tw-f"><span data-i18n="twBurst">Scoppio · km</span><input type="number" id="twBurst" min="10" max="45" step="0.1" inputmode="decimal"></label>
             <label class="tw-f"><span data-i18n="twDesc">Discesa al suolo · m/s</span><input type="number" id="twDesc" min="1" max="15" step="0.1" inputmode="decimal"></label>
           </div>
@@ -683,6 +684,7 @@
           <div class="tw-cv"><div class="sl" data-i18n="twHe">Elio necessario</div><div class="sv" id="twCHe">—</div><div class="tw-cs" id="twCHeSrc"></div></div>
           <div class="tw-cv"><div class="sl" data-i18n="twNeck">Portanza al collo</div><div class="sv" id="twCNeck">—</div></div>
           <div class="tw-cv"><div class="sl" data-i18n="twBurstC">Quota di scoppio</div><div class="sv" id="twCBurst">—</div><div class="tw-cs" id="twCBurstSrc"></div></div>
+          <div class="tw-cv"><div class="sl" data-i18n="twTBurst">Tempo allo scoppio</div><div class="sv" id="twCTime">—</div></div>
           <div class="tw-cv"><div class="sl" data-i18n="twDescC">Discesa al suolo</div><div class="sv" id="twCDesc">—</div></div>
         </div>
         <ul class="tw-warn" id="twWarn"></ul>
@@ -1108,11 +1110,11 @@
 
 </div>
 
-<script src="assets/i18n.js?v=94"></script>
-<script src="assets/sonda.js?v=94"></script>
-<script src="assets/catena.js?v=94"></script>
-<script src="assets/app.js?v=94"></script>
-<script src="assets/msis.js?v=94"></script>
-<script src="assets/traiettoria.js?v=94"></script>
+<script src="assets/i18n.js?v=95"></script>
+<script src="assets/sonda.js?v=95"></script>
+<script src="assets/catena.js?v=95"></script>
+<script src="assets/app.js?v=95"></script>
+<script src="assets/msis.js?v=95"></script>
+<script src="assets/traiettoria.js?v=95"></script>
 </body>
 </html>
