@@ -582,8 +582,7 @@ td.mercedes{color:var(--mercedes)}
 .tw-f select{appearance:auto}
 .tw-f input:hover,.tw-f select:hover{border-color:rgba(255,255,255,.22)}
 .tw-f input:focus,.tw-f select:focus{border-color:var(--cyan)}
-.tw-cust{display:none}
-.tw-is-custom .tw-cust{display:flex}
+.tw-f input::placeholder{color:var(--faint);opacity:.75}
 .tw-where{position:relative}
 .tw-sugg{position:absolute;top:100%;left:0;right:0;z-index:30;margin-top:6px;padding:6px 0;list-style:none;
   max-height:300px;overflow-y:auto;border:1px solid var(--line);border-radius:12px;background:#0b1726;
@@ -608,7 +607,7 @@ td.mercedes{color:var(--mercedes)}
 .tw-warn li{position:relative;padding-left:18px;margin-bottom:4px;font-size:13.5px;color:var(--beacon)}
 .tw-warn li::before{content:"!";position:absolute;left:0;font-family:var(--mono);font-weight:600}
 .tw-calc ~ .tw-hint{margin-top:10px}
-.tw-man{margin-top:18px}
+.tw-man{margin:0 0 22px}
 .tw-man summary{cursor:pointer;font-size:14px;color:var(--muted)}
 .tw-man summary:hover{color:var(--ink)}
 .tw-man-f{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,220px));gap:16px;margin:14px 0 8px}

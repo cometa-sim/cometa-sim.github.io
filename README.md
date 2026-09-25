@@ -56,11 +56,11 @@ Norme e autorizzazioni · Domande · Chi siamo.
 ### Dopo ogni modifica: il numero di versione
 
 In `index.html` i sei file di `assets/` sono richiamati con un numero in
-coda — oggi `?v=90`:
+coda — oggi `?v=91`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=90">
-<script src="assets/i18n.js?v=90"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=91">
+<script src="assets/i18n.js?v=91"></script>
 ```
 
 Serve a costringere il browser a riscaricarli. **Chi modifica un file in
@@ -248,12 +248,14 @@ poi lo studio dei venti che ci ha fatto scegliere il sito.
 Lo strumento sta tutto in `assets/traiettoria.js` e lavora nel browser di
 chi guarda, senza server nostri:
 
-1. **Il pallone.** Da modello (1600 g, 2000 g o personalizzato),
+1. **Il pallone.** Da modello (1600 g o Stratoflights 2000 g),
    payload, velocità di salita e paracadute calcola elio necessario,
    portanza al collo, quota di scoppio e velocità di discesa al suolo.
    È il porting delle funzioni di `cometa_venti.py` con l'atmosfera
-   standard, e dà gli stessi numeri. Quota di scoppio e discesa si
-   possono anche imporre a mano.
+   standard, e dà gli stessi numeri. Nella tendina «Imposta a mano i
+   parametri» si cambiano diametro di scoppio e massa del pallone, o si
+   impongono quota di scoppio e discesa: vuoti, valgono quelli del
+   modello e quelli calcolati.
 2. **La partenza.** Si scrive una località (suggerimenti mentre si
    scrive: prima Durazno e Mercedes, poi il geocoder di Open-Meteo),
    oppure le coordinate, oppure si tocca la mappa o si usa la posizione

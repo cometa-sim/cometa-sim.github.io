@@ -139,8 +139,8 @@ function diamPerDiscesa(m, v){      /* l'inversa: il paracadute che da' v al suo
 function readBalloon(){
   const pr = PRESET[elBal.value];
   const b = {
-    diam: pr ? pr.diam : parseFloat(elDiam.value),
-    mass: pr ? pr.mass : parseFloat(elMass.value),
+    diam: elDiam.value !== "" ? parseFloat(elDiam.value) : pr.diam,     /* a mano, o del modello */
+    mass: elMass.value !== "" ? parseFloat(elMass.value) : pr.mass,
     pay: parseFloat(elPay.value), asc: parseFloat(elAsc.value),
     chute: parseFloat(elChute.value), pr: pr, warn: []
   };
@@ -163,9 +163,8 @@ function readBalloon(){
   return b;
 }
 function renderBalloon(){
-  const custom = elBal.value === "custom";
-  form.classList.toggle("tw-is-custom", custom);
-  if(!custom){ elDiam.value = PRESET[elBal.value].diam; elMass.value = PRESET[elBal.value].mass; }
+  const pr = PRESET[elBal.value];
+  elDiam.placeholder = pr.diam; elMass.placeholder = pr.mass;
   const b = readBalloon();
   const set = function(id, v){ $(id).textContent = v; };
   elWarn.innerHTML = "";
@@ -176,8 +175,12 @@ function renderBalloon(){
   }
   set("#twCHe", num(b.V*1000, 0) + " L · " + num(b.V, 2) + " m³");
   set("#twCNeck", num(b.neck, 0) + " g");
-  set("#twCBurst", num(b.burst/1000, 1) + " km");
-  set("#twCDesc", num(b.desc, 1) + " m/s");
+  /* le tessere mostrano i valori che userà il calcolo: quelli a mano, se ci sono */
+  const mb = parseFloat(elBurst.value), md = parseFloat(elDesc.value);
+  const hand = " · " + t("twHand");
+  set("#twCBurst", elBurst.value !== "" && mb > 0 ? num(mb, 1) + " km" + hand : num(b.burst/1000, 1) + " km");
+  set("#twCDesc", elDesc.value !== "" && md > 0 ? num(md, 1) + " m/s" + hand : num(b.desc, 1) + " m/s");
+  elBurst.placeholder = (b.burst/1000).toFixed(1); elDesc.placeholder = b.desc.toFixed(1);
   b.warn.forEach(function(w){ elWarn.appendChild(el("li", null, w)); });
   return b;
 }
