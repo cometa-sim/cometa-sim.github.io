@@ -1,5 +1,5 @@
 /* ============================================================
-   COMETA — prevedere il volo (pagina Studio della traiettoria)
+   COMETA — prevedere il volo (pagina La traiettoria)
 
    1. Il pallone: dallo stesso modello di calcolo/cometa_venti.py
       ricava elio necessario, portanza al collo, quota di scoppio e
