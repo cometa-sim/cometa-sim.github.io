@@ -57,11 +57,11 @@ Norme e autorizzazioni · Domande · Chi siamo.
 ### Dopo ogni modifica: il numero di versione
 
 In `index.html` i sette file di `assets/`, e la mappa, sono richiamati con un numero in
-coda — oggi `?v=99`:
+coda — oggi `?v=100`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=99">
-<script src="assets/i18n.js?v=99"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=100">
+<script src="assets/i18n.js?v=100"></script>
 ```
 
 Serve a costringere il browser a riscaricarli. **Chi modifica un file in
@@ -261,8 +261,8 @@ chi guarda, senza server nostri:
    velocità di salita e bombola (20, 30, 40 o 50 L; proposta la 50 L)
    calcola elio necessario — in m³ e in bar da consumare, con l'elio
    trattato come gas reale (secondo coefficiente del viriale) —,
-   portanza al collo, quota di scoppio, tempo allo scoppio (salita a
-   velocità costante, come in Tawhiri) e velocità di discesa al suolo.
+   portanza al collo, quota di scoppio e velocità di discesa al suolo;
+   il tempo allo scoppio compare nella scheda della traiettoria.
    La bombola si considera a 200 bar e 15 °C; la pressione letta sul
    manometro si può impostare a mano.
    È il porting delle funzioni di `cometa_venti.py`, e dà gli stessi

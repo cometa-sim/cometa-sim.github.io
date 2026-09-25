@@ -597,9 +597,9 @@ td.mercedes{color:var(--mercedes)}
 .tw-link{margin-left:6px;padding:0;border:0;background:none;cursor:pointer;font:inherit;color:var(--cyan);
   border-bottom:1px solid rgba(95,227,255,.3)}
 .tw-link:hover{border-bottom-color:var(--cyan)}
-.tw-calc{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;overflow:hidden;
+.tw-calc{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;overflow:hidden;
   border:1px solid var(--line-soft);border-radius:14px;background:var(--line-soft)}
-@media(max-width:1000px){.tw-calc{grid-template-columns:repeat(2,1fr)}.tw-calc .tw-cv:last-child{grid-column:span 2}}
+@media(max-width:900px){.tw-calc{grid-template-columns:repeat(2,1fr)}}
 .tw-cv{padding:16px 18px;background:rgba(2,6,15,.55)}
 .tw-cv .sl{margin-bottom:8px;font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
 .tw-cv .sv{font-family:var(--disp);font-size:19px;font-weight:500;color:var(--ice);font-variant-numeric:tabular-nums}

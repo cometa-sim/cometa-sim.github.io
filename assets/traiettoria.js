@@ -275,7 +275,7 @@ function renderBalloon(){
   const set = function(id, v){ $(id).textContent = v; };
   elWarn.innerHTML = "";
   if(!b.V){
-    ["#twCHe","#twCNeck","#twCBurst","#twCTime","#twCDesc","#twCBurstSrc","#twCHeSrc"].forEach(function(id){ set(id, /Src$/.test(id) ? "" : "—"); });
+    ["#twCHe","#twCNeck","#twCBurst","#twCDesc","#twCBurstSrc","#twCHeSrc"].forEach(function(id){ set(id, /Src$/.test(id) ? "" : "—"); });
     b.warn.forEach(function(w){ elWarn.appendChild(el("li", null, w)); });
     return b;
   }
@@ -289,12 +289,10 @@ function renderBalloon(){
   /* le tessere mostrano i valori che userà il calcolo: quelli a mano, se ci sono */
   const mb = parseFloat(elBurst.value), md = parseFloat(elDesc.value);
   const hand = " · " + t("twHand");
-  const bd = burstFor(b, elDate.value, elTime.value || "09:00");
+  const bd = burstFor(b, elDate.value, elTime.value || "11:00");
   set("#twCBurst", elBurst.value !== "" && mb > 0 ? num(mb, 1) + " km" + hand : num(bd.m/1000, 1) + " km");
   set("#twCBurstSrc", elBurst.value !== "" && mb > 0 ? "" : t(bd.day ? "twAtmoDay" : "twAtmoStd"));
   set("#twCDesc", elDesc.value !== "" && md > 0 ? num(md, 1) + " m/s" + hand : num(b.desc, 1) + " m/s");
-  const zb = elBurst.value !== "" && mb > 0 ? mb*1000 : bd.m;
-  set("#twCTime", num(zb/b.asc/60, 0) + " min");      /* salita a velocita' costante, come in Tawhiri */
   elBurst.placeholder = (bd.m/1000).toFixed(1); elDesc.placeholder = b.desc.toFixed(1);
   b.warn.forEach(function(w){ elWarn.appendChild(el("li", null, w)); });
   return b;
@@ -308,7 +306,7 @@ function flightParams(iso, hhmm){
   const b = readBalloon();
   if(!b.V) return null;
   const mb = parseFloat(elBurst.value), md = parseFloat(elDesc.value);
-  const bd = burstFor(b, iso || elDate.value, hhmm || elTime.value || "09:00");
+  const bd = burstFor(b, iso || elDate.value, hhmm || elTime.value || "11:00");
   const p = {asc:b.asc, burst:bd.m/1000, desc:b.desc, atmo:bd.day ? "day" : "std"};
   if(elBurst.value !== ""){ if(!(mb >= 10 && mb <= 45)) return null; p.burst = mb; p.atmo = "hand"; }
   if(elDesc.value !== ""){ if(!(md >= 1 && md <= 15)) return null; p.desc = md; }
@@ -528,6 +526,7 @@ function parse(pl, d){
     drift: distKm(pl.lat, pl.lon, end.lat, end.lon),
     bear: bearing(pl.lat, pl.lon, end.lat, end.lon),
     dur: (end.t - t0)/6e4,
+    tBurst: (burst.t - t0)/6e4,
     burstDist: distKm(pl.lat, pl.lon, burst.lat, burst.lon),
     stato: stato(end.lat, end.lon)
   };
@@ -706,6 +705,7 @@ function renderBand(x){
     [t("twSpread"),    t("twSpreadV").replace("{d}", num(spread, 0))],
     [t("twDrift"),     rng(ok.map(function(r){ return r.drift; }), 0, " km")],
     [t("twBear"),      rng(ok.map(function(r){ return r.bear; }), 0, "°")],
+    [t("twTBurst"),    rng(ok.map(function(r){ return r.tBurst; }), 0, " min")],
     [t("twDur"),       rng(ok.map(function(r){ return r.dur; }), 0, " min")],
     [t("twBurstC"),    rng(ok.map(function(r){ return r.burst.alt/1000; }), 1, " km")]
   ];
@@ -747,6 +747,7 @@ function renderCard(r){
    [t("twLand"),      num(r.end.lat, 4) + ", " + num(r.end.lon, 4)],
    [t("twDrift"),     num(r.drift, 0) + " km"],
    [t("twBear"),      num(r.bear, 0) + "°"],
+   [t("twTBurst"),    num(r.tBurst, 0) + " min"],
    [t("twDur"),       num(r.dur, 0) + " min"],
    [t("twAt"),        fmtTime(r.end.t, false)],
    [t("twBurstDist"), num(r.burstDist, 0) + " km · " + num(r.burst.alt/1000, 1) + " km"]
@@ -868,7 +869,7 @@ function renderWeek(){
 }
 elWeekBtn.addEventListener("click", function(){
   if(!ready()) return;
-  const pl = launch, hhmm = elTime.value || "09:00";
+  const pl = launch, hhmm = elTime.value || "11:00";
   week = {};
   const days = [];
   for(let k = 0; k <= GIORNI_MAX; k++){
