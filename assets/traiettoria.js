@@ -476,10 +476,11 @@ function bearing(la1, lo1, la2, lo2){
   const x = Math.cos(la1*RAD)*Math.sin(la2*RAD) - Math.sin(la1*RAD)*Math.cos(la2*RAD)*Math.cos((lo2 - lo1)*RAD);
   return (Math.atan2(y, x)/RAD + 360) % 360;
 }
-/* «Fuori dall'Uruguay» ha senso solo se si parte dall'Uruguay,
-   come in cometa_venti.py */
+/* Territorio e area di esclusione (DINACIA) valgono solo se si parte
+   dall'Uruguay, come in cometa_venti.py: altrimenti nessun giudizio (null) */
 function stato(lat, lon, from){
-  if(from && inPoly(from.lon, from.lat, URU) && !inPoly(lon, lat, URU)) return "fuori";
+  if(!from || !inPoly(from.lon, from.lat, URU)) return null;
+  if(!inPoly(lon, lat, URU)) return "fuori";
   if(inPoly(lon, lat, EXCL)) return "escl";
   return "ok";
 }
@@ -693,10 +694,10 @@ function renderBand(x){
     elRes.appendChild(card); return;
   }
   const n = ok.length, cnt = {ok:0, escl:0, fuori:0};
-  ok.forEach(function(r){ cnt[r.stato]++; });
+  ok.forEach(function(r){ if(r.stato) cnt[r.stato]++; });
   const worst = cnt.fuori ? "fuori" : (cnt.escl ? "escl" : "ok");
   const ofN = function(k){ return t("twOfN").replace("{k}", k).replace("{n}", n); };
-  card.appendChild(el("span", "tw-badge " + worst, worst === "ok" ? t("twOk") :
+  if(ok[0].stato) card.appendChild(el("span", "tw-badge " + worst, worst === "ok" ? t("twOk") :
     t(worst === "escl" ? "twEscl" : "twFuori") + " · " + ofN(cnt[worst])));
   const mLat = ok.reduce(function(s, r){ return s + r.end.lat; }, 0)/n;
   const mLon = ok.reduce(function(s, r){ return s + r.end.lon; }, 0)/n;
@@ -742,8 +743,8 @@ function renderCard(r){
     card.appendChild(el("p", "tw-err", t("twErr").replace("{msg}", r.err)));
     elRes.appendChild(card); return;
   }
-  const badge = {ok:"twOk", escl:"twEscl", fuori:"twFuori"}[r.stato];
-  card.appendChild(el("span", "tw-badge " + r.stato, t(badge)));
+  if(r.stato) card.appendChild(el("span", "tw-badge " + r.stato,
+    t({ok:"twOk", escl:"twEscl", fuori:"twFuori"}[r.stato])));
   const dl = el("dl");
   [[t("twStart"),     t("twGround").replace("{m}", num(r.ground, 0))],
    [t("twLand"),      num(r.end.lat, 4) + ", " + num(r.end.lon, 4)],
@@ -856,7 +857,7 @@ function renderWeek(){
       tr.appendChild(el("td", null, num(r.bear, 0) + "°"));
       tr.appendChild(el("td", null, num(r.dur, 0) + " min"));
       tr.appendChild(el("td", null, num(r.burst.alt/1000, 1) + " km"));
-      tr.appendChild(el("td", "tw-w-" + r.stato, t({ok:"twOk", escl:"twEscl", fuori:"twFuori"}[r.stato])));
+      tr.appendChild(r.stato ? el("td", "tw-w-" + r.stato, t({ok:"twOk", escl:"twEscl", fuori:"twFuori"}[r.stato])) : el("td", null, "—"));
     }
     const pick = function(){
       if(!r || !r.ok) return;
