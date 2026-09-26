@@ -57,11 +57,11 @@ Norme e autorizzazioni · Domande · Chi siamo.
 ### Dopo ogni modifica: il numero di versione
 
 In `index.html` i sette file di `assets/`, e la mappa, sono richiamati con un numero in
-coda — oggi `?v=116`:
+coda — oggi `?v=118`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=116">
-<script src="assets/i18n.js?v=116"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=118">
+<script src="assets/i18n.js?v=118"></script>
 ```
 
 Serve a costringere il browser a riscaricarli. **Chi modifica un file in
@@ -263,8 +263,12 @@ chi guarda, senza server nostri:
    trattato come gas reale (secondo coefficiente del viriale) —,
    portanza al collo, quota di scoppio e velocità di discesa al suolo;
    il tempo allo scoppio compare nella scheda della traiettoria.
-   La bombola si considera a 200 bar e 15 °C; la pressione letta sul
-   manometro si può impostare a mano.
+   La bombola si considera a 200 bar e alla temperatura di gonfiaggio;
+   pressione del manometro e temperatura si possono impostare a mano.
+   Senza temperatura a mano valgono temperatura e pressione al suolo
+   previste all'ora del lancio (come `--temp-gonfiaggio auto` dello
+   script), altrimenti 15 °C e 1 atm. La temperatura cambia il volume da
+   caricare e i bar, non la massa d'elio né la quota di scoppio.
    È il porting delle funzioni di `cometa_venti.py`, e dà gli stessi
    numeri. La quota di scoppio usa l'atmosfera prevista per il luogo, il
    giorno e l'ora (Forecast API di Open-Meteo fino a 30 hPa, ~24 km) e
@@ -279,10 +283,11 @@ chi guarda, senza server nostri:
    impongono quota di scoppio e discesa: vuoti, valgono quelli del
    modello e quelli calcolati.
 2. **La partenza.** Si scrive una località (suggerimenti mentre si
-   scrive: prima Mercedes e Durazno, poi il geocoder di Open-Meteo),
+   scrive: prima l'aerodromo di Mercedes, poi i due siti dello studio,
+   Mercedes e Durazno, poi il geocoder di Open-Meteo),
    oppure le coordinate, oppure si tocca la mappa o si usa la posizione
    del telefono. La stella sulla mappa si può trascinare. Chi arriva
-   trova Mercedes; l'ultimo luogo scelto dal visitatore resta nel
+   trova l'aerodromo di Mercedes (SUME, dove c'è la stazione INUMET); l'ultimo luogo scelto dal visitatore resta nel
    `localStorage` del dispositivo (chiave `cometa-partenza-v2`).
 3. **La traiettoria.** La chiede a **Tawhiri**, il predittore di
    [SondeHub](https://sondehub.org/), sui venti dell'ultima corsa del

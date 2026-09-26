@@ -39,11 +39,15 @@ const TILES = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
 const KEY = "cometa-partenza-v2";
 
 /* I due siti dello studio: proposti per primi fra i suggerimenti */
+/* La partenza proposta e' l'aerodromo di Mercedes (SUME, Ricardo
+   Detomasi), dove c'e' la stazione di INUMET: punto di riferimento
+   dell'aerodromo, 33°14'55"S 58°04'25"W, 21 m. */
 const SUGGERITI = [
-  {name:"Mercedes (Soriano)", lat:-33.249, lon:-58.030, studied:true},
-  {name:"Durazno",            lat:-33.380, lon:-56.520, studied:true}
+  {name:"Mercedes · aeródromo", lat:-33.2486, lon:-58.0736, note:"twInumet"},
+  {name:"Mercedes (Soriano)",   lat:-33.249,  lon:-58.030,  studied:true},
+  {name:"Durazno",              lat:-33.380,  lon:-56.520,  studied:true}
 ];
-const PREDEFINITO = SUGGERITI[0];   /* Mercedes: la partenza proposta a chi arriva */
+const PREDEFINITO = SUGGERITI[0];
 /* [lon, lat], gli stessi poligoni di cometa_venti.py */
 const EXCL = [[-56.78,-34.55],[-56.75,-34.20],[-56.20,-34.12],[-55.74,-34.18],
   [-55.10,-34.15],[-54.60,-34.35],[-54.30,-34.62],[-54.63,-34.84],
@@ -60,7 +64,7 @@ if(!form || !$("#twWhere") || !$("#twBal")) return;
 const elWhere = $("#twWhere"), elSugg = $("#twSugg"), elGeo = $("#twGeo"),
       elDate = $("#twDate"), elTime = $("#twTime"),
       elBal = $("#twBal"), elDiam = $("#twDiam"), elMass = $("#twMass"), elPay = $("#twPay"),
-      elAsc = $("#twAsc"), elChute = $("#twChute"), elCyl = $("#twCyl"), elPCyl = $("#twPCyl"),
+      elAsc = $("#twAsc"), elChute = $("#twChute"), elCyl = $("#twCyl"), elPCyl = $("#twPCyl"), elTGonf = $("#twTGonf"),
       elBurst = $("#twBurst"), elDesc = $("#twDesc"), elWarn = $("#twWarn"),
       elStatus = $("#twStatus"), elRes = $("#twRes"), elMap = $("#twMap"),
       elWeekBtn = $("#twWeekBtn"), elWeekBox = $("#twWeekBox"), elWeekBody = $("#twWeekBody"),
@@ -106,8 +110,8 @@ const PARA_CD = 1.0, PARA_M = 0.08, PARA_D = 1.2;   /* paracadute del kit */
    con il secondo coefficiente del viriale, P (V - n B) = n R T, cioe'
    Z = 1 + B P/(R T) ~ 1,10. Una 50 L contiene ~9,0 m³ a 1 atm, non 9,9. */
 const R_GAS = 8.314462, B_ELIO = 11.8e-6, P_BOMB = 200e5;   /* J/(mol K), m³/mol, Pa; 200 bar se non si imposta a mano */
-function moliBombola(Vb, P){ return P*Vb/(R_GAS*T_RIF + B_ELIO*P); }
-function pressioneBombola(Vb, n){ return n*R_GAS*T_RIF/(Vb - n*B_ELIO); }
+function moliBombola(Vb, P, T){ return P*Vb/(R_GAS*T + B_ELIO*P); }
+function pressioneBombola(Vb, n, T){ return n*R_GAS*T/(Vb - n*B_ELIO); }
 /* Soglie degli avvisi. Discesa: oltre 6 m/s al suolo l'urto rischia di
    rompere la sonda; il paracadute consigliato e' quello che da' 5 m/s. */
 const DESC_MAX = 6, DESC_OBJ = 5, ASC_MIN = 3, BURST_MIN = 30000;
@@ -221,6 +225,7 @@ function loadAtmo(pl){
   if(atmo.key === k && atmo.promise) return atmo.promise;
   const hourly = [];
   LIVELLI.forEach(function(l){ hourly.push("temperature_" + l + "hPa", "geopotential_height_" + l + "hPa"); });
+  hourly.push("temperature_2m", "surface_pressure");        /* per il gonfiaggio */
   const q = new URLSearchParams({latitude:pl.lat.toFixed(4), longitude:pl.lon.toFixed(4),
     hourly:hourly.join(","), timezone:TZ, start_date:today, end_date:lastDay});
   const cur = {key:k, h:null, promise:null};
@@ -239,6 +244,16 @@ function burstSpread(b, iso, hhmm, s){
   const h0 = q(b.diam);
   return {lo:q(b.diam*(1 - s)) - h0, hi:q(b.diam*(1 + s)) - h0};
 }
+/* Temperatura [°C] e pressione [Pa] al suolo previste per il luogo, il
+   giorno e l'ora del lancio (come --temp-gonfiaggio auto dello script) */
+function groundAt(iso, hhmm){
+  const h = launch && atmo.key === atmoKey(launch) ? atmo.h : null;
+  if(!h || !h.time || !h.temperature_2m) return null;
+  const hh = Math.min(23, Math.round(parseInt(hhmm.slice(0, 2), 10) + parseInt(hhmm.slice(3, 5), 10)/60));
+  const i = h.time.indexOf(iso + "T" + String(hh).padStart(2, "0") + ":00");
+  if(i < 0 || h.temperature_2m[i] == null) return null;
+  return {T:h.temperature_2m[i], p:h.surface_pressure && h.surface_pressure[i] != null ? h.surface_pressure[i]*100 : P_STD};
+}
 /* Quota di scoppio per un giorno e un'ora: {m, day} con day=false se ISA */
 function burstFor(b, iso, hhmm){
   const col = launch && atmo.key === atmoKey(launch) ? dayColumn(atmo.h, iso, hhmm, launch.lat) : null;
@@ -255,9 +270,15 @@ function readBalloon(){
     cyl: parseFloat(elCyl.value)/1000,
     pCyl: elPCyl.value !== "" ? parseFloat(elPCyl.value)*1e5 : P_BOMB, pr: pr, warn: []
   };
+  /* gonfiaggio: temperatura a mano, o quella prevista al suolo, o 15 °C; pressione prevista o 1 atm */
+  const gr = groundAt(elDate.value, elTime.value || "11:00");
+  b.tGonfAuto = gr ? gr.T : null;
+  b.tGonf = elTGonf.value !== "" ? parseFloat(elTGonf.value) : (gr ? gr.T : T_RIF - 273.15);
+  b.pGonf = gr ? gr.p : P_STD;
   /* Avvisi solo per cio' che compromette il volo: parametri mancanti o
      incompatibili, peso eccessivo, salita troppo lenta, discesa troppo veloce. */
-  if(!(b.diam > 0 && b.mass > 0 && b.pay > 0 && b.asc >= 1 && b.asc <= 10 && b.chute > 0 && b.pCyl >= 20e5 && b.pCyl <= 300e5)){
+  if(!(b.diam > 0 && b.mass > 0 && b.pay > 0 && b.asc >= 1 && b.asc <= 10 && b.chute > 0 && b.pCyl >= 20e5 && b.pCyl <= 300e5
+       && b.tGonf > -40 && b.tGonf < 60)){
     b.warn.push(t("twWBad")); return b;
   }
   b.V = volumePerSalita(b.mass, b.pay, b.asc);
@@ -265,11 +286,16 @@ function readBalloon(){
   b.burst = quotaScoppio(b.V, b.diam);
   b.neck = (b.V*DRATIO - b.mass)*1000;
   b.desc = vAtterraggio(b.pay + PARA_M, b.chute);
-  /* elio in bombola: moli necessarie (V e' a 15 °C e 1 atm, gas ideale) e pressione che resta */
-  const nNec = P_STD*b.V/(R_GAS*T_RIF), nTot = moliBombola(b.cyl, b.pCyl);
-  b.pRest = nNec < nTot ? pressioneBombola(b.cyl, nTot - nNec) : null;
-  b.cylM3 = nTot*R_GAS*T_RIF/P_STD;
-  if(b.pRest === null) b.warn.push(t("twWCyl").replace("{v}", num(b.V, 2)).replace("{c}", num(b.cylM3, 2)));
+  /* Elio: le moli necessarie non dipendono dalla temperatura (V e' a 15 °C
+     e 1 atm; a parita' di portanza al collo la massa d'elio e' la stessa,
+     come in volume_a_T dello script). Cambia il volume da caricare, e la
+     bombola, che sta alla temperatura del gonfiaggio, dove si legge il manometro. */
+  const TK = b.tGonf + 273.15;
+  const nNec = P_STD*b.V/(R_GAS*T_RIF), nTot = moliBombola(b.cyl, b.pCyl, TK);
+  b.Vg = nNec*R_GAS*TK/b.pGonf;                                 /* m³ nel pallone al gonfiaggio */
+  b.pRest = nNec < nTot ? pressioneBombola(b.cyl, nTot - nNec, TK) : null;
+  b.cylM3 = nTot*R_GAS*TK/b.pGonf;
+  if(b.pRest === null) b.warn.push(t("twWCyl").replace("{v}", num(b.Vg, 2)).replace("{c}", num(b.cylM3, 2)));
   if(pr && b.pay > pr.pmax + 1e-9) b.warn.push(t("twWPay").replace("{max}", Math.round(pr.pmax*1000)));
   if(b.burst < BURST_MIN) b.warn.push(t("twWBurst"));
   if(b.asc < ASC_MIN) b.warn.push(t("twWSlow"));
@@ -290,12 +316,9 @@ function renderBalloon(){
     b.warn.forEach(function(w){ elWarn.appendChild(el("li", null, w)); });
     return b;
   }
-  if(b.pRest !== null){
-    set("#twCHe", num(b.V, 2) + " m³ · " + num((b.pCyl - b.pRest)/1e5, 0) + " bar");
-    set("#twCHeSrc", t("twCylLeft"));
-  } else {
-    set("#twCHe", num(b.V, 2) + " m³"); set("#twCHeSrc", "");
-  }
+  elTGonf.placeholder = (b.tGonfAuto !== null ? b.tGonfAuto : T_RIF - 273.15).toFixed(0);
+  set("#twCHe", num(b.Vg, 2) + " m³" + (b.pRest !== null ? " · " + num((b.pCyl - b.pRest)/1e5, 0) + " bar" : ""));
+  set("#twCHeSrc", t("twGonfAt").replace("{t}", num(b.tGonf, 0)).replace("{p}", String(Math.round(b.pGonf/100))));
   set("#twCNeck", num(b.neck, 0) + " g");
   /* le tessere mostrano i valori che userà il calcolo: quelli a mano, se ci sono */
   const mb = parseFloat(elBurst.value), md = parseFloat(elDesc.value);
@@ -308,7 +331,7 @@ function renderBalloon(){
   b.warn.forEach(function(w){ elWarn.appendChild(el("li", null, w)); });
   return b;
 }
-[elBal, elDiam, elMass, elPay, elAsc, elCyl, elPCyl, elChute, elBurst, elDesc, elDate, elTime].forEach(function(e){
+[elBal, elDiam, elMass, elPay, elAsc, elCyl, elPCyl, elTGonf, elChute, elBurst, elDesc, elDate, elTime].forEach(function(e){
   e.addEventListener("input", renderBalloon);
 });
 
@@ -383,7 +406,7 @@ function showSugg(list, msg){
     const li = el("li", "tw-sg");
     li.id = "twSg" + i; li.setAttribute("role", "option");
     li.appendChild(el("span", "tw-sg-n", s.name));
-    const extra = s.studied ? t("twStudied") : (s.coords ? "" : [s.admin, s.country].filter(Boolean).join(", "));
+    const extra = s.studied ? t("twStudied") : s.note ? t(s.note) : (s.coords ? "" : [s.admin, s.country].filter(Boolean).join(", "));
     if(extra) li.appendChild(el("span", "tw-sg-x", extra));
     li.addEventListener("mousedown", function(e){ e.preventDefault(); setLaunch(s); });
     elSugg.appendChild(li);
@@ -471,7 +494,7 @@ if(elToDay){ elToDay.min = today; elToDay.max = lastDay; }
     elDate.value = addDays(today, 1);
   }
   /* Si parte dall'ultimo luogo scelto su questo dispositivo, altrimenti
-     da Mercedes, uno dei due siti dello studio: con i valori proposti il calcolo
+     dall'aerodromo di Mercedes: con i valori proposti il calcolo
      funziona subito, e il luogo si cambia scrivendo sopra. */
   const saved = loadLaunch();
   if(saved) setLaunch(saved); else setLaunch(PREDEFINITO, false, true);
