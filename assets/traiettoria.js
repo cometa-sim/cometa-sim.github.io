@@ -39,11 +39,15 @@ const TILES = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
 const KEY = "cometa-partenza-v2";
 
 /* I due siti dello studio: proposti per primi fra i suggerimenti */
+/* La partenza proposta e' l'aerodromo di Mercedes (SUME, Ricardo
+   Detomasi), dove c'e' la stazione di INUMET: punto di riferimento
+   dell'aerodromo, 33°14'55"S 58°04'25"W, 21 m. */
 const SUGGERITI = [
-  {name:"Mercedes (Soriano)", lat:-33.249, lon:-58.030, studied:true},
-  {name:"Durazno",            lat:-33.380, lon:-56.520, studied:true}
+  {name:"Mercedes · aeródromo", lat:-33.2486, lon:-58.0736, note:"twInumet"},
+  {name:"Mercedes (Soriano)",   lat:-33.249,  lon:-58.030,  studied:true},
+  {name:"Durazno",              lat:-33.380,  lon:-56.520,  studied:true}
 ];
-const PREDEFINITO = SUGGERITI[0];   /* Mercedes: la partenza proposta a chi arriva */
+const PREDEFINITO = SUGGERITI[0];
 /* [lon, lat], gli stessi poligoni di cometa_venti.py */
 const EXCL = [[-56.78,-34.55],[-56.75,-34.20],[-56.20,-34.12],[-55.74,-34.18],
   [-55.10,-34.15],[-54.60,-34.35],[-54.30,-34.62],[-54.63,-34.84],
@@ -402,7 +406,7 @@ function showSugg(list, msg){
     const li = el("li", "tw-sg");
     li.id = "twSg" + i; li.setAttribute("role", "option");
     li.appendChild(el("span", "tw-sg-n", s.name));
-    const extra = s.studied ? t("twStudied") : (s.coords ? "" : [s.admin, s.country].filter(Boolean).join(", "));
+    const extra = s.studied ? t("twStudied") : s.note ? t(s.note) : (s.coords ? "" : [s.admin, s.country].filter(Boolean).join(", "));
     if(extra) li.appendChild(el("span", "tw-sg-x", extra));
     li.addEventListener("mousedown", function(e){ e.preventDefault(); setLaunch(s); });
     elSugg.appendChild(li);
@@ -490,7 +494,7 @@ if(elToDay){ elToDay.min = today; elToDay.max = lastDay; }
     elDate.value = addDays(today, 1);
   }
   /* Si parte dall'ultimo luogo scelto su questo dispositivo, altrimenti
-     da Mercedes, uno dei due siti dello studio: con i valori proposti il calcolo
+     dall'aerodromo di Mercedes: con i valori proposti il calcolo
      funziona subito, e il luogo si cambia scrivendo sopra. */
   const saved = loadLaunch();
   if(saved) setLaunch(saved); else setLaunch(PREDEFINITO, false, true);

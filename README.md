@@ -57,11 +57,11 @@ Norme e autorizzazioni · Domande · Chi siamo.
 ### Dopo ogni modifica: il numero di versione
 
 In `index.html` i sette file di `assets/`, e la mappa, sono richiamati con un numero in
-coda — oggi `?v=117`:
+coda — oggi `?v=118`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=117">
-<script src="assets/i18n.js?v=117"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=118">
+<script src="assets/i18n.js?v=118"></script>
 ```
 
 Serve a costringere il browser a riscaricarli. **Chi modifica un file in
@@ -283,10 +283,11 @@ chi guarda, senza server nostri:
    impongono quota di scoppio e discesa: vuoti, valgono quelli del
    modello e quelli calcolati.
 2. **La partenza.** Si scrive una località (suggerimenti mentre si
-   scrive: prima Mercedes e Durazno, poi il geocoder di Open-Meteo),
+   scrive: prima l'aerodromo di Mercedes, poi i due siti dello studio,
+   Mercedes e Durazno, poi il geocoder di Open-Meteo),
    oppure le coordinate, oppure si tocca la mappa o si usa la posizione
    del telefono. La stella sulla mappa si può trascinare. Chi arriva
-   trova Mercedes; l'ultimo luogo scelto dal visitatore resta nel
+   trova l'aerodromo di Mercedes (SUME, dove c'è la stazione INUMET); l'ultimo luogo scelto dal visitatore resta nel
    `localStorage` del dispositivo (chiave `cometa-partenza-v2`).
 3. **La traiettoria.** La chiede a **Tawhiri**, il predittore di
    [SondeHub](https://sondehub.org/), sui venti dell'ultima corsa del
