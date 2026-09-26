@@ -33,6 +33,7 @@ const TZ_OFF = "-03:00";            /* l'Uruguay non ha ora legale dal 2015 */
 const GIORNI_MAX = 7;               /* orizzonte della corsa GFS di Tawhiri */
 const LEAFLET = "assets/vendor/leaflet/";
 const COL = "#5FE3FF";              /* --cyan */
+const TILES = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
 /* v2: la prima versione salvava anche la partenza predefinita (Durazno)
    come se l'avesse scelta il visitatore; con una chiave nuova si riparte */
 const KEY = "cometa-partenza-v2";
@@ -63,7 +64,8 @@ const elWhere = $("#twWhere"), elSugg = $("#twSugg"), elGeo = $("#twGeo"),
       elBurst = $("#twBurst"), elDesc = $("#twDesc"), elWarn = $("#twWarn"),
       elStatus = $("#twStatus"), elRes = $("#twRes"), elMap = $("#twMap"),
       elWeekBtn = $("#twWeekBtn"), elWeekBox = $("#twWeekBox"), elWeekBody = $("#twWeekBody"),
-      elToDay = $("#twToDay"), elToTime = $("#twToTime"), elEvery = $("#twEvery"), elLegend = $("#twLegendTxt");
+      elToDay = $("#twToDay"), elToTime = $("#twToTime"), elEvery = $("#twEvery"), elLegend = $("#twLegendTxt"),
+      elErrOn = $("#twErrOn"), elErrSig = $("#twErrSig"), elErrAsc = $("#twErrAsc");
 
 /* ---------- Testi: seguono la lingua scelta nel sito ---------- */
 function lang(){ return document.documentElement.lang || "it"; }
@@ -227,6 +229,15 @@ function loadAtmo(pl){
     .then(function(r){ return r.ok ? r.json() : null; })
     .then(function(d){ cur.h = d && d.hourly ? d.hourly : null; return cur.h; }, function(){ return null; });
   return cur.promise;
+}
+/* Scarti della quota di scoppio se il lattice cede a d(1-s) o d(1+s):
+   {lo, hi} in metri rispetto al valore nominale, con la stessa atmosfera.
+   Si applicano anche a una quota imposta a mano. */
+function burstSpread(b, iso, hhmm, s){
+  const col = launch && atmo.key === atmoKey(launch) ? dayColumn(atmo.h, iso, hhmm, launch.lat) : null;
+  const q = function(d){ return col ? quotaScoppioCol(b.V, d, col) : quotaScoppio(b.V, d); };
+  const h0 = q(b.diam);
+  return {lo:q(b.diam*(1 - s)) - h0, hi:q(b.diam*(1 + s)) - h0};
 }
 /* Quota di scoppio per un giorno e un'ora: {m, day} con day=false se ISA */
 function burstFor(b, iso, hhmm){
@@ -581,8 +592,9 @@ function ensureMap(){
   mapReady = loadLeaflet().then(function(){
     const L = window.L;
     map = L.map(elMap, {scrollWheelZoom:false, zoomControl:true});
-    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      maxZoom:18, attribution:'© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'
+    L.tileLayer(TILES, {
+      maxZoom:18, crossOrigin:true,      /* le stesse mattonelle servono all'esportazione */
+      attribution:'© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'
     }).addTo(map);
     L.control.scale({imperial:false}).addTo(map);
     L.polygon(EXCL.map(function(p){ return [p[1], p[0]]; }),
@@ -591,6 +603,7 @@ function ensureMap(){
        reso trasparente per intero, cosi' le sovrapposizioni non si sommano. */
     map.createPane("twBand").style.cssText = "z-index:395;opacity:.3";
     map.createPane("twLandZ").style.cssText = "z-index:396;opacity:.7";
+    map.createPane("twEll").style.cssText = "z-index:394";
     layer = L.layerGroup().addTo(map);
     /* il contenitore cambia misura (rotazione del telefono, pagina che
        si riassesta): Leaflet va avvisato, o centra su misure vecchie */
@@ -638,7 +651,76 @@ function draw(r, noFit){
     .bindTooltip(t("twLand") + " " + fmtTime(r.end.t, false)).addTo(layer);
   const bb = L.latLngBounds(up.concat(down));
   bb.extend([r.from.lat, r.from.lon]);
+  if(r.spread){       /* intervallo di atterraggio */
+    const g = r.spread;
+    if(g.ellipse){
+      new (smoothPolygon())(g.ellipse, {pane:"twEll", color:"#CFE4F5", weight:1.5, opacity:.8, fillColor:"#CFE4F5", fillOpacity:.1,
+        smoothFactor:0, lineJoin:"round", interactive:false}).addTo(layer);
+      g.ellipse.forEach(function(ll){ bb.extend(ll); });
+    }
+    [[g.B, "#FFB84D"], [g.A, "#A98CFF"]].forEach(function(x){
+      if(!x[0]) return;
+      const seg = [[x[0].lo.end.lat, x[0].lo.end.lon], [r.end.lat, r.end.lon], [x[0].hi.end.lat, x[0].hi.end.lon]];
+      L.polyline(seg, {pane:"twLandZ", color:x[1], weight:6, opacity:1, lineCap:"round", interactive:false}).addTo(layer);
+      seg.forEach(function(ll){ bb.extend(ll); });
+    });
+  }
   if(!noFit){ map.invalidateSize(); map.fitBounds(bb, {padding:[30,30], maxZoom:10}); }
+}
+
+/* ---------- Intervallo di atterraggio ----------
+   Ogni coppia di estremi da' un semi-vettore di spostamento
+   dell'atterraggio (meta' della distanza fra i due): a per lo scoppio,
+   b per la salita. Con C = a·aT + b·bT = M·MT (M = [a b]) e x = αa + βb
+   si ha xT·C^-1·x = α² + β²: i vertici ±a±b del parallelogramma stanno
+   su xT·C^-1·x = 2. Quella e' l'ellisse di area minima che lo contiene
+   (Löwner–John: nelle coordinate α, β e' il cerchio circoscritto al
+   quadrato), quindi semiassi = √2 · √autovalori di C. */
+/* Leaflet arrotonda ogni vertice al pixel intero: su un'ellisse di poche
+   decine di pixel il contorno diventa a scalini. Questo poligono proietta
+   i vertici senza arrotondare, e l'SVG li disegna con i decimali. */
+let SmoothPolygon = null;
+function smoothPolygon(){
+  if(SmoothPolygon) return SmoothPolygon;
+  const L = window.L;
+  SmoothPolygon = L.Polygon.extend({
+    _projectLatlngs: function(latlngs, result, projectedBounds){
+      if(latlngs[0] instanceof L.LatLng){
+        const origin = this._map.getPixelOrigin(), ring = [];
+        for(let i = 0; i < latlngs.length; i++){
+          const p = this._map.project(latlngs[i])._subtract(origin);
+          ring.push(p); projectedBounds.extend(p);
+        }
+        result.push(ring);
+      } else {
+        for(let i = 0; i < latlngs.length; i++) this._projectLatlngs(latlngs[i], result, projectedBounds);
+      }
+    }
+  });
+  return SmoothPolygon;
+}
+function kmVec(from, to){
+  return [(to.lon - from.lon)*111.32*Math.cos(from.lat*RAD), (to.lat - from.lat)*110.57];
+}
+function spreadGeom(r, B, A){
+  const g = {B:B, A:A};
+  const half = function(X){ const u = kmVec(X.lo.end, X.hi.end); return [u[0]/2, u[1]/2]; };
+  const a = B ? half(B) : [0, 0], b = A ? half(A) : [0, 0];
+  const c11 = a[0]*a[0] + b[0]*b[0], c22 = a[1]*a[1] + b[1]*b[1], c12 = a[0]*a[1] + b[0]*b[1];
+  const tr = (c11 + c22)/2, dt = Math.sqrt(Math.max(0, (c11 - c22)*(c11 - c22)/4 + c12*c12));
+  const l1 = tr + dt, l2 = Math.max(0, tr - dt), th = Math.atan2(l1 - c11, c12 || 1e-12);
+  const k2 = B && A ? Math.SQRT2 : 1;     /* con un solo segmento: meta' segmento */
+  g.major = k2*Math.sqrt(l1); g.minor = k2*Math.sqrt(l2); g.theta = th;
+  if(B && A){       /* ellisse solo con entrambe le incertezze */
+    const lat0 = r.end.lat, lon0 = r.end.lon, k = Math.cos(lat0*RAD), pts = [];
+    for(let i = 0; i <= 360; i++){
+      const u = 2*Math.PI*i/360, ex = g.major*Math.cos(u), ey = g.minor*Math.sin(u);
+      const x = ex*Math.cos(g.theta) - ey*Math.sin(g.theta), y = ex*Math.sin(g.theta) + ey*Math.cos(g.theta);
+      pts.push([lat0 + y/110.57, lon0 + x/(111.32*k)]);
+    }
+    g.ellipse = pts;
+  }
+  return g;
 }
 
 /* ---------- Piu' partenze: una fascia sola ----------
@@ -739,7 +821,14 @@ function show(x, noFit){
   const band = !!(x && x.band);
   if(elLegend){ elLegend.setAttribute("data-i18n", band ? "twLegendBand" : "twLegend"); elLegend.textContent = t(band ? "twLegendBand" : "twLegend"); }
   if(band){ renderBand(x); statusDone(x.list); if(map) drawBand(x, noFit); }
-  else { renderCard(x); statusDone([x]); if(map) draw(x, noFit); }
+  else {
+    renderCard(x); statusDone([x]); if(map) draw(x, noFit);
+    if(elLegend && x && x.spread){
+      const e = [x.spread.B ? t("twLegendErrB") : "", x.spread.A ? t("twLegendErrA") : "", x.spread.ellipse ? t("twLegendErrE") : ""]
+        .filter(Boolean).join(" · ");
+      elLegend.textContent = t("twLegend") + " " + e.charAt(0).toUpperCase() + e.slice(1) + ".";
+    }
+  }
 }
 
 /* ---------- Risultati ---------- */
@@ -763,7 +852,12 @@ function renderCard(r){
    [t("twDur"),       num(r.dur, 0) + " min"],
    [t("twAt"),        fmtTime(r.end.t, false)],
    [t("twBurstDist"), num(r.burstDist, 0) + " km · " + num(r.burst.alt/1000, 1) + " km"]
-  ].forEach(function(row){ dl.appendChild(el("dt", null, row[0])); dl.appendChild(el("dd", null, row[1])); });
+  ].concat(r.spread ? [[t("twErrLand"), "± " + num(r.spread.major, 1) + " km"]] : [])
+   .concat(r.spread && r.spread.B ? [[t("twBurstRange"),
+     num(r.spread.B.lo.burst.alt/1000, 1) + "–" + num(r.spread.B.hi.burst.alt/1000, 1) + " km"]] : [])
+   .concat(r.spread && r.spread.A ? [[t("twAscRange"),
+     num(r.spread.A.vLo, 2) + "–" + num(r.spread.A.vHi, 2) + " m/s"]] : [])
+   .forEach(function(row){ dl.appendChild(el("dt", null, row[0])); dl.appendChild(el("dd", null, row[1])); });
   card.appendChild(dl);
   if(r.atmo) card.appendChild(el("p", "tw-hint tw-card-note",
     t({day:"twCardDay", std:"twCardStd", hand:"twCardHand"}[r.atmo])));
@@ -821,7 +915,25 @@ form.addEventListener("submit", function(e){
   setStatus(t("twLoading"));
   Promise.all([ensureMap(), loadAtmo(pl).then(function(){
     const p = flightParams(iso, hhmm);
-    return predict(pl, when, p).then(function(r){ r.atmo = p.atmo; return r; });
+    /* Intervallo di atterraggio: la stessa partenza con il diametro di
+       scoppio a d(1±sB) e con la velocita' di salita a v(1±sA) (quota di
+       scoppio invariata); fino a cinque traiettorie. */
+    const on = elErrOn && elErrOn.checked, valid = function(x){ return x > 0 && x < 0.5; };
+    const sB = on ? parseFloat(elErrSig.value)/100 : 0, sA = on ? parseFloat(elErrAsc.value)/100 : 0;
+    const soft = function(q){ return q ? predict(pl, when, q).catch(function(){ return null; }) : Promise.resolve(null); };
+    let bLo = null, bHi = null, aLo = null, aHi = null;
+    if(valid(sB)){
+      const d = burstSpread(readBalloon(), iso, hhmm, sB);
+      bLo = Object.assign({}, p, {burst:p.burst + d.lo/1000}); bHi = Object.assign({}, p, {burst:p.burst + d.hi/1000});
+    }
+    if(valid(sA)){ aLo = Object.assign({}, p, {asc:p.asc*(1 - sA)}); aHi = Object.assign({}, p, {asc:p.asc*(1 + sA)}); }
+    return Promise.all([predict(pl, when, p), soft(bLo), soft(bHi), soft(aLo), soft(aHi)]).then(function(rr){
+      const r = rr[0]; r.atmo = p.atmo;
+      const B = rr[1] && rr[2] ? {s:sB, lo:rr[1], hi:rr[2]} : null;
+      const A = rr[3] && rr[4] ? {s:sA, lo:rr[3], hi:rr[4], vLo:aLo.asc, vHi:aHi.asc} : null;
+      if(B || A) r.spread = spreadGeom(r, B, A);
+      return r;
+    });
   }).catch(function(e){ return {ok:false, from:pl, err:e.message}; })])
     .then(function(res){
       last = res[1];
@@ -908,6 +1020,171 @@ elWeekBtn.addEventListener("click", function(){
     statusDone(Object.keys(week).map(function(k){ return week[k]; }));
   });
 });
+
+/* ==========================================================
+   Esportazione: la mappa in PNG ad alta risoluzione, tema chiaro
+   ==========================================================
+   Non e' una fotografia dello schermo: si ridisegna la stessa vista su un
+   canvas con le mattonelle OSM a uno o due livelli di zoom in piu' (piu'
+   dettaglio, nessun filtro scuro) e i tracciati con colori da fondo
+   chiaro, piu' una riga con luogo, data, legenda, scala e attribuzione.
+   Le mattonelle sono al massimo MAX_TILES, per rispetto del server OSM. */
+const MAX_TILES = 200, OUT_W = 3200;
+const LIGHT = {track:"#0B6FA4", band:"#0B6FA4", land:"#E08E0B", asc:"#6C4FD1", ell:"#1F2D3D",
+               excl:"#C0392B", ink:"#0E1620", muted:"#4A5B6C", paper:"#FFFFFF"};
+function loadTile(url){
+  return new Promise(function(ok){
+    const im = new Image();
+    im.crossOrigin = "anonymous";
+    im.onload = function(){ ok(im); }; im.onerror = function(){ ok(null); };
+    im.src = url;
+  });
+}
+function exportPng(){
+  if(!map) return;
+  const L = window.L, msg = $("#twPngMsg");
+  msg.textContent = t("twPngWait");
+  const size = map.getSize(), z0 = map.getZoom();
+  /* Immagine sempre larga almeno OUT_W pixel (fattore S rispetto allo
+     schermo). Le mattonelle salgono di zoom quanto basta, ma senza
+     superare MAX_TILES: oltre, si ingrandiscono (k > 1). */
+  const S = Math.max(2, OUT_W/size.x);
+  let dz = Math.max(0, Math.min(3, Math.floor(Math.log2(S) + 1e-9)));
+  const tilesFor = function(d){ const f = Math.pow(2, d); return (Math.ceil(size.x*f/256) + 1)*(Math.ceil(size.y*f/256) + 1); };
+  while(dz > 0 && tilesFor(dz) > MAX_TILES) dz--;
+  const z = Math.min(18, z0 + dz), k = S/Math.pow(2, z - z0);
+  const W = Math.round(size.x*S), H = Math.round(size.y*S);
+  const origin = map.project(map.containerPointToLatLng([0, 0]), z);          /* pixel alla zoom delle mattonelle */
+  const P = function(lat, lon){ const p = map.project([lat, lon], z); return [(p.x - origin.x)*k, (p.y - origin.y)*k]; };
+  const u = W/1100;                                   /* unita' grafica: spessori e testi */
+  /* piede: titolo, legenda (a capo se serve), attribuzione */
+  const meas = document.createElement("canvas").getContext("2d");
+  meas.font = 12.5*u + "px Inter, system-ui, sans-serif";
+  const words = (elLegend ? elLegend.textContent : "").split(" "), lines = [];
+  let line = "";
+  words.forEach(function(wd){
+    const tryL = line ? line + " " + wd : wd;
+    if(line && meas.measureText(tryL).width > W - 36*u){ lines.push(line); line = wd; } else line = tryL;
+  });
+  if(line) lines.push(line);
+  const FOOT = Math.round((44 + 19*lines.length + 26)*u);
+  const cv = document.createElement("canvas"); cv.width = W; cv.height = H + FOOT;
+  const g = cv.getContext("2d");
+  g.fillStyle = "#E8EEF2"; g.fillRect(0, 0, W, H);
+  g.imageSmoothingQuality = "high";
+  /* mattonelle */
+  const n = Math.pow(2, z), jobs = [];
+  for(let ty = Math.floor(origin.y/256); ty <= Math.floor((origin.y + H/k)/256); ty++){
+    if(ty < 0 || ty >= n) continue;
+    for(let tx = Math.floor(origin.x/256); tx <= Math.floor((origin.x + W/k)/256); tx++){
+      const wx = ((tx % n) + n) % n;
+      const url = TILES.replace("{z}", z).replace("{x}", wx).replace("{y}", ty);
+      jobs.push(loadTile(url).then(function(im){
+        /* +0,5 px per non lasciare fessure fra una mattonella e l'altra quando k non e' intero */
+        if(im) g.drawImage(im, (tx*256 - origin.x)*k, (ty*256 - origin.y)*k, 256*k + .5, 256*k + .5);
+        return !!im;
+      }));
+    }
+  }
+  Promise.all(jobs).then(function(res){
+    const missing = res.filter(function(x){ return !x; }).length;
+    const path = function(pts, close){
+      g.beginPath();
+      pts.forEach(function(q, i){ const p = P(q[0], q[1]); if(i) g.lineTo(p[0], p[1]); else g.moveTo(p[0], p[1]); });
+      if(close) g.closePath();
+    };
+    const dot = function(lat, lon, r, fill, stroke, w){
+      const p = P(lat, lon); g.beginPath(); g.arc(p[0], p[1], r*u, 0, 2*Math.PI);
+      g.fillStyle = fill; g.fill(); if(stroke){ g.lineWidth = w*u; g.strokeStyle = stroke; g.stroke(); }
+    };
+    g.lineJoin = "round"; g.lineCap = "round";
+    /* area di esclusione */
+    path(EXCL.map(function(q){ return [q[1], q[0]]; }), true);
+    g.globalAlpha = .12; g.fillStyle = LIGHT.excl; g.fill(); g.globalAlpha = .8;
+    g.lineWidth = 1.5*u; g.strokeStyle = LIGHT.excl; g.stroke(); g.globalAlpha = 1;
+    const x = last;
+    if(x && x.band){
+      /* fascia: disegnata opaca su un foglio a parte e posata trasparente, come a schermo */
+      const ok = x.list.filter(function(r){ return r.ok; });
+      if(ok.length > 1){
+        const off = document.createElement("canvas"); off.width = W; off.height = H;
+        const o = off.getContext("2d"), R = ok.map(function(r){ return resample(r, FETTE); });
+        o.fillStyle = o.strokeStyle = LIGHT.band; o.lineWidth = 2*u; o.lineJoin = "round";
+        for(let k = 0; k < FETTE; k++){
+          const h = hull(R.map(function(r){ return r[k]; }).concat(R.map(function(r){ return r[k + 1]; })));
+          if(h.length < 3) continue;
+          o.beginPath(); h.forEach(function(q, i){ const p = P(q[1], q[0]); if(i) o.lineTo(p[0], p[1]); else o.moveTo(p[0], p[1]); });
+          o.closePath(); o.fill(); o.stroke();
+        }
+        g.globalAlpha = .3; g.drawImage(off, 0, 0); g.globalAlpha = .75;
+        const land = hull(ok.map(function(r){ return [r.end.lon, r.end.lat]; })).map(function(q){ return [q[1], q[0]]; });
+        path(land, land.length > 2); g.fillStyle = g.strokeStyle = LIGHT.land; g.lineWidth = (land.length > 2 ? 2 : 8)*u;
+        if(land.length > 2) g.fill(); g.stroke(); g.globalAlpha = 1;
+      }
+    } else if(x && x.ok){
+      const r = x, up = r.pts.filter(function(p){ return p.up; }).map(function(p){ return [p.lat, p.lon]; });
+      const down = [[r.burst.lat, r.burst.lon]].concat(r.pts.filter(function(p){ return !p.up; }).map(function(p){ return [p.lat, p.lon]; }));
+      g.strokeStyle = LIGHT.track;
+      path(up); g.lineWidth = 3*u; g.stroke();
+      g.setLineDash([6*u, 7*u]); path(down); g.lineWidth = 2.5*u; g.stroke(); g.setLineDash([]);
+      if(r.spread){
+        const s = r.spread;
+        if(s.ellipse){ path(s.ellipse, true); g.fillStyle = LIGHT.ell; g.globalAlpha = .08; g.fill(); g.globalAlpha = 1;
+                       g.lineWidth = 1.5*u; g.strokeStyle = LIGHT.ell; g.stroke(); }
+        [[s.B, LIGHT.land], [s.A, LIGHT.asc]].forEach(function(q){
+          if(!q[0]) return;
+          path([[q[0].lo.end.lat, q[0].lo.end.lon], [r.end.lat, r.end.lon], [q[0].hi.end.lat, q[0].hi.end.lon]]);
+          g.lineWidth = 6*u; g.strokeStyle = q[1]; g.globalAlpha = .85; g.stroke(); g.globalAlpha = 1;
+        });
+      }
+      dot(r.burst.lat, r.burst.lon, 5, "#FFFFFF", LIGHT.track, 2);
+      dot(r.end.lat, r.end.lon, 8, LIGHT.land, LIGHT.ink, 2);
+    }
+    /* partenza: stella */
+    if(launch){
+      const p = P(launch.lat, launch.lon), R1 = 11*u, R2 = 4.6*u;
+      g.beginPath();
+      for(let i = 0; i < 10; i++){
+        const a = -Math.PI/2 + i*Math.PI/5, rr = i % 2 ? R2 : R1;
+        g[i ? "lineTo" : "moveTo"](p[0] + rr*Math.cos(a), p[1] + rr*Math.sin(a));
+      }
+      g.closePath(); g.fillStyle = LIGHT.track; g.fill(); g.lineWidth = 1.5*u; g.strokeStyle = "#FFFFFF"; g.stroke();
+    }
+    /* scala */
+    const c = map.getCenter(), mpp = 40075016.686*Math.cos(c.lat*RAD)/(256*n)/k;
+    const target = 160*u*mpp, pow = Math.pow(10, Math.floor(Math.log10(target)));
+    const nice = [1, 2, 5, 10].map(function(k){ return k*pow; }).filter(function(v){ return v <= target; }).pop() || pow;
+    const len = nice/mpp, sx = 18*u, sy = H - 18*u;
+    g.fillStyle = "rgba(255,255,255,.85)"; g.fillRect(sx - 8*u, sy - 22*u, len + 16*u, 30*u);
+    g.strokeStyle = LIGHT.ink; g.lineWidth = 2*u; g.lineCap = "butt";
+    g.beginPath(); g.moveTo(sx, sy - 6*u); g.lineTo(sx, sy); g.lineTo(sx + len, sy); g.lineTo(sx + len, sy - 6*u); g.stroke();
+    g.fillStyle = LIGHT.ink; g.font = "600 " + 12*u + "px Inter, system-ui, sans-serif"; g.textBaseline = "bottom";
+    g.fillText(nice >= 1000 ? num(nice/1000, 0) + " km" : num(nice, 0) + " m", sx, sy - 8*u);
+    /* piede: titolo, legenda, attribuzione */
+    g.fillStyle = LIGHT.paper; g.fillRect(0, H, W, FOOT);
+    g.fillStyle = LIGHT.ink; g.textBaseline = "alphabetic"; g.font = "600 " + 17*u + "px 'Space Grotesk', Inter, system-ui, sans-serif";
+    let title = "COMETA · " + (launch ? launch.name : "");
+    if(x && x.band) title += " · " + t("twNFlights").toLowerCase() + " " + x.list.filter(function(r){ return r.ok; }).length;
+    else if(x && x.ok) title += " · " + fmtTime(x.pts[0].t, true) + (x.run ? " · GFS " + fmtTime(x.run, true) : "");
+    g.fillText(title, 18*u, H + 30*u);
+    g.fillStyle = LIGHT.muted; g.font = 12.5*u + "px Inter, system-ui, sans-serif";
+    lines.forEach(function(l, i){ g.fillText(l, 18*u, H + (53 + 19*i)*u); });
+    g.font = 11*u + "px Inter, system-ui, sans-serif"; g.fillStyle = "#7A8A99";
+    g.fillText("© OpenStreetMap contributors · Tawhiri (SondeHub) · NOAA GFS · cometa.scuolaitaliana.edu.uy", 18*u, H + FOOT - 14*u);
+    try {
+      cv.toBlob(function(blob){
+        if(!blob){ msg.textContent = t("twPngErr"); return; }
+        const a = document.createElement("a"), day = x && x.ok ? isoDay(x.pts[0].t) : elDate.value;
+        a.download = "cometa-traiettoria-" + (launch ? launch.name : "mappa").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") + "-" + day + ".png";
+        a.href = URL.createObjectURL(blob);
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(function(){ URL.revokeObjectURL(a.href); }, 4000);
+        msg.textContent = missing ? t("twPngPart") : "";
+      }, "image/png");
+    } catch(e){ msg.textContent = t("twPngErr"); }
+  });
+}
+$("#twPng") && $("#twPng").addEventListener("click", function(){ ensureMap().then(exportPng); });
 
 /* ---------- Cambio di lingua: si riscrive quello che e' gia' a schermo ---------- */
 function relabel(){

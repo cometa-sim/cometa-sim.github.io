@@ -617,6 +617,8 @@ td.mercedes{color:var(--mercedes)}
 .tw-man{margin:0 0 22px}
 .tw-man summary{cursor:pointer;font-size:14px;color:var(--muted)}
 .tw-man summary:hover{color:var(--ink)}
+.tw-check{display:flex;align-items:center;gap:10px;min-height:42px;align-self:end;cursor:pointer;font-size:14.5px;color:var(--ink)}
+.tw-check input{width:18px;height:18px;accent-color:var(--cyan);cursor:pointer}
 .tw-man-h{margin:22px 0 0;padding-top:16px;border-top:1px solid var(--line-soft);font-family:var(--disp);font-size:15px;font-weight:600;color:var(--ink)}
 .tw-man-f{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,220px));gap:16px;margin:14px 0 8px}
 .tw-acts{display:flex;flex-wrap:wrap;gap:12px;margin-top:24px}
@@ -656,6 +658,7 @@ td.mercedes{color:var(--mercedes)}
 .tw-star{background:none;border:0;cursor:grab}
 .tw-star span{display:block;font-size:26px;line-height:26px;text-align:center;
   text-shadow:0 0 3px #02060f,0 0 12px currentColor}
+.tw-export{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;margin-top:14px}
 .tw-week .table-wrap{margin-top:26px}
 .tw-week tbody tr{cursor:pointer}
 .tw-week td.tw-w-ok{color:var(--green)}
