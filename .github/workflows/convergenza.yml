@@ -1,0 +1,67 @@
+# COMETA — raccolta della convergenza delle previsioni di Tawhiri
+#
+# Una volta al giorno chiede a Tawhiri il volo previsto per oggi e per i
+# sette giorni seguenti (calcolo/convergenza_raccolta.py) e aggiunge i
+# punti di atterraggio a convergenza.csv sul branch `dati`. Quel branch
+# non e' protetto dal ruleset e non e' quello da cui si pubblica il sito:
+# il bot ci scrive senza PR e senza rigenerare le pagine.
+#
+# Le schedule girano solo dal branch di default, quindi questo file deve
+# stare su main. Si puo' lanciare anche a mano (Actions -> Run workflow).
+
+name: Convergenza delle previsioni
+
+on:
+  schedule:
+    # 06:37 UTC: la corsa GFS delle 00Z e' gia' in Tawhiri. Non al minuto
+    # 0, dove le schedule di GitHub si accodano e partono in ritardo.
+    - cron: "37 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: convergenza
+  cancel-in-progress: false
+
+jobs:
+  raccolta:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Script (da main)
+        uses: actions/checkout@v4
+
+      - name: Dati (branch dati, creato vuoto al primo giro)
+        run: |
+          if git ls-remote --exit-code --heads origin dati >/dev/null; then
+            git fetch --no-tags origin dati
+            git worktree add ${{ runner.temp }}/dati FETCH_HEAD
+            git -C ${{ runner.temp }}/dati checkout -B dati
+          else
+            git worktree add --detach ${{ runner.temp }}/dati
+            git -C ${{ runner.temp }}/dati checkout --orphan dati
+            git -C ${{ runner.temp }}/dati rm -rfq .
+          fi
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Otto previsioni
+        run: python3 calcolo/convergenza_raccolta.py --csv ${{ runner.temp }}/dati/convergenza.csv
+
+      - name: Commit sul branch dati
+        working-directory: ${{ runner.temp }}/dati
+        run: |
+          # *.csv e' nel .gitignore di main: qui serve -f
+          git add -f convergenza.csv
+          if git diff --cached --quiet; then
+            echo "Nessuna riga nuova (stesso dataset del giro precedente)."
+            exit 0
+          fi
+          git -c user.name="github-actions[bot]" \
+              -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+              commit -qm "Convergenza: previsioni del $(date -u +%Y-%m-%d)"
+          git push origin dati

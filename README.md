@@ -34,6 +34,9 @@ assets/img/og.png                   anteprima per social e messaggistica
 
 mappe/uru2000_footprint.html        mappa generata da cometa_venti.py — NON modificare a mano
 calcolo/cometa_venti.py             lo script della simulazione e della previsione
+calcolo/convergenza_raccolta.py     raccolta quotidiana delle previsioni di Tawhiri (workflow)
+calcolo/convergenza_analisi.py      di quanto si sposta l'atterraggio previsto al variare dell'anticipo
+.github/workflows/convergenza.yml   il workflow quotidiano, scrive sul branch dati
 
 LICENSE · README.md · .gitignore
 ```
@@ -332,6 +335,34 @@ con `crossOrigin`: senza, il canvas non si potrebbe salvare.
 
 Leaflet (`assets/vendor/leaflet/`) si scarica solo quando la mappa entra
 nello schermo.
+
+#### Quanto ci si può fidare della previsione a qualche giorno
+
+Per costruire una curva «spostamento contro anticipo», il workflow
+`.github/workflows/convergenza.yml` gira ogni giorno alle 06:37 UTC (non
+al minuto 0, dove GitHub accoda le schedule) e chiede a Tawhiri il volo
+proposto dalla pagina — aerodromo di Mercedes, Strato 2000, payload
+1,5 kg, salita 5 m/s, ore 11:00 — per oggi e per i sette giorni seguenti.
+Quota di scoppio e discesa sono fisse (ISA), così cambia solo il vento. I
+punti di atterraggio finiscono in `convergenza.csv` sul branch `dati`,
+non protetto e non pubblicato: il bot ci scrive senza PR e il sito non
+si rigenera. Una riga con lo stesso `(dataset, bersaglio)` di una già
+presente si scarta, così un giro caduto sulla stessa corsa GFS del
+precedente non aggiunge nulla.
+
+L'analisi si fa a mano:
+
+```
+git fetch origin dati && git show origin/dati:convergenza.csv > convergenza.csv
+python3 calcolo/convergenza_analisi.py convergenza.csv
+```
+
+Per ogni bersaglio T il riferimento è la previsione emessa il giorno T
+stesso; e(τ) è la distanza fra il punto previsto τ giorni prima e quello
+di riferimento. Misura la *convergenza* della previsione, non l'errore:
+il riferimento non è la verità, quindi è un limite inferiore, ed e(0) è
+zero per costruzione. Se si cambiano i parametri del volo nello script,
+le righe vecchie non sono più confrontabili: meglio un CSV nuovo.
 
 ### Three.js
 
