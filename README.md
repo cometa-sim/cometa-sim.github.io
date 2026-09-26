@@ -57,11 +57,11 @@ Norme e autorizzazioni · Domande · Chi siamo.
 ### Dopo ogni modifica: il numero di versione
 
 In `index.html` i sette file di `assets/`, e la mappa, sono richiamati con un numero in
-coda — oggi `?v=114`:
+coda — oggi `?v=115`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=114">
-<script src="assets/i18n.js?v=114"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=115">
+<script src="assets/i18n.js?v=115"></script>
 ```
 
 Serve a costringere il browser a riscaricarli. **Chi modifica un file in
@@ -301,7 +301,8 @@ chi guarda, senza server nostri:
    ±s % (quota di scoppio invariata), 5 % proposto per entrambi: fino a
    cinque richieste a Tawhiri. Sulla mappa un segmento arancione (scoppio)
    e uno viola (salita) uniscono gli atterraggi estremi; con entrambi c'è
-   anche l'ellisse di covarianza a·aᵀ + b·bᵀ dei due semi-segmenti. Con
+   anche l'ellisse xᵀC⁻¹x ≤ 2 con C = a·aᵀ + b·bᵀ (a, b i due
+   semi-segmenti): la minima che contiene il parallelogramma ±a±b. Con
    0 in una delle due voci resta solo l'altro segmento.
 
 Il giorno proposto è la data di `LAUNCH` in `assets/app.js`, quando cade

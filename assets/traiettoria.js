@@ -652,7 +652,8 @@ function draw(r, noFit){
   if(r.spread){       /* intervallo di atterraggio */
     const g = r.spread;
     if(g.ellipse){
-      L.polygon(g.ellipse, {pane:"twEll", color:"#CFE4F5", weight:1.5, opacity:.8, fillColor:"#CFE4F5", fillOpacity:.1, interactive:false}).addTo(layer);
+      new (smoothPolygon())(g.ellipse, {pane:"twEll", color:"#CFE4F5", weight:1.5, opacity:.8, fillColor:"#CFE4F5", fillOpacity:.1,
+        smoothFactor:0, lineJoin:"round", interactive:false}).addTo(layer);
       g.ellipse.forEach(function(ll){ bb.extend(ll); });
     }
     [[g.B, "#FFB84D"], [g.A, "#A98CFF"]].forEach(function(x){
@@ -667,9 +668,35 @@ function draw(r, noFit){
 
 /* ---------- Intervallo di atterraggio ----------
    Ogni coppia di estremi da' un semi-vettore di spostamento
-   dell'atterraggio (meta' della distanza fra i due). Trattandoli come
-   indipendenti, l'ellisse ha covarianza a·aT + b·bT: contiene le
-   estremita' dei due segmenti e ne segue l'orientamento. */
+   dell'atterraggio (meta' della distanza fra i due): a per lo scoppio,
+   b per la salita. Con C = a·aT + b·bT = M·MT (M = [a b]) e x = αa + βb
+   si ha xT·C^-1·x = α² + β²: i vertici ±a±b del parallelogramma stanno
+   su xT·C^-1·x = 2. Quella e' l'ellisse di area minima che lo contiene
+   (Löwner–John: nelle coordinate α, β e' il cerchio circoscritto al
+   quadrato), quindi semiassi = √2 · √autovalori di C. */
+/* Leaflet arrotonda ogni vertice al pixel intero: su un'ellisse di poche
+   decine di pixel il contorno diventa a scalini. Questo poligono proietta
+   i vertici senza arrotondare, e l'SVG li disegna con i decimali. */
+let SmoothPolygon = null;
+function smoothPolygon(){
+  if(SmoothPolygon) return SmoothPolygon;
+  const L = window.L;
+  SmoothPolygon = L.Polygon.extend({
+    _projectLatlngs: function(latlngs, result, projectedBounds){
+      if(latlngs[0] instanceof L.LatLng){
+        const origin = this._map.getPixelOrigin(), ring = [];
+        for(let i = 0; i < latlngs.length; i++){
+          const p = this._map.project(latlngs[i])._subtract(origin);
+          ring.push(p); projectedBounds.extend(p);
+        }
+        result.push(ring);
+      } else {
+        for(let i = 0; i < latlngs.length; i++) this._projectLatlngs(latlngs[i], result, projectedBounds);
+      }
+    }
+  });
+  return SmoothPolygon;
+}
 function kmVec(from, to){
   return [(to.lon - from.lon)*111.32*Math.cos(from.lat*RAD), (to.lat - from.lat)*110.57];
 }
@@ -680,11 +707,12 @@ function spreadGeom(r, B, A){
   const c11 = a[0]*a[0] + b[0]*b[0], c22 = a[1]*a[1] + b[1]*b[1], c12 = a[0]*a[1] + b[0]*b[1];
   const tr = (c11 + c22)/2, dt = Math.sqrt(Math.max(0, (c11 - c22)*(c11 - c22)/4 + c12*c12));
   const l1 = tr + dt, l2 = Math.max(0, tr - dt), th = Math.atan2(l1 - c11, c12 || 1e-12);
-  g.major = Math.sqrt(l1); g.minor = Math.sqrt(l2); g.theta = th;
+  const k2 = B && A ? Math.SQRT2 : 1;     /* con un solo segmento: meta' segmento */
+  g.major = k2*Math.sqrt(l1); g.minor = k2*Math.sqrt(l2); g.theta = th;
   if(B && A){       /* ellisse solo con entrambe le incertezze */
     const lat0 = r.end.lat, lon0 = r.end.lon, k = Math.cos(lat0*RAD), pts = [];
-    for(let i = 0; i <= 72; i++){
-      const u = 2*Math.PI*i/72, ex = g.major*Math.cos(u), ey = g.minor*Math.sin(u);
+    for(let i = 0; i <= 360; i++){
+      const u = 2*Math.PI*i/360, ex = g.major*Math.cos(u), ey = g.minor*Math.sin(u);
       const x = ex*Math.cos(g.theta) - ey*Math.sin(g.theta), y = ex*Math.sin(g.theta) + ey*Math.cos(g.theta);
       pts.push([lat0 + y/110.57, lon0 + x/(111.32*k)]);
     }
@@ -824,9 +852,9 @@ function renderCard(r){
    [t("twBurstDist"), num(r.burstDist, 0) + " km · " + num(r.burst.alt/1000, 1) + " km"]
   ].concat(r.spread ? [[t("twErrLand"), "± " + num(r.spread.major, 1) + " km"]] : [])
    .concat(r.spread && r.spread.B ? [[t("twBurstRange"),
-     num(r.spread.B.lo.burst.alt/1000, 1) + "–" + num(r.spread.B.hi.burst.alt/1000, 1) + " km · ± " + num(r.spread.B.s*100, 1) + " %"]] : [])
+     num(r.spread.B.lo.burst.alt/1000, 1) + "–" + num(r.spread.B.hi.burst.alt/1000, 1) + " km"]] : [])
    .concat(r.spread && r.spread.A ? [[t("twAscRange"),
-     num(r.spread.A.vLo, 2) + "–" + num(r.spread.A.vHi, 2) + " m/s · ± " + num(r.spread.A.s*100, 1) + " %"]] : [])
+     num(r.spread.A.vLo, 2) + "–" + num(r.spread.A.vHi, 2) + " m/s"]] : [])
    .forEach(function(row){ dl.appendChild(el("dt", null, row[0])); dl.appendChild(el("dd", null, row[1])); });
   card.appendChild(dl);
   if(r.atmo) card.appendChild(el("p", "tw-hint tw-card-note",
