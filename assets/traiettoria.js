@@ -71,6 +71,19 @@ const elWhere = $("#twWhere"), elSugg = $("#twSugg"), elGeo = $("#twGeo"),
       elToDay = $("#twToDay"), elToTime = $("#twToTime"), elEvery = $("#twEvery"), elLegend = $("#twLegendTxt"),
       elErrOn = $("#twErrOn"), elErrSig = $("#twErrSig"), elErrAsc = $("#twErrAsc");
 
+/* Ore sempre a 24 ore: il selettore nativo <input type=time> usa il
+   formato del dispositivo (AM/PM su molti telefoni), non la lingua della
+   pagina. Un menu con passi da 15 minuti; «Fino alle ore» ha anche la voce vuota. */
+(function(){
+  const opts = [];
+  for(let m = 0; m < 24*60; m += 15){
+    const v = String(Math.floor(m/60)).padStart(2, "0") + ":" + String(m % 60).padStart(2, "0");
+    opts.push('<option value="' + v + '">' + v + '</option>');
+  }
+  elTime.innerHTML = opts.join(""); elTime.value = "11:00";
+  if(elToTime) elToTime.innerHTML = '<option value="">—</option>' + opts.join("");
+})();
+
 /* ---------- Testi: seguono la lingua scelta nel sito ---------- */
 function lang(){ return document.documentElement.lang || "it"; }
 function t(k){
@@ -482,14 +495,25 @@ function addDays(iso, n){
 }
 const today = isoDay(new Date());
 const lastDay = addDays(today, GIORNI_MAX);
-elDate.min = today; elDate.max = lastDay;
-if(elToDay){ elToDay.min = today; elToDay.max = lastDay; }
+/* Giorni: un menu con gli otto giorni della previsione, scritti nella
+   lingua della pagina (il selettore nativo usa il formato del dispositivo,
+   mm/gg/aaaa su molti telefoni). Si riscrive al cambio di lingua. */
+function fillDays(){
+  const d0 = elDate.value, d1 = elToDay ? elToDay.value : "", opts = [];
+  for(let k = 0; k <= GIORNI_MAX; k++){ const iso = addDays(today, k); opts.push('<option value="' + iso + '">' + fmtDay(iso) + '</option>'); }
+  elDate.innerHTML = opts.join("");
+  if(d0) elDate.value = d0;
+  if(elToDay){ elToDay.innerHTML = '<option value="">—</option>' + opts.join(""); elToDay.value = d1; }
+}
+fillDays();
 (function defaults(){
   const L = window.COMETA_LAUNCH;
   const ld = L ? isoDay(L) : null;
   if(ld && ld >= today && ld <= lastDay){
     elDate.value = ld;
-    elTime.value = new Intl.DateTimeFormat("en-GB", {timeZone:TZ, hour:"2-digit", minute:"2-digit", hour12:false}).format(L);
+    const hm = new Intl.DateTimeFormat("en-GB", {timeZone:TZ, hour:"2-digit", minute:"2-digit", hour12:false}).format(L);
+    const q = Math.round((parseInt(hm.slice(0, 2), 10)*60 + parseInt(hm.slice(3, 5), 10))/15)*15 % (24*60);   /* al quarto d'ora */
+    elTime.value = String(Math.floor(q/60)).padStart(2, "0") + ":" + String(q % 60).padStart(2, "0");
   } else {
     elDate.value = addDays(today, 1);
   }
@@ -1211,6 +1235,7 @@ $("#twPng") && $("#twPng").addEventListener("click", function(){ ensureMap().the
 
 /* ---------- Cambio di lingua: si riscrive quello che e' gia' a schermo ---------- */
 function relabel(){
+  fillDays();
   elWhere.placeholder = t("twWherePh");
   renderBalloon();
   if(last) show(last, true);
