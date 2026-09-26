@@ -64,7 +64,7 @@ const elWhere = $("#twWhere"), elSugg = $("#twSugg"), elGeo = $("#twGeo"),
       elStatus = $("#twStatus"), elRes = $("#twRes"), elMap = $("#twMap"),
       elWeekBtn = $("#twWeekBtn"), elWeekBox = $("#twWeekBox"), elWeekBody = $("#twWeekBody"),
       elToDay = $("#twToDay"), elToTime = $("#twToTime"), elEvery = $("#twEvery"), elLegend = $("#twLegendTxt"),
-      elErrOn = $("#twErrOn"), elErrSig = $("#twErrSig");
+      elErrOn = $("#twErrOn"), elErrSig = $("#twErrSig"), elErrAsc = $("#twErrAsc");
 
 /* ---------- Testi: seguono la lingua scelta nel sito ---------- */
 function lang(){ return document.documentElement.lang || "it"; }
@@ -601,6 +601,7 @@ function ensureMap(){
        reso trasparente per intero, cosi' le sovrapposizioni non si sommano. */
     map.createPane("twBand").style.cssText = "z-index:395;opacity:.3";
     map.createPane("twLandZ").style.cssText = "z-index:396;opacity:.7";
+    map.createPane("twEll").style.cssText = "z-index:394";
     layer = L.layerGroup().addTo(map);
     /* il contenitore cambia misura (rotazione del telefono, pagina che
        si riassesta): Leaflet va avvisato, o centra su misure vecchie */
@@ -648,12 +649,48 @@ function draw(r, noFit){
     .bindTooltip(t("twLand") + " " + fmtTime(r.end.t, false)).addTo(layer);
   const bb = L.latLngBounds(up.concat(down));
   bb.extend([r.from.lat, r.from.lon]);
-  if(r.spread){       /* dove cade con lo scoppio piu' basso e piu' alto */
-    const seg = [[r.spread.lo.end.lat, r.spread.lo.end.lon], [r.end.lat, r.end.lon], [r.spread.hi.end.lat, r.spread.hi.end.lon]];
-    L.polyline(seg, {pane:"twLandZ", color:"#FFB84D", weight:7, opacity:1, lineCap:"round", interactive:false}).addTo(layer);
-    seg.forEach(function(ll){ bb.extend(ll); });
+  if(r.spread){       /* intervallo di atterraggio */
+    const g = r.spread;
+    if(g.ellipse){
+      L.polygon(g.ellipse, {pane:"twEll", color:"#CFE4F5", weight:1.5, opacity:.8, fillColor:"#CFE4F5", fillOpacity:.1, interactive:false}).addTo(layer);
+      g.ellipse.forEach(function(ll){ bb.extend(ll); });
+    }
+    [[g.B, "#FFB84D"], [g.A, "#A98CFF"]].forEach(function(x){
+      if(!x[0]) return;
+      const seg = [[x[0].lo.end.lat, x[0].lo.end.lon], [r.end.lat, r.end.lon], [x[0].hi.end.lat, x[0].hi.end.lon]];
+      L.polyline(seg, {pane:"twLandZ", color:x[1], weight:6, opacity:1, lineCap:"round", interactive:false}).addTo(layer);
+      seg.forEach(function(ll){ bb.extend(ll); });
+    });
   }
   if(!noFit){ map.invalidateSize(); map.fitBounds(bb, {padding:[30,30], maxZoom:10}); }
+}
+
+/* ---------- Intervallo di atterraggio ----------
+   Ogni coppia di estremi da' un semi-vettore di spostamento
+   dell'atterraggio (meta' della distanza fra i due). Trattandoli come
+   indipendenti, l'ellisse ha covarianza a·aT + b·bT: contiene le
+   estremita' dei due segmenti e ne segue l'orientamento. */
+function kmVec(from, to){
+  return [(to.lon - from.lon)*111.32*Math.cos(from.lat*RAD), (to.lat - from.lat)*110.57];
+}
+function spreadGeom(r, B, A){
+  const g = {B:B, A:A};
+  const half = function(X){ const u = kmVec(X.lo.end, X.hi.end); return [u[0]/2, u[1]/2]; };
+  const a = B ? half(B) : [0, 0], b = A ? half(A) : [0, 0];
+  const c11 = a[0]*a[0] + b[0]*b[0], c22 = a[1]*a[1] + b[1]*b[1], c12 = a[0]*a[1] + b[0]*b[1];
+  const tr = (c11 + c22)/2, dt = Math.sqrt(Math.max(0, (c11 - c22)*(c11 - c22)/4 + c12*c12));
+  const l1 = tr + dt, l2 = Math.max(0, tr - dt), th = Math.atan2(l1 - c11, c12 || 1e-12);
+  g.major = Math.sqrt(l1); g.minor = Math.sqrt(l2); g.theta = th;
+  if(B && A){       /* ellisse solo con entrambe le incertezze */
+    const lat0 = r.end.lat, lon0 = r.end.lon, k = Math.cos(lat0*RAD), pts = [];
+    for(let i = 0; i <= 72; i++){
+      const u = 2*Math.PI*i/72, ex = g.major*Math.cos(u), ey = g.minor*Math.sin(u);
+      const x = ex*Math.cos(g.theta) - ey*Math.sin(g.theta), y = ex*Math.sin(g.theta) + ey*Math.cos(g.theta);
+      pts.push([lat0 + y/110.57, lon0 + x/(111.32*k)]);
+    }
+    g.ellipse = pts;
+  }
+  return g;
 }
 
 /* ---------- Piu' partenze: una fascia sola ----------
@@ -756,7 +793,11 @@ function show(x, noFit){
   if(band){ renderBand(x); statusDone(x.list); if(map) drawBand(x, noFit); }
   else {
     renderCard(x); statusDone([x]); if(map) draw(x, noFit);
-    if(elLegend && x && x.spread) elLegend.textContent = t("twLegend") + " " + t("twLegendErr");
+    if(elLegend && x && x.spread){
+      const e = [x.spread.B ? t("twLegendErrB") : "", x.spread.A ? t("twLegendErrA") : "", x.spread.ellipse ? t("twLegendErrE") : ""]
+        .filter(Boolean).join(" · ");
+      elLegend.textContent = t("twLegend") + " " + e.charAt(0).toUpperCase() + e.slice(1) + ".";
+    }
   }
 }
 
@@ -781,10 +822,12 @@ function renderCard(r){
    [t("twDur"),       num(r.dur, 0) + " min"],
    [t("twAt"),        fmtTime(r.end.t, false)],
    [t("twBurstDist"), num(r.burstDist, 0) + " km · " + num(r.burst.alt/1000, 1) + " km"]
-  ].concat(r.spread ? [
-   [t("twErrLand"),   "± " + num(r.spread.km, 1) + " km"],
-   [t("twBurstRange"), num(r.spread.lo.burst.alt/1000, 1) + "–" + num(r.spread.hi.burst.alt/1000, 1) + " km · ± " + num(r.spread.s*100, 1) + " %"]
-  ] : []).forEach(function(row){ dl.appendChild(el("dt", null, row[0])); dl.appendChild(el("dd", null, row[1])); });
+  ].concat(r.spread ? [[t("twErrLand"), "± " + num(r.spread.major, 1) + " km"]] : [])
+   .concat(r.spread && r.spread.B ? [[t("twBurstRange"),
+     num(r.spread.B.lo.burst.alt/1000, 1) + "–" + num(r.spread.B.hi.burst.alt/1000, 1) + " km · ± " + num(r.spread.B.s*100, 1) + " %"]] : [])
+   .concat(r.spread && r.spread.A ? [[t("twAscRange"),
+     num(r.spread.A.vLo, 2) + "–" + num(r.spread.A.vHi, 2) + " m/s · ± " + num(r.spread.A.s*100, 1) + " %"]] : [])
+   .forEach(function(row){ dl.appendChild(el("dt", null, row[0])); dl.appendChild(el("dd", null, row[1])); });
   card.appendChild(dl);
   if(r.atmo) card.appendChild(el("p", "tw-hint tw-card-note",
     t({day:"twCardDay", std:"twCardStd", hand:"twCardHand"}[r.atmo])));
@@ -842,16 +885,23 @@ form.addEventListener("submit", function(e){
   setStatus(t("twLoading"));
   Promise.all([ensureMap(), loadAtmo(pl).then(function(){
     const p = flightParams(iso, hhmm);
-    const s = elErrOn && elErrOn.checked ? parseFloat(elErrSig.value)/100 : 0;
-    if(!(s > 0 && s < 0.5)) return predict(pl, when, p).then(function(r){ r.atmo = p.atmo; return r; });
-    /* errore: la stessa partenza con lo scoppio agli estremi */
-    const d = burstSpread(readBalloon(), iso, hhmm, s);
-    const pLo = Object.assign({}, p, {burst:p.burst + d.lo/1000}), pHi = Object.assign({}, p, {burst:p.burst + d.hi/1000});
-    const soft = function(q){ return predict(pl, when, q).catch(function(){ return null; }); };
-    return Promise.all([predict(pl, when, p), soft(pLo), soft(pHi)]).then(function(rr){
+    /* Intervallo di atterraggio: la stessa partenza con il diametro di
+       scoppio a d(1±sB) e con la velocita' di salita a v(1±sA) (quota di
+       scoppio invariata); fino a cinque traiettorie. */
+    const on = elErrOn && elErrOn.checked, valid = function(x){ return x > 0 && x < 0.5; };
+    const sB = on ? parseFloat(elErrSig.value)/100 : 0, sA = on ? parseFloat(elErrAsc.value)/100 : 0;
+    const soft = function(q){ return q ? predict(pl, when, q).catch(function(){ return null; }) : Promise.resolve(null); };
+    let bLo = null, bHi = null, aLo = null, aHi = null;
+    if(valid(sB)){
+      const d = burstSpread(readBalloon(), iso, hhmm, sB);
+      bLo = Object.assign({}, p, {burst:p.burst + d.lo/1000}); bHi = Object.assign({}, p, {burst:p.burst + d.hi/1000});
+    }
+    if(valid(sA)){ aLo = Object.assign({}, p, {asc:p.asc*(1 - sA)}); aHi = Object.assign({}, p, {asc:p.asc*(1 + sA)}); }
+    return Promise.all([predict(pl, when, p), soft(bLo), soft(bHi), soft(aLo), soft(aHi)]).then(function(rr){
       const r = rr[0]; r.atmo = p.atmo;
-      if(rr[1] && rr[2]) r.spread = {s:s, lo:rr[1], hi:rr[2],
-        km:Math.max(distKm(r.end.lat, r.end.lon, rr[1].end.lat, rr[1].end.lon), distKm(r.end.lat, r.end.lon, rr[2].end.lat, rr[2].end.lon))};
+      const B = rr[1] && rr[2] ? {s:sB, lo:rr[1], hi:rr[2]} : null;
+      const A = rr[3] && rr[4] ? {s:sA, lo:rr[3], hi:rr[4], vLo:aLo.asc, vHi:aHi.asc} : null;
+      if(B || A) r.spread = spreadGeom(r, B, A);
       return r;
     });
   }).catch(function(e){ return {ok:false, from:pl, err:e.message}; })])
