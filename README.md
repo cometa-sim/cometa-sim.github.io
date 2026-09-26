@@ -60,11 +60,11 @@ Norme e autorizzazioni · Domande · Chi siamo.
 ### Dopo ogni modifica: il numero di versione
 
 In `index.html` i sette file di `assets/`, e la mappa, sono richiamati con un numero in
-coda — oggi `?v=120`:
+coda — oggi `?v=118`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=120">
-<script src="assets/i18n.js?v=120"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=118">
+<script src="assets/i18n.js?v=118"></script>
 ```
 
 Serve a costringere il browser a riscaricarli. **Chi modifica un file in
@@ -312,11 +312,6 @@ chi guarda, senza server nostri:
    anche l'ellisse xᵀC⁻¹x ≤ 2 con C = a·aᵀ + b·bᵀ (a, b i due
    semi-segmenti): la minima che contiene il parallelogramma ±a±b. Con
    0 in una delle due voci resta solo l'altro segmento.
-
-Giorno e ora si scelgono da due menu (gli otto giorni della previsione,
-scritti nella lingua della pagina; le ore a 24 ore ogni 15 minuti): i
-selettori nativi seguono il formato del dispositivo (AM/PM, mm/gg), non
-la lingua della pagina.
 
 Il giorno proposto è la data di `LAUNCH` in `assets/app.js`, quando cade
 nella settimana della previsione, altrimenti domani. L'area di esclusione

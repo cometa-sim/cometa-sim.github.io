@@ -23,7 +23,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@200;300;400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/cometa.css?v=120">
+<link rel="stylesheet" href="assets/cometa.css?v=118">
 </head>
 <body>
 
@@ -640,8 +640,8 @@
             </div>
             <p class="tw-hint tw-wide"><span data-i18n="twWhereHint">Scrivi una località o le coordinate (per esempio -33.38, -56.52), oppure tocca la mappa.</span>
               <button type="button" class="tw-link" id="twGeo" data-i18n="twGeo">Usa la mia posizione</button></p>
-            <label class="tw-f"><span data-i18n="twDate">Giorno</span><select id="twDate" required></select></label>
-            <label class="tw-f"><span data-i18n="twTime">Ora di lancio (Uruguay)</span><select id="twTime" required></select></label>
+            <label class="tw-f"><span data-i18n="twDate">Giorno</span><input type="date" id="twDate" required></label>
+            <label class="tw-f"><span data-i18n="twTime">Ora di lancio (Uruguay)</span><input type="time" id="twTime" value="11:00" step="900" required></label>
           </div>
         </fieldset>
 
@@ -683,8 +683,8 @@
                disegnate sulla mappa come un'unica fascia. -->
           <p class="tw-man-h" data-i18n="twMulti">Più partenze</p>
           <div class="tw-man-f">
-            <label class="tw-f"><span data-i18n="twToDay">Fino al giorno</span><select id="twToDay"></select></label>
-            <label class="tw-f"><span data-i18n="twToTime">Fino alle ore</span><select id="twToTime"></select></label>
+            <label class="tw-f"><span data-i18n="twToDay">Fino al giorno</span><input type="date" id="twToDay"></label>
+            <label class="tw-f"><span data-i18n="twToTime">Fino alle ore</span><input type="time" id="twToTime" step="900"></label>
             <label class="tw-f"><span data-i18n="twEvery">Ogni</span>
               <select id="twEvery">
                 <option value="30">30 min</option>
@@ -786,7 +786,7 @@
       </div>
 
       <div class="map-frame reveal d1">
-        <iframe id="mapFrame" src="mappe/uru2000_footprint.html?v=120"
+        <iframe id="mapFrame" src="mappe/uru2000_footprint.html?v=118"
                 title="Mappa interattiva dei 600 punti di atterraggio simulati con le ellissi di dispersione"
                 loading="lazy"></iframe>
       </div>
@@ -1138,11 +1138,11 @@
 
 </div>
 
-<script src="assets/i18n.js?v=120"></script>
-<script src="assets/sonda.js?v=120"></script>
-<script src="assets/catena.js?v=120"></script>
-<script src="assets/app.js?v=120"></script>
-<script src="assets/msis.js?v=120"></script>
-<script src="assets/traiettoria.js?v=120"></script>
+<script src="assets/i18n.js?v=118"></script>
+<script src="assets/sonda.js?v=118"></script>
+<script src="assets/catena.js?v=118"></script>
+<script src="assets/app.js?v=118"></script>
+<script src="assets/msis.js?v=118"></script>
+<script src="assets/traiettoria.js?v=118"></script>
 </body>
 </html>
