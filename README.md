@@ -57,11 +57,11 @@ Norme e autorizzazioni · Domande · Chi siamo.
 ### Dopo ogni modifica: il numero di versione
 
 In `index.html` i sette file di `assets/`, e la mappa, sono richiamati con un numero in
-coda — oggi `?v=112`:
+coda — oggi `?v=113`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=112">
-<script src="assets/i18n.js?v=112"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=113">
+<script src="assets/i18n.js?v=113"></script>
 ```
 
 Serve a costringere il browser a riscaricarli. **Chi modifica un file in
@@ -295,6 +295,12 @@ chi guarda, senza server nostri:
    mappa le disegna come un'unica fascia — per ogni frazione del volo,
    l'involucro convesso delle posizioni di tutte le partenze — con in
    arancione la zona di atterraggio, e la scheda dà gli intervalli.
+   Sempre lì, «Errore sull'atterraggio»: per una partenza singola si
+   ricalcola la traiettoria con il lattice che cede a ±s % del diametro
+   di scoppio (5 % proposto, la fonte di errore principale secondo lo
+   studio, circa 200 m di quota per punto percentuale). La scheda dà lo
+   scarto dell'atterraggio e l'intervallo della quota di scoppio; sulla
+   mappa un segmento arancione unisce gli atterraggi estremi.
 
 Il giorno proposto è la data di `LAUNCH` in `assets/app.js`, quando cade
 nella settimana della previsione, altrimenti domani. L'area di esclusione

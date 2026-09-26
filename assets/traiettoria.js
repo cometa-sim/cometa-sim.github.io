@@ -63,7 +63,8 @@ const elWhere = $("#twWhere"), elSugg = $("#twSugg"), elGeo = $("#twGeo"),
       elBurst = $("#twBurst"), elDesc = $("#twDesc"), elWarn = $("#twWarn"),
       elStatus = $("#twStatus"), elRes = $("#twRes"), elMap = $("#twMap"),
       elWeekBtn = $("#twWeekBtn"), elWeekBox = $("#twWeekBox"), elWeekBody = $("#twWeekBody"),
-      elToDay = $("#twToDay"), elToTime = $("#twToTime"), elEvery = $("#twEvery"), elLegend = $("#twLegendTxt");
+      elToDay = $("#twToDay"), elToTime = $("#twToTime"), elEvery = $("#twEvery"), elLegend = $("#twLegendTxt"),
+      elErrOn = $("#twErrOn"), elErrSig = $("#twErrSig");
 
 /* ---------- Testi: seguono la lingua scelta nel sito ---------- */
 function lang(){ return document.documentElement.lang || "it"; }
@@ -227,6 +228,15 @@ function loadAtmo(pl){
     .then(function(r){ return r.ok ? r.json() : null; })
     .then(function(d){ cur.h = d && d.hourly ? d.hourly : null; return cur.h; }, function(){ return null; });
   return cur.promise;
+}
+/* Scarti della quota di scoppio se il lattice cede a d(1-s) o d(1+s):
+   {lo, hi} in metri rispetto al valore nominale, con la stessa atmosfera.
+   Si applicano anche a una quota imposta a mano. */
+function burstSpread(b, iso, hhmm, s){
+  const col = launch && atmo.key === atmoKey(launch) ? dayColumn(atmo.h, iso, hhmm, launch.lat) : null;
+  const q = function(d){ return col ? quotaScoppioCol(b.V, d, col) : quotaScoppio(b.V, d); };
+  const h0 = q(b.diam);
+  return {lo:q(b.diam*(1 - s)) - h0, hi:q(b.diam*(1 + s)) - h0};
 }
 /* Quota di scoppio per un giorno e un'ora: {m, day} con day=false se ISA */
 function burstFor(b, iso, hhmm){
@@ -638,6 +648,11 @@ function draw(r, noFit){
     .bindTooltip(t("twLand") + " " + fmtTime(r.end.t, false)).addTo(layer);
   const bb = L.latLngBounds(up.concat(down));
   bb.extend([r.from.lat, r.from.lon]);
+  if(r.spread){       /* dove cade con lo scoppio piu' basso e piu' alto */
+    const seg = [[r.spread.lo.end.lat, r.spread.lo.end.lon], [r.end.lat, r.end.lon], [r.spread.hi.end.lat, r.spread.hi.end.lon]];
+    L.polyline(seg, {pane:"twLandZ", color:"#FFB84D", weight:7, opacity:1, lineCap:"round", interactive:false}).addTo(layer);
+    seg.forEach(function(ll){ bb.extend(ll); });
+  }
   if(!noFit){ map.invalidateSize(); map.fitBounds(bb, {padding:[30,30], maxZoom:10}); }
 }
 
@@ -739,7 +754,10 @@ function show(x, noFit){
   const band = !!(x && x.band);
   if(elLegend){ elLegend.setAttribute("data-i18n", band ? "twLegendBand" : "twLegend"); elLegend.textContent = t(band ? "twLegendBand" : "twLegend"); }
   if(band){ renderBand(x); statusDone(x.list); if(map) drawBand(x, noFit); }
-  else { renderCard(x); statusDone([x]); if(map) draw(x, noFit); }
+  else {
+    renderCard(x); statusDone([x]); if(map) draw(x, noFit);
+    if(elLegend && x && x.spread) elLegend.textContent = t("twLegend") + " " + t("twLegendErr");
+  }
 }
 
 /* ---------- Risultati ---------- */
@@ -763,7 +781,10 @@ function renderCard(r){
    [t("twDur"),       num(r.dur, 0) + " min"],
    [t("twAt"),        fmtTime(r.end.t, false)],
    [t("twBurstDist"), num(r.burstDist, 0) + " km · " + num(r.burst.alt/1000, 1) + " km"]
-  ].forEach(function(row){ dl.appendChild(el("dt", null, row[0])); dl.appendChild(el("dd", null, row[1])); });
+  ].concat(r.spread ? [
+   [t("twErrLand"),   "± " + num(r.spread.km, 1) + " km"],
+   [t("twBurstRange"), num(r.spread.lo.burst.alt/1000, 1) + "–" + num(r.spread.hi.burst.alt/1000, 1) + " km · ± " + num(r.spread.s*100, 1) + " %"]
+  ] : []).forEach(function(row){ dl.appendChild(el("dt", null, row[0])); dl.appendChild(el("dd", null, row[1])); });
   card.appendChild(dl);
   if(r.atmo) card.appendChild(el("p", "tw-hint tw-card-note",
     t({day:"twCardDay", std:"twCardStd", hand:"twCardHand"}[r.atmo])));
@@ -821,7 +842,18 @@ form.addEventListener("submit", function(e){
   setStatus(t("twLoading"));
   Promise.all([ensureMap(), loadAtmo(pl).then(function(){
     const p = flightParams(iso, hhmm);
-    return predict(pl, when, p).then(function(r){ r.atmo = p.atmo; return r; });
+    const s = elErrOn && elErrOn.checked ? parseFloat(elErrSig.value)/100 : 0;
+    if(!(s > 0 && s < 0.5)) return predict(pl, when, p).then(function(r){ r.atmo = p.atmo; return r; });
+    /* errore: la stessa partenza con lo scoppio agli estremi */
+    const d = burstSpread(readBalloon(), iso, hhmm, s);
+    const pLo = Object.assign({}, p, {burst:p.burst + d.lo/1000}), pHi = Object.assign({}, p, {burst:p.burst + d.hi/1000});
+    const soft = function(q){ return predict(pl, when, q).catch(function(){ return null; }); };
+    return Promise.all([predict(pl, when, p), soft(pLo), soft(pHi)]).then(function(rr){
+      const r = rr[0]; r.atmo = p.atmo;
+      if(rr[1] && rr[2]) r.spread = {s:s, lo:rr[1], hi:rr[2],
+        km:Math.max(distKm(r.end.lat, r.end.lon, rr[1].end.lat, rr[1].end.lon), distKm(r.end.lat, r.end.lon, rr[2].end.lat, rr[2].end.lon))};
+      return r;
+    });
   }).catch(function(e){ return {ok:false, from:pl, err:e.message}; })])
     .then(function(res){
       last = res[1];

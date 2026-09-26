@@ -23,7 +23,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@200;300;400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/cometa.css?v=112">
+<link rel="stylesheet" href="assets/cometa.css?v=113">
 </head>
 <body>
 
@@ -693,6 +693,15 @@
               </select></label>
           </div>
           <p class="tw-hint" data-i18n="twMultiHint">Dal giorno e dall'ora scelti sopra fino a questi. Se restano vuoti si calcola una sola partenza.</p>
+          <!-- Errore sull'atterraggio: la fonte principale e' la dispersione del
+               diametro di rottura del lattice (vedi wA4P); si ricalcola la
+               traiettoria con lo scoppio piu' basso e piu' alto. -->
+          <p class="tw-man-h" data-i18n="twErrH">Errore sull'atterraggio</p>
+          <div class="tw-man-f">
+            <label class="tw-check"><input type="checkbox" id="twErrOn"><span data-i18n="twErrOn">Calcola l'errore</span></label>
+            <label class="tw-f"><span data-i18n="twErrSig">Diametro di scoppio · ± %</span><input type="number" id="twErrSig" value="5" min="0.5" max="20" step="0.5" inputmode="decimal"></label>
+          </div>
+          <p class="tw-hint" data-i18n="twErrHint">La quota di scoppio è la fonte di errore principale: dipende dal diametro a cui il lattice cede, che varia da un pallone all'altro. Si ricalcola la traiettoria con lo scoppio più basso e più alto. Solo per una partenza singola.</p>
         </details>
 
         <div class="tw-calc" id="twCalc" aria-live="polite">
@@ -772,7 +781,7 @@
       </div>
 
       <div class="map-frame reveal d1">
-        <iframe id="mapFrame" src="mappe/uru2000_footprint.html?v=112"
+        <iframe id="mapFrame" src="mappe/uru2000_footprint.html?v=113"
                 title="Mappa interattiva dei 600 punti di atterraggio simulati con le ellissi di dispersione"
                 loading="lazy"></iframe>
       </div>
@@ -1124,11 +1133,11 @@
 
 </div>
 
-<script src="assets/i18n.js?v=112"></script>
-<script src="assets/sonda.js?v=112"></script>
-<script src="assets/catena.js?v=112"></script>
-<script src="assets/app.js?v=112"></script>
-<script src="assets/msis.js?v=112"></script>
-<script src="assets/traiettoria.js?v=112"></script>
+<script src="assets/i18n.js?v=113"></script>
+<script src="assets/sonda.js?v=113"></script>
+<script src="assets/catena.js?v=113"></script>
+<script src="assets/app.js?v=113"></script>
+<script src="assets/msis.js?v=113"></script>
+<script src="assets/traiettoria.js?v=113"></script>
 </body>
 </html>
