@@ -658,6 +658,7 @@ td.mercedes{color:var(--mercedes)}
 .tw-star{background:none;border:0;cursor:grab}
 .tw-star span{display:block;font-size:26px;line-height:26px;text-align:center;
   text-shadow:0 0 3px #02060f,0 0 12px currentColor}
+.tw-export{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;margin-top:14px}
 .tw-week .table-wrap{margin-top:26px}
 .tw-week tbody tr{cursor:pointer}
 .tw-week td.tw-w-ok{color:var(--green)}

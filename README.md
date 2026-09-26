@@ -57,11 +57,11 @@ Norme e autorizzazioni · Domande · Chi siamo.
 ### Dopo ogni modifica: il numero di versione
 
 In `index.html` i sette file di `assets/`, e la mappa, sono richiamati con un numero in
-coda — oggi `?v=115`:
+coda — oggi `?v=116`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=115">
-<script src="assets/i18n.js?v=115"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=116">
+<script src="assets/i18n.js?v=116"></script>
 ```
 
 Serve a costringere il browser a riscaricarli. **Chi modifica un file in
@@ -316,6 +316,14 @@ Lo stesso calcolo si fa dal terminale:
 ```
 python3 calcolo/cometa_venti.py --tawhiri --pallone 2000 --payload 1.5 --sito "Mercedes,-33.249,-58.030" --lancio 2026-10-07T11:00 --giorni-prev 3 --html
 ```
+
+«Scarica l'immagine della mappa» produce un PNG largo almeno 3200 px, a
+tema chiaro: non è una foto dello schermo, la stessa vista viene
+ridisegnata con le mattonelle OSM a uno o due livelli di zoom in più (al
+massimo 200 mattonelle, per rispetto del server) e i tracciati con
+colori da fondo chiaro, più scala, titolo (luogo, data, corsa GFS),
+legenda e attribuzione. Per questo il livello delle mattonelle è caricato
+con `crossOrigin`: senza, il canvas non si potrebbe salvare.
 
 Leaflet (`assets/vendor/leaflet/`) si scarica solo quando la mappa entra
 nello schermo.
