@@ -339,8 +339,9 @@ nello schermo.
 #### Quanto ci si può fidare della previsione a qualche giorno
 
 Per costruire una curva «spostamento contro anticipo», il workflow
-`.github/workflows/convergenza.yml` gira ogni giorno alle 06:37 UTC (non
-al minuto 0, dove GitHub accoda le schedule) e chiede a Tawhiri il volo
+`.github/workflows/convergenza.yml` gira ogni giorno alle 03:37 UTC (non
+al minuto 0, dove GitHub accoda le schedule; in pratica parte con ore di
+ritardo, ma prima del lancio delle 14:00 UTC) e chiede a Tawhiri il volo
 proposto dalla pagina — aerodromo di Mercedes, Strato 2000, payload
 1,5 kg, salita 5 m/s, ore 11:00 — per oggi e per i sette giorni seguenti.
 Quota di scoppio e discesa sono fisse (ISA), così cambia solo il vento. I
@@ -357,9 +358,12 @@ git fetch origin dati && git show origin/dati:convergenza.csv > convergenza.csv
 python3 calcolo/convergenza_analisi.py convergenza.csv
 ```
 
-Per ogni bersaglio T il riferimento è la previsione emessa il giorno T
-stesso; e(τ) è la distanza fra il punto previsto τ giorni prima e quello
-di riferimento. Misura la *convergenza* della previsione, non l'errore:
+L'anticipo τ è l'età della corsa GFS all'ora del lancio (bersaglio meno
+dataset), a passo di 24 h: così non conta quando è partito il workflow né
+quale corsa ha trovato. Per ogni bersaglio T il riferimento è la
+previsione con τ = 0; e(τ) è la distanza fra il punto previsto con
+anticipo τ e quello di riferimento. Con `--calendario` l'anticipo è
+invece `lead_giorni`, i giorni fra emissione e bersaglio. Misura la *convergenza* della previsione, non l'errore:
 il riferimento non è la verità, quindi è un limite inferiore, ed e(0) è
 zero per costruzione. Se si cambiano i parametri del volo nello script,
 le righe vecchie non sono più confrontabili: meglio un CSV nuovo.
