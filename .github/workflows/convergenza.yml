@@ -13,9 +13,13 @@ name: Convergenza delle previsioni
 
 on:
   schedule:
-    # 06:37 UTC: la corsa GFS delle 00Z e' gia' in Tawhiri. Non al minuto
-    # 0, dove le schedule di GitHub si accodano e partono in ritardo.
-    - cron: "37 6 * * *"
+    # 03:37 UTC (00:37 in Uruguay). Le schedule di GitHub partono con ore
+    # di ritardo (5-8 h nei primi giorni): cosi' il giro cade comunque
+    # prima del lancio delle 14:00 UTC. Quale corsa GFS trova non conta,
+    # l'analisi misura l'anticipo dal dataset. Non prima delle 03:00 UTC,
+    # quando in Uruguay e' ancora il giorno prima; non al minuto 0, dove
+    # le schedule si accodano di piu'.
+    - cron: "37 3 * * *"
   workflow_dispatch:
 
 permissions:
