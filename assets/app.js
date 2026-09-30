@@ -81,6 +81,12 @@ function applyTexts(){
     const k = el.getAttribute("data-i18n-html");
     if(d[k] !== undefined) el.innerHTML = expand(d[k]);
   });
+  /* Testo alternativo delle immagini: la pagina lo dichiarava gia' con
+     data-i18n-alt, ma nessuno lo applicava e le foto restavano senza alt. */
+  $$("[data-i18n-alt]").forEach(function(el){
+    const k = el.getAttribute("data-i18n-alt");
+    if(d[k] !== undefined) el.setAttribute("alt", d[k]);
+  });
   $$(".scr").forEach(function(el){ delete el.dataset.final; });
   document.documentElement.lang = d.code;
   document.title = d.title;
