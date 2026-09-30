@@ -222,6 +222,8 @@ it:{
 
   /* — Chi siamo — */
   aboutKicker:"Fase 1 · Chi siamo", aboutTitle:"Chi siamo", aboutSub:"Le persone dietro COMETA.",
+  groupAlt:"Le studentesse e gli studenti del progetto COMETA insieme ai loro insegnanti, in gruppo nel giardino della scuola.",
+  groupCap:"Il gruppo di COMETA, settembre 2026.",
   aboutBody:"Siamo studentesse e studenti di 2EMS, IIIS, 3EMS, IVL e IVS della Scuola Italiana di Montevideo.",
   contactHead:"Seguici", contactSub:"Per vedere i nostri contenuti e scoprire le novità sulla missione.", igCta:"Seguici su Instagram",
 
@@ -636,6 +638,8 @@ es:{
   wDate:"septiembre de 2026",
 
   aboutKicker:"Fase 1 · Quiénes somos", aboutTitle:"Nosotros", aboutSub:"Las personas detrás de COMETA.",
+  groupAlt:"Las y los estudiantes del proyecto COMETA junto a sus docentes, en grupo en el jardín de la escuela.",
+  groupCap:"El grupo de COMETA, septiembre de 2026.",
   aboutBody:"Somos estudiantes de 2EMS, IIIS, 3EMS, IVL y IVS de la Scuola Italiana di Montevideo.",
   contactHead:"Seguinos", contactSub:"Para ver nuestros contenidos y descubrir las novedades de la misión.", igCta:"Seguinos en Instagram",
 
@@ -1049,6 +1053,8 @@ en:{
   wDate:"September 2026",
 
   aboutKicker:"Phase 1 · About us", aboutTitle:"About us", aboutSub:"The people behind COMETA.",
+  groupAlt:"The students of the COMETA project together with their teachers, in a group in the school garden.",
+  groupCap:"The COMETA group, September 2026.",
   aboutBody:"We are students of 2EMS, IIIS, 3EMS, IVL and IVS at the Scuola Italiana di Montevideo.",
   contactHead:"Follow us", contactSub:"To see what we are making and follow the mission news.", igCta:"Follow on Instagram",
 
