@@ -123,6 +123,7 @@ $$(".lang button").forEach(function(b){
    ========================================================== */
 const pages = {
   home:     $("#page-home"),
+  diretta:  $("#page-diretta"),
   missione: $("#page-missione"),
   fisica:   $("#page-fisica"),
   sonda:    $("#page-sonda"),
