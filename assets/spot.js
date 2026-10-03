@@ -76,7 +76,8 @@ window.COMETA_SPOT = (function(){
     const last = lastPoints[lastPoints.length - 1];
     const when = new Date(last.time);
     const ok = !isNaN(when.getTime());
-    elStatus.textContent = last.lat.toFixed(4) + ", " + last.lon.toFixed(4) +
+    const alt = last.alt != null ? " · " + (d.dirAltLabel || "altitude") + " " + (last.alt / 1000).toFixed(1) + " km" : "";
+    elStatus.textContent = last.lat.toFixed(4) + ", " + last.lon.toFixed(4) + alt +
       (ok ? " · " + (d.dirSpotUpdated || "updated at") + " " + when.toLocaleTimeString(d.code || "it", {hour:"2-digit", minute:"2-digit"}) : "");
   }
 
@@ -114,6 +115,9 @@ window.COMETA_SPOT = (function(){
         return {
           lat: +m.latitude,
           lon: +m.longitude,
+          /* Metri, quota ellissoidica GPS: vicino al suolo puo' essere
+             negativa di suo (rumore tipico del GPS li', non un errore). */
+          alt: m.altitude != null ? +m.altitude : null,
           time: m.unixTime ? m.unixTime * 1000 : m.dateTime
         };
       })

@@ -32,6 +32,7 @@ it:{
   dirSpotWaiting:"in attesa del segnale…",
   dirSpotUnavailable:"mappa non disponibile",
   dirSpotUpdated:"aggiornato alle",
+  dirAltLabel:"quota",
 
   /* — Inizio — */
   heroSchool:"Scuola Italiana di Montevideo",
@@ -467,6 +468,7 @@ es:{
   dirSpotWaiting:"esperando la señal…",
   dirSpotUnavailable:"mapa no disponible",
   dirSpotUpdated:"actualizado a las",
+  dirAltLabel:"altitud",
 
   heroSchool:"Scuola Italiana di Montevideo",
 
@@ -896,6 +898,7 @@ en:{
   dirSpotWaiting:"waiting for signal…",
   dirSpotUnavailable:"map unavailable",
   dirSpotUpdated:"updated at",
+  dirAltLabel:"altitude",
 
   heroSchool:"Scuola Italiana di Montevideo",
 
