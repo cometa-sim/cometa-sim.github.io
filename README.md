@@ -15,6 +15,9 @@ resta. Senza indirizzo si apre `#home`.
 ```
 index.html                          tutte le sezioni
 sonda.html · venti.html             rimandi ai vecchi indirizzi
+simulazione-diretta.html            prova la pagina Diretta con un orologio accelerato
+                                     e un feed GPS finto, senza aspettare il lancio vero
+                                     (NON è una pagina del sito, non è linkata da nessuna parte)
 
 assets/cometa.css                   colori, caratteri, impaginazione
 assets/i18n.js                      i testi in italiano, spagnolo e inglese
@@ -23,6 +26,7 @@ assets/catena.js                    la catena di volo in 3D, nella pagina Missio
 assets/app.js                       lingua, navigazione, salita, fisica, conto alla rovescia
 assets/traiettoria.js               prevedere il volo: pallone, partenza, Tawhiri
 assets/msis.js                      NRLMSIS 2.1 tabulato, generato da calcolo/genera_msis.py
+assets/spot.js                      pagina Diretta: mappa GPS e quota stimata in volo
 assets/vendor/three.min.js          Three.js r128, copia locale (vedi sotto)
 assets/vendor/leaflet/              Leaflet 1.9.4, copia locale, per la previsione del giorno
 
@@ -58,6 +62,9 @@ Norme e autorizzazioni · Domande · Chi siamo.
 | Colori e caratteri di tutto il sito | il blocco `:root` in `assets/cometa.css` |
 | Data del lancio (conto alla rovescia) | la costante `LAUNCH` in `assets/app.js` |
 | Fondo scala delle animazioni | la costante `SCALA_KM` in `assets/app.js` |
+| Quota di scoppio, velocità di salita/discesa e sito di lancio attesi (pagina Diretta) | `FLIGHT_BURST_KM`, `FLIGHT_ASCENT_MS`, `FLIGHT_DESCENT_V0_MS`, `FLIGHT_SITE` in `assets/app.js` |
+| Indirizzo del backend che interroga SPOT (pagina Diretta) | la costante `TRACK_URL` in `assets/app.js` |
+| Quando compare "Diretta" in nav e quando diventa rossa | `DIRETTA_WINDOW` e `DIRETTA_START` in `assets/app.js` |
 | Numeri delle quattro schede della pagina iniziale | direttamente in `index.html` |
 | Stato di una tappa del progetto | la classe `done`, `wip` o `todo` della riga in `index.html` |
 
@@ -407,8 +414,78 @@ approvare la propria richiesta di modifica.
 ## Da completare
 
 - **La data definitiva del lancio**, quando la DINACIA autorizza. Oggi la
-  costante `LAUNCH` in `assets/app.js` vale `2026-10-07T11:00:00-03:00`: è
+  costante `LAUNCH` in `assets/app.js` vale `2026-10-14T11:00:00-03:00`: è
   provvisoria, e il conto alla rovescia la mostra come se fosse certa.
+  È anche il via vero: il lancio **è** la scadenza di `LAUNCH`, non un
+  segnale a parte — se il giorno stesso il lancio slitta rispetto all'ora
+  prevista, si aggiorna `LAUNCH` all'ora vera (commit e push) e il resto
+  (conto alla rovescia, quota stimata in `assets/spot.js`) segue da solo.
+
+- **La quota di scoppio e le velocità di salita/discesa**, nella pagina
+  Diretta. `FLIGHT_BURST_KM`, `FLIGHT_ASCENT_MS` e `FLIGHT_DESCENT_V0_MS`
+  in `assets/app.js` oggi hanno i numeri generici già scritti su Missione
+  (37,9 km, 5 m/s di salita, 4,6 m/s di velocità terminale al suolo):
+  il giorno del lancio vanno sostituiti con la previsione precisa di quel
+  volo, altrimenti la quota stimata in volo (`assets/spot.js`) scoppia e
+  scende al punto sbagliato. La discesa non è più una retta: la quota
+  stimata sale linearmente fino a `FLIGHT_BURST_KM`, poi scende con la
+  stessa formula di velocità terminale del paracadute di
+  `assets/traiettoria.js` (`vAtterraggio`), scalata con la quota secondo
+  l'atmosfera standard ISA (`densitaISA`) — non la previsione meteo del
+  giorno con Open-Meteo e NRLMSIS 2.1 che usa invece la pagina Traiettoria
+  quando ha i dati: qui, in diretta, non c'è tempo né bisogno di scaricare
+  quella previsione, perché a correggere la curva ci pensano via via i
+  punti GPS veri. Partendo da `FLIGHT_DESCENT_V0_MS` al suolo, la discesa
+  è molto veloce appena dopo lo scoppio, dove l'aria è rarefatta, e via
+  via più lenta scendendo. I punti GPS reali non spostano la curva in
+  verticale — la riancorano: ogni punto vero dice a `assets/spot.js` "a
+  che punto della curva (quale `tau`, il tempo del modello dal lancio)
+  corrisponde questa quota misurata", trovato per bisezione sul ramo di
+  salita o discesa; da lì il modello riparte con la pendenza giusta per
+  quel punto, non quella nominale — segue cioè anche una deriva nel
+  *ritmo* del volo reale (salita più lenta o veloce, scoppio prima o
+  dopo), non solo uno scarto di quota. Il salto che un riancoraggio può
+  produrre nel valore mostrato si assorbe con un decadimento di pochi
+  secondi, non di scatto: può succedere che per qualche minuto attorno
+  allo scoppio la quota stimata scenda già mentre l'ultimo fix GPS mostra
+  ancora valori prossimi al massimo — è normale, non un errore, ed è
+  proprio quello che il riancoraggio risolve appena arriva il punto
+  giusto.
+
+  `FLIGHT_SITE` (sempre in `assets/app.js`) è il punto di partenza usato
+  per la linea grigia tratteggiata della traiettoria prevista, disegnata
+  sulla mappa della pagina Diretta accanto ai punti GPS veri (verdi):
+  oggi è l'aerodromo di Mercedes, lo stesso sito proposto di default
+  nella pagina Traiettoria. `assets/spot.js` interroga Tawhiri (lo stesso
+  previsore usato lì) in background, in silenzio, con questi parametri —
+  non quelli che un visitatore potrebbe aver cambiato giocando col modulo
+  della pagina Traiettoria — e ridisegna la linea ogni volta che la
+  previsione (la corsa del modello GFS) cambia. Se la data del lancio è
+  troppo lontana per l'orizzonte del previsore la richiesta fallisce e
+  non succede nulla: ci riprova da sola più avanti, senza bisogno di
+  intervenire.
+
+- **L'indirizzo del backend che interroga SPOT**. Il browser non chiama
+  mai SPOT direttamente (con tanti spettatori durante la diretta,
+  rischierebbe di far bloccare il feed): a interrogarlo una sola volta
+  per tutti è un Cloudflare Worker a parte, nella cartella `worker/`
+  (non in questo branch: vive sul proprio, con la sua pull request —
+  vedi `worker/README.md` per il deploy). La costante `TRACK_URL` in
+  `assets/app.js` è l'indirizzo di quel Worker una volta distribuito
+  (`https://cometa-spot-tracker.<account>.workers.dev` o simile);
+  finché resta vuota (`""`, il valore di oggi) `assets/spot.js` non
+  chiama nessuno e la mappa GPS mostra solo "in attesa del segnale" —
+  niente di rotto, solo il backend non ancora collegato.
+
+- **Quando compare la voce "Diretta"**, e quando passa dal ciano
+  "diretta tra poco" al rosso "in diretta". Sono due date separate in
+  `assets/app.js`: `DIRETTA_WINDOW` (oggi 11 ottobre, qualche giorno prima
+  del lancio — da quel momento la voce appare in nav, in grigio/ciano) e
+  `DIRETTA_START` (oggi 10:00, un'ora prima del lancio — da li' in poi
+  diventa rossa e compare il banner sotto la nav). A differenza del via
+  alla quota, questo passaggio non ha bisogno di un file da pushare
+  nell'istante: la diretta la si accende quando si vuole, quindi basta
+  che le due date siano giuste in anticipo.
 
 ## Licenza
 
