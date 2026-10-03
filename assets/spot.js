@@ -32,15 +32,18 @@ window.COMETA_SPOT = (function(){
   const POLL_MS = 30000;      // il feed si aggiorna ogni ~2,5 min: basta chiedere piu' spesso per non perdere tempo ad accorgersene
   const TICK_MS = 1000;
   const REALIGN_TAU_S = 150;  // costante di tempo del riallineamento: circa un intervallo SPOT
+  const LOST_MS = 3 * 60000;  // SPOT manda un punto ogni ~2,5 min: 3 min e' un margine ragionevole
+  const HIGH_KM = 18;         // sopra qui il GPS smette di trasmettere per natura sua, non per un guasto
+  const LANDED_TOL_DEG = 0.0003;  // ~30 m: fix fermi allo stesso punto, segno che la sonda e' a terra
   const GREEN = "#4ADE9B", ORANGE = "#FFB84D", GREY = "#8FA6BC";   // punto reale, lampeggio, traiettoria prevista
   /* Finche' la sonda non ha ancora mandato nessun punto, la mappa si apre
      centrata sull'Uruguay invece che sull'oceano a (0,0). */
   const FALLBACK = {lat:-33.0, lon:-56.5, zoom:7};
 
   let map, trail, ptsLayer, marker, trajLine, trajRun, mapReady, pollId, tickId, trajId,
-      elMap, elStatus, elAltEst, elAltGps,
+      elMap, elStatus, elAltEst, elAltGps, elRecenter,
       lastPoints, lastErr, curLang = "it",
-      correctionKm = 0, correctionTargetKm = 0, lastTickMs = null;
+      correctionKm = 0, correctionTargetKm = 0, lastTickMs = null, lastEstKm = null;
 
   /* I numeri del volo stanno in assets/app.js — window.COMETA_FLIGHT —
      cosi' c'e' un solo posto dove aggiornarli il giorno del lancio.
@@ -133,22 +136,68 @@ window.COMETA_SPOT = (function(){
       if("ResizeObserver" in window) new ResizeObserver(function(){ map.invalidateSize(); }).observe(elMap);
       map.on("click", function(){ map.scrollWheelZoom.enable(); });
       map.on("mouseout", function(){ map.scrollWheelZoom.disable(); });
+      /* Un pulsante per tornare sull'ultima posizione, se chi guarda ha
+         spostato o zoomato la mappa da solo: stesso stile dei controlli
+         di zoom di Leaflet (.leaflet-bar), niente CSS nuovo da scrivere. */
+      const Recenter = L.Control.extend({
+        options:{position:"topright"},
+        onAdd:function(){
+          const div = L.DomUtil.create("div", "leaflet-bar spot-recenter");
+          const a = elRecenter = L.DomUtil.create("a", "", div);
+          a.href = "#"; a.innerHTML = "⌖"; a.title = dict().dirSpotRecenter || "recenter";
+          L.DomEvent.on(a, "click", L.DomEvent.stop).on(a, "click", function(){
+            if(lastPoints && lastPoints.length){
+              const last = lastPoints[lastPoints.length - 1];
+              map.setView([last.lat, last.lon], Math.max(map.getZoom(), 10));
+            }
+          });
+          return div;
+        }
+      });
+      new Recenter().addTo(map);
     });
     return mapReady;
   }
 
   function dict(){ return (window.I18N && (window.I18N[curLang] || window.I18N.it)) || {}; }
 
+  /* "12s", "2min 05s": niente ore, un volo e' questione di minuti non di ore. */
+  function formatAgo(ms){
+    const s = Math.max(0, Math.round(ms / 1000));
+    if(s < 60) return s + "s";
+    const m = Math.floor(s / 60), r = s % 60;
+    return m + "min " + String(r).padStart(2, "0") + "s";
+  }
+
+  /* Due fix di seguito fermi quasi allo stesso punto, DOPO il lancio
+     vero: a terra, non in volo (in aria la deriva del vento sposta
+     sempre qualcosa). Senza il "dopo il lancio" la sonda ferma al suolo
+     prima del via sembrerebbe gia' atterrata. */
+  function isLanded(points){
+    if(secSinceLaunch(Date.now()) <= 0 || points.length < 2) return false;
+    const a = points[points.length - 1], b = points[points.length - 2];
+    return Math.abs(a.lat - b.lat) < LANDED_TOL_DEG && Math.abs(a.lon - b.lon) < LANDED_TOL_DEG;
+  }
+
   function renderStatus(){
+    if(elRecenter) elRecenter.title = dict().dirSpotRecenter || "recenter";
     if(!elStatus) return;
     const d = dict();
     if(lastErr){ elStatus.textContent = (d.dirSpotUnavailable || "map unavailable") + " (" + lastErr + ")"; return; }
     if(!lastPoints || !lastPoints.length){ elStatus.textContent = d.dirSpotWaiting || "waiting…"; return; }
+    if(isLanded(lastPoints)){ elStatus.textContent = d.dirSpotLanded || "probe landed"; return; }
     const last = lastPoints[lastPoints.length - 1];
-    const when = new Date(last.time);
-    const ok = !isNaN(when.getTime());
+    const whenMs = new Date(last.time).getTime();
+    const elapsed = isNaN(whenMs) ? null : Date.now() - whenMs;
+    if(elapsed != null && elapsed > LOST_MS){
+      /* La quota STIMATA (non l'ultimo fix, ormai vecchio) dice se il
+         silenzio e' quello normale sopra i 18 km o no. */
+      const high = lastEstKm != null && lastEstKm > HIGH_KM;
+      elStatus.textContent = high ? (d.dirSpotLostHigh || "GPS signal lost • > 18 km") : (d.dirSpotLost || "GPS signal lost");
+      return;
+    }
     elStatus.textContent = last.lat.toFixed(4) + ", " + last.lon.toFixed(4) +
-      (ok ? " · " + (d.dirSpotUpdated || "updated at") + " " + when.toLocaleTimeString(d.code || "it", {hour:"2-digit", minute:"2-digit"}) : "");
+      (elapsed != null ? " · " + (d.dirSpotAgo || "{t} ago").replace("{t}", formatAgo(elapsed)) : "");
   }
 
   function setAltText(el, km){
@@ -185,7 +234,13 @@ window.COMETA_SPOT = (function(){
     /* Una quota "stimata" negativa non ha senso per chi guarda, anche se
        il dato grezzo del GPS (sotto, onesto) puo' esserlo per via del
        rumore a terra: qui mostriamo 0 invece di un numero sottoterra. */
-    setAltText(elAltEst, Math.max(estKm, 0));
+    lastEstKm = Math.max(estKm, 0);
+    setAltText(elAltEst, lastEstKm);
+    /* Il contatore "da quanto" e gli stati segnale perso/atterrata si
+       aggiornano ogni secondo, anche senza una risposta nuova dal feed:
+       cosi' si vede che la pagina non e' bloccata, non solo quando
+       arriva un dato. */
+    renderStatus();
   }
 
   let lastRealTime = null;

@@ -31,7 +31,11 @@ it:{
   dirNote:"Sopra i 18 km il GPS smette di inviare il segnale: non è un'avaria, è il suo funzionamento normale — riprenderà in discesa. Fino ad allora la mappa resta ferma sull'ultima posizione nota. I punti verdi sono i fix GPS ricevuti: si toccano per vedere orario, coordinate e quota di ognuno; la linea grigia tratteggiata è la traiettoria prevista dal modello dei venti, aggiornata via via che la previsione cambia.",
   dirSpotWaiting:"in attesa del segnale…",
   dirSpotUnavailable:"mappa non disponibile",
-  dirSpotUpdated:"aggiornato alle",
+  dirSpotAgo:"{t} fa",
+  dirSpotLost:"segnale GPS perso",
+  dirSpotLostHigh:"segnale GPS perso • > 18 km",
+  dirSpotLanded:"sonda atterrata",
+  dirSpotRecenter:"Torna sull'ultima posizione",
   dirAltHead:"Quota", dirAltEstLabel:"Stimata", dirAltGpsLabel:"Ultimo punto GPS",
 
   /* — Inizio — */
@@ -467,7 +471,11 @@ es:{
   dirNote:"Por encima de los 18 km el GPS deja de enviar señal: no es una avería, es su funcionamiento normal — se reanudará en el descenso. Hasta entonces el mapa queda fijo en la última posición conocida. Los puntos verdes son los fixes GPS recibidos: se pueden tocar para ver hora, coordenadas y altitud de cada uno; la línea gris punteada es la trayectoria prevista por el modelo de vientos, que se actualiza a medida que cambia la previsión.",
   dirSpotWaiting:"esperando la señal…",
   dirSpotUnavailable:"mapa no disponible",
-  dirSpotUpdated:"actualizado a las",
+  dirSpotAgo:"hace {t}",
+  dirSpotLost:"señal GPS perdida",
+  dirSpotLostHigh:"señal GPS perdida • > 18 km",
+  dirSpotLanded:"sonda aterrizada",
+  dirSpotRecenter:"Volver a la última posición",
   dirAltHead:"Altitud", dirAltEstLabel:"Estimada", dirAltGpsLabel:"Último punto GPS",
 
   heroSchool:"Scuola Italiana di Montevideo",
@@ -897,7 +905,11 @@ en:{
   dirNote:"Above 18 km the GPS stops sending its signal: that is not a malfunction, it is normal operation — it will resume on the way down. Until then the map stays on the last known position. The green points are the GPS fixes received: tap one to see its time, coordinates and altitude; the dashed grey line is the trajectory predicted by the wind model, updated as the forecast changes.",
   dirSpotWaiting:"waiting for signal…",
   dirSpotUnavailable:"map unavailable",
-  dirSpotUpdated:"updated at",
+  dirSpotAgo:"{t} ago",
+  dirSpotLost:"GPS signal lost",
+  dirSpotLostHigh:"GPS signal lost • > 18 km",
+  dirSpotLanded:"probe landed",
+  dirSpotRecenter:"Back to last position",
   dirAltHead:"Altitude", dirAltEstLabel:"Estimated", dirAltGpsLabel:"Latest GPS fix",
 
   heroSchool:"Scuola Italiana di Montevideo",
