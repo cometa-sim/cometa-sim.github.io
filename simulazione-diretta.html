@@ -1223,10 +1223,21 @@
    ========================================================== */
 (function(){
   var RealDate = Date;
+  var RealSetInterval = window.setInterval.bind(window);
+  var RealSetTimeout = window.setTimeout.bind(window);
   var SPEED = 10; // il tempo scorre 10 volte piu' in fretta
   var realStart = RealDate.now();
   var REAL_LAUNCH_MS = new RealDate("2026-10-14T11:00:00-03:00").getTime();
-  var fakeStart = REAL_LAUNCH_MS - 40000; // 40 s (finti) prima del vero LAUNCH
+  /* ---- fisica del volo finto: rispecchia FLIGHT_* in assets/app.js ---- */
+  var FLIGHT = {burstKm: 37.9, ascentMs: 5, descentMs: 5.5};
+  var LAT0 = -33.68, LON0 = -56.35;
+  var ASC_SEC = FLIGHT.burstKm * 1000 / FLIGHT.ascentMs; // secondi (finti) dal lancio allo scoppio
+
+  /* Punto di partenza della simulazione: pochi minuti (finti) prima
+     dello scoppio, non dal lancio — per vedere subito quella fase,
+     invece di aspettare tutta la salita anche accelerata 10x. */
+  var LEAD_SIM_MIN = 4;
+  var fakeStart = REAL_LAUNCH_MS + (ASC_SEC - LEAD_SIM_MIN * 60) * 1000;
 
   function fakeNowMs(){ return fakeStart + (RealDate.now() - realStart) * SPEED; }
   window.__fakeNow = fakeNowMs;
@@ -1236,16 +1247,20 @@
     static now(){ return fakeNowMs(); }
   };
 
+  /* Anche i timer vanno accelerati 10x, non solo l'orologio: altrimenti
+     assets/spot.js continua a controllare il feed ogni 30 secondi VERI
+     (fissi nel codice, giusto per il ritmo reale di SPOT), e i punti
+     finti — che qui arrivano ogni 15 s veri — si vedono a scatti di
+     due alla volta invece che uno alla volta. */
+  window.setInterval = function(fn, ms){ return RealSetInterval(fn, (ms || 0) / SPEED); };
+  window.setTimeout = function(fn, ms){ return RealSetTimeout(fn, (ms || 0) / SPEED); };
+
   location.hash = "diretta";
 
-  setInterval(function(){
+  RealSetInterval(function(){
     var el = document.getElementById("simClock");
     if(el) el.textContent = new Date().toLocaleString("it-IT");
   }, 250);
-
-  /* ---- feed GPS finto, stessa forma di quello vero di SPOT ---- */
-  var FLIGHT = {burstKm: 37.9, ascentMs: 5, descentMs: 5.5}; // rispecchia FLIGHT_* in assets/app.js
-  var LAT0 = -33.68, LON0 = -56.35;
 
   function altAtSec(s){
     if(s <= 0) return 0;
