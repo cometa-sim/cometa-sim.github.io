@@ -26,11 +26,12 @@ enabled = false
 
 # Dominio/i da cui il sito puo' leggere /track.json e /track.csv, e da
 # cui la pagina di amministrazione (admin-diretta.html, stesso dominio)
-# puo' chiamare /claim e /ingest (CORS). Aggiungere anche l'anteprima
-# raw.githack usata nelle prove, se serve:
-# ["https://cometa-sim.github.io", "https://raw.githack.com"]
+# puo' chiamare /claim e /ingest (CORS). Elenco separato da virgole:
+# il dominio personalizzato del sito (vedi CNAME, e' quello vero usato
+# dai visitatori) e quello "tecnico" di GitHub Pages (utile per le prove
+# dirette su cometa-sim.github.io, es. prima che il CNAME sia attivo).
 [vars]
-ALLOWED_ORIGINS = "https://cometa-sim.github.io"
+ALLOWED_ORIGINS = "https://cometa-sim.github.io,https://cometa.scuolaitaliana.edu.uy"
 # SPOT blocca le richieste dai Worker di Cloudflare (403 anti-bot): il
 # polling lo fa la pagina di amministrazione dal browser, non il Worker
 # da solo. "true" per riattivare l'alarm interno, se SPOT dovesse un
