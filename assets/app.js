@@ -556,20 +556,25 @@ function smoothScrollTo(to, dur){
 const LAUNCH = new Date("2026-10-07T11:00:00-03:00");
 function updateCountdown(){
   const diff = LAUNCH - Date.now();
-  const d = $("#cd"), h = $("#ch"), m = $("#cm"), s = $("#cs"), cb = $("#cbadge");
-  if(diff <= 0){
-    if(d) d.textContent = "0";
-    [h,m,s].forEach(function(e){ if(e) e.textContent = "00"; });
-    if(cb) cb.textContent = "● LIVE";
-    return;
-  }
-  const dd = Math.floor(diff/864e5), hh = Math.floor(diff/36e5) % 24,
-        mm = Math.floor(diff/6e4) % 60, ss = Math.floor(diff/1e3) % 60;
-  if(d) d.textContent = dd;
-  if(h) h.textContent = String(hh).padStart(2, "0");
-  if(m) m.textContent = String(mm).padStart(2, "0");
-  if(s) s.textContent = String(ss).padStart(2, "0");
-  if(cb) cb.textContent = "T– " + dd + I18N[LANG].cUnit;
+  const cb = $("#cbadge");
+  /* "" = conto alla rovescia in home, "2" = la stessa cosa ripetuta
+     nella pagina Diretta: stesso LAUNCH, id separati per non scontrarsi. */
+  ["", "2"].forEach(function(suffix){
+    const d = $("#cd" + suffix), h = $("#ch" + suffix), m = $("#cm" + suffix), s = $("#cs" + suffix);
+    if(diff <= 0){
+      if(d) d.textContent = "0";
+      [h,m,s].forEach(function(e){ if(e) e.textContent = "00"; });
+      return;
+    }
+    const dd = Math.floor(diff/864e5), hh = Math.floor(diff/36e5) % 24,
+          mm = Math.floor(diff/6e4) % 60, ss = Math.floor(diff/1e3) % 60;
+    if(d) d.textContent = dd;
+    if(h) h.textContent = String(hh).padStart(2, "0");
+    if(m) m.textContent = String(mm).padStart(2, "0");
+    if(s) s.textContent = String(ss).padStart(2, "0");
+  });
+  if(diff <= 0){ if(cb) cb.textContent = "● LIVE"; return; }
+  if(cb) cb.textContent = "T– " + Math.floor(diff/864e5) + I18N[LANG].cUnit;
 }
 
 /* ==========================================================

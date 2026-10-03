@@ -875,6 +875,10 @@ nav a.ig:hover svg{transform:translateY(-1px)}
   font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
 .ecard2 .box{aspect-ratio:16/9;background:#02060f;display:flex;align-items:center;justify-content:center;position:relative}
 .ecard2 .box iframe{width:100%;height:100%;border:0;display:block}
+/* Il widget di SPOT Trace e' un'app completa (barra, filtri, condivisione):
+   in un riquadro 16:9 la sua interfaccia viene tagliata. Le serve piu'
+   altezza propria, non il rapporto del video. */
+.ecard2 .box.tall{aspect-ratio:auto;height:min(70vh,620px)}
 
 .preview-toggle{position:fixed;right:16px;bottom:16px;z-index:100;display:flex;gap:2px;padding:3px;border-radius:999px;
   background:rgba(4,12,25,.9);border:1px solid var(--line-soft);backdrop-filter:blur(10px)}
