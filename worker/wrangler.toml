@@ -1,4 +1,4 @@
-name = "cometa-spot-tracker"
+name = "cometa-sim-github-io"
 main = "src/index.ts"
 compatibility_date = "2024-11-01"
 

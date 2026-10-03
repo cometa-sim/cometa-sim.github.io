@@ -1,4 +1,4 @@
-# cometa-spot-tracker
+# cometa-sim-github-io (Worker SPOT tracker)
 
 Backend per la diretta COMETA: un Cloudflare Worker con un Durable Object
 (storage SQLite) che interroga il feed pubblico dello SPOT Trace **una
@@ -112,7 +112,7 @@ chiede esplicitamente in fase di collegamento.
      (se la dashboard insiste per averne uno, `npm install` va bene).
    - **Deploy command**: `npx wrangler deploy`
    - Il nome del progetto proposto dovrebbe coincidere con `name` in
-     `wrangler.toml` (`cometa-spot-tracker`); se la dashboard ne
+     `wrangler.toml` (`cometa-sim-github-io`); se la dashboard ne
      suggerisce uno diverso, meglio rinominarlo così prima di confermare.
    - **Deployments di anteprima per le pull request**: si può
      disattivare (non servono, questo progetto non ne ha bisogno); se
@@ -151,7 +151,7 @@ chiede esplicitamente in fase di collegamento.
    # {"points":[],"last_fetch":null,"last_fetch_ok":null,"last_point_time":null,"polling_active":false}
    ```
    L'URL del Worker (del tipo
-   `https://cometa-spot-tracker.<account>.workers.dev`, o un dominio
+   `https://cometa-sim-github-io.<account>.workers.dev`, o un dominio
    personalizzato se ne è stato collegato uno) è quello da mettere
    nella costante `TRACK_URL` in `assets/app.js`, sul sito principale.
 
