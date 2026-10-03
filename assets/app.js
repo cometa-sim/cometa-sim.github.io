@@ -596,7 +596,7 @@ window.COMETA_FLIGHT = {burstKm: FLIGHT_BURST_KM, ascentMs: FLIGHT_ASCENT_MS, de
    assets/spot.js legge solo da qui, mai da SPOT direttamente dal
    browser. Da sostituire con l'URL vero una volta fatto il deploy —
    finche' resta vuota, la mappa GPS mostra solo "in attesa del segnale". */
-const TRACK_URL = "";
+const TRACK_URL = "https://cometa-sim-github-io.de-toni-carlo.workers.dev";
 window.COMETA_TRACK_URL = TRACK_URL;
 
 /* Quando compare la voce "Diretta" in nav (qualche giorno prima del
