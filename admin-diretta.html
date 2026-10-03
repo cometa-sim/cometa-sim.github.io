@@ -46,6 +46,13 @@
   #log li{border-bottom:1px solid var(--line-soft);padding:6px 0;color:var(--muted)}
   #log li:first-child{color:var(--ink)}
   #log li .t{color:var(--faint);margin-right:8px}
+  #positionsCard summary{font-family:var(--disp);font-weight:500;font-size:16px;color:var(--ink);cursor:pointer;user-select:none}
+  #positionsCard summary::marker{color:var(--faint)}
+  #positions{list-style:none;margin:14px 0 0;padding:0;max-height:280px;overflow-y:auto;font-family:var(--mono);font-size:12px;line-height:1.7}
+  #positions li{border-bottom:1px solid var(--line-soft);padding:6px 0;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap}
+  #positions li:first-child{color:var(--ink)}
+  #positions .t{color:var(--faint);min-width:64px}
+  #positions .ty{color:var(--faint)}
   .banner{border-radius:12px;padding:12px 16px;font-size:13px;line-height:1.5;margin-bottom:18px}
   .banner.info{background:var(--panel-2);border:1px solid var(--line);color:var(--muted)}
   .banner.warn{background:rgba(255,184,77,.12);border:1px solid rgba(255,184,77,.4);color:var(--beacon)}
@@ -95,6 +102,11 @@
       <h2>Registro</h2>
       <ul id="log"></ul>
     </section>
+
+    <details class="card" id="positionsCard">
+      <summary>Ultime posizioni salvate</summary>
+      <ul id="positions"><li class="hint">—</li></ul>
+    </details>
 
     <section class="card">
       <h2>Comandi</h2>
@@ -156,6 +168,7 @@
     started = true;
     requestWakeLock();
     logEvent("avviato — un giro ogni " + (POLL_MS / 1000) + "s");
+    refreshPositions();
     runCycle();
   });
 
@@ -230,6 +243,7 @@
         if (/HTTP 401/.test(err.message)) $("visBanner").textContent = "Admin token rifiutato dal Worker: ricarica la pagina e ricontrollalo.";
       })
       .then(function(){
+        refreshPositions();
         scheduleNext();
       });
   }
@@ -256,6 +270,48 @@
     if (ok === true) el.classList.add("ok"); else if (ok === false) el.classList.add("bad");
   }
   function setNew(n){ $("statNew").querySelector(".v").textContent = String(n); }
+
+  /* Lista a tendina delle ultime posizioni salvate sul Worker — solo per
+     controllo rapido, non e' la mappa vera (quella e' nella pagina
+     Diretta). Aggiornata a ogni giro, successo o no: /track-all.json
+     non ha il filtro PUBLIC_FROM, quindi mostra anche le prove. */
+  function refreshPositions(){
+    fetch(WORKER_BASE + "/track-all.json", { headers: authHeaders() })
+      .then(function(res){ if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
+      .then(function(data){ renderPositions((data.points || []).slice(-15).reverse()); })
+      .catch(function(err){ renderPositions(null, err); });
+  }
+
+  function renderPositions(points, err){
+    const ul = $("positions");
+    ul.innerHTML = "";
+    if (err) {
+      const li = document.createElement("li");
+      li.textContent = "impossibile leggere /track-all.json: " + err.message;
+      ul.appendChild(li);
+      return;
+    }
+    if (!points.length) {
+      const li = document.createElement("li");
+      li.className = "hint";
+      li.textContent = "ancora nessun punto salvato.";
+      ul.appendChild(li);
+      return;
+    }
+    points.forEach(function(p){
+      const li = document.createElement("li");
+      const t = document.createElement("span"); t.className = "t";
+      t.textContent = new Date(p.time * 1000).toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+      const coords = document.createElement("span");
+      coords.textContent = p.lat.toFixed(5) + ", " + p.lon.toFixed(5) + (p.altitude != null ? " · " + Math.round(p.altitude) + " m" : "");
+      const ty = document.createElement("span"); ty.className = "ty";
+      ty.textContent = p.messageType || "";
+      li.appendChild(t);
+      li.appendChild(coords);
+      li.appendChild(ty);
+      ul.appendChild(li);
+    });
+  }
 
   const logEntries = [];
   function logEvent(msg){
