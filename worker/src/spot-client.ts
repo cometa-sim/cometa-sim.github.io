@@ -8,19 +8,24 @@ export interface RawFetchResult {
   raws: Map<string, unknown>; // id -> messaggio originale completo
 }
 
-/* Un messaggio SPOT grezzo diventa un Point normalizzato. Niente scarti
-   ne' correzioni sulla quota (vedi spec): se altitude manca resta null,
-   non si inventa uno zero. Senza un id ne' un orario utilizzabile il
-   messaggio non e' nemmeno deduplicabile: quello solo si scarta. */
+/* Un messaggio SPOT grezzo diventa un Point normalizzato — qualunque sia
+   messageType (il nostro tracker manda anche EXTREME-TRACK e
+   NEWMOVEMENT, non solo TRACK: nessun filtro sul tipo, si salva e si
+   conserva cosi' com'e', in modo da poterlo distinguere a posteriori).
+   L'unico criterio e' avere lat/lon: senza una posizione un messaggio
+   non serve alla traccia (un SOS o un OK senza GPS, per esempio) e non
+   diventa un Point. Niente scarti ne' correzioni sulla quota (vedi
+   spec): se altitude manca resta null, non si inventa uno zero. */
 function normalize(m: Record<string, unknown>): Point | null {
+  if (m.latitude == null || m.longitude == null) return null;
   const time = m.unixTime != null ? Number(m.unixTime) : m.dateTime ? Math.floor(Date.parse(String(m.dateTime)) / 1000) : null;
   if (time == null || Number.isNaN(time)) return null;
   const id = m.id != null ? String(m.id) : `t${time}`; // fallback raro: SPOT manda sempre un id, ma non si sa mai
   return {
     id,
     time,
-    lat: m.latitude != null ? Number(m.latitude) : null,
-    lon: m.longitude != null ? Number(m.longitude) : null,
+    lat: Number(m.latitude),
+    lon: Number(m.longitude),
     altitude: m.altitude != null ? Number(m.altitude) : null,
     messageType: m.messageType != null ? String(m.messageType) : null,
     batteryState: m.batteryState != null ? String(m.batteryState) : null,
