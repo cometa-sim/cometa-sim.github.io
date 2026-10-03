@@ -161,8 +161,20 @@ window.COMETA_SPOT = (function(){
       anchorAltKm = flight.burstKm; anchorTime = Date.now(); rateKmS = -flight.descentMs / 1000;
       estKm = flight.burstKm;
     }
-    if(phase === "descent") estKm = Math.max(estKm, 0);
-    setAltText(elAltEst, estKm);
+    /* Una quota "stimata" negativa non ha senso per chi guarda, anche se
+       il dato grezzo del GPS (sotto, onesto) puo' esserlo per via del
+       rumore a terra: qui mostriamo 0 invece di un numero sottoterra. */
+    setAltText(elAltEst, Math.max(estKm, 0));
+  }
+
+  let lastRealTime = null;
+
+  function flashGps(){
+    const el = document.getElementById("altGpsRow");
+    if(!el) return;
+    el.classList.remove("flash");
+    void el.offsetWidth; // forza il reflow, cosi' l'animazione riparte anche se era appena finita
+    el.classList.add("flash");
   }
 
   function render(points){
@@ -175,6 +187,8 @@ window.COMETA_SPOT = (function(){
       marker.setStyle({opacity:1, fillOpacity:.9});
       map.setView([last.lat, last.lon], Math.max(map.getZoom(), 10));
       setAltText(elAltGps, last.alt != null ? last.alt / 1000 : null);
+      if(lastRealTime != null && String(last.time) !== String(lastRealTime)) flashGps();
+      lastRealTime = last.time;
       updateRate(points);
     }
     renderStatus();
