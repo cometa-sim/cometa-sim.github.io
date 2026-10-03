@@ -1,5 +1,5 @@
 import type { Env } from "./env";
-import { fetchSpotPage, fetchFakeSpot } from "./spot-client";
+import { fetchSpotPage, fetchFakeSpot, parseSpotJson } from "./spot-client";
 import { checkAuth, corsHeaders, jsonResponse, pointsToCsv, type Point } from "./util";
 
 const POLL_INTERVAL_MS = 155_000; // i 150s richiesti da SPOT, piu' un margine
@@ -34,6 +34,12 @@ export class SpotTracker implements DurableObject {
 
   // ------------------------------------------------------------ routing
 
+  /* I CORS si applicano qui, a ogni risposta indistintamente (anche un
+     401 o un 404): da quando la pagina di amministrazione chiama anche
+     gli endpoint protetti dal browser, non solo quelli pubblici, serve
+     che il browser possa sempre leggere l'esito — il Bearer token
+     resta il vero controllo d'accesso, i CORS header non bypassano
+     nulla, dicono solo al browser chi puo' leggere la risposta. */
   async fetch(req: Request): Promise<Response> {
     const url = new URL(req.url);
     const path = url.pathname;
@@ -41,43 +47,41 @@ export class SpotTracker implements DurableObject {
 
     if (req.method === "OPTIONS") return new Response(null, { headers: cors });
 
+    let res: Response;
     try {
-      if (path === "/track.json" && req.method === "GET") return this.handleTrackJson(cors);
-      if (path === "/track.csv" && req.method === "GET") return this.handleTrackCsv(cors);
-
+      if (path === "/track.json" && req.method === "GET") res = await this.handleTrackJson();
+      else if (path === "/track.csv" && req.method === "GET") res = await this.handleTrackCsv();
       // Tutto il resto e' protetto da token.
-      if (!checkAuth(req, this.env)) return jsonResponse({ error: "non autorizzato" }, { status: 401 });
-
-      if (path === "/track-all.json" && req.method === "GET") return this.handleTrackAll();
-      if (path === "/start" && req.method === "POST") return this.handleStart();
-      if (path === "/stop" && req.method === "POST") return this.handleStop();
-      if (path === "/reset" && req.method === "POST") return this.handleReset();
-      if (path === "/backfill" && req.method === "POST") return this.handleBackfill(req);
-      if (path === "/public-from" && req.method === "POST") return this.handlePublicFrom(req);
-      if (path === "/simulate" && req.method === "POST") return this.handleSimulate(req);
-
-      return jsonResponse({ error: "non trovato" }, { status: 404 });
+      else if (!checkAuth(req, this.env)) res = jsonResponse({ error: "non autorizzato" }, { status: 401 });
+      else if (path === "/track-all.json" && req.method === "GET") res = await this.handleTrackAll();
+      else if (path === "/start" && req.method === "POST") res = await this.handleStart();
+      else if (path === "/stop" && req.method === "POST") res = await this.handleStop();
+      else if (path === "/reset" && req.method === "POST") res = await this.handleReset();
+      else if (path === "/backfill" && req.method === "POST") res = await this.handleBackfill(req);
+      else if (path === "/public-from" && req.method === "POST") res = await this.handlePublicFrom(req);
+      else if (path === "/simulate" && req.method === "POST") res = await this.handleSimulate(req);
+      else if (path === "/claim" && req.method === "POST") res = await this.handleClaim();
+      else if (path === "/ingest" && req.method === "POST") res = await this.handleIngest(req);
+      else res = jsonResponse({ error: "non trovato" }, { status: 404 });
     } catch (err) {
-      return jsonResponse({ error: String(err) }, { status: 500 });
+      res = jsonResponse({ error: String(err) }, { status: 500 });
     }
+    for (const [k, v] of Object.entries(cors)) res.headers.set(k, v as string);
+    return res;
   }
 
   // ------------------------------------------------------- endpoint pubblici
 
   /* Solo i punti con time >= publicFrom; senza publicFrom impostato,
      nessun punto — i test prima del lancio restano privati di default. */
-  private async handleTrackJson(cors: HeadersInit): Promise<Response> {
+  private async handleTrackJson(): Promise<Response> {
     const publicFrom = (await this.state.storage.get<number>("publicFrom")) ?? null;
     const points = publicFrom == null ? [] : this.selectPoints(publicFrom);
     const meta = await this.metaForPublic();
-    return jsonResponse(
-      { points, ...meta },
-      { headers: { "Cache-Control": "public, max-age=30" } },
-      cors
-    );
+    return jsonResponse({ points, ...meta }, { headers: { "Cache-Control": "public, max-age=30" } });
   }
 
-  private async handleTrackCsv(cors: HeadersInit): Promise<Response> {
+  private async handleTrackCsv(): Promise<Response> {
     const publicFrom = (await this.state.storage.get<number>("publicFrom")) ?? null;
     const points = publicFrom == null ? [] : this.selectPoints(publicFrom);
     const csv = pointsToCsv(points);
@@ -86,7 +90,6 @@ export class SpotTracker implements DurableObject {
         "Content-Type": "text/csv; charset=utf-8",
         "Content-Disposition": 'attachment; filename="cometa-track.csv"',
         "Cache-Control": "public, max-age=30",
-        ...cors,
       },
     });
   }
@@ -150,14 +153,14 @@ export class SpotTracker implements DurableObject {
       if (body.startDate) params.startDate = body.startDate;
       if (body.endDate) params.endDate = body.endDate;
       const { points, raws } = await fetchSpotPage(this.env, params);
-      total += this.upsertPoints(points, raws);
+      total += this.upsertPoints(points, raws).processed;
     } else {
       for (let page = 0; page < BACKFILL_MAX_PAGES; page++) {
         const start = page * BACKFILL_PAGE + 1;
         const params: Record<string, string> = page === 0 ? {} : { start: String(start) };
         const { points, raws } = await fetchSpotPage(this.env, params);
         if (points.length === 0) break;
-        total += this.upsertPoints(points, raws);
+        total += this.upsertPoints(points, raws).processed;
         if (points.length < BACKFILL_PAGE) break; // ultima pagina
       }
     }
@@ -186,14 +189,88 @@ export class SpotTracker implements DurableObject {
     return jsonResponse({ ok: true, simulate: body.enabled });
   }
 
+  /* Il permesso di chiamare SPOT: concesso solo se sono passati almeno
+     150s (MIN_INTERVAL_MS, lo stesso limite di SPOT) dall'ultimo
+     permesso concesso — non dall'ultimo /ingest andato a buon fine: il
+     permesso e' speso appena concesso, anche se chi lo ottiene non
+     arriva mai a chiamare /ingest (pagina chiusa, rete caduta), cosi'
+     nessun'altra pagina di amministrazione aperta in parallelo puo'
+     richiamare SPOT troppo presto. Al sicuro con piu' pagine aperte
+     insieme: un Durable Object processa le proprie richieste una alla
+     volta (non in parallelo) finche' non si passa un'opzione esplicita
+     per toglierlo, che qui non si usa — get e put dello storage non
+     vengono mai interallacciati da un'altra richiesta nel mezzo. */
+  private async handleClaim(): Promise<Response> {
+    const lastClaimMs = (await this.state.storage.get<number>("lastClaimMs")) ?? 0;
+    const now = Date.now();
+    const elapsed = now - lastClaimMs;
+    if (elapsed < MIN_INTERVAL_MS) {
+      return jsonResponse({ granted: false, retry_after_s: Math.ceil((MIN_INTERVAL_MS - elapsed) / 1000) });
+    }
+    await this.state.storage.put("lastClaimMs", now);
+    return jsonResponse({ granted: true });
+  }
+
+  /* La pagina di amministrazione manda qui cosa le ha risposto SPOT,
+     cosi' com'e' — non e' il Worker a chiamare SPOT (vedi
+     INTERNAL_POLLING_ENABLED). "ok" dice se e' arrivata una risposta
+     HTTP qualunque da SPOT (anche di errore applicativo): se e' false
+     il fetch dal browser e' fallito del tutto (rete, CORS) e non c'e'
+     nessun corpo da leggere. Un esito negativo si registra comunque
+     (spot_ok:false, lastError) — non si rifiuta l'ingest — cosi'
+     track.json lo riporta invece di restare silenziosamente indietro. */
+  private async handleIngest(req: Request): Promise<Response> {
+    const body = await req
+      .json<{ ok: boolean; status?: number; body?: unknown; error?: string }>()
+      .catch(() => null);
+    if (!body || typeof body.ok !== "boolean") {
+      return jsonResponse({ error: "body atteso: {ok, status?, body?, error?}" }, { status: 400 });
+    }
+    await this.state.storage.put("lastFetchMs", Date.now());
+
+    if (!body.ok) {
+      console.error(`[SPOT via admin] fetch fallito: ${body.error ?? "motivo sconosciuto"}`);
+      await this.state.storage.put("lastFetchOk", false);
+      await this.state.storage.put("lastError", body.error ?? "fetch fallito");
+      return jsonResponse({ ok: true, spot_ok: false, upserted: 0, received: 0 });
+    }
+    if (body.status != null && (body.status < 200 || body.status >= 300)) {
+      const bodyText = typeof body.body === "string" ? body.body : JSON.stringify(body.body ?? null);
+      console.error(`[SPOT via admin] HTTP ${body.status}\n${bodyText}`);
+      await this.state.storage.put("lastFetchOk", false);
+      await this.state.storage.put("lastError", `SPOT HTTP ${body.status}: ${bodyText.slice(0, 300)}`);
+      return jsonResponse({ ok: true, spot_ok: false, upserted: 0, received: 0 });
+    }
+    try {
+      const { points, raws } = parseSpotJson(body.body);
+      const { inserted } = this.upsertPoints(points, raws);
+      await this.state.storage.put("lastFetchOk", true);
+      await this.state.storage.delete("lastError");
+      return jsonResponse({ ok: true, spot_ok: true, upserted: inserted, received: points.length });
+    } catch (err) {
+      await this.state.storage.put("lastFetchOk", false);
+      await this.state.storage.put("lastError", String(err));
+      return jsonResponse({ ok: true, spot_ok: false, upserted: 0, received: 0 });
+    }
+  }
+
   // --------------------------------------------------------------- polling
 
-  /* Il cuore del "una sola interrogazione per tutti": i Cron Trigger di
-     Cloudflare hanno granularita' di un minuto (non permettono 150s), quindi
-     il ritmo lo tiene l'alarm del Durable Object, che si riprogramma da
-     solo a ogni esecuzione. Il guardiano su lastFetchMs garantisce i 150s
-     minimi anche con alarm duplicati o un riavvio del Worker. */
+  /* Il cuore del "una sola interrogazione per tutti" — quando era il
+     Worker a interrogare SPOT. SPOT pero' blocca le richieste dai
+     Worker di Cloudflare con un 403 anti-bot (accetta solo quelle da un
+     browser): finche' non cambia, il polling lo fa la pagina di
+     amministrazione via /claim+/ingest, e questo alarm non fa nulla.
+     Il codice resta (non cancellato: vedi INTERNAL_POLLING_ENABLED in
+     env.ts), per il giorno in cui si potesse riaccendere. Quando era
+     attivo: i Cron Trigger di Cloudflare hanno granularita' di un
+     minuto (non permettono 150s), quindi il ritmo lo teneva l'alarm
+     del Durable Object, che si riprogramma da solo a ogni esecuzione;
+     il guardiano su lastFetchMs garantiva i 150s minimi anche con
+     alarm duplicati o un riavvio del Worker. */
   async alarm(): Promise<void> {
+    if (this.env.INTERNAL_POLLING_ENABLED !== "true") return;
+
     const active = (await this.state.storage.get<boolean>("pollingActive")) ?? false;
     if (!active) return; // non si riprogramma da solo: ci pensa /start
 
@@ -231,10 +308,25 @@ export class SpotTracker implements DurableObject {
 
   /* Upsert per id: un punto gia' visto si aggiorna (nel raro caso in cui
      SPOT lo ritrasmetta corretto), uno nuovo si inserisce. Mai scartati
-     ne' corretti i valori di quota, anche se sembrano anomali. */
-  private upsertPoints(points: Point[], raws: Map<string, unknown>): number {
-    let n = 0;
+     ne' corretti i valori di quota, anche se sembrano anomali.
+     "inserted" (non "processed") e' il numero di punti DAVVERO nuovi —
+     serve a /ingest per dire alla pagina di amministrazione quanti
+     punti nuovi sono arrivati in questo giro, non solo quanti ne
+     conteneva la risposta di SPOT (che ne manda sempre fino a 50,
+     quasi tutti gia' visti). */
+  private upsertPoints(points: Point[], raws: Map<string, unknown>): { processed: number; inserted: number } {
+    if (points.length === 0) return { processed: 0, inserted: 0 };
+    const ids = points.map((p) => p.id);
+    const placeholders = ids.map(() => "?").join(",");
+    const existing = new Set(
+      this.state.storage.sql
+        .exec(`SELECT id FROM points WHERE id IN (${placeholders})`, ...ids)
+        .toArray()
+        .map((r) => (r as { id: string }).id)
+    );
+    let inserted = 0;
     for (const p of points) {
+      if (!existing.has(p.id)) inserted++;
       this.state.storage.sql.exec(
         `INSERT INTO points (id, time, lat, lon, altitude, messageType, batteryState, raw)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
@@ -244,9 +336,8 @@ export class SpotTracker implements DurableObject {
         p.id, p.time, p.lat, p.lon, p.altitude, p.messageType, p.batteryState,
         JSON.stringify(raws.get(p.id) ?? null)
       );
-      n++;
     }
-    return n;
+    return { processed: points.length, inserted };
   }
 
   private selectPoints(fromTime: number): Point[] {
