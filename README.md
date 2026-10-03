@@ -15,6 +15,9 @@ resta. Senza indirizzo si apre `#home`.
 ```
 index.html                          tutte le sezioni
 sonda.html · venti.html             rimandi ai vecchi indirizzi
+simulazione-diretta.html            prova la pagina Diretta con un orologio accelerato
+                                     e un feed GPS finto, senza aspettare il lancio vero
+                                     (NON è una pagina del sito, non è linkata da nessuna parte)
 
 assets/cometa.css                   colori, caratteri, impaginazione
 assets/i18n.js                      i testi in italiano, spagnolo e inglese
@@ -24,7 +27,6 @@ assets/app.js                       lingua, navigazione, salita, fisica, conto a
 assets/traiettoria.js               prevedere il volo: pallone, partenza, Tawhiri
 assets/msis.js                      NRLMSIS 2.1 tabulato, generato da calcolo/genera_msis.py
 assets/spot.js                      pagina Diretta: mappa GPS e quota stimata in volo
-assets/flight-start.json            il via alla quota stimata, il giorno del lancio (vedi sotto)
 assets/vendor/three.min.js          Three.js r128, copia locale (vedi sotto)
 assets/vendor/leaflet/              Leaflet 1.9.4, copia locale, per la previsione del giorno
 
@@ -57,7 +59,6 @@ Norme e autorizzazioni · Domande · Chi siamo.
 | Data del lancio (conto alla rovescia) | la costante `LAUNCH` in `assets/app.js` |
 | Fondo scala delle animazioni | la costante `SCALA_KM` in `assets/app.js` |
 | Quota di scoppio e velocità di salita/discesa attese (pagina Diretta) | `FLIGHT_BURST_KM`, `FLIGHT_ASCENT_MS`, `FLIGHT_DESCENT_MS` in `assets/app.js` |
-| Il via alla quota stimata, nell'istante vero del lancio | `"launched":true` in `assets/flight-start.json` — vedi «Da completare» |
 | Quando compare "Diretta" in nav e quando diventa rossa | `DIRETTA_WINDOW` e `DIRETTA_START` in `assets/app.js` |
 | Numeri delle quattro schede della pagina iniziale | direttamente in `index.html` |
 | Stato di una tappa del progetto | la classe `done`, `wip` o `todo` della riga in `index.html` |
@@ -410,6 +411,10 @@ approvare la propria richiesta di modifica.
 - **La data definitiva del lancio**, quando la DINACIA autorizza. Oggi la
   costante `LAUNCH` in `assets/app.js` vale `2026-10-14T11:00:00-03:00`: è
   provvisoria, e il conto alla rovescia la mostra come se fosse certa.
+  È anche il via vero: il lancio **è** la scadenza di `LAUNCH`, non un
+  segnale a parte — se il giorno stesso il lancio slitta rispetto all'ora
+  prevista, si aggiorna `LAUNCH` all'ora vera (commit e push) e il resto
+  (conto alla rovescia, quota stimata in `assets/spot.js`) segue da solo.
 
 - **La quota di scoppio e le velocità di salita/discesa**, nella pagina
   Diretta. `FLIGHT_BURST_KM`, `FLIGHT_ASCENT_MS` e `FLIGHT_DESCENT_MS` in
@@ -417,29 +422,6 @@ approvare la propria richiesta di modifica.
   (37,9 km, 5 m/s, 5,5 m/s): il giorno del lancio vanno sostituiti con la
   previsione precisa di quel volo, altrimenti la quota stimata in volo
   (`assets/spot.js`) scoppia e scende al punto sbagliato.
-
-- **Il via alla quota stimata, nell'istante vero del lancio.** La pagina
-  Diretta non capisce da sola quando il pallone parte — altrimenti, se il
-  lancio slitta rispetto all'orario previsto (capita sempre), la quota
-  stimata comincerebbe a salire da sola mentre la sonda è ancora a terra.
-  Il via è `assets/flight-start.json`: appena il pallone lascia la mano,
-  chi segue il lancio da un computer cambia
-
-  ```json
-  {"launched": false}
-  ```
-
-  in
-
-  ```json
-  {"launched": true}
-  ```
-
-  e fa commit e push. Da quel momento tutti quelli che stanno guardando la
-  pagina vedono la quota stimata cominciare a salire, entro una trentina
-  di secondi (il tempo che impiega ognuno a ricontrollare il file). Senza
-  quel via, parte comunque da sola all'orario di `LAUNCH`, come riserva —
-  ma solo se il lancio è stato puntuale.
 
 - **Quando compare la voce "Diretta"**, e quando passa dal ciano
   "diretta tra poco" al rosso "in diretta". Sono due date separate in

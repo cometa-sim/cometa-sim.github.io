@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMETA · Sonda Klo-01 — Scuola Italiana di Montevideo</title>
+<title>SIMULAZIONE — COMETA Diretta</title>
+<meta name="robots" content="noindex">
 <meta name="description" id="metaDesc" content="COMETA è un programma di palloni stratosferici della Scuola Italiana di Montevideo: misure atmosferiche fino a più di 37 km di quota, progettate e realizzate dagli studenti.">
 <meta name="theme-color" content="#010308">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='5' fill='%2302060f'/%3E%3Ccircle cx='12' cy='9' r='5.2' fill='none' stroke='%23EAF3FA' stroke-width='1.5'/%3E%3Cpath d='M10 14.4 12 16.8l2-2.4' fill='none' stroke='%23EAF3FA' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Crect x='10.3' y='18' width='3.4' height='3.4' rx='.8' fill='none' stroke='%23FFB84D' stroke-width='1.4'/%3E%3C/svg%3E">
@@ -26,6 +27,10 @@
 <link rel="stylesheet" href="assets/cometa.css?v=131">
 </head>
 <body>
+<div class="sim-bar" style="position:sticky;top:0;z-index:90;background:#3a1600;border-bottom:1px solid rgba(255,184,77,.5);padding:11px 20px;font-family:var(--mono);font-size:12.5px;color:#FFB84D;display:flex;gap:16px;flex-wrap:wrap;align-items:center">
+  <span style="text-transform:uppercase;letter-spacing:.14em;font-weight:600">⚠ Simulazione — non è il sito vero</span>
+  <span>Orologio 10× più veloce, posizioni GPS finte ogni ~15 s · <b id="simClock" style="color:#fff">—</b></span>
+</div>
 
 <a class="skip" href="#app" data-i18n="skip">Vai al contenuto</a>
 
@@ -1209,6 +1214,83 @@
 
 </div>
 
+<script>
+/* ==========================================================
+   SOLO per questa pagina di prova: orologio accelerato e feed
+   GPS finto, al posto di quelli di SPOT. Da qui in poi caricano
+   i file VERI del sito (assets/spot.js, assets/app.js) — quello
+   che gira e' il codice vero, non una copia riscritta.
+   ========================================================== */
+(function(){
+  var RealDate = Date;
+  var SPEED = 10; // il tempo scorre 10 volte piu' in fretta
+  var realStart = RealDate.now();
+  var REAL_LAUNCH_MS = new RealDate("2026-10-14T11:00:00-03:00").getTime();
+  var fakeStart = REAL_LAUNCH_MS - 40000; // 40 s (finti) prima del vero LAUNCH
+
+  function fakeNowMs(){ return fakeStart + (RealDate.now() - realStart) * SPEED; }
+  window.__fakeNow = fakeNowMs;
+
+  window.Date = class extends RealDate {
+    constructor(...args){ if(args.length === 0) super(fakeNowMs()); else super(...args); }
+    static now(){ return fakeNowMs(); }
+  };
+
+  location.hash = "diretta";
+
+  setInterval(function(){
+    var el = document.getElementById("simClock");
+    if(el) el.textContent = new Date().toLocaleString("it-IT");
+  }, 250);
+
+  /* ---- feed GPS finto, stessa forma di quello vero di SPOT ---- */
+  var FLIGHT = {burstKm: 37.9, ascentMs: 5, descentMs: 5.5}; // rispecchia FLIGHT_* in assets/app.js
+  var LAT0 = -33.68, LON0 = -56.35;
+
+  function altAtSec(s){
+    if(s <= 0) return 0;
+    var ascSec = FLIGHT.burstKm * 1000 / FLIGHT.ascentMs;
+    if(s <= ascSec) return s * FLIGHT.ascentMs;
+    var burstM = FLIGHT.burstKm * 1000, descSec = burstM / FLIGHT.descentMs, sd = s - ascSec;
+    if(sd <= descSec) return Math.max(burstM - sd * FLIGHT.descentMs, 0);
+    return 0; // atterrata
+  }
+
+  function fakeMessages(){
+    var nowMs = fakeNowMs();
+    var groundStart = REAL_LAUNCH_MS - 15 * 60 * 1000; // 15 min (finti) di terra prima del lancio
+    var msgs = [], t = groundStart, i = 0;
+    while(t <= nowMs && i < 300){
+      var s = (t - REAL_LAUNCH_MS) / 1000;
+      var alt = altAtSec(s) + (Math.random() * 160 - 80); // stesso rumore visto nel feed vero
+      var driftKm = Math.max(0, s) / 3600 * 15; // deriva finta verso est
+      msgs.push({
+        latitude: LAT0 + driftKm / 111,
+        longitude: LON0 + driftKm / 92,
+        altitude: Math.round(alt),
+        unixTime: Math.floor(t / 1000),
+        dateTime: new RealDate(t).toISOString(),
+        messageType: "TRACK"
+      });
+      t += 150000; // 2,5 min (finti) fra un punto e l'altro, come il vero SPOT
+      i++;
+    }
+    return msgs.slice(-50);
+  }
+
+  var REAL_FETCH = window.fetch.bind(window);
+  window.fetch = function(url, opts){
+    if(typeof url === "string" && url.indexOf("api.findmespot.com") !== -1){
+      var msgs = fakeMessages();
+      var body = msgs.length
+        ? {response:{feedMessageResponse:{count:msgs.length, messages:{message: msgs.length === 1 ? msgs[0] : msgs}}}}
+        : {response:{errors:{error:{code:"E-0195", text:"No Messages to display", description:"simulazione: ancora nessun punto"}}}};
+      return Promise.resolve(new Response(JSON.stringify(body), {status:200, headers:{"Content-Type":"application/json"}}));
+    }
+    return REAL_FETCH(url, opts);
+  };
+})();
+</script>
 <script src="assets/i18n.js?v=131"></script>
 <script src="assets/sonda.js?v=131"></script>
 <script src="assets/catena.js?v=131"></script>

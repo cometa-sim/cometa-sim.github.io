@@ -20,7 +20,6 @@
 window.COMETA_SPOT = (function(){
   const FEED_ID = "0khMEQthBCgxvZpuibCz2eabjNtFovxKI";
   const FEED_URL = "https://api.findmespot.com/spot-main-web/consumer/rest-api/2.0/public/feed/" + FEED_ID + "/message.json";
-  const START_URL = "assets/flight-start.json";
   const LEAFLET = "assets/vendor/leaflet/";
   const TILES = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
   const POLL_MS = 30000;      // il feed si aggiorna ogni ~2,5 min: basta chiedere piu' spesso per non perdere tempo ad accorgersene
@@ -33,7 +32,7 @@ window.COMETA_SPOT = (function(){
 
   let map, trail, marker, mapReady, pollId, tickId,
       elMap, elStatus, elAltEst, elAltGps,
-      lastPoints, lastErr, curLang = "it", startedFlag = false,
+      lastPoints, lastErr, curLang = "it",
       phase = "ground", rateKmS = 0, anchorAltKm = null, anchorTime = null;
 
   /* I tre numeri del volo (quota di scoppio attesa, salita, discesa)
@@ -127,20 +126,17 @@ window.COMETA_SPOT = (function(){
      la quota di scoppio prevista serve solo come ipotesi migliore nei
      minuti fra un punto e l'altro, non quando i dati dicono altro.
 
-     Il passaggio da "a terra" a "in salita" NON parte da solo all'orario
-     previsto del lancio (puo' slittare): parte quando assets/flight-start.json
-     dice "launched":true — un solo file, che chi segue il lancio aggiorna
-     e pusha nell'istante vero, cosi' la stima riparte uguale per chiunque
-     stia guardando, non a scatti diversi a seconda di quando ricarica la
-     pagina. L'orario di LAUNCH resta solo come riserva, se per qualche
-     motivo nessuno aggiorna quel file in tempo. */
+     Il passaggio da "a terra" a "in salita" parte quando scade il conto
+     alla rovescia (LAUNCH, in assets/app.js): il lancio e' quello, non
+     un segnale a parte — se slitta, si aggiorna LAUNCH e basta, come il
+     resto del sito gia' fa. */
   function updateRate(points){
     if(!points.length) return;
     const last = points[points.length - 1];
     if(last.alt == null) return;
     const flight = flightCfg();
     const obs = observedRateKmS(points);
-    const launched = startedFlag || (window.COMETA_LAUNCH ? Date.now() >= window.COMETA_LAUNCH.getTime() : false);
+    const launched = window.COMETA_LAUNCH ? Date.now() >= window.COMETA_LAUNCH.getTime() : false;
 
     if(phase === "ground"){
       if(obs != null && obs > RATE_THRESH_KMS){ phase = "ascent"; rateKmS = obs; }
@@ -156,30 +152,21 @@ window.COMETA_SPOT = (function(){
     anchorTime = last.time;
   }
 
-  /* Il segnale di lancio puo' arrivare anche fra due punti GPS: non
-     conviene aspettare il prossimo per farne uso, o parte in ritardo
-     fino a 2,5 minuti per tutti. Riparte dall'ultima quota nota, con la
-     velocita' osservata se ce n'e' gia' una credibile, altrimenti quella
-     nominale di salita. */
+  /* Il conto alla rovescia scade anche fra due punti GPS: non conviene
+     aspettare il prossimo per accorgersene, o la stima parte in ritardo
+     fino a 2,5 minuti. Riparte dall'ultima quota nota, alla velocita'
+     nominale di salita finche' un punto vero non la corregge. */
   function maybeBeginAscent(){
     if(phase !== "ground" || anchorAltKm == null) return;
+    if(!window.COMETA_LAUNCH || Date.now() < window.COMETA_LAUNCH.getTime()) return;
     const flight = flightCfg();
-    const obs = observedRateKmS(lastPoints || []);
     phase = "ascent";
-    rateKmS = obs != null && obs > RATE_THRESH_KMS ? obs : flight.ascentMs / 1000;
+    rateKmS = flight.ascentMs / 1000;
     anchorTime = Date.now();
   }
 
-  function pollStart(){
-    fetch(START_URL, {cache:"no-store"})
-      .then(function(res){ return res.json(); })
-      .then(function(data){
-        if(data && data.launched && !startedFlag){ startedFlag = true; maybeBeginAscent(); }
-      })
-      .catch(function(){ /* niente di grave: resta la riserva sull'orario di LAUNCH */ });
-  }
-
   function tick(){
+    maybeBeginAscent();
     if(anchorAltKm == null){ setAltText(elAltEst, null); return; }
     const flight = flightCfg();
     const elapsedS = (Date.now() - new Date(anchorTime).getTime()) / 1000;
@@ -271,8 +258,7 @@ window.COMETA_SPOT = (function(){
     renderStatus(); // "in attesa del segnale" subito, non vuoto finche' arriva la prima risposta
     ensureMap().then(function(){
       poll();
-      pollStart();
-      if(!pollId) pollId = setInterval(function(){ poll(); pollStart(); }, POLL_MS);
+      if(!pollId) pollId = setInterval(poll, POLL_MS);
       if(!tickId) tickId = setInterval(tick, TICK_MS);
     }).catch(function(){ lastErr = "leaflet"; renderStatus(); });
   }
