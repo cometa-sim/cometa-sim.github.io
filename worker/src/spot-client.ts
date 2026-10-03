@@ -49,7 +49,16 @@ export async function fetchSpotPage(env: Env, extraParams: Record<string, string
   if (env.FEED_PASSWORD) q.set("feedPassword", env.FEED_PASSWORD);
   const qs = q.toString();
   const url = `${SPOT_BASE}/${env.FEED_ID}/message.json${qs ? "?" + qs : ""}`;
-  const res = await fetch(url, { cf: { cacheTtl: 0 } });
+  /* Senza questi header SPOT risponde 403 con la pagina anti-bot di
+     Cloudflare (il fetch di un Worker, senza, non sembra un browser). */
+  const res = await fetch(url, {
+    cf: { cacheTtl: 0 },
+    headers: {
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+      "Accept": "application/json",
+      "Accept-Language": "en-US,en;q=0.9"
+    }
+  });
   if (!res.ok) {
     const body = await res.text().catch(() => "(corpo non leggibile)");
     console.error(`[SPOT] HTTP ${res.status} ${res.statusText}\n${body}`);
