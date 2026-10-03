@@ -18,6 +18,20 @@ it:{
   metaDesc:"COMETA è un programma di palloni stratosferici della Scuola Italiana di Montevideo: misure atmosferiche fino a più di 37 km di quota, progettate e realizzate dagli studenti.",
 
   navHome:"Inizio", navMission:"Missione", navPhysics:"La fisica", navProbe:"La sonda", navWinds:"La traiettoria", navAbout:"Chi siamo", navContact:"Contatti",
+  navDiretta:"Diretta",
+
+  /* — Diretta (bozza) — */
+  dirKicker:"Il giorno del lancio",
+  dirSub:"Il video dal campo e la posizione della sonda, in tempo reale.",
+  dirStatusPre:"Diretta tra poco", dirStatusLive:"In diretta ora",
+  dirBannerDesc:"— video dal campo e posizione GPS", dirBannerCta:"Guarda →",
+  dirYoutubeHead:"YouTube · diretta", dirGpsHead:"Tracciatore GPS · SPOT Trace",
+  dirYoutubePlaceholder:"[ embed YouTube quando attivo ]",
+  dirNoteTag:"Nota",
+  dirNote:"Sopra i 18 km il GPS smette di inviare il segnale: non è un'avaria, è il suo funzionamento normale — riprenderà in discesa. Fino ad allora la mappa resta ferma sull'ultima posizione nota.",
+  dirSpotWaiting:"in attesa del segnale…",
+  dirSpotUnavailable:"mappa non disponibile",
+  dirSpotUpdated:"aggiornato alle",
 
   /* — Inizio — */
   heroSchool:"Scuola Italiana di Montevideo",
@@ -439,6 +453,20 @@ es:{
   metaDesc:"COMETA es un programa de globos estratosféricos de la Scuola Italiana di Montevideo: mediciones atmosféricas hasta más de 37 km de altura, diseñadas y construidas por los estudiantes.",
 
   navHome:"Inicio", navMission:"Misión", navPhysics:"La física", navProbe:"La sonda", navWinds:"La trayectoria", navAbout:"Quiénes somos", navContact:"Contacto",
+  navDiretta:"En directo",
+
+  /* — En directo (borrador) — */
+  dirKicker:"El día del lanzamiento",
+  dirSub:"El video desde el terreno y la posición de la sonda, en tiempo real.",
+  dirStatusPre:"En directo pronto", dirStatusLive:"En directo ahora",
+  dirBannerDesc:"— video desde el terreno y posición GPS", dirBannerCta:"Mirar →",
+  dirYoutubeHead:"YouTube · en directo", dirGpsHead:"Rastreador GPS · SPOT Trace",
+  dirYoutubePlaceholder:"[ embed de YouTube cuando esté activo ]",
+  dirNoteTag:"Nota",
+  dirNote:"Por encima de los 18 km el GPS deja de enviar señal: no es una avería, es su funcionamiento normal — se reanudará en el descenso. Hasta entonces el mapa queda fijo en la última posición conocida.",
+  dirSpotWaiting:"esperando la señal…",
+  dirSpotUnavailable:"mapa no disponible",
+  dirSpotUpdated:"actualizado a las",
 
   heroSchool:"Scuola Italiana di Montevideo",
 
@@ -854,6 +882,20 @@ en:{
   metaDesc:"COMETA is a stratospheric balloon programme at the Scuola Italiana di Montevideo: atmospheric measurements up to over 37 km, designed and built by students.",
 
   navHome:"Home", navMission:"Mission", navPhysics:"The physics", navProbe:"The probe", navWinds:"The trajectory", navAbout:"About us", navContact:"Contact",
+  navDiretta:"Live",
+
+  /* — Live (draft) — */
+  dirKicker:"Launch day",
+  dirSub:"Footage from the field and the probe's position, in real time.",
+  dirStatusPre:"Live soon", dirStatusLive:"Live now",
+  dirBannerDesc:"— footage from the field and GPS position", dirBannerCta:"Watch →",
+  dirYoutubeHead:"YouTube · live", dirGpsHead:"GPS tracker · SPOT Trace",
+  dirYoutubePlaceholder:"[ YouTube embed, once live ]",
+  dirNoteTag:"Note",
+  dirNote:"Above 18 km the GPS stops sending its signal: that is not a malfunction, it is normal operation — it will resume on the way down. Until then the map stays on the last known position.",
+  dirSpotWaiting:"waiting for signal…",
+  dirSpotUnavailable:"map unavailable",
+  dirSpotUpdated:"updated at",
 
   heroSchool:"Scuola Italiana di Montevideo",
 

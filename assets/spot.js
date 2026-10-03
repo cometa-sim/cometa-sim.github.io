@@ -19,7 +19,7 @@ window.COMETA_SPOT = (function(){
      centrata sull'Uruguay invece che sull'oceano a (0,0). */
   const FALLBACK = {lat:-33.0, lon:-56.5, zoom:7};
 
-  let map, trail, marker, mapReady, pollId, elMap, elStatus;
+  let map, trail, marker, mapReady, pollId, elMap, elStatus, lastPoints, lastErr, curLang = "it";
 
   function loadLeaflet(){
     if(window.L) return Promise.resolve();
@@ -49,8 +49,12 @@ window.COMETA_SPOT = (function(){
       L.control.scale({imperial:false}).addTo(map);
       map.setView([FALLBACK.lat, FALLBACK.lon], FALLBACK.zoom);
       trail = L.polyline([], {color:"#4ADE9B", weight:2, opacity:.75}).addTo(map);
+      /* Nascosto del tutto finche' non arriva un punto vero: opacity e
+         fillOpacity vanno azzerati entrambi, o il pallino pieno resta
+         visibile sul punto di fallback (e' il "punto a Mercedes" che si
+         vedeva anche senza nessun dato). */
       marker = L.circleMarker([FALLBACK.lat, FALLBACK.lon], {
-        radius:7, color:"#4ADE9B", weight:2, fillColor:"#4ADE9B", fillOpacity:.9, opacity:0
+        radius:7, color:"#4ADE9B", weight:2, fillColor:"#4ADE9B", fillOpacity:0, opacity:0
       }).addTo(map);
       if("ResizeObserver" in window) new ResizeObserver(function(){ map.invalidateSize(); }).observe(elMap);
       map.on("click", function(){ map.scrollWheelZoom.enable(); });
@@ -59,20 +63,34 @@ window.COMETA_SPOT = (function(){
     return mapReady;
   }
 
-  function setStatus(txt){ if(elStatus) elStatus.textContent = txt; }
+  function dict(){ return (window.I18N && (window.I18N[curLang] || window.I18N.it)) || {}; }
 
-  function render(points){
-    if(!points.length){ setStatus("in attesa del segnale…"); return; }
-    const latlngs = points.map(function(p){ return [p.lat, p.lon]; });
-    trail.setLatLngs(latlngs);
-    const last = points[points.length - 1];
-    marker.setLatLng([last.lat, last.lon]);
-    marker.setStyle({opacity:1});
-    map.setView([last.lat, last.lon], Math.max(map.getZoom(), 10));
+  /* Ridisegna solo il testo dello stato, nella lingua corrente, senza
+     ricontattare il feed: serve sia dopo un fetch sia dopo un cambio
+     lingua, sull'ultimo risultato gia' noto. */
+  function renderStatus(){
+    if(!elStatus) return;
+    const d = dict();
+    if(lastErr){ elStatus.textContent = (d.dirSpotUnavailable || "map unavailable") + " (" + lastErr + ")"; return; }
+    if(!lastPoints || !lastPoints.length){ elStatus.textContent = d.dirSpotWaiting || "waiting…"; return; }
+    const last = lastPoints[lastPoints.length - 1];
     const when = new Date(last.time);
     const ok = !isNaN(when.getTime());
-    setStatus(last.lat.toFixed(4) + ", " + last.lon.toFixed(4) +
-      (ok ? " · aggiornato alle " + when.toLocaleTimeString("it-IT", {hour:"2-digit", minute:"2-digit"}) : ""));
+    elStatus.textContent = last.lat.toFixed(4) + ", " + last.lon.toFixed(4) +
+      (ok ? " · " + (d.dirSpotUpdated || "updated at") + " " + when.toLocaleTimeString(d.code || "it", {hour:"2-digit", minute:"2-digit"}) : "");
+  }
+
+  function render(points){
+    lastPoints = points; lastErr = null;
+    if(points.length){
+      const latlngs = points.map(function(p){ return [p.lat, p.lon]; });
+      trail.setLatLngs(latlngs);
+      const last = points[points.length - 1];
+      marker.setLatLng([last.lat, last.lon]);
+      marker.setStyle({opacity:1, fillOpacity:.9});
+      map.setView([last.lat, last.lon], Math.max(map.getZoom(), 10));
+    }
+    renderStatus();
   }
 
   /* L'API di SPOT restituisce "message" come oggetto singolo (non dentro
@@ -109,19 +127,23 @@ window.COMETA_SPOT = (function(){
       .catch(function(err){
         /* Capita anche se l'API non permette richieste dal browser (CORS):
            in quel caso ogni richiesta fallisce cosi', senza dettagli. */
-        setStatus("mappa non disponibile (" + err.message + ")");
+        lastErr = err.message; renderStatus();
       });
   }
 
   function start(){
+    renderStatus(); // "in attesa del segnale" subito, non vuoto finche' arriva la prima risposta
     ensureMap().then(function(){
       poll();
       if(!pollId) pollId = setInterval(poll, POLL_MS);
-    }).catch(function(){ setStatus("mappa non disponibile"); });
+    }).catch(function(){ lastErr = "leaflet"; renderStatus(); });
   }
   function stop(){
     if(pollId){ clearInterval(pollId); pollId = null; }
   }
 
-  return { setActive: function(on){ if(on) start(); else stop(); } };
+  return {
+    setActive: function(on){ if(on) start(); else stop(); },
+    setLang: function(l){ curLang = l; renderStatus(); }
+  };
 })();

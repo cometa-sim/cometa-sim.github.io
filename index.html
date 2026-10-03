@@ -23,7 +23,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@200;300;400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/cometa.css?v=123">
+<link rel="stylesheet" href="assets/cometa.css?v=124">
 </head>
 <body>
 
@@ -41,7 +41,7 @@
   </button>
   <div class="nav-links">
     <a data-page="home" data-i18n="navHome" class="active" tabindex="0">Inizio</a>
-    <a data-page="diretta" id="navDiretta" class="nav-diretta" tabindex="0"><i></i><span>Diretta</span></a>
+    <a data-page="diretta" id="navDiretta" class="nav-diretta" tabindex="0"><i></i><span data-i18n="navDiretta">Diretta</span></a>
     <a data-page="missione" data-i18n="navMission" tabindex="0">Missione</a>
     <a data-page="fisica" data-i18n="navPhysics" tabindex="0">La fisica</a>
     <a data-page="sonda" data-i18n="navProbe" tabindex="0">La sonda</a>
@@ -69,7 +69,7 @@
 <div class="menu-overlay" id="menu">
   <button class="menu-close" id="menuClose" aria-label="Close" type="button">×</button>
   <a data-page="home" data-i18n="navHome" tabindex="0">Inizio</a>
-  <a data-page="diretta" id="navDirettaM" class="nav-diretta" tabindex="0"><i></i><span>Diretta</span></a>
+  <a data-page="diretta" id="navDirettaM" class="nav-diretta" tabindex="0"><i></i><span data-i18n="navDiretta">Diretta</span></a>
   <a data-page="missione" data-i18n="navMission" tabindex="0">Missione</a>
   <a data-page="fisica" data-i18n="navPhysics" tabindex="0">La fisica</a>
   <a data-page="sonda" data-i18n="navProbe" tabindex="0">La sonda</a>
@@ -88,10 +88,9 @@
 <div class="diretta-banner" id="direttaBanner">
   <span class="pill" data-page="diretta" tabindex="0">
     <i></i>
-    <span class="txt-pre">Diretta tra <b>2 g 14 h</b></span>
-    <span class="txt-live" style="display:none">In diretta <b>ora</b></span>
-    <span>— video dal campo e posizione GPS</span>
-    <span class="go">Guarda →</span>
+    <span data-i18n="dirStatusLive">In diretta ora</span>
+    <span data-i18n="dirBannerDesc">— video dal campo e posizione GPS</span>
+    <span class="go" data-i18n="dirBannerCta">Guarda →</span>
   </span>
 </div>
 
@@ -219,38 +218,38 @@
 <!-- ======================= DIRETTA (bozza) ======================= -->
 <section class="page" id="page-diretta">
   <div class="wrap page-hero">
-    <div class="kicker">Il giorno del lancio</div>
-    <h1 class="ttl">Diretta</h1>
-    <p class="psub">Il video dal campo e la posizione della sonda, in tempo reale.</p>
+    <div class="kicker" data-i18n="dirKicker">Il giorno del lancio</div>
+    <h1 class="ttl" data-i18n="navDiretta">Diretta</h1>
+    <p class="psub" data-i18n="dirSub">Il video dal campo e la posizione della sonda, in tempo reale.</p>
   </div>
 
   <section class="section tight">
     <div class="wrap">
-      <span class="dstatus" id="dStatus"><i></i><span class="txt-pre">Diretta tra poco</span><span class="txt-live" style="display:none">In diretta ora</span></span>
+      <span class="dstatus" id="dStatus"><i></i><span class="txt-pre" data-i18n="dirStatusPre">Diretta tra poco</span><span class="txt-live" style="display:none" data-i18n="dirStatusLive">In diretta ora</span></span>
 
-      <div class="count-head" style="margin-top:22px">Lancio tra</div>
+      <div class="count-head" style="margin-top:22px" data-i18n="countHead">Lancio tra</div>
       <div class="count">
-        <div class="ctile"><div class="cn" id="cd2">—</div><div class="cl">Giorni</div></div>
-        <div class="ctile"><div class="cn" id="ch2">00</div><div class="cl">Ore</div></div>
-        <div class="ctile"><div class="cn" id="cm2">00</div><div class="cl">Minuti</div></div>
-        <div class="ctile"><div class="cn" id="cs2">00</div><div class="cl">Secondi</div></div>
+        <div class="ctile"><div class="cn" id="cd2">—</div><div class="cl" data-i18n="cDays">Giorni</div></div>
+        <div class="ctile"><div class="cn" id="ch2">00</div><div class="cl" data-i18n="cHours">Ore</div></div>
+        <div class="ctile"><div class="cn" id="cm2">00</div><div class="cl" data-i18n="cMins">Minuti</div></div>
+        <div class="ctile"><div class="cn" id="cs2">00</div><div class="cl" data-i18n="cSecs">Secondi</div></div>
       </div>
 
       <div class="embeds2">
         <div class="ecard2">
-          <div class="ehead"><span>YouTube · diretta</span></div>
-          <div class="box"><span style="font-family:var(--mono);font-size:11px;color:var(--faint)">[ embed YouTube quando attivo ]</span></div>
+          <div class="ehead"><span data-i18n="dirYoutubeHead">YouTube · diretta</span></div>
+          <div class="box"><span data-i18n="dirYoutubePlaceholder" style="font-family:var(--mono);font-size:11px;color:var(--faint)">[ embed YouTube quando attivo ]</span></div>
         </div>
         <div class="ecard2">
-          <div class="ehead"><span>Tracciatore GPS · SPOT Trace</span></div>
+          <div class="ehead"><span data-i18n="dirGpsHead">Tracciatore GPS · SPOT Trace</span></div>
           <div class="box tw-map"><div id="spotMap" style="position:absolute;inset:0"></div></div>
-          <p id="spotStatus" style="font-family:var(--mono);font-size:10.5px;color:var(--faint);padding:10px 15px;border-top:1px solid var(--line-soft)">in attesa del segnale…</p>
+          <p id="spotStatus" style="font-family:var(--mono);font-size:10.5px;color:var(--faint);padding:10px 15px;border-top:1px solid var(--line-soft)"></p>
         </div>
       </div>
 
       <div class="note" style="margin-top:26px">
-        <div class="nt">Nota</div>
-        <p>Sopra i 18 km il GPS smette di inviare il segnale: non è un'avaria, è il suo funzionamento normale — riprenderà in discesa. Fino ad allora la mappa resta ferma sull'ultima posizione nota.</p>
+        <div class="nt" data-i18n="dirNoteTag">Nota</div>
+        <p data-i18n="dirNote">Sopra i 18 km il GPS smette di inviare il segnale: non è un'avaria, è il suo funzionamento normale — riprenderà in discesa. Fino ad allora la mappa resta ferma sull'ultima posizione nota.</p>
       </div>
     </div>
   </section>
@@ -838,7 +837,7 @@
       </div>
 
       <div class="map-frame reveal d1">
-        <iframe id="mapFrame" src="mappe/uru2000_footprint.html?v=123"
+        <iframe id="mapFrame" src="mappe/uru2000_footprint.html?v=124"
                 title="Mappa interattiva dei 600 punti di atterraggio simulati con le ellissi di dispersione"
                 loading="lazy"></iframe>
       </div>
@@ -1220,8 +1219,6 @@
       el.classList.toggle('is-live', live);
     });
     banner.classList.toggle('show', live);
-    banner.classList.toggle('is-live', live);
-    setTxt(banner, live);
     if(dStatus){ dStatus.classList.toggle('is-live', live); setTxt(dStatus, live); }
     document.querySelectorAll('#previewToggle button').forEach(function(b){ b.classList.toggle('on', b.dataset.set === s); });
   }
@@ -1231,12 +1228,12 @@
   setState('off');
 })();
 </script>
-<script src="assets/i18n.js?v=123"></script>
-<script src="assets/sonda.js?v=123"></script>
-<script src="assets/catena.js?v=123"></script>
-<script src="assets/spot.js?v=123"></script>
-<script src="assets/app.js?v=123"></script>
-<script src="assets/msis.js?v=123"></script>
-<script src="assets/traiettoria.js?v=123"></script>
+<script src="assets/i18n.js?v=124"></script>
+<script src="assets/sonda.js?v=124"></script>
+<script src="assets/catena.js?v=124"></script>
+<script src="assets/spot.js?v=124"></script>
+<script src="assets/app.js?v=124"></script>
+<script src="assets/msis.js?v=124"></script>
+<script src="assets/traiettoria.js?v=124"></script>
 </body>
 </html>

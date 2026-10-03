@@ -109,6 +109,7 @@ function setLang(l, remember){
     applyTexts();
     buildChain();
     if(window.COMETA_SONDA) window.COMETA_SONDA.setLang(LANG);
+    if(window.COMETA_SPOT) window.COMETA_SPOT.setLang(LANG);
     updateFlight(); updateCountdown(); checkReveals();
     app.classList.remove("switching");
   };

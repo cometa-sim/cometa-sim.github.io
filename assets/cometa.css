@@ -964,12 +964,11 @@ nav a.ig:hover svg{transform:translateY(-1px)}
 .diretta-banner.show{transform:translateY(0);opacity:1;pointer-events:auto}
 .diretta-banner .pill{display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);font-size:12.5px;
   color:var(--muted);cursor:pointer;flex-wrap:wrap;justify-content:center}
-.diretta-banner .pill i{width:6px;height:6px;border-radius:50%;background:var(--cyan);flex:none}
-.diretta-banner b{color:var(--ink);font-weight:500}
-.diretta-banner .go{color:var(--cyan)}
-.diretta-banner.is-live .pill i{background:var(--live);box-shadow:0 0 0 0 rgba(255,77,79,.5);animation:navPulse 1.8s infinite}
-.diretta-banner.is-live .go{color:var(--live)}
-.diretta-banner.is-live b{color:var(--live)}
+/* Il banner compare solo a diretta avviata (mai durante il conto alla
+   rovescia): niente stato "in attesa", e' sempre nei colori del live. */
+.diretta-banner .pill i{width:6px;height:6px;border-radius:50%;background:var(--live);
+  box-shadow:0 0 0 0 rgba(255,77,79,.5);animation:navPulse 1.8s infinite;flex:none}
+.diretta-banner .go{color:var(--live)}
 
 .dstatus{display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);font-size:11px;letter-spacing:.14em;
   text-transform:uppercase;padding:8px 14px;border-radius:999px;border:1px solid var(--line-soft);color:var(--muted)}
