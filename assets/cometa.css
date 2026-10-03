@@ -1001,9 +1001,9 @@ nav a.ig:hover svg{transform:translateY(-1px)}
 /* Quota, sotto a video e mappa: due riquadri piatti affiancati, sempre
    — anche su telefono, mai uno sopra l'altro. Non i tile del conto
    alla rovescia apposta (quelli aspettano, questi arrivano dal GPS).
-   Blu come il resto dei dati di posizione nel sito — tranne la stimata,
-   che e' un calcolo e non un dato misurato: resta in grigio, come la
-   traiettoria prevista sulla mappa (stesso --muted). */
+   Il punto GPS e' verde come il pallino sulla mappa (stesso --green);
+   la stimata, che e' un calcolo e non un dato misurato, resta in
+   grigio, come la traiettoria prevista sulla mappa (stesso --muted). */
 .alt-pair{display:flex;gap:14px;margin-top:14px}
 .alt-tile{flex:1;min-width:0;border:1px solid var(--line-soft);border-radius:14px;
   background:var(--panel);padding:15px 16px;text-align:center}
@@ -1011,12 +1011,13 @@ nav a.ig:hover svg{transform:translateY(-1px)}
   font-variant-numeric:tabular-nums;letter-spacing:.01em}
 .alt-n small{font-size:.42em;font-weight:400;margin-left:3px;opacity:.65}
 #altEstRow .alt-n{color:var(--muted)}
+#altGpsRow .alt-n{color:var(--green)}
 .alt-l{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-top:7px}
 /* Lampeggia una volta, in arancio, quando arriva un punto nuovo dal
    tracciatore — cosi' si vede che il dato si e' davvero aggiornato,
    non solo che il numero e' cambiato (a volte non cambia). */
 #altGpsRow.flash .alt-n{animation:altFlash 2.6s ease-out}
-@keyframes altFlash{0%,30%{color:var(--beacon)}100%{color:var(--c-pos)}}
+@keyframes altFlash{0%,30%{color:var(--beacon)}100%{color:var(--green)}}
 @media(prefers-reduced-motion:reduce){#altGpsRow.flash .alt-n{animation:none}}
 
 .q-tight p + p{margin-top:0}
