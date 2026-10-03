@@ -23,7 +23,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@200;300;400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/cometa.css?v=122">
+<link rel="stylesheet" href="assets/cometa.css?v=123">
 </head>
 <body>
 
@@ -243,7 +243,8 @@
         </div>
         <div class="ecard2">
           <div class="ehead"><span>Tracciatore GPS · SPOT Trace</span></div>
-          <div class="box tall"><iframe src="https://maps.findmespot.com/s/DK4R" loading="lazy" title="SPOT Trace — posizione in tempo reale"></iframe></div>
+          <div class="box tw-map"><div id="spotMap" style="position:absolute;inset:0"></div></div>
+          <p id="spotStatus" style="font-family:var(--mono);font-size:10.5px;color:var(--faint);padding:10px 15px;border-top:1px solid var(--line-soft)">in attesa del segnale…</p>
         </div>
       </div>
 
@@ -837,7 +838,7 @@
       </div>
 
       <div class="map-frame reveal d1">
-        <iframe id="mapFrame" src="mappe/uru2000_footprint.html?v=122"
+        <iframe id="mapFrame" src="mappe/uru2000_footprint.html?v=123"
                 title="Mappa interattiva dei 600 punti di atterraggio simulati con le ellissi di dispersione"
                 loading="lazy"></iframe>
       </div>
@@ -1230,11 +1231,12 @@
   setState('off');
 })();
 </script>
-<script src="assets/i18n.js?v=122"></script>
-<script src="assets/sonda.js?v=122"></script>
-<script src="assets/catena.js?v=122"></script>
-<script src="assets/app.js?v=122"></script>
-<script src="assets/msis.js?v=122"></script>
-<script src="assets/traiettoria.js?v=122"></script>
+<script src="assets/i18n.js?v=123"></script>
+<script src="assets/sonda.js?v=123"></script>
+<script src="assets/catena.js?v=123"></script>
+<script src="assets/spot.js?v=123"></script>
+<script src="assets/app.js?v=123"></script>
+<script src="assets/msis.js?v=123"></script>
+<script src="assets/traiettoria.js?v=123"></script>
 </body>
 </html>

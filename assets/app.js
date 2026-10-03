@@ -155,6 +155,7 @@ function showPage(id){
     if(id === "sonda"){ window.COMETA_SONDA.init().then(function(){ window.COMETA_SONDA.setActive(true); }); }
     else { window.COMETA_SONDA.setActive(false); }
   }
+  if(window.COMETA_SPOT) window.COMETA_SPOT.setActive(id === "diretta");
 
   requestAnimationFrame(function(){
     checkReveals();
