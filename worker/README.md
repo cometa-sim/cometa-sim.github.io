@@ -1,9 +1,8 @@
 # cometa-sim-github-io (Worker SPOT tracker)
 
 Backend per la diretta COMETA: un Cloudflare Worker con un Durable Object
-(storage SQLite) che interroga il feed pubblico dello SPOT Trace **una
-sola volta per tutti i visitatori**, salva la traccia completa del volo
-e la espone in JSON/CSV al sito.
+(storage SQLite) che riceve e conserva la traccia del volo dello SPOT
+Trace, deduplicata, e la espone in JSON/CSV al sito.
 
 ## Perché
 
@@ -24,20 +23,50 @@ Un'unica istanza del Durable Object `SpotTracker` (sempre la stessa,
 stato del polling, la tabella SQLite dei punti, e risponde a tutti gli
 endpoint.
 
-Il ritmo del polling (ogni 155 secondi: i 150 richiesti da SPOT, più un
-margine) non usa i Cron Trigger di Cloudflare — hanno granularità di un
-minuto, non permettono un intervallo di 150s — ma l'**alarm** del
-Durable Object: a ogni esecuzione interroga SPOT (o il feed finto, in
-modalità simulazione) e riprogramma da solo l'alarm successivo. Un
-guardiano su `lastFetchMs` garantisce che due chiamate vere non siano
-mai più vicine di 150s, anche in caso di alarm duplicati o di un
-riavvio del Worker.
+**SPOT blocca le richieste che arrivano dai Worker di Cloudflare** (403
+con la pagina anti-bot), ma accetta quelle da un browser normale. Per
+questo non è il Worker a interrogare SPOT: lo fa **`admin-diretta.html`**
+(alla radice del sito, non collegata dal sito, `noindex` — vedi più
+sotto), una pagina aperta in un browser il giorno del lancio, che ogni
+~155 secondi:
+
+1. chiede il permesso al Worker con `POST /claim`;
+2. se concesso, interroga SPOT direttamente dal browser;
+3. manda il risultato (successo o errore) al Worker con `POST /ingest`,
+   che lo salva con la stessa logica di sempre (deduplica per `id`,
+   `last_fetch`/`last_fetch_ok`/`last_error`).
+
+`/claim` concede il permesso solo se sono passati almeno 150 secondi
+(`MIN_INTERVAL_MS`, lo stesso limite di SPOT) dall'ultimo permesso
+concesso — non da quando è arrivato l'ultimo `/ingest`: il permesso è
+speso appena concesso, anche se chi lo ottiene non arriva mai a
+chiamare `/ingest` (pagina chiusa, rete caduta). Così, se più pagine di
+amministrazione sono aperte insieme (una di riserva), SPOT non viene
+mai interrogato più di una volta ogni 150 secondi in tutto — un Durable
+Object processa le proprie richieste una alla volta, mai in parallelo,
+quindi il controllo e l'aggiornamento del permesso non vengono mai
+interallacciati da un'altra richiesta nel mezzo.
 
 Ogni messaggio ricevuto si salva deduplicato per `id` (upsert: un
 messaggio già visto si aggiorna, uno nuovo si inserisce), insieme al
 messaggio originale completo — così una chiamata fallita si recupera
 da sola al giro successivo, e campi non ancora usati restano comunque
-conservati.
+conservati. Nessun filtro su `messageType`: il tracker manda anche
+`EXTREME-TRACK` e `NEWMOVEMENT`, non solo `TRACK` — si salva qualunque
+messaggio abbia latitudine e longitudine, il tipo resta conservato nel
+dato.
+
+### Il vecchio polling interno (presente, spento)
+
+Il Worker sapeva anche interrogare SPOT da solo, con un ciclo basato
+sull'**alarm** del Durable Object (i Cron Trigger di Cloudflare hanno
+granularità di un minuto, non permettono 150s) invece che sui Cron
+Trigger. Quel codice c'è ancora — non è stato cancellato, solo spento,
+nel caso SPOT smetta un giorno di bloccare i Worker. `alarm()` esce
+subito a meno che la variabile `INTERNAL_POLLING_ENABLED` in
+`wrangler.toml` non sia `"true"` (oggi è `"false"`); `/start` e `/stop`
+restano gli endpoint di allora, ma con il polling interno spento non
+fanno più nulla di utile.
 
 ## Endpoint
 
@@ -53,12 +82,14 @@ conservati.
 | | |
 |---|---|
 | `GET /track-all.json` | Tutti i punti salvati, senza il filtro `PUBLIC_FROM` — per verificare le prove. |
-| `POST /start` | Avvia il polling. |
-| `POST /stop` | Ferma il polling (l'alarm in corso, se c'è, non si riprogramma). |
-| `POST /reset` | Cancella tutti i punti salvati. Da usare dopo le prove, prima del giorno vero. Non tocca `polling_active`/`PUBLIC_FROM`/`simulate`. |
-| `POST /backfill` | Riscarica l'intero volo da SPOT e lo reinserisce (stessa deduplica del polling). Corpo vuoto → pagina con `start=51,101,…` fino a 7 giorni; oppure `{"startDate":"...", "endDate":"..."}` (formato SPOT) per un intervallo preciso. |
+| `POST /claim` | Chiede il permesso di interrogare SPOT. Risponde `{"granted":true}` se sono passati almeno 150s dall'ultimo permesso concesso (a chiunque), altrimenti `{"granted":false,"retry_after_s":N}`. Lo usa `admin-diretta.html`. |
+| `POST /ingest` | Corpo `{"ok":bool,"status"?:number,"body"?:JSON\|testo,"error"?:string}` — il risultato di una chiamata a SPOT fatta dal browser (da `admin-diretta.html`), così com'è arrivata. `ok:false` = il fetch dal browser è fallito del tutto (rete/CORS); altrimenti `status`/`body` sono quelli della risposta HTTP di SPOT, errore applicativo incluso. Risponde sempre `{"ok":true,"spot_ok":bool,"upserted":N,"received":M}` — anche quando `spot_ok` è `false`: l'errore si registra comunque (`last_error`), non si rifiuta l'ingest. "Nessun messaggio ancora" (`E-0195`) conta come successo. |
+| `POST /start` | Avvia il *polling interno* (oggi spento, vedi sopra — non serve più per l'uso normale). |
+| `POST /stop` | Ferma il polling interno. |
+| `POST /reset` | Cancella tutti i punti salvati. Da usare dopo le prove, prima del giorno vero. Non tocca `publicFrom`/`simulate`. |
+| `POST /backfill` | Riscarica l'intero volo da SPOT **dal Worker** (occasionale e manuale: se anche questa iniziasse a essere bloccata da SPOT andrà spostata sul browser come il resto) e lo reinserisce, stessa deduplica. Corpo vuoto → pagina con `start=51,101,…` fino a 7 giorni; oppure `{"startDate":"...", "endDate":"..."}` (formato SPOT) per un intervallo preciso. |
 | `POST /public-from` | Corpo `{"time": <unix secondi>}` oppure `{"time": null}` per nascondere di nuovo tutto. |
-| `POST /simulate` | Corpo `{"enabled": true\|false}`. Con `true`, il polling genera un volo finto (vedi sotto) invece di chiamare SPOT davvero. |
+| `POST /simulate` | Corpo `{"enabled": true\|false}`. Riguarda solo il polling interno (spento): con `simulate` attivo e `INTERNAL_POLLING_ENABLED="true"`, l'alarm genera un volo finto invece di chiamare SPOT davvero — vedi sotto. |
 
 ## Privacy dei punti di prova
 
@@ -69,16 +100,55 @@ pubblici restituiscono solo i punti con `time >= PUBLIC_FROM`, e senza
 lancio**: usare `POST /reset` per ripulire le prove, poi `POST
 /public-from` con l'orario reale di decollo (o un po' prima).
 
-## Modalità simulazione
+## Modalità simulazione (per il vecchio polling interno)
 
-`POST /simulate {"enabled": true}` fa generare, invece di chiamare
-SPOT, un volo finto che segue lo stesso ritmo vero (un punto ogni 150s
-reali — la simulazione non accelera il tempo, prova proprio la cadenza
-del Worker), con buchi di segnale e messaggi duplicati inclusi apposta
-(circa 1 su 10 ciascuno, scelta deterministica — lo stesso slot dà
-sempre lo stesso risultato), per verificare la deduplica e la cadenza
-senza il tracker vero. `POST /simulate {"enabled": false}` torna al
-feed vero.
+Riguarda solo `alarm()`, oggi spento (vedi sopra): `POST /simulate
+{"enabled": true}`, con `INTERNAL_POLLING_ENABLED="true"`, fa generare
+invece di chiamare SPOT un volo finto che segue lo stesso ritmo vero
+(un punto ogni 150s reali — la simulazione non accelera il tempo,
+prova proprio la cadenza del Worker), con buchi di segnale e messaggi
+duplicati inclusi apposta (circa 1 su 10 ciascuno, scelta
+deterministica — lo stesso slot dà sempre lo stesso risultato), per
+verificare la deduplica e la cadenza senza il tracker vero. `POST
+/simulate {"enabled": false}` torna al feed vero. Per provare
+`/claim`+`/ingest` (il meccanismo vero, oggi) basta aprire
+`admin-diretta.html` in locale (`npm run dev`) con un `WORKER_BASE`
+che punta al Worker locale — non serve la modalità simulazione per
+quello.
+
+## Pagina di amministrazione
+
+`admin-diretta.html`, alla radice del sito (non in `worker/`): non è
+collegata da nessuna parte nel sito e ha `<meta name="robots"
+content="noindex">`. È lei a interrogare SPOT, dal browser di chi la
+tiene aperta — vedi "Come funziona" sopra.
+
+- **All'apertura** chiede admin token, Feed ID e password del feed (se
+  richiesta): restano solo nella memoria della pagina — niente nel
+  repo, niente in `localStorage`. Si perdono ricaricando la pagina.
+- **Ogni ~155s**: `POST /claim` → se concesso, interroga SPOT dal
+  browser → `POST /ingest` col risultato, successo o errore. Se il
+  permesso non è concesso (un'altra pagina di amministrazione ce l'ha
+  già), salta il giro senza chiamare SPOT.
+- **Mostra**: ultima chiamata, esito, punti nuovi arrivati, conto alla
+  rovescia al prossimo giro, un registro degli ultimi eventi.
+- **Wake Lock API** (`navigator.wakeLock`) per evitare che lo schermo
+  si spenga da solo — da sola non basta: se il browser manda la scheda
+  in background (si passa a un'altra scheda, si minimizza la finestra)
+  i timer rallentano comunque, indipendentemente dallo schermo. La
+  pagina lo segnala con un avviso che diventa urgente quando rileva
+  che è andata in background (`document.visibilityState`), e con un
+  simbolo nel titolo della scheda.
+- **Niente pulsanti `/start`/`/stop`** (non servono più): restano
+  `/reset` e l'impostazione di `PUBLIC_FROM` (con un selettore di data
+  e ora, più una scorciatoia "ora").
+
+Prima di poterla usare va impostato `WORKER_BASE` nel file stesso (una
+costante in cima allo `<script>`, vuota di default) con l'URL del
+Worker distribuito — la stessa cosa di `TRACK_URL` in `assets/app.js`
+sul sito, ma tenuta separata apposta: questa pagina non carica
+`assets/app.js` (che fa tutt'altro — nav, lingua, conto alla rovescia
+del sito — niente che serva qui).
 
 ## Deploy (dalla dashboard, collegato al repo GitHub)
 
@@ -152,8 +222,11 @@ chiede esplicitamente in fase di collegamento.
    ```
    L'URL del Worker (del tipo
    `https://cometa-sim-github-io.<account>.workers.dev`, o un dominio
-   personalizzato se ne è stato collegato uno) è quello da mettere
-   nella costante `TRACK_URL` in `assets/app.js`, sul sito principale.
+   personalizzato se ne è stato collegato uno) è quello da mettere in
+   **due posti**: la costante `TRACK_URL` in `assets/app.js` sul sito
+   principale (legge `/track.json`), e la costante `WORKER_BASE` in
+   cima allo `<script>` di `admin-diretta.html` (chiama `/claim` e
+   `/ingest`) — vedi "Pagina di amministrazione" sopra.
 
 ### In alternativa: deploy da terminale
 
@@ -193,22 +266,29 @@ ADMIN_TOKEN=...
 # ripulire le prove
 curl -X POST https://<url-worker>/reset -H "Authorization: Bearer <ADMIN_TOKEN>"
 
-# rendere pubblici solo i punti da ora in poi (unix secondi)
+# rendere pubblici solo i punti da ora in poi (unix secondi) — oppure
+# dalla pagina di amministrazione stessa, con il selettore data/ora
 curl -X POST https://<url-worker>/public-from -H "Authorization: Bearer <ADMIN_TOKEN>" \
   -H "Content-Type: application/json" -d '{"time": 1760000000}'
-
-# avviare il polling vero
-curl -X POST https://<url-worker>/start -H "Authorization: Bearer <ADMIN_TOKEN>"
 ```
+
+Poi aprire `admin-diretta.html`, inserire admin token/Feed ID/password
+del feed, premere "Avvia" e **tenere quella scheda in primo piano**
+per tutto il volo (vedi "Pagina di amministrazione" sopra — il Wake
+Lock evita che lo schermo si spenga, ma non basta da solo se si cambia
+scheda).
 
 Dopo il volo, se ci sono buchi (per esempio dopo un'interruzione di
 rete), `POST /backfill` riscarica tutto da SPOT e li colma.
 
-### Verificare i tempi di polling
+### Verificare i tempi
 
 ```sh
 npm run tail
 ```
-mostra i log in diretta: ogni giro logga l'esito; `lastFetchMs` in
-`GET /track-all.json` (protetto) conferma che i giri reali non sono mai
-più vicini di 150s fra loro, anche sotto `wrangler tail`.
+mostra i log in diretta: un `/ingest` fallito (errore SPOT, HTTP
+non-ok) logga per intero status e corpo della risposta. `last_fetch`
+in `GET /track.json` conferma che gli `/ingest` arrivano ogni ~155s;
+se più pagine di amministrazione sono aperte insieme, i `/claim`
+negati negli eventi di `admin-diretta.html` confermano che solo una
+alla volta sta davvero chiamando SPOT.

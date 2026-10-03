@@ -11,16 +11,22 @@ export interface Point {
 }
 
 /* CORS: solo le origini in ALLOWED_ORIGINS (CSV in wrangler.toml) possono
-   leggere gli endpoint pubblici. Niente wildcard: qui girano anche i dati
-   per DINACIA, meglio restare espliciti su chi li legge dal browser. */
+   leggere gli endpoint pubblici — e, da quando la pagina di
+   amministrazione chiama /claim e /ingest dal browser, anche quelli
+   protetti (il Bearer token resta il vero controllo d'accesso: i CORS
+   header dicono solo al browser chi puo' LEGGERE la risposta). Serve
+   "Authorization" fra gli header ammessi (altrimenti il preflight
+   rifiuta la richiesta prima ancora che parta) e POST fra i metodi.
+   Niente wildcard: qui girano anche i dati per DINACIA, meglio restare
+   espliciti su chi li legge dal browser. */
 export function corsHeaders(req: Request, env: Env): HeadersInit {
   const origin = req.headers.get("Origin") || "";
   const allowed = env.ALLOWED_ORIGINS.split(",").map((s) => s.trim());
   const h: Record<string, string> = { Vary: "Origin" };
   if (allowed.includes(origin)) {
     h["Access-Control-Allow-Origin"] = origin;
-    h["Access-Control-Allow-Methods"] = "GET, OPTIONS";
-    h["Access-Control-Allow-Headers"] = "Content-Type";
+    h["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS";
+    h["Access-Control-Allow-Headers"] = "Content-Type, Authorization";
   }
   return h;
 }

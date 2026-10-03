@@ -24,11 +24,18 @@ enabled = false
 # nulla (exit 0, Worker pubblicato comunque): si puo' ignorare finche'
 # una wrangler piu' recente non lo riconosce.
 
-# Dominio/i da cui il sito puo' leggere /track.json e /track.csv (CORS).
-# Aggiungere anche l'anteprima raw.githack usata nelle prove, se serve:
+# Dominio/i da cui il sito puo' leggere /track.json e /track.csv, e da
+# cui la pagina di amministrazione (admin-diretta.html, stesso dominio)
+# puo' chiamare /claim e /ingest (CORS). Aggiungere anche l'anteprima
+# raw.githack usata nelle prove, se serve:
 # ["https://cometa-sim.github.io", "https://raw.githack.com"]
 [vars]
 ALLOWED_ORIGINS = "https://cometa-sim.github.io"
+# SPOT blocca le richieste dai Worker di Cloudflare (403 anti-bot): il
+# polling lo fa la pagina di amministrazione dal browser, non il Worker
+# da solo. "true" per riattivare l'alarm interno, se SPOT dovesse un
+# giorno smettere di bloccarci — vedi INTERNAL_POLLING_ENABLED in env.ts.
+INTERNAL_POLLING_ENABLED = "false"
 
 # Il Durable Object che fa tutto: polling, storage SQLite, gli endpoint.
 # Un'unica istanza fissa (vedi src/index.ts, idFromName) per tutto il volo.

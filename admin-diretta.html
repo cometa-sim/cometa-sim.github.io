@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COMETA · Amministrazione diretta</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#010308">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@200;300;400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/cometa.css?v=121">
+<style>
+  /* Pagina a parte, non collegata dal sito: qui basta un contenitore
+     stretto e pochi widget, niente nav/header del sito. */
+  body{min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:32px 16px 60px}
+  .admin-wrap{width:100%;max-width:640px}
+  h1{font-family:var(--disp);font-weight:500;font-size:clamp(22px,4vw,28px);color:var(--ink);margin:0 0 6px}
+  .sub{color:var(--muted);font-size:14px;line-height:1.6;margin:0 0 28px}
+  .card{border:1px solid var(--line-soft);border-radius:16px;background:var(--panel);padding:22px;margin-bottom:18px}
+  .card h2{font-family:var(--disp);font-weight:500;font-size:16px;color:var(--ink);margin:0 0 14px}
+  label{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:14px 0 6px}
+  label:first-child{margin-top:0}
+  input[type=password],input[type=text],input[type=datetime-local]{
+    width:100%;box-sizing:border-box;background:rgba(2,6,15,.6);border:1px solid var(--line);border-radius:10px;
+    padding:10px 12px;color:var(--ink);font-family:var(--mono);font-size:14px}
+  input:focus{outline:2px solid var(--cyan);outline-offset:1px}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .show-toggle{font-size:12px;color:var(--muted);cursor:pointer;user-select:none;white-space:nowrap}
+  button{font-family:var(--text);font-weight:500;font-size:14px;color:var(--ink);background:var(--panel-2);
+    border:1px solid var(--line);border-radius:10px;padding:10px 16px;cursor:pointer;transition:.2s var(--ease)}
+  button:hover{background:rgba(120,160,200,.16)}
+  button:disabled{opacity:.45;cursor:default}
+  button.primary{background:var(--cyan);color:#02060f;border-color:transparent;font-weight:600}
+  button.primary:hover{background:#7eeaff}
+  button.danger{border-color:rgba(255,122,92,.4);color:#FF7A5C}
+  button.danger:hover{background:rgba(255,122,92,.12)}
+  .err{color:#FF7A5C;font-size:13px;margin-top:10px;min-height:1.2em}
+  .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .stat{border:1px solid var(--line-soft);border-radius:12px;padding:14px;text-align:center}
+  .stat .v{font-family:var(--disp);font-size:22px;color:var(--ink);font-variant-numeric:tabular-nums}
+  .stat .l{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin-top:4px}
+  .stat.ok .v{color:var(--green)}
+  .stat.bad .v{color:#FF7A5C}
+  #log{list-style:none;margin:0;padding:0;max-height:280px;overflow-y:auto;font-family:var(--mono);font-size:12px;line-height:1.7}
+  #log li{border-bottom:1px solid var(--line-soft);padding:6px 0;color:var(--muted)}
+  #log li:first-child{color:var(--ink)}
+  #log li .t{color:var(--faint);margin-right:8px}
+  .banner{border-radius:12px;padding:12px 16px;font-size:13px;line-height:1.5;margin-bottom:18px}
+  .banner.info{background:var(--panel-2);border:1px solid var(--line);color:var(--muted)}
+  .banner.warn{background:rgba(255,184,77,.12);border:1px solid rgba(255,184,77,.4);color:var(--beacon)}
+  .banner.urgent{background:rgba(255,122,92,.16);border:1px solid rgba(255,122,92,.5);color:#FF7A5C;font-weight:600;animation:pulse 1.4s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+  .wl-status{font-size:12px;color:var(--faint);margin-top:8px}
+  .hint{font-size:12px;color:var(--faint);margin-top:6px;line-height:1.5}
+  [hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="admin-wrap">
+  <h1>Amministrazione diretta — SPOT</h1>
+  <p class="sub">SPOT blocca le richieste dai Worker di Cloudflare (403 anti-bot) ma accetta quelle dal browser: questa pagina interroga SPOT da qui, ogni ~155&nbsp;s, e manda il risultato al Worker.</p>
+
+  <section id="gate" class="card">
+    <h2>Credenziali</h2>
+    <p class="hint">Restano solo nella memoria di questa pagina — niente repo, niente localStorage. Si perdono ricaricando la pagina.</p>
+    <label for="fAdminToken">Admin token del Worker</label>
+    <input type="password" id="fAdminToken" autocomplete="off">
+    <label for="fFeedId">Feed ID SPOT</label>
+    <input type="password" id="fFeedId" autocomplete="off">
+    <label for="fFeedPw">Password del feed (se richiesta)</label>
+    <input type="password" id="fFeedPw" autocomplete="off">
+    <div class="row" style="margin-top:14px">
+      <button class="primary" id="btnStart">Avvia</button>
+      <span class="show-toggle" id="toggleShow">mostra i valori</span>
+    </div>
+    <p class="err" id="gateErr"></p>
+  </section>
+
+  <div id="panel" hidden>
+    <div id="visBanner" class="banner info">Tieni questa scheda in primo piano: i browser rallentano i timer di una scheda in background, e i 155&nbsp;s salterebbero.</div>
+
+    <section class="card">
+      <h2>Stato del polling</h2>
+      <div class="stat-grid">
+        <div class="stat" id="statLast"><div class="v">—</div><div class="l">Ultima chiamata</div></div>
+        <div class="stat" id="statOutcome"><div class="v">—</div><div class="l">Esito</div></div>
+        <div class="stat" id="statNew"><div class="v">—</div><div class="l">Punti nuovi</div></div>
+        <div class="stat" id="statNext"><div class="v">—</div><div class="l">Prossima tra</div></div>
+      </div>
+      <p class="wl-status" id="wlStatus">Wake Lock: —</p>
+    </section>
+
+    <section class="card">
+      <h2>Registro</h2>
+      <ul id="log"></ul>
+    </section>
+
+    <section class="card">
+      <h2>Comandi</h2>
+      <label for="fPublicFrom">Rendi pubblici i punti da (ora locale)</label>
+      <div class="row">
+        <input type="datetime-local" id="fPublicFrom" style="flex:1;min-width:200px">
+        <button id="btnPublicFromSet">Imposta</button>
+        <button id="btnPublicFromNow">Ora</button>
+        <button id="btnPublicFromClear">Nascondi tutto</button>
+      </div>
+      <p class="hint">Senza questo impostato, /track.json e /track.csv non mostrano nessun punto — le prove restano private di default.</p>
+      <label style="margin-top:22px">Pulizia</label>
+      <div class="row">
+        <button class="danger" id="btnReset">Cancella tutti i punti salvati (/reset)</button>
+      </div>
+      <p class="hint">Da usare dopo le prove, prima del giorno vero.</p>
+      <p class="hint" id="cmdMsg"></p>
+    </section>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* L'indirizzo del Worker: vuoto finche' non e' stato distribuito —
+     vedi worker/README.md e la stessa costante (TRACK_URL) in
+     assets/app.js sul sito principale. Da riempire qui a parte perche'
+     questa pagina e' volutamente autosufficiente, senza caricare
+     assets/app.js (che fa tutt'altro: nav, lingua, conto alla
+     rovescia...). */
+  const WORKER_BASE = "";
+  const POLL_MS = 155000; // lo stesso ritmo della pagina Diretta vera
+
+  const $ = (id) => document.getElementById(id);
+  let adminToken = "", feedId = "", feedPassword = "";
+  let timer = null, nextAt = 0, started = false;
+  let wakeLock = null;
+
+  // ---------------------------------------------------------- credenziali
+
+  $("toggleShow").addEventListener("click", function(){
+    const show = $("fAdminToken").type === "password";
+    ["fAdminToken", "fFeedId", "fFeedPw"].forEach(function(id){ $(id).type = show ? "text" : "password"; });
+    this.textContent = show ? "nascondi i valori" : "mostra i valori";
+  });
+
+  $("btnStart").addEventListener("click", function(){
+    adminToken = $("fAdminToken").value.trim();
+    feedId = $("fFeedId").value.trim();
+    feedPassword = $("fFeedPw").value.trim();
+    $("gateErr").textContent = "";
+    if (!adminToken || !feedId) { $("gateErr").textContent = "Servono almeno admin token e Feed ID."; return; }
+    if (!WORKER_BASE) { $("gateErr").textContent = "WORKER_BASE è vuota in questa pagina: va impostata nel file prima di poterla usare."; return; }
+    // Svuota subito i campi a video, i valori restano solo nelle variabili sopra.
+    ["fAdminToken", "fFeedId", "fFeedPw"].forEach(function(id){ $(id).value = ""; });
+    $("gate").hidden = true;
+    $("panel").hidden = false;
+    started = true;
+    requestWakeLock();
+    logEvent("avviato — un giro ogni " + (POLL_MS / 1000) + "s");
+    runCycle();
+  });
+
+  // --------------------------------------------------------------- fetch
+
+  function authHeaders(extra){
+    return Object.assign({ "Authorization": "Bearer " + adminToken }, extra || {});
+  }
+
+  function workerPost(path, body){
+    return fetch(WORKER_BASE + path, {
+      method: "POST",
+      headers: authHeaders({ "Content-Type": "application/json" }),
+      body: body == null ? undefined : JSON.stringify(body)
+    }).then(function(res){
+      return res.json().catch(function(){ return null; }).then(function(json){
+        if (!res.ok) throw new Error("HTTP " + res.status + (json && json.error ? ": " + json.error : ""));
+        return json;
+      });
+    });
+  }
+
+  function spotUrl(){
+    const q = new URLSearchParams();
+    if (feedPassword) q.set("feedPassword", feedPassword);
+    const qs = q.toString();
+    return "https://api.findmespot.com/spot-main-web/consumer/rest-api/2.0/public/feed/" + encodeURIComponent(feedId) + "/message.json" + (qs ? "?" + qs : "");
+  }
+
+  /* Il fetch vero a SPOT, dal browser — qui funziona perche' SPOT
+     accetta le richieste da un browser, non quelle da un Worker. Si
+     manda a /ingest cosi' com'e' arrivato, successo o fallimento. */
+  function fetchSpotAndIngest(){
+    return fetch(spotUrl(), { headers: { "Accept": "application/json" } })
+      .then(function(res){
+        return res.text().then(function(text){
+          let body;
+          try { body = JSON.parse(text); } catch (e) { body = text; }
+          return workerPost("/ingest", { ok: true, status: res.status, body: body });
+        });
+      })
+      .catch(function(err){
+        return workerPost("/ingest", { ok: false, error: String((err && err.message) || err) });
+      });
+  }
+
+  // ---------------------------------------------------------------- ciclo
+
+  function runCycle(){
+    workerPost("/claim", null)
+      .then(function(claim){
+        if (!claim.granted) {
+          logEvent("turno di un'altra pagina — niente chiamata questo giro (richiesti ancora " + claim.retry_after_s + "s altrove)");
+          setOutcome("saltato", null);
+          return;
+        }
+        return fetchSpotAndIngest().then(function(r){
+          setLast();
+          if (r.spot_ok) {
+            setOutcome(r.upserted > 0 ? "ok, " + r.upserted + " nuovi" : "ok, nessun punto nuovo", true);
+            setNew(r.upserted);
+            logEvent("ok — " + r.received + " ricevuti, " + r.upserted + " nuovi");
+          } else {
+            setOutcome("SPOT ha risposto con un errore", false);
+            logEvent("SPOT ha risposto con un errore — dettagli in /track-all.json e nei log del Worker");
+          }
+        });
+      })
+      .catch(function(err){
+        logEvent("errore nel giro: " + err.message);
+        setOutcome("errore", false);
+        if (/HTTP 401/.test(err.message)) $("visBanner").textContent = "Admin token rifiutato dal Worker: ricarica la pagina e ricontrollalo.";
+      })
+      .then(function(){
+        scheduleNext();
+      });
+  }
+
+  function scheduleNext(){
+    nextAt = Date.now() + POLL_MS;
+    if (timer) clearTimeout(timer);
+    timer = setTimeout(runCycle, POLL_MS);
+  }
+
+  setInterval(function(){
+    if (!started) return;
+    const s = Math.max(0, Math.round((nextAt - Date.now()) / 1000));
+    $("statNext").querySelector(".v").textContent = s + "s";
+  }, 1000);
+
+  // ---------------------------------------------------------------- stato UI
+
+  function setLast(){ $("statLast").querySelector(".v").textContent = new Date().toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit", second: "2-digit" }); }
+  function setOutcome(text, ok){
+    const el = $("statOutcome");
+    el.querySelector(".v").textContent = text;
+    el.classList.remove("ok", "bad");
+    if (ok === true) el.classList.add("ok"); else if (ok === false) el.classList.add("bad");
+  }
+  function setNew(n){ $("statNew").querySelector(".v").textContent = String(n); }
+
+  const logEntries = [];
+  function logEvent(msg){
+    const t = new Date().toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+    logEntries.unshift({ t: t, msg: msg });
+    if (logEntries.length > 200) logEntries.length = 200;
+    const ul = $("log");
+    ul.innerHTML = "";
+    logEntries.forEach(function(e){
+      const li = document.createElement("li");
+      const t = document.createElement("span"); t.className = "t"; t.textContent = e.t;
+      li.appendChild(t);
+      li.appendChild(document.createTextNode(e.msg));
+      ul.appendChild(li);
+    });
+  }
+
+  // ------------------------------------------------------------- Wake Lock
+
+  function setWlStatus(s){ $("wlStatus").textContent = "Wake Lock: " + s; }
+  function requestWakeLock(){
+    if (!("wakeLock" in navigator)) { setWlStatus("non supportato da questo browser — lo schermo potrebbe spegnersi da solo"); return; }
+    navigator.wakeLock.request("screen").then(function(wl){
+      wakeLock = wl;
+      setWlStatus("attivo");
+      wl.addEventListener("release", function(){ setWlStatus("rilasciato"); });
+    }, function(err){
+      setWlStatus("negato (" + err.message + ")");
+    });
+  }
+
+  /* Il Wake Lock si rilascia da solo quando la scheda va in background,
+     e va richiesto di nuovo quando torna visibile — questo pero' non
+     c'entra con i timer rallentati: per quello serve tenere la scheda
+     davvero in primo piano, il Wake Lock impedisce solo allo schermo
+     di spegnersi. */
+  function updateVisibilityBanner(){
+    const b = $("visBanner");
+    if (document.hidden) {
+      b.className = "banner urgent";
+      b.textContent = "ATTENZIONE — questa scheda è in background: i tempi potrebbero saltare. Torna su questa scheda.";
+      document.title = "⚠ COMETA · Amministrazione diretta";
+    } else {
+      b.className = "banner info";
+      b.textContent = "Tieni questa scheda in primo piano: i browser rallentano i timer di una scheda in background, e i 155 s salterebbero.";
+      document.title = "COMETA · Amministrazione diretta";
+      if (started) requestWakeLock();
+    }
+  }
+  document.addEventListener("visibilitychange", updateVisibilityBanner);
+
+  // ---------------------------------------------------------------- comandi
+
+  $("btnPublicFromNow").addEventListener("click", function(){
+    const now = new Date();
+    now.setSeconds(0, 0);
+    $("fPublicFrom").value = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+  });
+  $("btnPublicFromSet").addEventListener("click", function(){
+    const v = $("fPublicFrom").value;
+    if (!v) { $("cmdMsg").textContent = "Scegli prima una data e un'ora."; return; }
+    const t = Math.floor(new Date(v).getTime() / 1000);
+    workerPost("/public-from", { time: t })
+      .then(function(){ $("cmdMsg").textContent = "Pubblico da " + new Date(t * 1000).toLocaleString("it-IT") + "."; logEvent("public-from impostato"); })
+      .catch(function(err){ $("cmdMsg").textContent = "Errore: " + err.message; });
+  });
+  $("btnPublicFromClear").addEventListener("click", function(){
+    workerPost("/public-from", { time: null })
+      .then(function(){ $("cmdMsg").textContent = "Tutti i punti tornati privati."; logEvent("public-from azzerato"); })
+      .catch(function(err){ $("cmdMsg").textContent = "Errore: " + err.message; });
+  });
+  $("btnReset").addEventListener("click", function(){
+    if (!confirm("Cancellare TUTTI i punti salvati? Non si può annullare.")) return;
+    workerPost("/reset", null)
+      .then(function(){ $("cmdMsg").textContent = "Punti cancellati."; logEvent("reset eseguito"); })
+      .catch(function(err){ $("cmdMsg").textContent = "Errore: " + err.message; });
+  });
+})();
+</script>
+</body>
+</html>

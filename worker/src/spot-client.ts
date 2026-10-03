@@ -32,39 +32,15 @@ function normalize(m: Record<string, unknown>): Point | null {
   };
 }
 
-/* Una chiamata al feed pubblico SPOT. extraParams permette la paginazione
-   del backfill (start=51, 101, ... oppure startDate/endDate). "nessun
-   messaggio ancora" (E-0195) non e' un guasto: torna una pagina vuota.
-
-   Ogni altro esito negativo (HTTP non-ok, risposta senza "response",
-   errore SPOT strutturato) finisce per intero nei log del Worker
-   (console.error, visibili in Logs sulla dashboard e con `npm run
-   tail` — vedi [observability] in wrangler.toml), non solo come
-   messaggio corto nell'eccezione: qui' c'e' lo status HTTP e il corpo
-   completo della risposta, utile per capire un guasto reale di SPOT
-   senza doverlo riprodurre. Mai l'URL della richiesta nei log: contiene
-   FEED_ID e, se impostata, FEED_PASSWORD — sono secret apposta. */
-export async function fetchSpotPage(env: Env, extraParams: Record<string, string> = {}): Promise<RawFetchResult> {
-  const q = new URLSearchParams(extraParams);
-  if (env.FEED_PASSWORD) q.set("feedPassword", env.FEED_PASSWORD);
-  const qs = q.toString();
-  const url = `${SPOT_BASE}/${env.FEED_ID}/message.json${qs ? "?" + qs : ""}`;
-  /* Senza questi header SPOT risponde 403 con la pagina anti-bot di
-     Cloudflare (il fetch di un Worker, senza, non sembra un browser). */
-  const res = await fetch(url, {
-    cf: { cacheTtl: 0 },
-    headers: {
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
-      "Accept": "application/json",
-      "Accept-Language": "en-US,en;q=0.9"
-    }
-  });
-  if (!res.ok) {
-    const body = await res.text().catch(() => "(corpo non leggibile)");
-    console.error(`[SPOT] HTTP ${res.status} ${res.statusText}\n${body}`);
-    throw new Error(`SPOT HTTP ${res.status}: ${body.slice(0, 300)}`);
-  }
-  const data = (await res.json()) as any;
+/* Il corpo JSON del feed SPOT (gia' scaricato, da fetchSpotPage qui
+   sotto o dalla pagina di amministrazione via /ingest) diventa punti
+   normalizzati. "nessun messaggio ancora" (E-0195) non e' un guasto:
+   torna una pagina vuota. Un errore SPOT strutturato (feed non
+   trovato, credenziali sbagliate, ...) finisce per intero nei log del
+   Worker (console.error, visibili in Logs sulla dashboard e con `npm
+   run tail` — vedi [observability] in wrangler.toml) e lancia
+   un'eccezione con la sola descrizione, piu' corta. */
+export function parseSpotJson(data: any): RawFetchResult {
   const r = data?.response;
   if (!r) {
     console.error(`[SPOT] risposta senza "response": ${JSON.stringify(data)}`);
@@ -90,6 +66,45 @@ export async function fetchSpotPage(env: Env, extraParams: Record<string, string
     raws.set(p.id, raw);
   }
   return { points, raws };
+}
+
+/* Una chiamata al feed pubblico SPOT, fatta dal Worker stesso — usata
+   solo da /backfill (SPOT blocca il resto delle chiamate del Worker con
+   un 403 anti-bot, vedi INTERNAL_POLLING_ENABLED in env.ts; /backfill
+   e' occasionale e manuale, non il polling regolare, e per ora resta
+   cosi': se anche questa iniziasse a essere bloccata andra' spostata
+   sul browser come il resto). extraParams permette la paginazione
+   (start=51, 101, ... oppure startDate/endDate).
+
+   Un HTTP non-ok finisce per intero nei log (status, statusText e
+   corpo completo) prima di lanciare un'eccezione piu' corta (troncata
+   a 300 caratteri: quella finisce anche in lastError, persistito ed
+   esposto da /track-all.json). Mai l'URL della richiesta nei log:
+   contiene FEED_ID e, se impostata, FEED_PASSWORD — sono secret
+   apposta. */
+export async function fetchSpotPage(env: Env, extraParams: Record<string, string> = {}): Promise<RawFetchResult> {
+  const q = new URLSearchParams(extraParams);
+  if (env.FEED_PASSWORD) q.set("feedPassword", env.FEED_PASSWORD);
+  const qs = q.toString();
+  const url = `${SPOT_BASE}/${env.FEED_ID}/message.json${qs ? "?" + qs : ""}`;
+  /* Questi header non bastano a evitare il 403 anti-bot dalle IP dei
+     Worker — vedi sopra — ma restano: non fanno danno, e aiutano se un
+     giorno smette di essere un problema. */
+  const res = await fetch(url, {
+    cf: { cacheTtl: 0 },
+    headers: {
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+      "Accept": "application/json",
+      "Accept-Language": "en-US,en;q=0.9"
+    }
+  });
+  if (!res.ok) {
+    const body = await res.text().catch(() => "(corpo non leggibile)");
+    console.error(`[SPOT] HTTP ${res.status} ${res.statusText}\n${body}`);
+    throw new Error(`SPOT HTTP ${res.status}: ${body.slice(0, 300)}`);
+  }
+  const data = (await res.json()) as any;
+  return parseSpotJson(data);
 }
 
 /* --------------------------------------------------------------------

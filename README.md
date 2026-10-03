@@ -38,6 +38,10 @@ calcolo/convergenza_raccolta.py     raccolta quotidiana delle previsioni di Tawh
 calcolo/convergenza_analisi.py      di quanto si sposta l'atterraggio previsto al variare dell'anticipo
 .github/workflows/convergenza.yml   il workflow quotidiano, scrive sul branch dati
 
+worker/                             backend SPOT (Cloudflare Worker + Durable Object) — vedi worker/README.md
+admin-diretta.html                  pagina di amministrazione per il polling SPOT il giorno del lancio —
+                                     non collegata dal sito, noindex, vedi worker/README.md
+
 LICENSE · README.md · .gitignore
 ```
 
