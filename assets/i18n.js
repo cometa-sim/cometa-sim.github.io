@@ -453,14 +453,14 @@ es:{
   metaDesc:"COMETA es un programa de globos estratosféricos de la Scuola Italiana di Montevideo: mediciones atmosféricas hasta más de 37 km de altura, diseñadas y construidas por los estudiantes.",
 
   navHome:"Inicio", navMission:"Misión", navPhysics:"La física", navProbe:"La sonda", navWinds:"La trayectoria", navAbout:"Quiénes somos", navContact:"Contacto",
-  navDiretta:"En directo",
+  navDiretta:"En vivo",
 
-  /* — En directo (borrador) — */
+  /* — En vivo (borrador) — */
   dirKicker:"El día del lanzamiento",
   dirSub:"El video desde el terreno y la posición de la sonda, en tiempo real.",
-  dirStatusPre:"En directo pronto", dirStatusLive:"En directo ahora",
+  dirStatusPre:"En vivo pronto", dirStatusLive:"En vivo ahora",
   dirBannerDesc:"— video desde el terreno y posición GPS", dirBannerCta:"Mirar →",
-  dirYoutubeHead:"YouTube · en directo", dirGpsHead:"Rastreador GPS · SPOT Trace",
+  dirYoutubeHead:"YouTube · en vivo", dirGpsHead:"Rastreador GPS · SPOT Trace",
   dirYoutubePlaceholder:"[ embed de YouTube cuando esté activo ]",
   dirNoteTag:"Nota",
   dirNote:"Por encima de los 18 km el GPS deja de enviar señal: no es una avería, es su funcionamiento normal — se reanudará en el descenso. Hasta entonces el mapa queda fijo en la última posición conocida.",
