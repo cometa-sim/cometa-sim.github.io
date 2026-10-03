@@ -24,7 +24,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@200;300;400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/cometa.css?v=140">
+<link rel="stylesheet" href="assets/cometa.css?v=142">
 </head>
 <body>
 <div class="sim-bar" style="position:sticky;top:0;z-index:90;background:#3a1600;border-bottom:1px solid rgba(255,184,77,.5);padding:11px 20px;font-family:var(--mono);font-size:12.5px;color:#FFB84D;display:flex;gap:16px;flex-wrap:wrap;align-items:center">
@@ -855,7 +855,7 @@
       </div>
 
       <div class="map-frame reveal d1">
-        <iframe id="mapFrame" src="mappe/uru2000_footprint.html?v=140"
+        <iframe id="mapFrame" src="mappe/uru2000_footprint.html?v=142"
                 title="Mappa interattiva dei 600 punti di atterraggio simulati con le ellissi di dispersione"
                 loading="lazy"></iframe>
       </div>
@@ -1343,25 +1343,53 @@
     return msgs.slice(-50);
   }
 
+  /* Il sito vero legge solo da window.COMETA_TRACK_URL (il backend in
+     worker/, vedi assets/spot.js), mai da SPOT direttamente. Qui si
+     finge quel backend: si blocca COMETA_TRACK_URL su un indirizzo
+     finto PRIMA che assets/app.js lo sovrascriva (scrivere su una
+     proprieta' non scrivibile, fuori da "use strict", fallisce in
+     silenzio: resta questo valore), e si intercetta il fetch verso
+     quell'indirizzo restituendo la stessa forma di GET /track.json
+     del Worker — non quella grezza di SPOT. */
+  var FAKE_TRACK_URL = "https://simulazione.invalid/track.json";
+  /* Getter/setter, non un valore fisso: assets/app.js assegna
+     window.COMETA_TRACK_URL = "" al proprio caricamento, e quella riga
+     gira in strict mode (lancerebbe un TypeError contro una proprieta'
+     davvero non scrivibile). Il setter qui sotto accetta l'assegnazione
+     senza fare nulla: il valore restituito resta sempre quello finto. */
+  Object.defineProperty(window, "COMETA_TRACK_URL", {
+    get: function(){ return FAKE_TRACK_URL; },
+    set: function(){},
+    configurable: true
+  });
+
   var REAL_FETCH = window.fetch.bind(window);
   window.fetch = function(url, opts){
-    if(typeof url === "string" && url.indexOf("api.findmespot.com") !== -1){
+    if(url === FAKE_TRACK_URL){
       var msgs = fakeMessages();
-      var body = msgs.length
-        ? {response:{feedMessageResponse:{count:msgs.length, messages:{message: msgs.length === 1 ? msgs[0] : msgs}}}}
-        : {response:{errors:{error:{code:"E-0195", text:"No Messages to display", description:"simulazione: ancora nessun punto"}}}};
+      var points = msgs.map(function(m){
+        return {id:"sim" + m.unixTime, time:m.unixTime, lat:m.latitude, lon:m.longitude,
+                altitude:m.altitude, messageType:m.messageType, batteryState:"GOOD"};
+      });
+      var body = {
+        points: points,
+        last_fetch: new RealDate().toISOString(),
+        last_fetch_ok: true,
+        last_point_time: points.length ? points[points.length - 1].time : null,
+        polling_active: true
+      };
       return Promise.resolve(new Response(JSON.stringify(body), {status:200, headers:{"Content-Type":"application/json"}}));
     }
     return REAL_FETCH(url, opts);
   };
 })();
 </script>
-<script src="assets/i18n.js?v=140"></script>
-<script src="assets/sonda.js?v=140"></script>
-<script src="assets/catena.js?v=140"></script>
-<script src="assets/spot.js?v=140"></script>
-<script src="assets/app.js?v=140"></script>
-<script src="assets/msis.js?v=140"></script>
-<script src="assets/traiettoria.js?v=140"></script>
+<script src="assets/i18n.js?v=142"></script>
+<script src="assets/sonda.js?v=142"></script>
+<script src="assets/catena.js?v=142"></script>
+<script src="assets/spot.js?v=142"></script>
+<script src="assets/app.js?v=142"></script>
+<script src="assets/msis.js?v=142"></script>
+<script src="assets/traiettoria.js?v=142"></script>
 </body>
 </html>

@@ -591,6 +591,14 @@ const FLIGHT_DESCENT_V0_MS = 4.6;
 const FLIGHT_SITE = {lat: -33.2486, lon: -58.0736};
 window.COMETA_FLIGHT = {burstKm: FLIGHT_BURST_KM, ascentMs: FLIGHT_ASCENT_MS, descentV0Ms: FLIGHT_DESCENT_V0_MS, site: FLIGHT_SITE};
 
+/* Il backend che interroga SPOT una sola volta per tutti i visitatori
+   (worker/, Cloudflare Worker + Durable Object — vedi worker/README.md):
+   assets/spot.js legge solo da qui, mai da SPOT direttamente dal
+   browser. Da sostituire con l'URL vero una volta fatto il deploy —
+   finche' resta vuota, la mappa GPS mostra solo "in attesa del segnale". */
+const TRACK_URL = "";
+window.COMETA_TRACK_URL = TRACK_URL;
+
 /* Quando compare la voce "Diretta" in nav (qualche giorno prima del
    lancio, col pallino ciano e "diretta tra poco") e quando passa allo
    stato rosso "in diretta" (quando comincia davvero la trasmissione,

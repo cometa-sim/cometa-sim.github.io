@@ -59,6 +59,7 @@ Norme e autorizzazioni · Domande · Chi siamo.
 | Data del lancio (conto alla rovescia) | la costante `LAUNCH` in `assets/app.js` |
 | Fondo scala delle animazioni | la costante `SCALA_KM` in `assets/app.js` |
 | Quota di scoppio, velocità di salita/discesa e sito di lancio attesi (pagina Diretta) | `FLIGHT_BURST_KM`, `FLIGHT_ASCENT_MS`, `FLIGHT_DESCENT_V0_MS`, `FLIGHT_SITE` in `assets/app.js` |
+| Indirizzo del backend che interroga SPOT (pagina Diretta) | la costante `TRACK_URL` in `assets/app.js` |
 | Quando compare "Diretta" in nav e quando diventa rossa | `DIRETTA_WINDOW` e `DIRETTA_START` in `assets/app.js` |
 | Numeri delle quattro schede della pagina iniziale | direttamente in `index.html` |
 | Stato di una tappa del progetto | la classe `done`, `wip` o `todo` della riga in `index.html` |
@@ -459,6 +460,18 @@ approvare la propria richiesta di modifica.
   troppo lontana per l'orizzonte del previsore la richiesta fallisce e
   non succede nulla: ci riprova da sola più avanti, senza bisogno di
   intervenire.
+
+- **L'indirizzo del backend che interroga SPOT**. Il browser non chiama
+  mai SPOT direttamente (con tanti spettatori durante la diretta,
+  rischierebbe di far bloccare il feed): a interrogarlo una sola volta
+  per tutti è un Cloudflare Worker a parte, nella cartella `worker/`
+  (non in questo branch: vive sul proprio, con la sua pull request —
+  vedi `worker/README.md` per il deploy). La costante `TRACK_URL` in
+  `assets/app.js` è l'indirizzo di quel Worker una volta distribuito
+  (`https://cometa-spot-tracker.<account>.workers.dev` o simile);
+  finché resta vuota (`""`, il valore di oggi) `assets/spot.js` non
+  chiama nessuno e la mappa GPS mostra solo "in attesa del segnale" —
+  niente di rotto, solo il backend non ancora collegato.
 
 - **Quando compare la voce "Diretta"**, e quando passa dal ciano
   "diretta tra poco" al rosso "in diretta". Sono due date separate in

@@ -5,9 +5,17 @@
    interfaccia — barra, filtri temporali, condivisione — pensata
    per una pagina intera: incorporata in un riquadro piccolo
    risultava tagliata, non ridimensionata male. Qui invece
-   leggiamo solo i dati dal feed XML/API pubblico del dispositivo
-   e disegniamo noi la posizione, su Leaflet, nello stesso stile
+   disegniamo noi la posizione, su Leaflet, nello stesso stile
    scuro della pagina Traiettoria.
+
+   Il browser non chiama MAI SPOT direttamente: con tanti
+   spettatori durante la diretta, ogni browser che interrogasse
+   SPOT per conto suo rischierebbe di far bloccare il feed (SPOT
+   chiede non piu' di una richiesta ogni 2,5 minuti). A interrogare
+   SPOT ci pensa un solo backend (worker/, un Cloudflare Worker —
+   vedi worker/README.md), che salva la traccia e la espone in
+   GET /track.json; qui si legge solo quello, all'indirizzo in
+   window.COMETA_TRACK_URL (assets/app.js).
 
    La quota ha due numeri distinti, apposta:
    - "GPS" e' l'ultimo punto vero ricevuto, fermo fra un
@@ -30,8 +38,6 @@
      e quando arriva la riallinea con dolcezza.
    ========================================================== */
 window.COMETA_SPOT = (function(){
-  const FEED_ID = "0khMEQthBCgxvZpuibCz2eabjNtFovxKI";
-  const FEED_URL = "https://api.findmespot.com/spot-main-web/consumer/rest-api/2.0/public/feed/" + FEED_ID + "/message.json";
   const TRAJ_URL = "https://api.v2.sondehub.org/tawhiri";   // lo stesso previsore di assets/traiettoria.js
   const TRAJ_POLL_MS = 20 * 60000;  // il modello GFS si aggiorna ogni poche ore: ogni 20 min basta per non perdere un aggiornamento
   const LEAFLET = "assets/vendor/leaflet/";
@@ -408,45 +414,39 @@ window.COMETA_SPOT = (function(){
     renderStatus();
   }
 
-  /* L'API di SPOT restituisce "message" come oggetto singolo (non dentro
-     un array) quando c'e' un solo punto: va normalizzato, o il .map()
-     sotto fallisce silenziosamente su un oggetto che non e' una lista. */
+  /* La risposta del backend (worker/, GET /track.json) e' gia' pulita e
+     deduplicata — qui si normalizza solo la forma che il resto del file
+     si aspetta: alt in metri, time in ms (il Worker lo da' in secondi
+     unix). publicFrom non impostato sul Worker = points vuoto: la mappa
+     resta su "in attesa del segnale", niente di rotto. */
   function parse(data){
-    const r = data && data.response;
-    if(!r) throw new Error("risposta vuota");
-    if(r.errors){
-      const e = r.errors.error || {};
-      if(e.code === "E-0195") return []; // nessun messaggio ancora: non e' un guasto
-      throw new Error(e.description || e.text || "errore sconosciuto");
-    }
-    const fr = r.feedMessageResponse;
-    if(!fr || !fr.messages) return [];
-    let msgs = fr.messages.message || [];
-    if(!Array.isArray(msgs)) msgs = [msgs];
-    return msgs
-      .filter(function(m){ return m.latitude != null && m.longitude != null; })
-      .map(function(m){
+    if(!data || !Array.isArray(data.points)) throw new Error("risposta del backend non valida");
+    return data.points
+      .filter(function(p){ return p.lat != null && p.lon != null && p.time != null; })
+      .map(function(p){
         return {
-          lat: +m.latitude,
-          lon: +m.longitude,
+          lat: +p.lat,
+          lon: +p.lon,
           /* Metri, quota ellissoidica GPS: vicino al suolo puo' essere
              negativa di suo (rumore tipico del GPS li', non un errore). */
-          alt: m.altitude != null ? +m.altitude : null,
-          time: m.unixTime ? m.unixTime * 1000 : m.dateTime
+          alt: p.altitude != null ? +p.altitude : null,
+          time: p.time * 1000
         };
       })
-      .sort(function(a, b){ return new Date(a.time) - new Date(b.time); });
+      .sort(function(a, b){ return a.time - b.time; });
   }
 
   function poll(){
-    fetch(FEED_URL, {cache:"no-store"})
-      .then(function(res){ return res.json(); })
+    const url = window.COMETA_TRACK_URL;
+    /* Finche' il backend non e' stato ancora distribuito (TRACK_URL
+       vuota in assets/app.js) niente chiamate a vuoto: solo lo stato
+       "in attesa del segnale", come se la sonda non avesse ancora
+       trasmesso. */
+    if(!url){ lastErr = null; renderStatus(); return; }
+    fetch(url, {cache:"no-store"})
+      .then(function(res){ if(!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
       .then(function(data){ render(parse(data)); })
-      .catch(function(err){
-        /* Capita anche se l'API non permette richieste dal browser (CORS):
-           in quel caso ogni richiesta fallisce cosi', senza dettagli. */
-        lastErr = err.message; renderStatus();
-      });
+      .catch(function(err){ lastErr = err.message; renderStatus(); });
   }
 
   /* La traiettoria grigia: lo stesso previsore (Tawhiri/SondeHub) e i
