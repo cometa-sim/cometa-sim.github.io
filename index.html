@@ -23,7 +23,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@200;300;400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/cometa.css?v=128">
+<link rel="stylesheet" href="assets/cometa.css?v=129">
 </head>
 <body>
 
@@ -241,22 +241,22 @@
           <div class="box"><span data-i18n="dirYoutubePlaceholder" style="font-family:var(--mono);font-size:11px;color:var(--faint)">[ embed YouTube quando attivo ]</span></div>
         </div>
 
-        <div class="ecard2 alt-mid">
-          <div class="ehead" data-i18n="dirAltHead">Quota</div>
-          <div class="alt-row">
-            <div class="alt-n"><span id="altEst">—</span><small>km</small></div>
-            <div class="alt-l" data-i18n="dirAltEstLabel">Stimata</div>
-          </div>
-          <div class="alt-row" id="altGpsRow">
-            <div class="alt-n"><span id="altGps">—</span><small>km</small></div>
-            <div class="alt-l" data-i18n="dirAltGpsLabel">Ultimo punto GPS</div>
-          </div>
-        </div>
-
         <div class="ecard2">
           <div class="ehead"><span data-i18n="dirGpsHead">Tracciatore GPS · SPOT Trace</span></div>
           <div class="box tw-map"><div id="spotMap" style="position:absolute;inset:0"></div></div>
           <p id="spotStatus" style="font-family:var(--mono);font-size:10.5px;color:var(--faint);padding:10px 15px;border-top:1px solid var(--line-soft)"></p>
+        </div>
+      </div>
+
+      <div class="count-head" style="margin-top:26px" data-i18n="dirAltHead">Quota</div>
+      <div class="alt-pair">
+        <div class="alt-tile">
+          <div class="alt-n"><span id="altEst">—</span><small>km</small></div>
+          <div class="alt-l" data-i18n="dirAltEstLabel">Stimata</div>
+        </div>
+        <div class="alt-tile" id="altGpsRow">
+          <div class="alt-n"><span id="altGps">—</span><small>km</small></div>
+          <div class="alt-l" data-i18n="dirAltGpsLabel">Ultimo punto GPS</div>
         </div>
       </div>
 
@@ -850,7 +850,7 @@
       </div>
 
       <div class="map-frame reveal d1">
-        <iframe id="mapFrame" src="mappe/uru2000_footprint.html?v=128"
+        <iframe id="mapFrame" src="mappe/uru2000_footprint.html?v=129"
                 title="Mappa interattiva dei 600 punti di atterraggio simulati con le ellissi di dispersione"
                 loading="lazy"></iframe>
       </div>
@@ -1241,12 +1241,12 @@
   setState('off');
 })();
 </script>
-<script src="assets/i18n.js?v=128"></script>
-<script src="assets/sonda.js?v=128"></script>
-<script src="assets/catena.js?v=128"></script>
-<script src="assets/spot.js?v=128"></script>
-<script src="assets/app.js?v=128"></script>
-<script src="assets/msis.js?v=128"></script>
-<script src="assets/traiettoria.js?v=128"></script>
+<script src="assets/i18n.js?v=129"></script>
+<script src="assets/sonda.js?v=129"></script>
+<script src="assets/catena.js?v=129"></script>
+<script src="assets/spot.js?v=129"></script>
+<script src="assets/app.js?v=129"></script>
+<script src="assets/msis.js?v=129"></script>
+<script src="assets/traiettoria.js?v=129"></script>
 </body>
 </html>

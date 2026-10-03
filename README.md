@@ -23,6 +23,8 @@ assets/catena.js                    la catena di volo in 3D, nella pagina Missio
 assets/app.js                       lingua, navigazione, salita, fisica, conto alla rovescia
 assets/traiettoria.js               prevedere il volo: pallone, partenza, Tawhiri
 assets/msis.js                      NRLMSIS 2.1 tabulato, generato da calcolo/genera_msis.py
+assets/spot.js                      pagina Diretta: mappa GPS e quota stimata in volo
+assets/flight-start.json            il via alla quota stimata, il giorno del lancio (vedi sotto)
 assets/vendor/three.min.js          Three.js r128, copia locale (vedi sotto)
 assets/vendor/leaflet/              Leaflet 1.9.4, copia locale, per la previsione del giorno
 
@@ -55,6 +57,7 @@ Norme e autorizzazioni · Domande · Chi siamo.
 | Data del lancio (conto alla rovescia) | la costante `LAUNCH` in `assets/app.js` |
 | Fondo scala delle animazioni | la costante `SCALA_KM` in `assets/app.js` |
 | Quota di scoppio e velocità di salita/discesa attese (pagina Diretta) | `FLIGHT_BURST_KM`, `FLIGHT_ASCENT_MS`, `FLIGHT_DESCENT_MS` in `assets/app.js` |
+| Il via alla quota stimata, nell'istante vero del lancio | `"launched":true` in `assets/flight-start.json` — vedi «Da completare» |
 | Numeri delle quattro schede della pagina iniziale | direttamente in `index.html` |
 | Stato di una tappa del progetto | la classe `done`, `wip` o `todo` della riga in `index.html` |
 
@@ -413,6 +416,29 @@ approvare la propria richiesta di modifica.
   (37,9 km, 5 m/s, 5,5 m/s): il giorno del lancio vanno sostituiti con la
   previsione precisa di quel volo, altrimenti la quota stimata in volo
   (`assets/spot.js`) scoppia e scende al punto sbagliato.
+
+- **Il via alla quota stimata, nell'istante vero del lancio.** La pagina
+  Diretta non capisce da sola quando il pallone parte — altrimenti, se il
+  lancio slitta rispetto all'orario previsto (capita sempre), la quota
+  stimata comincerebbe a salire da sola mentre la sonda è ancora a terra.
+  Il via è `assets/flight-start.json`: appena il pallone lascia la mano,
+  chi segue il lancio da un computer cambia
+
+  ```json
+  {"launched": false}
+  ```
+
+  in
+
+  ```json
+  {"launched": true}
+  ```
+
+  e fa commit e push. Da quel momento tutti quelli che stanno guardando la
+  pagina vedono la quota stimata cominciare a salire, entro una trentina
+  di secondi (il tempo che impiega ognuno a ricontrollare il file). Senza
+  quel via, parte comunque da sola all'orario di `LAUNCH`, come riserva —
+  ma solo se il lancio è stato puntuale.
 
 ## Licenza
 

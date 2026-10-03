@@ -978,7 +978,7 @@ nav a.ig:hover svg{transform:translateY(-1px)}
 .dstatus.is-live i{background:var(--live);animation:navPulse 1.8s infinite}
 
 .dcount{display:flex;gap:12px;margin-top:22px;flex-wrap:wrap}
-.embeds2{display:grid;grid-template-columns:1.3fr auto 1fr;gap:18px;margin-top:12px;align-items:start}
+.embeds2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:12px}
 @media(max-width:720px){.embeds2{grid-template-columns:1fr}}
 .ecard2{border:1px solid var(--line-soft);border-radius:16px;overflow:hidden;background:var(--panel)}
 .ecard2 .ehead{padding:11px 15px;border-bottom:1px solid var(--line-soft);
@@ -986,17 +986,17 @@ nav a.ig:hover svg{transform:translateY(-1px)}
 .ecard2 .box{aspect-ratio:16/9;background:#02060f;display:flex;align-items:center;justify-content:center;position:relative}
 .ecard2 .box iframe{width:100%;height:100%;border:0;display:block}
 
-/* Quota, fra il video e la mappa: stesso riquadro piatto degli altri
-   due, non i tile del conto alla rovescia (quelli sono per un numero
-   che aspetta, questo per uno che arriva dal GPS — li tengo diversi
-   apposta). Blu come il resto dei dati di posizione nel sito. */
-.alt-mid{min-width:126px}
-.alt-row{padding:14px 15px;border-bottom:1px solid var(--line-soft)}
-.alt-row:last-child{border-bottom:0}
-.alt-n{font-family:var(--disp);font-weight:400;font-size:26px;line-height:1;color:var(--c-pos);
+/* Quota, sotto a video e mappa: due riquadri piatti affiancati, sempre
+   — anche su telefono, mai uno sopra l'altro. Non i tile del conto
+   alla rovescia apposta (quelli aspettano, questi arrivano dal GPS).
+   Blu come il resto dei dati di posizione nel sito. */
+.alt-pair{display:flex;gap:14px;margin-top:14px}
+.alt-tile{flex:1;min-width:0;border:1px solid var(--line-soft);border-radius:14px;
+  background:var(--panel);padding:15px 16px;text-align:center}
+.alt-n{font-family:var(--disp);font-weight:400;font-size:clamp(22px,5vw,28px);line-height:1;color:var(--c-pos);
   font-variant-numeric:tabular-nums;letter-spacing:.01em}
 .alt-n small{font-size:.42em;font-weight:400;margin-left:3px;opacity:.65}
-.alt-l{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);margin-top:6px}
+.alt-l{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-top:7px}
 /* Lampeggia una volta, in arancio, quando arriva un punto nuovo dal
    tracciatore — cosi' si vede che il dato si e' davvero aggiornato,
    non solo che il numero e' cambiato (a volte non cambia). */
