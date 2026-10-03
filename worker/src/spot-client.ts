@@ -34,20 +34,37 @@ function normalize(m: Record<string, unknown>): Point | null {
 
 /* Una chiamata al feed pubblico SPOT. extraParams permette la paginazione
    del backfill (start=51, 101, ... oppure startDate/endDate). "nessun
-   messaggio ancora" (E-0195) non e' un guasto: torna una pagina vuota. */
+   messaggio ancora" (E-0195) non e' un guasto: torna una pagina vuota.
+
+   Ogni altro esito negativo (HTTP non-ok, risposta senza "response",
+   errore SPOT strutturato) finisce per intero nei log del Worker
+   (console.error, visibili in Logs sulla dashboard e con `npm run
+   tail` — vedi [observability] in wrangler.toml), non solo come
+   messaggio corto nell'eccezione: qui' c'e' lo status HTTP e il corpo
+   completo della risposta, utile per capire un guasto reale di SPOT
+   senza doverlo riprodurre. Mai l'URL della richiesta nei log: contiene
+   FEED_ID e, se impostata, FEED_PASSWORD — sono secret apposta. */
 export async function fetchSpotPage(env: Env, extraParams: Record<string, string> = {}): Promise<RawFetchResult> {
   const q = new URLSearchParams(extraParams);
   if (env.FEED_PASSWORD) q.set("feedPassword", env.FEED_PASSWORD);
   const qs = q.toString();
   const url = `${SPOT_BASE}/${env.FEED_ID}/message.json${qs ? "?" + qs : ""}`;
   const res = await fetch(url, { cf: { cacheTtl: 0 } });
-  if (!res.ok) throw new Error(`SPOT HTTP ${res.status}`);
+  if (!res.ok) {
+    const body = await res.text().catch(() => "(corpo non leggibile)");
+    console.error(`[SPOT] HTTP ${res.status} ${res.statusText}\n${body}`);
+    throw new Error(`SPOT HTTP ${res.status}: ${body.slice(0, 300)}`);
+  }
   const data = (await res.json()) as any;
   const r = data?.response;
-  if (!r) throw new Error("risposta SPOT vuota");
+  if (!r) {
+    console.error(`[SPOT] risposta senza "response": ${JSON.stringify(data)}`);
+    throw new Error("risposta SPOT vuota");
+  }
   if (r.errors) {
     const e = r.errors.error || {};
     if (e.code === "E-0195") return { points: [], raws: new Map() }; // nessun messaggio, non e' un errore
+    console.error(`[SPOT] errore ${e.code ?? "?"}: ${JSON.stringify(r.errors)}`);
     throw new Error(e.description || e.text || "errore SPOT sconosciuto");
   }
   const fr = r.feedMessageResponse;
