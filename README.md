@@ -58,7 +58,7 @@ Norme e autorizzazioni · Domande · Chi siamo.
 | Colori e caratteri di tutto il sito | il blocco `:root` in `assets/cometa.css` |
 | Data del lancio (conto alla rovescia) | la costante `LAUNCH` in `assets/app.js` |
 | Fondo scala delle animazioni | la costante `SCALA_KM` in `assets/app.js` |
-| Quota di scoppio e velocità di salita/discesa attese (pagina Diretta) | `FLIGHT_BURST_KM`, `FLIGHT_ASCENT_MS`, `FLIGHT_DESCENT_V0_MS` in `assets/app.js` |
+| Quota di scoppio, velocità di salita/discesa e sito di lancio attesi (pagina Diretta) | `FLIGHT_BURST_KM`, `FLIGHT_ASCENT_MS`, `FLIGHT_DESCENT_V0_MS`, `FLIGHT_SITE` in `assets/app.js` |
 | Quando compare "Diretta" in nav e quando diventa rossa | `DIRETTA_WINDOW` e `DIRETTA_START` in `assets/app.js` |
 | Numeri delle quattro schede della pagina iniziale | direttamente in `index.html` |
 | Stato di una tappa del progetto | la classe `done`, `wip` o `todo` della riga in `index.html` |
@@ -438,6 +438,19 @@ approvare la propria richiesta di modifica.
   ancora valori prossimi al massimo — è normale, non un errore, ed è
   proprio quello che la correzione graduale serve a riallineare appena
   arrivano nuovi dati.
+
+  `FLIGHT_SITE` (sempre in `assets/app.js`) è il punto di partenza usato
+  per la linea grigia tratteggiata della traiettoria prevista, disegnata
+  sulla mappa della pagina Diretta accanto ai punti GPS veri (verdi):
+  oggi è l'aerodromo di Mercedes, lo stesso sito proposto di default
+  nella pagina Traiettoria. `assets/spot.js` interroga Tawhiri (lo stesso
+  previsore usato lì) in background, in silenzio, con questi parametri —
+  non quelli che un visitatore potrebbe aver cambiato giocando col modulo
+  della pagina Traiettoria — e ridisegna la linea ogni volta che la
+  previsione (la corsa del modello GFS) cambia. Se la data del lancio è
+  troppo lontana per l'orizzonte del previsore la richiesta fallisce e
+  non succede nulla: ci riprova da sola più avanti, senza bisogno di
+  intervenire.
 
 - **Quando compare la voce "Diretta"**, e quando passa dal ciano
   "diretta tra poco" al rosso "in diretta". Sono due date separate in

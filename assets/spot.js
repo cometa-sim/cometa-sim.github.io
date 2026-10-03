@@ -25,26 +25,32 @@
 window.COMETA_SPOT = (function(){
   const FEED_ID = "0khMEQthBCgxvZpuibCz2eabjNtFovxKI";
   const FEED_URL = "https://api.findmespot.com/spot-main-web/consumer/rest-api/2.0/public/feed/" + FEED_ID + "/message.json";
+  const TRAJ_URL = "https://api.v2.sondehub.org/tawhiri";   // lo stesso previsore di assets/traiettoria.js
+  const TRAJ_POLL_MS = 20 * 60000;  // il modello GFS si aggiorna ogni poche ore: ogni 20 min basta per non perdere un aggiornamento
   const LEAFLET = "assets/vendor/leaflet/";
   const TILES = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
   const POLL_MS = 30000;      // il feed si aggiorna ogni ~2,5 min: basta chiedere piu' spesso per non perdere tempo ad accorgersene
   const TICK_MS = 1000;
   const REALIGN_TAU_S = 150;  // costante di tempo del riallineamento: circa un intervallo SPOT
+  const GREEN = "#4ADE9B", ORANGE = "#FFB84D", GREY = "#8FA6BC";   // punto reale, lampeggio, traiettoria prevista
   /* Finche' la sonda non ha ancora mandato nessun punto, la mappa si apre
      centrata sull'Uruguay invece che sull'oceano a (0,0). */
   const FALLBACK = {lat:-33.0, lon:-56.5, zoom:7};
 
-  let map, trail, marker, mapReady, pollId, tickId,
+  let map, trail, ptsLayer, marker, trajLine, trajRun, mapReady, pollId, tickId, trajId,
       elMap, elStatus, elAltEst, elAltGps,
       lastPoints, lastErr, curLang = "it",
       correctionKm = 0, correctionTargetKm = 0, lastTickMs = null;
 
-  /* I tre numeri del volo stanno in assets/app.js — window.COMETA_FLIGHT
-     — cosi' c'e' un solo posto dove aggiornarli il giorno del lancio.
+  /* I numeri del volo stanno in assets/app.js — window.COMETA_FLIGHT —
+     cosi' c'e' un solo posto dove aggiornarli il giorno del lancio.
      descentV0Ms e' la velocita' del paracadute AL SUOLO: piu' in alto
-     scende molto piu' veloce (vedi densityISA sotto). */
+     scende molto piu' veloce (vedi densityISA sotto). site e' il punto di
+     partenza previsto per la traiettoria grigia: lo stesso di default
+     della pagina Traiettoria (aerodromo di Mercedes), non quello che un
+     visitatore potrebbe aver cambiato giocando col modulo di quella pagina. */
   function flightCfg(){
-    return window.COMETA_FLIGHT || {burstKm:37.9, ascentMs:5, descentV0Ms:4.6};
+    return window.COMETA_FLIGHT || {burstKm:37.9, ascentMs:5, descentV0Ms:4.6, site:{lat:-33.2486, lon:-58.0736}};
   }
 
   /* Atmosfera standard (ISA) — stessa formula di densitaISA() in
@@ -114,13 +120,15 @@ window.COMETA_SPOT = (function(){
       }).addTo(map);
       L.control.scale({imperial:false}).addTo(map);
       map.setView([FALLBACK.lat, FALLBACK.lon], FALLBACK.zoom);
-      trail = L.polyline([], {color:"#4ADE9B", weight:2, opacity:.75}).addTo(map);
+      trail = L.polyline([], {color:GREEN, weight:2, opacity:.75}).addTo(map);
+      ptsLayer = L.layerGroup().addTo(map);     // i punti precedenti, puntini piccoli
       /* Nascosto del tutto finche' non arriva un punto vero: opacity e
          fillOpacity vanno azzerati entrambi, o il pallino pieno resta
          visibile sul punto di fallback (e' il "punto a Mercedes" che si
-         vedeva anche senza nessun dato). */
+         vedeva anche senza nessun dato). className serve solo per
+         l'animazione del lampeggio (vedi flashMapMarker). */
       marker = L.circleMarker([FALLBACK.lat, FALLBACK.lon], {
-        radius:7, color:"#4ADE9B", weight:2, fillColor:"#4ADE9B", fillOpacity:0, opacity:0
+        radius:7, color:GREEN, weight:2, fillColor:GREEN, fillOpacity:0, opacity:0, className:"spot-marker"
       }).addTo(map);
       if("ResizeObserver" in window) new ResizeObserver(function(){ map.invalidateSize(); }).observe(elMap);
       map.on("click", function(){ map.scrollWheelZoom.enable(); });
@@ -190,17 +198,51 @@ window.COMETA_SPOT = (function(){
     el.classList.add("flash");
   }
 
+  /* Lo stesso lampeggio arancione della tessera, sul puntino della mappa:
+     scatto immediato all'arancione (senza transizione, o si vedrebbe
+     sfumare anche l'entrata), poi — con la classe "spot-marker-fade", che
+     ha la transizione CSS — una dissolvenza morbida di ritorno al verde. */
+  function flashMapMarker(){
+    if(!marker) return;
+    const path = marker.getElement && marker.getElement();
+    if(path) path.classList.remove("spot-marker-fade");
+    marker.setStyle({color:ORANGE, fillColor:ORANGE});
+    setTimeout(function(){
+      if(path) path.classList.add("spot-marker-fade");
+      marker.setStyle({color:GREEN, fillColor:GREEN});
+    }, 780);   // tiene l'arancione pieno circa il primo terzo, come altFlash in cometa.css
+  }
+
+  function popupHtml(p){
+    const d = dict();
+    const when = new Date(p.time);
+    const ok = !isNaN(when.getTime());
+    const timeTxt = ok ? when.toLocaleString(d.code || "it", {day:"2-digit", month:"2-digit", hour:"2-digit", minute:"2-digit"}) : "—";
+    const altTxt = p.alt != null ? (p.alt / 1000).toFixed(1) + " km" : "—";
+    return "<b>" + timeTxt + "</b><br>" + p.lat.toFixed(4) + ", " + p.lon.toFixed(4) + "<br>" + altTxt;
+  }
+
   function render(points){
     lastPoints = points; lastErr = null;
     if(points.length){
+      const L = window.L;
       const latlngs = points.map(function(p){ return [p.lat, p.lon]; });
       trail.setLatLngs(latlngs);
+      /* I punti precedenti restano sulla mappa, piu' piccoli dell'ultimo,
+         uniti dalla stessa spezzata verde: si ridisegnano tutti a ogni
+         risposta, sono al massimo poche decine. */
+      ptsLayer.clearLayers();
+      points.slice(0, -1).forEach(function(p){
+        L.circleMarker([p.lat, p.lon], {radius:4, color:GREEN, weight:1.5, fillColor:GREEN, fillOpacity:.85})
+          .bindPopup(popupHtml(p)).addTo(ptsLayer);
+      });
       const last = points[points.length - 1];
       marker.setLatLng([last.lat, last.lon]);
       marker.setStyle({opacity:1, fillOpacity:.9});
+      if(marker.getPopup()) marker.setPopupContent(popupHtml(last)); else marker.bindPopup(popupHtml(last));
       map.setView([last.lat, last.lon], Math.max(map.getZoom(), 10));
       setAltText(elAltGps, last.alt != null ? last.alt / 1000 : null);
-      if(lastRealTime != null && String(last.time) !== String(lastRealTime)) flashGps();
+      if(lastRealTime != null && String(last.time) !== String(lastRealTime)){ flashGps(); flashMapMarker(); }
       lastRealTime = last.time;
       updateRealignTarget(points);
     }
@@ -248,17 +290,61 @@ window.COMETA_SPOT = (function(){
       });
   }
 
+  /* La traiettoria grigia: lo stesso previsore (Tawhiri/SondeHub) e i
+     parametri di default della pagina Traiettoria (aerodromo di Mercedes,
+     quota di scoppio e velocita' del volo vero), girato silenziosamente
+     in background, senza toccare la vista della mappa (quella segue solo
+     i punti GPS veri). Se la data di lancio e' fuori dall'orizzonte del
+     previsore (troppo lontana, o il modello non e' ancora pronto) la
+     richiesta fallisce e non si fa nulla: si riprova al giro dopo. */
+  function pollTrajectory(){
+    const flight = flightCfg(), L0 = window.COMETA_LAUNCH;
+    if(!flight.site || !L0) return;
+    const q = new URLSearchParams({
+      profile: "standard_profile",
+      launch_latitude: flight.site.lat.toFixed(5),
+      launch_longitude: (((flight.site.lon % 360) + 360) % 360).toFixed(5),
+      launch_datetime: L0.toISOString().replace(/\.\d+Z$/, "Z"),
+      ascent_rate: flight.ascentMs.toFixed(2),
+      burst_altitude: Math.round(flight.burstKm * 1000),
+      descent_rate: flight.descentV0Ms.toFixed(2)
+    });
+    fetch(TRAJ_URL + "?" + q.toString())
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        if(!d || d.error || !d.prediction) return;      // silenzioso: fuori orizzonte, o previsore non pronto
+        const run = d.request && d.request.dataset;
+        if(run && run === trajRun) return;               // stessa corsa GFS di prima: niente da ridisegnare
+        const pts = [];
+        d.prediction.forEach(function(stage){
+          stage.trajectory.forEach(function(p){ pts.push([p.latitude, p.longitude >= 180 ? p.longitude - 360 : p.longitude]); });
+        });
+        if(pts.length < 2) return;
+        trajRun = run;
+        ensureMap().then(function(){
+          const L = window.L;
+          if(!trajLine) trajLine = L.polyline(pts, {color:GREY, weight:2, opacity:.85, dashArray:"5 8", interactive:false}).addTo(map);
+          else trajLine.setLatLngs(pts);
+          trajLine.bringToBack();
+        });
+      })
+      .catch(function(){ /* silenzioso: offline, CORS, o fuori dall'orizzonte del previsore */ });
+  }
+
   function start(){
     renderStatus(); // "in attesa del segnale" subito, non vuoto finche' arriva la prima risposta
     ensureMap().then(function(){
       poll();
+      pollTrajectory();
       if(!pollId) pollId = setInterval(poll, POLL_MS);
       if(!tickId) tickId = setInterval(tick, TICK_MS);
+      if(!trajId) trajId = setInterval(pollTrajectory, TRAJ_POLL_MS);
     }).catch(function(){ lastErr = "leaflet"; renderStatus(); });
   }
   function stop(){
     if(pollId){ clearInterval(pollId); pollId = null; }
     if(tickId){ clearInterval(tickId); tickId = null; }
+    if(trajId){ clearInterval(trajId); trajId = null; }
     lastTickMs = null;
   }
 

@@ -659,6 +659,15 @@ td.mercedes{color:var(--mercedes)}
 .tw-map .leaflet-tooltip{background:#0b1726;color:var(--ink);border-color:rgba(255,255,255,.14);
   box-shadow:0 8px 24px rgba(0,0,0,.45);font-family:var(--mono);font-size:11.5px}
 .tw-map .leaflet-tooltip-top:before{border-top-color:#0b1726}
+.tw-map .leaflet-popup-content-wrapper{background:#0b1726;color:var(--ink);box-shadow:0 8px 24px rgba(0,0,0,.45)}
+.tw-map .leaflet-popup-content{font-family:var(--mono);font-size:11.5px;line-height:1.6;margin:9px 13px}
+.tw-map .leaflet-popup-tip{background:#0b1726}
+.tw-map .leaflet-popup-close-button{color:var(--muted)!important}
+/* Il lampeggio arancione del puntino GPS sulla mappa: scatto immediato
+   (niente transizione), poi flashMapMarker() aggiunge questa classe per
+   la dissolvenza morbida di ritorno al verde — vedi assets/spot.js. */
+.spot-marker-fade{transition:fill 1.82s ease, stroke 1.82s ease}
+@media(prefers-reduced-motion:reduce){.spot-marker-fade{transition:none}}
 .tw-star{background:none;border:0;cursor:grab}
 .tw-star span{display:block;font-size:26px;line-height:26px;text-align:center;
   text-shadow:0 0 3px #02060f,0 0 12px currentColor}
@@ -992,13 +1001,16 @@ nav a.ig:hover svg{transform:translateY(-1px)}
 /* Quota, sotto a video e mappa: due riquadri piatti affiancati, sempre
    — anche su telefono, mai uno sopra l'altro. Non i tile del conto
    alla rovescia apposta (quelli aspettano, questi arrivano dal GPS).
-   Blu come il resto dei dati di posizione nel sito. */
+   Blu come il resto dei dati di posizione nel sito — tranne la stimata,
+   che e' un calcolo e non un dato misurato: resta in grigio, come la
+   traiettoria prevista sulla mappa (stesso --muted). */
 .alt-pair{display:flex;gap:14px;margin-top:14px}
 .alt-tile{flex:1;min-width:0;border:1px solid var(--line-soft);border-radius:14px;
   background:var(--panel);padding:15px 16px;text-align:center}
 .alt-n{font-family:var(--disp);font-weight:400;font-size:clamp(22px,5vw,28px);line-height:1;color:var(--c-pos);
   font-variant-numeric:tabular-nums;letter-spacing:.01em}
 .alt-n small{font-size:.42em;font-weight:400;margin-left:3px;opacity:.65}
+#altEstRow .alt-n{color:var(--muted)}
 .alt-l{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-top:7px}
 /* Lampeggia una volta, in arancio, quando arriva un punto nuovo dal
    tracciatore — cosi' si vede che il dato si e' davvero aggiornato,

@@ -576,13 +576,20 @@ window.COMETA_LAUNCH = LAUNCH;
    (vAtterraggio). assets/spot.js la usa solo come velocita' AL SUOLO:
    piu' in alto, dove l'aria e' rada, la stessa sonda scende molto piu'
    veloce, e rallenta scendendo — lo stesso motivo per cui qui e' "al
-   suolo" e non "di discesa" e basta. Il giorno del lancio vanno
-   sostituiti con i valori precisi di quella previsione specifica — li
-   aggiorna chi segue il lancio, qui e in nessun altro posto. */
+   suolo" e non "di discesa" e basta. FLIGHT_SITE e' il punto di partenza
+   usato per la traiettoria grigia disegnata in diretta — lo stesso
+   aerodromo di Mercedes che la pagina Traiettoria propone di default
+   (SUGGERITI[0] in assets/traiettoria.js): e' una costante a parte,
+   invece di leggerla dal modulo di quella pagina, apposta — cosi' non
+   dipende da cosa un visitatore potrebbe aver cambiato lì per curiosita'.
+   Il giorno del lancio vanno sostituiti tutti questi valori con quelli
+   precisi di quella previsione specifica — li aggiorna chi segue il
+   lancio, qui e in nessun altro posto. */
 const FLIGHT_BURST_KM = 37.9;
 const FLIGHT_ASCENT_MS = 5;
 const FLIGHT_DESCENT_V0_MS = 4.6;
-window.COMETA_FLIGHT = {burstKm: FLIGHT_BURST_KM, ascentMs: FLIGHT_ASCENT_MS, descentV0Ms: FLIGHT_DESCENT_V0_MS};
+const FLIGHT_SITE = {lat: -33.2486, lon: -58.0736};
+window.COMETA_FLIGHT = {burstKm: FLIGHT_BURST_KM, ascentMs: FLIGHT_ASCENT_MS, descentV0Ms: FLIGHT_DESCENT_V0_MS, site: FLIGHT_SITE};
 
 /* Quando compare la voce "Diretta" in nav (qualche giorno prima del
    lancio, col pallino ciano e "diretta tra poco") e quando passa allo
