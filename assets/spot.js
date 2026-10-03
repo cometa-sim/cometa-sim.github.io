@@ -40,7 +40,7 @@ window.COMETA_SPOT = (function(){
      centrata sull'Uruguay invece che sull'oceano a (0,0). */
   const FALLBACK = {lat:-33.0, lon:-56.5, zoom:7};
 
-  let map, trail, ptsLayer, marker, trajLine, trajRun, mapReady, pollId, tickId, trajId,
+  let map, trail, ptsLayer, marker, markerHit, trajLine, trajRun, mapReady, pollId, tickId, trajId,
       elMap, elStatus, elAltEst, elAltGps, elRecenter,
       lastPoints, lastErr, curLang = "it",
       correctionKm = 0, correctionTargetKm = 0, lastTickMs = null, lastEstKm = null;
@@ -129,10 +129,14 @@ window.COMETA_SPOT = (function(){
          fillOpacity vanno azzerati entrambi, o il pallino pieno resta
          visibile sul punto di fallback (e' il "punto a Mercedes" che si
          vedeva anche senza nessun dato). className serve solo per
-         l'animazione del lampeggio (vedi flashMapMarker). */
+         l'animazione del lampeggio (vedi flashMapMarker). interactive:false
+         perche' al tocco risponde markerHit, sotto: un cerchio piu' grande
+         (invisibile) fa lo stesso per il dito su telefono, dove il pallino
+         vero e proprio e' troppo piccolo da toccare con precisione. */
       marker = L.circleMarker([FALLBACK.lat, FALLBACK.lon], {
-        radius:7, color:GREEN, weight:2, fillColor:GREEN, fillOpacity:0, opacity:0, className:"spot-marker"
+        radius:7, color:GREEN, weight:2, fillColor:GREEN, fillOpacity:0, opacity:0, className:"spot-marker", interactive:false
       }).addTo(map);
+      markerHit = L.circleMarker([FALLBACK.lat, FALLBACK.lon], {radius:16, weight:0, fillOpacity:0, opacity:0}).addTo(map);
       if("ResizeObserver" in window) new ResizeObserver(function(){ map.invalidateSize(); }).observe(elMap);
       map.on("click", function(){ map.scrollWheelZoom.enable(); });
       map.on("mouseout", function(){ map.scrollWheelZoom.disable(); });
@@ -285,16 +289,23 @@ window.COMETA_SPOT = (function(){
       trail.setLatLngs(latlngs);
       /* I punti precedenti restano sulla mappa, piu' piccoli dell'ultimo,
          uniti dalla stessa spezzata verde: si ridisegnano tutti a ogni
-         risposta, sono al massimo poche decine. */
+         risposta, sono al massimo poche decine. Ogni punto e' in realta'
+         due cerchi sovrapposti: quello visibile (piccolo) e uno invisibile
+         piu' grande (interattivo lui, non l'altro) solo per rendere il
+         tocco piu' facile su telefono — il pallino vero da solo e' troppo
+         piccolo da centrare con un dito. */
       ptsLayer.clearLayers();
       points.slice(0, -1).forEach(function(p){
-        L.circleMarker([p.lat, p.lon], {radius:4, color:GREEN, weight:1.5, fillColor:GREEN, fillOpacity:.85})
+        L.circleMarker([p.lat, p.lon], {radius:14, weight:0, fillOpacity:0, opacity:0})
           .bindPopup(popupHtml(p)).addTo(ptsLayer);
+        L.circleMarker([p.lat, p.lon], {radius:4, color:GREEN, weight:1.5, fillColor:GREEN, fillOpacity:.85, interactive:false})
+          .addTo(ptsLayer);
       });
       const last = points[points.length - 1];
       marker.setLatLng([last.lat, last.lon]);
       marker.setStyle({opacity:1, fillOpacity:.9});
-      if(marker.getPopup()) marker.setPopupContent(popupHtml(last)); else marker.bindPopup(popupHtml(last));
+      markerHit.setLatLng([last.lat, last.lon]);
+      if(markerHit.getPopup()) markerHit.setPopupContent(popupHtml(last)); else markerHit.bindPopup(popupHtml(last));
       map.setView([last.lat, last.lon], Math.max(map.getZoom(), 10));
       setAltText(elAltGps, last.alt != null ? last.alt / 1000 : null);
       if(lastRealTime != null && String(last.time) !== String(lastRealTime)){ flashGps(); flashMapMarker(); }
