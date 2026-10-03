@@ -1004,9 +1004,4 @@ nav a.ig:hover svg{transform:translateY(-1px)}
 @keyframes altFlash{0%{color:var(--beacon)}100%{color:var(--c-pos)}}
 @media(prefers-reduced-motion:reduce){#altGpsRow.flash .alt-n{animation:none}}
 
-.preview-toggle{position:fixed;right:16px;bottom:16px;z-index:100;display:flex;gap:2px;padding:3px;border-radius:999px;
-  background:rgba(4,12,25,.9);border:1px solid var(--line-soft);backdrop-filter:blur(10px)}
-.preview-toggle button{appearance:none;border:0;background:transparent;color:var(--muted);font-family:var(--mono);
-  font-size:11px;padding:8px 13px;border-radius:999px;cursor:pointer}
-.preview-toggle button.on{background:var(--ink);color:#0a1420}
 .q-tight p + p{margin-top:0}

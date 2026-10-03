@@ -23,7 +23,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@200;300;400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/cometa.css?v=129">
+<link rel="stylesheet" href="assets/cometa.css?v=130">
 </head>
 <body>
 
@@ -850,7 +850,7 @@
       </div>
 
       <div class="map-frame reveal d1">
-        <iframe id="mapFrame" src="mappe/uru2000_footprint.html?v=129"
+        <iframe id="mapFrame" src="mappe/uru2000_footprint.html?v=130"
                 title="Mappa interattiva dei 600 punti di atterraggio simulati con le ellissi di dispersione"
                 loading="lazy"></iframe>
       </div>
@@ -1209,44 +1209,12 @@
 
 </div>
 
-<div class="preview-toggle" id="previewToggle">
-  <button data-set="off" class="on" type="button">Fuori finestra</button>
-  <button data-set="pre" type="button">Diretta tra poco</button>
-  <button data-set="live" type="button">In diretta</button>
-</div>
-<script>
-(function(){
-  var navD = document.getElementById('navDiretta');
-  var navDM = document.getElementById('navDirettaM');
-  var banner = document.getElementById('direttaBanner');
-  var dStatus = document.getElementById('dStatus');
-  function setTxt(root, live){
-    root.querySelectorAll('.txt-pre').forEach(function(e){ e.style.display = live ? 'none' : ''; });
-    root.querySelectorAll('.txt-live').forEach(function(e){ e.style.display = live ? '' : 'none'; });
-  }
-  function setState(s){
-    var live = s === 'live';
-    [navD, navDM].forEach(function(el){
-      if(!el) return;
-      el.style.display = (s === 'off') ? 'none' : 'flex';
-      el.classList.toggle('is-live', live);
-    });
-    banner.classList.toggle('show', live);
-    if(dStatus){ dStatus.classList.toggle('is-live', live); setTxt(dStatus, live); }
-    document.querySelectorAll('#previewToggle button').forEach(function(b){ b.classList.toggle('on', b.dataset.set === s); });
-  }
-  document.getElementById('previewToggle').addEventListener('click', function(e){
-    var b = e.target.closest('button'); if(!b) return; setState(b.dataset.set);
-  });
-  setState('off');
-})();
-</script>
-<script src="assets/i18n.js?v=129"></script>
-<script src="assets/sonda.js?v=129"></script>
-<script src="assets/catena.js?v=129"></script>
-<script src="assets/spot.js?v=129"></script>
-<script src="assets/app.js?v=129"></script>
-<script src="assets/msis.js?v=129"></script>
-<script src="assets/traiettoria.js?v=129"></script>
+<script src="assets/i18n.js?v=130"></script>
+<script src="assets/sonda.js?v=130"></script>
+<script src="assets/catena.js?v=130"></script>
+<script src="assets/spot.js?v=130"></script>
+<script src="assets/app.js?v=130"></script>
+<script src="assets/msis.js?v=130"></script>
+<script src="assets/traiettoria.js?v=130"></script>
 </body>
 </html>

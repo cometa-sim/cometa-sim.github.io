@@ -578,6 +578,33 @@ const FLIGHT_BURST_KM = 37.9;
 const FLIGHT_ASCENT_MS = 5;
 const FLIGHT_DESCENT_MS = 5.5;
 window.COMETA_FLIGHT = {burstKm: FLIGHT_BURST_KM, ascentMs: FLIGHT_ASCENT_MS, descentMs: FLIGHT_DESCENT_MS};
+
+/* Quando compare la voce "Diretta" in nav (qualche giorno prima del
+   lancio, col pallino ciano e "diretta tra poco") e quando passa allo
+   stato rosso "in diretta" (quando comincia davvero la trasmissione,
+   non il lancio del pallone: la diretta parte prima). Date
+   provvisorie, da confermare insieme al resto. */
+const DIRETTA_WINDOW = new Date("2026-10-11T00:00:00-03:00");
+const DIRETTA_START  = new Date("2026-10-14T10:00:00-03:00");
+
+function updateDiretta(){
+  const now = Date.now();
+  const state = now < DIRETTA_WINDOW.getTime() ? "off" : now < DIRETTA_START.getTime() ? "pre" : "live";
+  const live = state === "live";
+  const navD = $("#navDiretta"), navDM = $("#navDirettaM"),
+        banner = $("#direttaBanner"), dStatus = $("#dStatus");
+  [navD, navDM].forEach(function(el){
+    if(!el) return;
+    el.style.display = state === "off" ? "none" : "flex";
+    el.classList.toggle("is-live", live);
+  });
+  if(banner) banner.classList.toggle("show", live);
+  if(dStatus){
+    dStatus.classList.toggle("is-live", live);
+    dStatus.querySelectorAll(".txt-pre").forEach(function(e){ e.style.display = live ? "none" : ""; });
+    dStatus.querySelectorAll(".txt-live").forEach(function(e){ e.style.display = live ? "" : "none"; });
+  }
+}
 function updateCountdown(){
   const diff = LAUNCH - Date.now();
   const cb = $("#cbadge");
@@ -829,7 +856,8 @@ darkenMap();
 progBalloon();
 bnumSale();
 updateCountdown();
-setInterval(updateCountdown, 1000);
+updateDiretta();
+setInterval(function(){ updateCountdown(); updateDiretta(); }, 1000);
 requestAnimationFrame(function(){ moveThumb(); onScroll(); updateFlight(); });
 if(!reduced) (function raf(){ updateFlight(); updatePhys(); requestAnimationFrame(raf); })();
 addEventListener("load", function(){ moveThumb(); sfResize(); updateFlight(); });

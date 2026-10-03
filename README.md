@@ -58,6 +58,7 @@ Norme e autorizzazioni · Domande · Chi siamo.
 | Fondo scala delle animazioni | la costante `SCALA_KM` in `assets/app.js` |
 | Quota di scoppio e velocità di salita/discesa attese (pagina Diretta) | `FLIGHT_BURST_KM`, `FLIGHT_ASCENT_MS`, `FLIGHT_DESCENT_MS` in `assets/app.js` |
 | Il via alla quota stimata, nell'istante vero del lancio | `"launched":true` in `assets/flight-start.json` — vedi «Da completare» |
+| Quando compare "Diretta" in nav e quando diventa rossa | `DIRETTA_WINDOW` e `DIRETTA_START` in `assets/app.js` |
 | Numeri delle quattro schede della pagina iniziale | direttamente in `index.html` |
 | Stato di una tappa del progetto | la classe `done`, `wip` o `todo` della riga in `index.html` |
 
@@ -439,6 +440,16 @@ approvare la propria richiesta di modifica.
   di secondi (il tempo che impiega ognuno a ricontrollare il file). Senza
   quel via, parte comunque da sola all'orario di `LAUNCH`, come riserva —
   ma solo se il lancio è stato puntuale.
+
+- **Quando compare la voce "Diretta"**, e quando passa dal ciano
+  "diretta tra poco" al rosso "in diretta". Sono due date separate in
+  `assets/app.js`: `DIRETTA_WINDOW` (oggi 11 ottobre, qualche giorno prima
+  del lancio — da quel momento la voce appare in nav, in grigio/ciano) e
+  `DIRETTA_START` (oggi 10:00, un'ora prima del lancio — da li' in poi
+  diventa rossa e compare il banner sotto la nav). A differenza del via
+  alla quota, questo passaggio non ha bisogno di un file da pushare
+  nell'istante: la diretta la si accende quando si vuole, quindi basta
+  che le due date siano giuste in anticipo.
 
 ## Licenza
 
