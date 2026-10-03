@@ -80,44 +80,98 @@ sempre lo stesso risultato), per verificare la deduplica e la cadenza
 senza il tracker vero. `POST /simulate {"enabled": false}` torna al
 feed vero.
 
-## Deploy
+## Deploy (dalla dashboard, collegato al repo GitHub)
 
-1. **Installare le dipendenze**
-   ```sh
-   cd worker
-   npm install
-   ```
+Il Worker si distribuisce collegando questo repository a Cloudflare,
+non da terminale: a ogni push su main che tocca `worker/`, Cloudflare
+lo ricostruisce e lo pubblica da sola (Workers Builds). Il repo è un
+monorepo — contiene anche il sito — quindi il passaggio che conta è
+impostare la **root directory** su `worker/`, cosa che Cloudflare
+chiede esplicitamente in fase di collegamento.
 
-2. **Accedere a Cloudflare** (serve un account Cloudflare, anche gratuito)
-   ```sh
-   npx wrangler login
-   ```
+1. **Collegare il repository**
+   Dashboard Cloudflare → **Compute (Workers)** → **Workers & Pages**
+   → **Create** → scheda **Import a repository** (o **Connect to
+   Git**, a seconda della versione della dashboard).
+   - Autorizzare la GitHub App di Cloudflare, se non è già installata
+     sull'organizzazione `cometa-sim`, e darle accesso al repository
+     `cometa-sim.github.io` (basta anche solo a quel repository, non
+     serve concedere accesso a tutti i repository dell'account).
+   - Selezionare `cometa-sim/cometa-sim.github.io`.
+   - **Branch di produzione**: `main` — ma `worker/` deve già esistere
+     su quel branch, quindi questo passaggio va fatto *dopo* che la
+     pull request del backend è stata unita a `main` (prima, per
+     fare una prova, si può collegare temporaneamente al branch della
+     pull request e cambiarlo a `main` dopo il merge).
 
-3. **Impostare i secret** (mai nel repo — uno alla volta, wrangler chiede il valore)
-   ```sh
-   npx wrangler secret put FEED_ID
-   npx wrangler secret put FEED_PASSWORD   # solo se il feed lo richiede
-   npx wrangler secret put ADMIN_TOKEN     # un token lungo e casuale, es. `openssl rand -hex 32`
-   ```
+2. **Impostazioni di build** (schermata "Set up builds and deployments",
+   o "Build configuration")
+   - **Root directory**: `worker`
+   - **Build command**: lasciare vuoto — Wrangler compila il
+     TypeScript da solo, non serve un passaggio di build separato
+     (se la dashboard insiste per averne uno, `npm install` va bene).
+   - **Deploy command**: `npx wrangler deploy`
+   - Il nome del progetto proposto dovrebbe coincidere con `name` in
+     `wrangler.toml` (`cometa-spot-tracker`); se la dashboard ne
+     suggerisce uno diverso, meglio rinominarlo così prima di confermare.
+   - **Deployments di anteprima per le pull request**: si può
+     disattivare (non servono, questo progetto non ne ha bisogno); se
+     restano attivi, ogni anteprima è un Worker separato con i suoi
+     secret da impostare a parte — un dettaglio in più da gestire per
+     niente, meglio spegnerli se la dashboard lo permette.
+   - Confermare: la prima build parte subito, applica anche la
+     migrazione del Durable Object (`new_sqlite_classes`, già descritta
+     in `wrangler.toml`) e pubblica il Worker.
+   - Da questo momento, Cloudflare ricostruisce e ripubblica da sola a
+     ogni push su `main` — ma solo quando il push tocca file dentro
+     `worker/`: un commit che cambia solo il sito (`index.html`,
+     `assets/`, …) non fa ripartire una build qui.
 
-4. **Controllare `wrangler.toml`**: `ALLOWED_ORIGINS` deve elencare il
-   dominio del sito (e, se serve durante le prove, l'anteprima
-   raw.githack usata), separati da virgola.
+3. **Impostare i secret dalla dashboard** (mai nel repo)
+   Dopo il primo deploy, sulla pagina del Worker appena creato:
+   **Settings** → **Variables and Secrets** → **Add** (o **Edit
+   variables**, a seconda della versione).
+   Per ciascuno di questi tre, Nome + Valore, tipo **Secret** (cifrato,
+   non più leggibile dopo averlo salvato — non il tipo "Text", che
+   resta in chiaro):
+   - `FEED_ID` — l'id del feed pubblico SPOT
+   - `FEED_PASSWORD` — solo se il canale la richiede
+   - `ADMIN_TOKEN` — un token lungo e casuale, per esempio generato con
+     `openssl rand -hex 32`
 
-5. **Deploy**
-   ```sh
-   npm run deploy
-   ```
-   Il comando stampa l'URL del Worker (del tipo
-   `https://cometa-spot-tracker.<account>.workers.dev`): è quello da
-   mettere nella costante di configurazione del sito (vedi il sito
-   principale, non questa cartella).
+   `ALLOWED_ORIGINS` **non** va qui: è una variabile normale (non un
+   segreto), già definita in `wrangler.toml` sotto `[vars]` — cambia
+   il dominio lì, con un commit, non dalla dashboard. Salvare i
+   secret fa ripartire da sola una nuova build (necessaria, o il
+   Worker in esecuzione non li vede).
 
-6. **Verificare**
+4. **Verificare**
    ```sh
    curl https://<url-worker>/track.json
    # {"points":[],"last_fetch":null,"last_fetch_ok":null,"last_point_time":null,"polling_active":false}
    ```
+   L'URL del Worker (del tipo
+   `https://cometa-spot-tracker.<account>.workers.dev`, o un dominio
+   personalizzato se ne è stato collegato uno) è quello da mettere
+   nella costante `TRACK_URL` in `assets/app.js`, sul sito principale.
+
+### In alternativa: deploy da terminale
+
+Utile per una prova rapida prima di collegare la dashboard, o se si
+preferisce non usare Workers Builds:
+```sh
+cd worker
+npm install
+npx wrangler login
+npx wrangler secret put FEED_ID
+npx wrangler secret put FEED_PASSWORD   # solo se il feed lo richiede
+npx wrangler secret put ADMIN_TOKEN
+npm run deploy
+```
+Un deploy da terminale e uno da dashboard collegata pubblicano lo
+stesso Worker (stesso `name` in `wrangler.toml`): usarli insieme non
+rompe nulla, ma da quel momento ogni push su `main` sovrascrive quanto
+pubblicato a mano dal terminale.
 
 ### Sviluppo locale
 
