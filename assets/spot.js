@@ -12,10 +12,15 @@
    La quota ha due numeri distinti, apposta:
    - "GPS" e' l'ultimo punto vero ricevuto, fermo fra un
      aggiornamento e l'altro (SPOT manda un punto ogni ~2,5 minuti).
-   - "stimata" conta in continuo, un secondo alla volta, estrapolando
-     dall'ultimo punto vero con una velocita' ricalcolata sui punti
-     recenti — non sull'ultimo intervallo da solo, che da solo e'
-     troppo vicino al rumore della quota GPS per essere credibile.
+   - "stimata" e' una curva continua, calcolata dalla fisica del volo
+     (salita costante, poi discesa che rallenta scendendo, perche'
+     l'aria si fa piu' densa — stessa formula di assets/traiettoria.js),
+     corretta via via con uno scarto che insegue senza salti la
+     differenza con l'ultimo punto vero. Non sa quando scoppia
+     davvero: in giro per quel momento puo' benissimo mostrarsi gia'
+     in discesa mentre il GPS manda ancora un punto di salita — il
+     punto vero arriva con qualche minuto di ritardo per natura sua,
+     e quando arriva la riallinea con dolcezza, non di scatto.
    ========================================================== */
 window.COMETA_SPOT = (function(){
   const FEED_ID = "0khMEQthBCgxvZpuibCz2eabjNtFovxKI";
@@ -24,9 +29,7 @@ window.COMETA_SPOT = (function(){
   const TILES = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
   const POLL_MS = 30000;      // il feed si aggiorna ogni ~2,5 min: basta chiedere piu' spesso per non perdere tempo ad accorgersene
   const TICK_MS = 1000;
-  const WINDOW_MS = 12 * 60 * 1000;   // ampiezza della velocita': ~5 punti veri, il rumore si media via
-  const TREND_WINDOW_MS = 6 * 60 * 1000; // direzione (sale/scende): ~2-3 punti, reattiva apposta
-  const RATE_THRESH_KMS = 0.001;      // 1 m/s: sopra conta come salita/discesa vera, sotto e' rumore
+  const REALIGN_TAU_S = 150;  // costante di tempo del riallineamento: circa un intervallo SPOT
   /* Finche' la sonda non ha ancora mandato nessun punto, la mappa si apre
      centrata sull'Uruguay invece che sull'oceano a (0,0). */
   const FALLBACK = {lat:-33.0, lon:-56.5, zoom:7};
@@ -34,14 +37,52 @@ window.COMETA_SPOT = (function(){
   let map, trail, marker, mapReady, pollId, tickId,
       elMap, elStatus, elAltEst, elAltGps,
       lastPoints, lastErr, curLang = "it",
-      phase = "ground", rateKmS = 0, anchorAltKm = null, anchorTime = null,
-      pendingPhase = null, pendingCount = 0;
+      correctionKm = 0, correctionTargetKm = 0, lastTickMs = null;
 
-  /* I tre numeri del volo (quota di scoppio attesa, salita, discesa)
-     stanno in assets/app.js — window.COMETA_FLIGHT — cosi' c'e' un
-     solo posto dove aggiornarli il giorno del lancio. */
+  /* I tre numeri del volo stanno in assets/app.js — window.COMETA_FLIGHT
+     — cosi' c'e' un solo posto dove aggiornarli il giorno del lancio.
+     descentV0Ms e' la velocita' del paracadute AL SUOLO: piu' in alto
+     scende molto piu' veloce (vedi densityISA sotto). */
   function flightCfg(){
-    return window.COMETA_FLIGHT || {burstKm:37.9, ascentMs:5, descentMs:5.5};
+    return window.COMETA_FLIGHT || {burstKm:37.9, ascentMs:5, descentV0Ms:4.6};
+  }
+
+  /* Atmosfera standard (ISA) — stessa formula di densitaISA() in
+     assets/traiettoria.js, copiata qui (e' autosufficiente, niente
+     dati del giorno: per la FORMA della discesa basta il modello
+     standard, non il meteo di oggi). */
+  function densityISA(h){
+    let T, p;
+    if(h < 11000){ T = 288.15 - 0.0065 * h; p = 101325 * Math.pow(T / 288.15, 5.2559); }
+    else if(h < 20000){ T = 216.65; p = 22632 * Math.exp(-9.80665 * (h - 11000) / (287.05 * T)); }
+    else if(h < 32000){ T = 216.65 + 0.001 * (h - 20000); p = 5474.9 * Math.pow(T / 216.65, -34.1632); }
+    else { T = 228.65 + 0.0028 * (h - 32000); p = 868.02 * Math.pow(T / 228.65, -12.2011); }
+    return p / (287.05 * T);
+  }
+  const RHO0 = densityISA(0);
+
+  /* Quota (km) attesa in volo, solo dalla fisica, a s secondi dal
+     lancio — salita lineare fino allo scoppio, poi discesa integrata
+     passo-passo: la velocita' del paracadute scala con 1/sqrt(densita'),
+     quindi e' alta appena scoppiato (aria rada) e rallenta scendendo
+     (aria piu' densa). */
+  function altPhysicsKm(s, flight){
+    if(s <= 0) return 0;
+    const ascentSec = flight.burstKm * 1000 / flight.ascentMs;
+    if(s <= ascentSec) return s * flight.ascentMs / 1000;
+    let z = flight.burstKm * 1000, t = ascentSec;
+    const dt = 2;
+    while(t < s && z > 0){
+      const v = flight.descentV0Ms * Math.sqrt(RHO0 / densityISA(Math.max(z, 0)));
+      z -= v * dt;
+      t += dt;
+    }
+    return Math.max(z, 0) / 1000;
+  }
+
+  function secSinceLaunch(ms){
+    const L = window.COMETA_LAUNCH;
+    return L ? (ms - L.getTime()) / 1000 : -1e9;
   }
 
   function loadLeaflet(){
@@ -107,114 +148,26 @@ window.COMETA_SPOT = (function(){
     el.textContent = km == null ? "—" : km.toFixed(1);
   }
 
-  /* Velocita' sugli estremi di una finestra, non sull'ultimo intervallo
-     da solo: a 5 m/s la sonda sale ~750 m fra due punti SPOT (ogni 2,5
-     min), ma la quota GPS da sola rumoreggia di un centinaio di metri —
-     su un solo intervallo il rumore e' lo stesso ordine di grandezza
-     del segnale. */
-  function windowRateKmS(points, windowMs){
-    if(points.length < 2) return null;
-    const latest = points[points.length - 1];
-    const windowPts = points.filter(function(p){ return latest.time - p.time <= windowMs && p.alt != null; });
-    if(windowPts.length < 2) return null;
-    const first = windowPts[0];
-    const dtS = (new Date(latest.time) - new Date(first.time)) / 1000;
-    if(dtS <= 0) return null;
-    return (latest.alt - first.alt) / 1000 / dtS; // km/s
-  }
-
-  /* Decide la fase e la velocita' da usare per estrapolare, a partire
-     dall'ultimo punto vero. I dati reali vincono sempre quando ci sono:
-     la quota di scoppio prevista serve solo come ipotesi migliore nei
-     minuti fra un punto e l'altro, non quando i dati dicono altro.
-
-     Il passaggio da "a terra" a "in salita" parte quando scade il conto
-     alla rovescia (LAUNCH, in assets/app.js): il lancio e' quello, non
-     un segnale a parte — se slitta, si aggiorna LAUNCH e basta, come il
-     resto del sito gia' fa.
-
-     La direzione (sale/scende) e l'ampiezza della velocita' usano
-     finestre diverse apposta. Vicino allo scoppio la finestra larga
-     (12 min, buona per smussare il rumore quando la direzione non
-     cambia) resta per un po' dominata dai punti di salita anche dopo
-     lo scoppio vero, e continuerebbe a dire "sta salendo" — rimettendo
-     la fase avanti e indietro ogni volta che arriva un punto nuovo.
-     La direzione guarda invece solo gli ultimi due punti, reattiva
-     apposta: basta un punto vero dopo lo scoppio perche' la direzione
-     giri, anche se l'ampiezza su finestra larga non si e' ancora
-     aggiornata. L'ampiezza sulla finestra larga si usa solo quando il
-     suo segno e' gia' coerente con la direzione decisa — altrimenti,
-     finche' non lo e', si usa quella reattiva: piu' rumorosa, ma mai
-     nella direzione sbagliata. */
-  function updateRate(points){
+  /* Ogni punto vero sposta il bersaglio del riallineamento: quanto la
+     fisica pura sbaglia, in quel momento. tick() lo insegue con
+     un'esponenziale, non un salto — vedi REALIGN_TAU_S. */
+  function updateRealignTarget(points){
     if(!points.length) return;
     const last = points[points.length - 1];
     if(last.alt == null) return;
     const flight = flightCfg();
-    const trend = windowRateKmS(points, TREND_WINDOW_MS);
-    const smooth = windowRateKmS(points, WINDOW_MS);
-    const launched = window.COMETA_LAUNCH ? Date.now() >= window.COMETA_LAUNCH.getTime() : false;
-
-    if(phase === "ground"){
-      if(trend != null && trend > RATE_THRESH_KMS){ phase = "ascent"; rateKmS = trend; }
-      else if(launched){ phase = "ascent"; rateKmS = (trend != null ? trend : flight.ascentMs / 1000); }
-      else { rateKmS = 0; }
-    } else {
-      /* Proprio al culmine la velocita' vera e' vicina a zero (sta
-         girando), quindi anche un punto pulito puo' leggere un segno
-         ambiguo per rumore: la fase cambia solo se due punti di
-         seguito sono d'accordo sulla nuova direzione, non al primo. */
-      const dir = trend == null ? null : trend < -RATE_THRESH_KMS ? "descent" : trend > RATE_THRESH_KMS ? "ascent" : null;
-      if(dir && dir !== phase){
-        pendingCount = pendingPhase === dir ? pendingCount + 1 : 1;
-        pendingPhase = dir;
-        if(pendingCount >= 2){ phase = dir; pendingPhase = null; pendingCount = 0; }
-      } else {
-        pendingPhase = null; pendingCount = 0;
-      }
-      /* L'ampiezza non prende mai un segno che contraddice la fase appena
-         decisa — nemmeno di poco: e' quello che faceva risalire la stima
-         di qualche centinaio di metri subito dopo essere scesa, se il
-         punto successivo era ancora ambiguo. Se ne' la finestra larga
-         ne' quella reattiva sono chiaramente dalla parte giusta, si usa
-         il valore nominale, che almeno il segno giusto ce l'ha sempre. */
-      const smoothAgrees = smooth != null && (phase === "ascent" ? smooth > 0 : smooth < 0);
-      const trendAgrees = trend != null && (phase === "ascent" ? trend > 0 : trend < 0);
-      if(smoothAgrees) rateKmS = smooth;
-      else if(trendAgrees) rateKmS = trend;
-      else rateKmS = phase === "ascent" ? flight.ascentMs / 1000 : -flight.descentMs / 1000;
-    }
-    anchorAltKm = last.alt / 1000;
-    anchorTime = last.time;
-  }
-
-  /* Il conto alla rovescia scade anche fra due punti GPS: non conviene
-     aspettare il prossimo per accorgersene, o la stima parte in ritardo
-     fino a 2,5 minuti. Riparte dall'ultima quota nota, alla velocita'
-     nominale di salita finche' un punto vero non la corregge. */
-  function maybeBeginAscent(){
-    if(phase !== "ground" || anchorAltKm == null) return;
-    if(!window.COMETA_LAUNCH || Date.now() < window.COMETA_LAUNCH.getTime()) return;
-    const flight = flightCfg();
-    phase = "ascent";
-    rateKmS = flight.ascentMs / 1000;
-    anchorTime = Date.now();
+    const s = secSinceLaunch(new Date(last.time).getTime());
+    correctionTargetKm = last.alt / 1000 - altPhysicsKm(s, flight);
   }
 
   function tick(){
-    maybeBeginAscent();
-    if(anchorAltKm == null){ setAltText(elAltEst, null); return; }
     const flight = flightCfg();
-    const elapsedS = (Date.now() - new Date(anchorTime).getTime()) / 1000;
-    let estKm = anchorAltKm + rateKmS * elapsedS;
-    /* Fra due punti veri non sappiamo quando scoppia per davvero: in
-       salita la stima non supera la quota di scoppio prevista, resta
-       ferma li' ad aspettare — non indovina da sola che e' cominciata
-       la discesa (lo faceva prima: scoppiava e ripartiva in discesa a
-       un orario suo, salvo poi essere smentita dal punto vero
-       successivo, e il tira-e-molla era proprio quello che oscillava).
-       La fase cambia solo in updateRate(), dati reali alla mano. */
-    if(phase === "ascent") estKm = Math.min(estKm, flight.burstKm);
+    const now = Date.now();
+    const dtS = lastTickMs == null ? 1 : Math.max((now - lastTickMs) / 1000, 0);
+    lastTickMs = now;
+    const alpha = 1 - Math.exp(-dtS / REALIGN_TAU_S);
+    correctionKm += (correctionTargetKm - correctionKm) * alpha;
+    const estKm = altPhysicsKm(secSinceLaunch(now), flight) + correctionKm;
     /* Una quota "stimata" negativa non ha senso per chi guarda, anche se
        il dato grezzo del GPS (sotto, onesto) puo' esserlo per via del
        rumore a terra: qui mostriamo 0 invece di un numero sottoterra. */
@@ -243,7 +196,7 @@ window.COMETA_SPOT = (function(){
       setAltText(elAltGps, last.alt != null ? last.alt / 1000 : null);
       if(lastRealTime != null && String(last.time) !== String(lastRealTime)) flashGps();
       lastRealTime = last.time;
-      updateRate(points);
+      updateRealignTarget(points);
     }
     renderStatus();
   }
@@ -300,6 +253,7 @@ window.COMETA_SPOT = (function(){
   function stop(){
     if(pollId){ clearInterval(pollId); pollId = null; }
     if(tickId){ clearInterval(tickId); tickId = null; }
+    lastTickMs = null;
   }
 
   return {

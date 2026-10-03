@@ -24,7 +24,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@200;300;400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/cometa.css?v=132">
+<link rel="stylesheet" href="assets/cometa.css?v=133">
 </head>
 <body>
 <div class="sim-bar" style="position:sticky;top:0;z-index:90;background:#3a1600;border-bottom:1px solid rgba(255,184,77,.5);padding:11px 20px;font-family:var(--mono);font-size:12.5px;color:#FFB84D;display:flex;gap:16px;flex-wrap:wrap;align-items:center">
@@ -855,7 +855,7 @@
       </div>
 
       <div class="map-frame reveal d1">
-        <iframe id="mapFrame" src="mappe/uru2000_footprint.html?v=132"
+        <iframe id="mapFrame" src="mappe/uru2000_footprint.html?v=133"
                 title="Mappa interattiva dei 600 punti di atterraggio simulati con le ellissi di dispersione"
                 loading="lazy"></iframe>
       </div>
@@ -1229,8 +1229,18 @@
   var realStart = RealDate.now();
   var REAL_LAUNCH_MS = new RealDate("2026-10-14T11:00:00-03:00").getTime();
   /* ---- fisica del volo finto: rispecchia FLIGHT_* in assets/app.js ---- */
-  var FLIGHT = {burstKm: 37.9, ascentMs: 5, descentMs: 5.5};
+  var FLIGHT = {burstKm: 37.9, ascentMs: 5, descentV0Ms: 4.6};
   var LAT0 = -33.68, LON0 = -56.35;
+
+  function densityISA(h){
+    var T, p;
+    if(h < 11000){ T = 288.15 - 0.0065 * h; p = 101325 * Math.pow(T / 288.15, 5.2559); }
+    else if(h < 20000){ T = 216.65; p = 22632 * Math.exp(-9.80665 * (h - 11000) / (287.05 * T)); }
+    else if(h < 32000){ T = 216.65 + 0.001 * (h - 20000); p = 5474.9 * Math.pow(T / 216.65, -34.1632); }
+    else { T = 228.65 + 0.0028 * (h - 32000); p = 868.02 * Math.pow(T / 228.65, -12.2011); }
+    return p / (287.05 * T);
+  }
+  var RHO0_SIM = densityISA(0);
   var ASC_SEC = FLIGHT.burstKm * 1000 / FLIGHT.ascentMs; // secondi (finti) dal lancio allo scoppio
 
   /* Punto di partenza della simulazione: pochi minuti (finti) prima
@@ -1262,13 +1272,22 @@
     if(el) el.textContent = new Date().toLocaleString("it-IT");
   }, 250);
 
+  /* Stessa curva di altPhysicsKm() in assets/spot.js, qui in metri e
+     con lo stesso passo: la "verita'" finta deve avere la forma che il
+     vero estimatore si aspetta di dover riallineare, non una salita e
+     discesa lineari — altrimenti la prova non direbbe niente di utile
+     sul riallineamento vero. */
   function altAtSec(s){
     if(s <= 0) return 0;
     var ascSec = FLIGHT.burstKm * 1000 / FLIGHT.ascentMs;
     if(s <= ascSec) return s * FLIGHT.ascentMs;
-    var burstM = FLIGHT.burstKm * 1000, descSec = burstM / FLIGHT.descentMs, sd = s - ascSec;
-    if(sd <= descSec) return Math.max(burstM - sd * FLIGHT.descentMs, 0);
-    return 0; // atterrata
+    var z = FLIGHT.burstKm * 1000, t = ascSec, dt = 2;
+    while(t < s && z > 0){
+      var v = FLIGHT.descentV0Ms * Math.sqrt(RHO0_SIM / densityISA(Math.max(z, 0)));
+      z -= v * dt;
+      t += dt;
+    }
+    return Math.max(z, 0);
   }
 
   function fakeMessages(){
@@ -1306,12 +1325,12 @@
   };
 })();
 </script>
-<script src="assets/i18n.js?v=132"></script>
-<script src="assets/sonda.js?v=132"></script>
-<script src="assets/catena.js?v=132"></script>
-<script src="assets/spot.js?v=132"></script>
-<script src="assets/app.js?v=132"></script>
-<script src="assets/msis.js?v=132"></script>
-<script src="assets/traiettoria.js?v=132"></script>
+<script src="assets/i18n.js?v=133"></script>
+<script src="assets/sonda.js?v=133"></script>
+<script src="assets/catena.js?v=133"></script>
+<script src="assets/spot.js?v=133"></script>
+<script src="assets/app.js?v=133"></script>
+<script src="assets/msis.js?v=133"></script>
+<script src="assets/traiettoria.js?v=133"></script>
 </body>
 </html>

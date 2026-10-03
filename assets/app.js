@@ -569,15 +569,20 @@ window.COMETA_LAUNCH = LAUNCH;
 /* ==========================================================
    Pagina Diretta — quota stimata in volo (bozza, da affinare)
    ========================================================== */
-/* Numeri provvisori, gli stessi gia' scritti su Missione (quota 37+,
-   salita 5 m/s). Il giorno del lancio vanno sostituiti con i valori
-   precisi di quella previsione specifica: quota di scoppio attesa,
-   velocita' di salita e di discesa stimate per quel volo — li aggiorna
-   chi segue il lancio, qui e in nessun altro posto. */
+/* Numeri provvisori. Quota di scoppio e salita sono gli stessi gia'
+   scritti su Missione (37,9 km, 5 m/s); la discesa non e' un numero
+   fisso — e' la velocita' del paracadute del kit (1,2 m, Cd 1,0) con
+   la massa di oggi (≈1,5 kg), calcolata come in assets/traiettoria.js
+   (vAtterraggio). assets/spot.js la usa solo come velocita' AL SUOLO:
+   piu' in alto, dove l'aria e' rada, la stessa sonda scende molto piu'
+   veloce, e rallenta scendendo — lo stesso motivo per cui qui e' "al
+   suolo" e non "di discesa" e basta. Il giorno del lancio vanno
+   sostituiti con i valori precisi di quella previsione specifica — li
+   aggiorna chi segue il lancio, qui e in nessun altro posto. */
 const FLIGHT_BURST_KM = 37.9;
 const FLIGHT_ASCENT_MS = 5;
-const FLIGHT_DESCENT_MS = 5.5;
-window.COMETA_FLIGHT = {burstKm: FLIGHT_BURST_KM, ascentMs: FLIGHT_ASCENT_MS, descentMs: FLIGHT_DESCENT_MS};
+const FLIGHT_DESCENT_V0_MS = 4.6;
+window.COMETA_FLIGHT = {burstKm: FLIGHT_BURST_KM, ascentMs: FLIGHT_ASCENT_MS, descentV0Ms: FLIGHT_DESCENT_V0_MS};
 
 /* Quando compare la voce "Diretta" in nav (qualche giorno prima del
    lancio, col pallino ciano e "diretta tra poco") e quando passa allo
@@ -612,6 +617,8 @@ function updateCountdown(){
      nella pagina Diretta: stesso LAUNCH, id separati per non scontrarsi. */
   ["", "2"].forEach(function(suffix){
     const d = $("#cd" + suffix), h = $("#ch" + suffix), m = $("#cm" + suffix), s = $("#cs" + suffix);
+    const count = d && d.closest(".count");
+    if(count) count.classList.toggle("zero", diff <= 0);
     if(diff <= 0){
       if(d) d.textContent = "0";
       [h,m,s].forEach(function(e){ if(e) e.textContent = "00"; });

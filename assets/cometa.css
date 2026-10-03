@@ -383,6 +383,9 @@ h3.sub-head{font-family:var(--disp);font-weight:600;font-size:clamp(19px,2.4vw,2
   border:1px solid var(--intro-plate-line,rgba(255,255,255,.6));text-align:center;backdrop-filter:blur(6px);transition:background .8s linear,border-color .8s linear}
 .ctile .cn{font-family:var(--disp);font-weight:400;font-size:clamp(28px,5vw,44px);line-height:1;color:var(--intro-ink,#0e2a40);font-variant-numeric:tabular-nums;letter-spacing:.02em;transition:color .8s linear}
 .ctile .cn small{font-size:.36em;font-weight:400;margin-left:3px;opacity:.68}
+/* A zero, il conto alla rovescia diventa rosso — in home e nella
+   pagina Diretta, stesso rosso del resto della diretta (--live). */
+.count.zero .ctile .cn{color:var(--live, #FF4D4F);transition:color .4s ease}
 .ctile .cl{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--intro-dim,rgba(15,45,65,.65));margin-top:7px;transition:color .8s linear}
 .count-head{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--intro-dim,rgba(15,45,65,.75));margin-top:26px;transition:color .8s linear}
 .count-date{font-family:var(--mono);font-size:12px;color:var(--intro-dim,rgba(15,45,65,.8));margin-top:14px;

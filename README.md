@@ -58,7 +58,7 @@ Norme e autorizzazioni · Domande · Chi siamo.
 | Colori e caratteri di tutto il sito | il blocco `:root` in `assets/cometa.css` |
 | Data del lancio (conto alla rovescia) | la costante `LAUNCH` in `assets/app.js` |
 | Fondo scala delle animazioni | la costante `SCALA_KM` in `assets/app.js` |
-| Quota di scoppio e velocità di salita/discesa attese (pagina Diretta) | `FLIGHT_BURST_KM`, `FLIGHT_ASCENT_MS`, `FLIGHT_DESCENT_MS` in `assets/app.js` |
+| Quota di scoppio e velocità di salita/discesa attese (pagina Diretta) | `FLIGHT_BURST_KM`, `FLIGHT_ASCENT_MS`, `FLIGHT_DESCENT_V0_MS` in `assets/app.js` |
 | Quando compare "Diretta" in nav e quando diventa rossa | `DIRETTA_WINDOW` e `DIRETTA_START` in `assets/app.js` |
 | Numeri delle quattro schede della pagina iniziale | direttamente in `index.html` |
 | Stato di una tappa del progetto | la classe `done`, `wip` o `todo` della riga in `index.html` |
@@ -417,11 +417,23 @@ approvare la propria richiesta di modifica.
   (conto alla rovescia, quota stimata in `assets/spot.js`) segue da solo.
 
 - **La quota di scoppio e le velocità di salita/discesa**, nella pagina
-  Diretta. `FLIGHT_BURST_KM`, `FLIGHT_ASCENT_MS` e `FLIGHT_DESCENT_MS` in
-  `assets/app.js` oggi hanno i numeri generici già scritti su Missione
-  (37,9 km, 5 m/s, 5,5 m/s): il giorno del lancio vanno sostituiti con la
-  previsione precisa di quel volo, altrimenti la quota stimata in volo
-  (`assets/spot.js`) scoppia e scende al punto sbagliato.
+  Diretta. `FLIGHT_BURST_KM`, `FLIGHT_ASCENT_MS` e `FLIGHT_DESCENT_V0_MS`
+  in `assets/app.js` oggi hanno i numeri generici già scritti su Missione
+  (37,9 km, 5 m/s di salita, 4,6 m/s di velocità terminale al suolo):
+  il giorno del lancio vanno sostituiti con la previsione precisa di quel
+  volo, altrimenti la quota stimata in volo (`assets/spot.js`) scoppia e
+  scende al punto sbagliato. La discesa non è più una retta: la quota
+  stimata sale linearmente fino a `FLIGHT_BURST_KM`, poi scende seguendo
+  la stessa fisica del paracadute usata in `assets/traiettoria.js`
+  (velocità terminale che scala con la densità dell'aria secondo il
+  modello ISA standard) partendo da `FLIGHT_DESCENT_V0_MS` al suolo: molto
+  veloce appena dopo lo scoppio, dove l'aria è rarefatta, via via più
+  lenta scendendo. I punti GPS reali correggono questa curva in modo
+  graduale (non a scatti): può succedere che per qualche minuto attorno
+  allo scoppio la quota stimata scenda già mentre l'ultimo fix GPS mostra
+  ancora valori prossimi al massimo — è normale, non un errore, ed è
+  proprio quello che la correzione graduale serve a riallineare appena
+  arrivano nuovi dati.
 
 - **Quando compare la voce "Diretta"**, e quando passa dal ciano
   "diretta tra poco" al rosso "in diretta". Sono due date separate in
