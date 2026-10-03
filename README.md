@@ -423,12 +423,16 @@ approvare la propria richiesta di modifica.
   il giorno del lancio vanno sostituiti con la previsione precisa di quel
   volo, altrimenti la quota stimata in volo (`assets/spot.js`) scoppia e
   scende al punto sbagliato. La discesa non è più una retta: la quota
-  stimata sale linearmente fino a `FLIGHT_BURST_KM`, poi scende seguendo
-  la stessa fisica del paracadute usata in `assets/traiettoria.js`
-  (velocità terminale che scala con la densità dell'aria secondo il
-  modello ISA standard) partendo da `FLIGHT_DESCENT_V0_MS` al suolo: molto
-  veloce appena dopo lo scoppio, dove l'aria è rarefatta, via via più
-  lenta scendendo. I punti GPS reali correggono questa curva in modo
+  stimata sale linearmente fino a `FLIGHT_BURST_KM`, poi scende con la
+  stessa formula di velocità terminale del paracadute di
+  `assets/traiettoria.js` (`vAtterraggio`), scalata con la quota secondo
+  l'atmosfera standard ISA (`densitaISA`) — non la previsione meteo del
+  giorno con Open-Meteo e NRLMSIS 2.1 che usa invece la pagina Traiettoria
+  quando ha i dati: qui, in diretta, non c'è tempo né bisogno di scaricare
+  quella previsione, perché a correggere la curva ci pensano via via i
+  punti GPS veri. Partendo da `FLIGHT_DESCENT_V0_MS` al suolo, la discesa
+  è molto veloce appena dopo lo scoppio, dove l'aria è rarefatta, e via
+  via più lenta scendendo. I punti GPS reali correggono questa curva in modo
   graduale (non a scatti): può succedere che per qualche minuto attorno
   allo scoppio la quota stimata scenda già mentre l'ultimo fix GPS mostra
   ancora valori prossimi al massimo — è normale, non un errore, ed è

@@ -145,7 +145,13 @@ window.COMETA_SPOT = (function(){
 
   function setAltText(el, km){
     if(!el) return;
-    el.textContent = km == null ? "—" : km.toFixed(1);
+    if(km == null){ el.textContent = "—"; return; }
+    /* toFixed arrotonda anche il segno: -0,04 diventa "-0.0", che sembra
+       un errore. Il meno resta solo se il valore arrotondato e' davvero
+       sotto zero (es. "-0.1"), non quando arrotonda a zero. */
+    let txt = km.toFixed(1);
+    if(txt === "-0.0") txt = "0.0";
+    el.textContent = txt;
   }
 
   /* Ogni punto vero sposta il bersaglio del riallineamento: quanto la

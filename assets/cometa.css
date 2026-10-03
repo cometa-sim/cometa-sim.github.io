@@ -1003,8 +1003,8 @@ nav a.ig:hover svg{transform:translateY(-1px)}
 /* Lampeggia una volta, in arancio, quando arriva un punto nuovo dal
    tracciatore — cosi' si vede che il dato si e' davvero aggiornato,
    non solo che il numero e' cambiato (a volte non cambia). */
-#altGpsRow.flash .alt-n{animation:altFlash 1.6s ease-out}
-@keyframes altFlash{0%{color:var(--beacon)}100%{color:var(--c-pos)}}
+#altGpsRow.flash .alt-n{animation:altFlash 2.6s ease-out}
+@keyframes altFlash{0%,30%{color:var(--beacon)}100%{color:var(--c-pos)}}
 @media(prefers-reduced-motion:reduce){#altGpsRow.flash .alt-n{animation:none}}
 
 .q-tight p + p{margin-top:0}
