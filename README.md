@@ -54,6 +54,7 @@ Norme e autorizzazioni · Domande · Chi siamo.
 | Colori e caratteri di tutto il sito | il blocco `:root` in `assets/cometa.css` |
 | Data del lancio (conto alla rovescia) | la costante `LAUNCH` in `assets/app.js` |
 | Fondo scala delle animazioni | la costante `SCALA_KM` in `assets/app.js` |
+| Quota di scoppio e velocità di salita/discesa attese (pagina Diretta) | `FLIGHT_BURST_KM`, `FLIGHT_ASCENT_MS`, `FLIGHT_DESCENT_MS` in `assets/app.js` |
 | Numeri delle quattro schede della pagina iniziale | direttamente in `index.html` |
 | Stato di una tappa del progetto | la classe `done`, `wip` o `todo` della riga in `index.html` |
 
@@ -403,8 +404,15 @@ approvare la propria richiesta di modifica.
 ## Da completare
 
 - **La data definitiva del lancio**, quando la DINACIA autorizza. Oggi la
-  costante `LAUNCH` in `assets/app.js` vale `2026-10-07T11:00:00-03:00`: è
+  costante `LAUNCH` in `assets/app.js` vale `2026-10-14T11:00:00-03:00`: è
   provvisoria, e il conto alla rovescia la mostra come se fosse certa.
+
+- **La quota di scoppio e le velocità di salita/discesa**, nella pagina
+  Diretta. `FLIGHT_BURST_KM`, `FLIGHT_ASCENT_MS` e `FLIGHT_DESCENT_MS` in
+  `assets/app.js` oggi hanno i numeri generici già scritti su Missione
+  (37,9 km, 5 m/s, 5,5 m/s): il giorno del lancio vanno sostituiti con la
+  previsione precisa di quel volo, altrimenti la quota stimata in volo
+  (`assets/spot.js`) scoppia e scende al punto sbagliato.
 
 ## Licenza
 

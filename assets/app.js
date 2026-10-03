@@ -565,6 +565,19 @@ const LAUNCH = new Date("2026-10-14T11:00:00-03:00");
 /* La previsione del giorno (assets/traiettoria.js) propone questo giorno
    e quest'ora, quando cadono dentro la settimana coperta dal GFS. */
 window.COMETA_LAUNCH = LAUNCH;
+
+/* ==========================================================
+   Pagina Diretta — quota stimata in volo (bozza, da affinare)
+   ========================================================== */
+/* Numeri provvisori, gli stessi gia' scritti su Missione (quota 37+,
+   salita 5 m/s). Il giorno del lancio vanno sostituiti con i valori
+   precisi di quella previsione specifica: quota di scoppio attesa,
+   velocita' di salita e di discesa stimate per quel volo — li aggiorna
+   chi segue il lancio, qui e in nessun altro posto. */
+const FLIGHT_BURST_KM = 37.9;
+const FLIGHT_ASCENT_MS = 5;
+const FLIGHT_DESCENT_MS = 5.5;
+window.COMETA_FLIGHT = {burstKm: FLIGHT_BURST_KM, ascentMs: FLIGHT_ASCENT_MS, descentMs: FLIGHT_DESCENT_MS};
 function updateCountdown(){
   const diff = LAUNCH - Date.now();
   const cb = $("#cbadge");

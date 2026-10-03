@@ -32,7 +32,7 @@ it:{
   dirSpotWaiting:"in attesa del segnale…",
   dirSpotUnavailable:"mappa non disponibile",
   dirSpotUpdated:"aggiornato alle",
-  dirAltLabel:"quota",
+  dirAltHead:"Quota", dirAltEstLabel:"Stimata", dirAltGpsLabel:"Ultimo punto GPS",
 
   /* — Inizio — */
   heroSchool:"Scuola Italiana di Montevideo",
@@ -468,7 +468,7 @@ es:{
   dirSpotWaiting:"esperando la señal…",
   dirSpotUnavailable:"mapa no disponible",
   dirSpotUpdated:"actualizado a las",
-  dirAltLabel:"altitud",
+  dirAltHead:"Altitud", dirAltEstLabel:"Estimada", dirAltGpsLabel:"Último punto GPS",
 
   heroSchool:"Scuola Italiana di Montevideo",
 
@@ -898,7 +898,7 @@ en:{
   dirSpotWaiting:"waiting for signal…",
   dirSpotUnavailable:"map unavailable",
   dirSpotUpdated:"updated at",
-  dirAltLabel:"altitude",
+  dirAltHead:"Altitude", dirAltEstLabel:"Estimated", dirAltGpsLabel:"Latest GPS fix",
 
   heroSchool:"Scuola Italiana di Montevideo",
 
