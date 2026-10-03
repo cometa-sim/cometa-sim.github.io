@@ -21,7 +21,10 @@ assets/i18n.js                      i testi in italiano, spagnolo e inglese
 assets/sonda.js                     i 26 componenti + il modello 3D (Three.js)
 assets/catena.js                    la catena di volo in 3D, nella pagina Missione
 assets/app.js                       lingua, navigazione, salita, fisica, conto alla rovescia
+assets/traiettoria.js               prevedere il volo: pallone, partenza, Tawhiri
+assets/msis.js                      NRLMSIS 2.1 tabulato, generato da calcolo/genera_msis.py
 assets/vendor/three.min.js          Three.js r128, copia locale (vedi sotto)
+assets/vendor/leaflet/              Leaflet 1.9.4, copia locale, per la previsione del giorno
 
 assets/img/cometa-logo.png          marchio COMETA, fondo trasparente
 assets/img/sim-logo.png             stemma della Scuola, fondo trasparente
@@ -30,11 +33,15 @@ assets/img/zona-exclusion-dinacia.jpg   area di esclusione aeronautica
 assets/img/og.png                   anteprima per social e messaggistica
 
 mappe/uru2000_footprint.html        mappa generata da cometa_venti.py — NON modificare a mano
+calcolo/cometa_venti.py             lo script della simulazione e della previsione
+calcolo/convergenza_raccolta.py     raccolta quotidiana delle previsioni di Tawhiri (workflow)
+calcolo/convergenza_analisi.py      di quanto si sposta l'atterraggio previsto al variare dell'anticipo
+.github/workflows/convergenza.yml   il workflow quotidiano, scrive sul branch dati
 
 LICENSE · README.md · .gitignore
 ```
 
-Sezioni: Inizio · Missione · La fisica del volo · La sonda · Studio dei venti ·
+Sezioni: Inizio · Missione · La fisica del volo · La sonda · La traiettoria ·
 Norme e autorizzazioni · Domande · Chi siamo.
 
 ## Dove si modificano le cose
@@ -52,12 +59,12 @@ Norme e autorizzazioni · Domande · Chi siamo.
 
 ### Dopo ogni modifica: il numero di versione
 
-In `index.html` i cinque file di `assets/` sono richiamati con un numero in
-coda — oggi `?v=83`:
+In `index.html` i sette file di `assets/`, e la mappa, sono richiamati con un numero in
+coda — oggi `?v=121`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=83">
-<script src="assets/i18n.js?v=83"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=121">
+<script src="assets/i18n.js?v=121"></script>
 ```
 
 Serve a costringere il browser a riscaricarli. **Chi modifica un file in
@@ -195,7 +202,7 @@ mai come cifra precisa**: si scrive «più di 37 km», «oltre 37 km», «37+»,
 «la quota di scoppio». Così restano veri anche quando il calcolo cambia.
 
 I **valori esatti stanno solo nello studio dei venti**, dove c'è la
-discussione che li giustifica: la chiave `wParP` per i parametri della
+discussione che li giustifica: la chiave `wParP2` per i parametri della
 simulazione, e le chiavi `wA4P`…`wA4P4` per il bilancio d'incertezza.
 
 Nelle due animazioni con la scala — la pagina iniziale e la fisica — il
@@ -208,7 +215,7 @@ sale con i decimali e resta `37+` — e la tappa 06 della fisica dice
 `37+ km`.
 
 Quando il calcolo verrà rifatto, i posti da toccare sono tre: la
-costante in `app.js`, `wParP` e il blocco `wA4P` in `i18n.js`.
+costante in `app.js`, `wParP2` e il blocco `wA4P` in `i18n.js`.
 
 ### Il cielo della pagina iniziale
 
@@ -234,6 +241,132 @@ siti di partenza, i 600 atterraggi, le ellissi: il file resta com'è.
 Lo script produce un nome che contiene la data della corsa
 (`010926_footprint.html`): rinominarlo in `uru2000_footprint.html`, che è
 il nome che `index.html` cerca.
+
+Cliccando un punto compare solo la data del volo: deriva e rotta si
+leggono dalla mappa, la data serve a confrontare. Le mappe nuove escono
+già così. In quella pubblicata, generata prima, le date sono state messe
+da `calcolo/date_nei_popup.py`, che le ricava dall'ordine in cui lo script
+scrive i punti e si ferma se i conteggi non tornano: non va rifatto, a
+meno di rimettere una mappa vecchia.
+
+### La traiettoria: prevedere il volo
+
+La pagina `#venti` si chiama «La traiettoria» e ha un indice in
+cima, come Missione (`data-jump` verso `v-previsione`, `v-calcolo`,
+`v-studio`, `v-approx`). Prima viene lo strumento per prevedere il volo,
+poi come si calcolano salita e discesa, poi lo studio dei venti che ci ha
+fatto scegliere il sito.
+
+Lo strumento sta tutto in `assets/traiettoria.js` e lavora nel browser di
+chi guarda, senza server nostri:
+
+1. **Il pallone.** Da modello (Strato 1600 o Strato 2000), payload,
+   velocità di salita e bombola (20, 30, 40 o 50 L; proposta la 50 L)
+   calcola elio necessario — in m³ e in bar da consumare, con l'elio
+   trattato come gas reale (secondo coefficiente del viriale) —,
+   portanza al collo, quota di scoppio e velocità di discesa al suolo;
+   il tempo allo scoppio compare nella scheda della traiettoria.
+   La bombola si considera a 200 bar e alla temperatura di gonfiaggio;
+   pressione del manometro e temperatura si possono impostare a mano.
+   Senza temperatura a mano valgono temperatura e pressione al suolo
+   previste all'ora del lancio (come `--temp-gonfiaggio auto` dello
+   script), altrimenti 15 °C e 1 atm. La temperatura cambia il volume da
+   caricare e i bar, non la massa d'elio né la quota di scoppio.
+   È il porting delle funzioni di `cometa_venti.py`, e dà gli stessi
+   numeri. La quota di scoppio usa l'atmosfera prevista per il luogo, il
+   giorno e l'ora (Forecast API di Open-Meteo fino a 30 hPa, ~24 km) e
+   più in alto la forma di NRLMSIS 2.1, ancorata all'ultimo livello: la
+   stessa `Colonna` dello script. Il browser non può far girare NRLMSIS,
+   quindi è tabulato in `assets/msis.js` per latitudine (tutto il globo,
+   ogni 10°) e mese, da
+   `calcolo/genera_msis.py` — non si modifica a mano. Senza dati del
+   giorno si usa l'ISA, e la pagina lo dice. Nelle «Impostazioni
+   avanzate» si cambiano diametro di scoppio e massa del pallone e il
+   paracadute (quello del kit, 1,2 m, se resta vuoto), o si
+   impongono quota di scoppio e discesa: vuoti, valgono quelli del
+   modello e quelli calcolati.
+2. **La partenza.** Si scrive una località (suggerimenti mentre si
+   scrive: prima l'aerodromo di Mercedes, poi i due siti dello studio,
+   Mercedes e Durazno, poi il geocoder di Open-Meteo),
+   oppure le coordinate, oppure si tocca la mappa o si usa la posizione
+   del telefono. La stella sulla mappa si può trascinare. Chi arriva
+   trova l'aerodromo di Mercedes (SUME, dove c'è la stazione INUMET); l'ultimo luogo scelto dal visitatore resta nel
+   `localStorage` del dispositivo (chiave `cometa-partenza-v2`).
+3. **La traiettoria.** La chiede a **Tawhiri**, il predittore di
+   [SondeHub](https://sondehub.org/), sui venti dell'ultima corsa del
+   modello **GFS** della NOAA. La quota di partenza non la passiamo:
+   Tawhiri usa quella del terreno nel punto scelto, e la scheda la
+   mostra. «Confronta i prossimi giorni» ripete il calcolo per ogni
+   giorno della settimana coperta dalla previsione.
+   Nelle «Impostazioni avanzate» si possono chiedere più partenze
+   (fino a un giorno e a un'ora, ogni 30 min-3 h, al massimo 48): la
+   mappa le disegna come un'unica fascia — per ogni frazione del volo,
+   l'involucro convesso delle posizioni di tutte le partenze — con in
+   arancione la zona di atterraggio, e la scheda dà gli intervalli.
+   Sempre lì, «Intervallo di atterraggio»: per una partenza singola si
+   ricalcola la traiettoria con il diametro di scoppio a ±s % (quota di
+   scoppio dal modello, stessa atmosfera) e con la velocità di salita a
+   ±s % (quota di scoppio invariata), 5 % proposto per entrambi: fino a
+   cinque richieste a Tawhiri. Sulla mappa un segmento arancione (scoppio)
+   e uno viola (salita) uniscono gli atterraggi estremi; con entrambi c'è
+   anche l'ellisse xᵀC⁻¹x ≤ 2 con C = a·aᵀ + b·bᵀ (a, b i due
+   semi-segmenti): la minima che contiene il parallelogramma ±a±b. Con
+   0 in una delle due voci resta solo l'altro segmento.
+
+Il giorno proposto è la data di `LAUNCH` in `assets/app.js`, quando cade
+nella settimana della previsione, altrimenti domani. L'area di esclusione
+e il contorno dell'Uruguay sono ripetuti in cima a `assets/traiettoria.js`
+e sono gli stessi di `cometa_venti.py`: se cambiano, vanno cambiati nei
+due posti. Così i preset dei palloni.
+
+Lo stesso calcolo si fa dal terminale:
+
+```
+python3 calcolo/cometa_venti.py --tawhiri --pallone 2000 --payload 1.5 --sito "Mercedes,-33.249,-58.030" --lancio 2026-10-07T11:00 --giorni-prev 3 --html
+```
+
+«Scarica l'immagine della mappa» produce un PNG largo almeno 3200 px, a
+tema chiaro: non è una foto dello schermo, la stessa vista viene
+ridisegnata con le mattonelle OSM a uno o due livelli di zoom in più (al
+massimo 200 mattonelle, per rispetto del server) e i tracciati con
+colori da fondo chiaro, più scala, titolo (luogo, data, corsa GFS),
+legenda e attribuzione. Per questo il livello delle mattonelle è caricato
+con `crossOrigin`: senza, il canvas non si potrebbe salvare.
+
+Leaflet (`assets/vendor/leaflet/`) si scarica solo quando la mappa entra
+nello schermo.
+
+#### Quanto ci si può fidare della previsione a qualche giorno
+
+Per costruire una curva «spostamento contro anticipo», il workflow
+`.github/workflows/convergenza.yml` gira ogni giorno alle 03:37 UTC (non
+al minuto 0, dove GitHub accoda le schedule; in pratica parte con ore di
+ritardo, ma prima del lancio delle 14:00 UTC) e chiede a Tawhiri il volo
+proposto dalla pagina — aerodromo di Mercedes, Strato 2000, payload
+1,5 kg, salita 5 m/s, ore 11:00 — per oggi e per i sette giorni seguenti.
+Quota di scoppio e discesa sono fisse (ISA), così cambia solo il vento. I
+punti di atterraggio finiscono in `convergenza.csv` sul branch `dati`,
+non protetto e non pubblicato: il bot ci scrive senza PR e il sito non
+si rigenera. Una riga con lo stesso `(dataset, bersaglio)` di una già
+presente si scarta, così un giro caduto sulla stessa corsa GFS del
+precedente non aggiunge nulla.
+
+L'analisi si fa a mano:
+
+```
+git fetch origin dati && git show origin/dati:convergenza.csv > convergenza.csv
+python3 calcolo/convergenza_analisi.py convergenza.csv
+```
+
+L'anticipo τ è l'età della corsa GFS all'ora del lancio (bersaglio meno
+dataset), a passo di 24 h: così non conta quando è partito il workflow né
+quale corsa ha trovato. Per ogni bersaglio T il riferimento è la
+previsione con τ = 0; e(τ) è la distanza fra il punto previsto con
+anticipo τ e quello di riferimento. Con `--calendario` l'anticipo è
+invece `lead_giorni`, i giorni fra emissione e bersaglio. Misura la *convergenza* della previsione, non l'errore:
+il riferimento non è la verità, quindi è un limite inferiore, ed e(0) è
+zero per costruzione. Se si cambiano i parametri del volo nello script,
+le righe vecchie non sono più confrontabili: meglio un CSV nuovo.
 
 ### Three.js
 

@@ -81,6 +81,12 @@ function applyTexts(){
     const k = el.getAttribute("data-i18n-html");
     if(d[k] !== undefined) el.innerHTML = expand(d[k]);
   });
+  /* Testo alternativo delle immagini: la pagina lo dichiarava gia' con
+     data-i18n-alt, ma nessuno lo applicava e le foto restavano senza alt. */
+  $$("[data-i18n-alt]").forEach(function(el){
+    const k = el.getAttribute("data-i18n-alt");
+    if(d[k] !== undefined) el.setAttribute("alt", d[k]);
+  });
   $$(".scr").forEach(function(el){ delete el.dataset.final; });
   document.documentElement.lang = d.code;
   document.title = d.title;
@@ -553,7 +559,10 @@ function smoothScrollTo(to, dur){
    ========================================================== */
 /* Ora locale di Montevideo (UTC-3). Scritta cosi', il conto alla rovescia
    e' identico per un visitatore di Montevideo, di Roma o di Malargue. */
-const LAUNCH = new Date("2026-10-07T11:00:00-03:00");
+const LAUNCH = new Date("2026-10-14T11:00:00-03:00");
+/* La previsione del giorno (assets/traiettoria.js) propone questo giorno
+   e quest'ora, quando cadono dentro la settimana coperta dal GFS. */
+window.COMETA_LAUNCH = LAUNCH;
 function updateCountdown(){
   const diff = LAUNCH - Date.now();
   const cb = $("#cbadge");
