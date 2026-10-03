@@ -15,12 +15,19 @@
    - "stimata" e' una curva continua, calcolata dalla fisica del volo
      (salita costante, poi discesa che rallenta scendendo, perche'
      l'aria si fa piu' densa — stessa formula di assets/traiettoria.js),
-     corretta via via con uno scarto che insegue senza salti la
-     differenza con l'ultimo punto vero. Non sa quando scoppia
+     seguita lungo un proprio orologio interno (tau, in secondi dal
+     lancio) invece che lungo il tempo reale: ogni punto GPS vero
+     riancora quell'orologio al punto della curva compatibile con la
+     quota misurata (trovato per bisezione, sul ramo di salita o di
+     discesa a seconda di dove ci si aspettava di essere), cosi' la
+     stima segue anche una deriva nel RITMO del volo — non solo uno
+     scarto verticale — se quello vero differisce dal modello. Il
+     salto che un riancoraggio puo' produrre si assorbe con un breve
+     decadimento (pochi secondi), non di scatto. Non sa quando scoppia
      davvero: in giro per quel momento puo' benissimo mostrarsi gia'
      in discesa mentre il GPS manda ancora un punto di salita — il
      punto vero arriva con qualche minuto di ritardo per natura sua,
-     e quando arriva la riallinea con dolcezza, non di scatto.
+     e quando arriva la riallinea con dolcezza.
    ========================================================== */
 window.COMETA_SPOT = (function(){
   const FEED_ID = "0khMEQthBCgxvZpuibCz2eabjNtFovxKI";
@@ -31,7 +38,7 @@ window.COMETA_SPOT = (function(){
   const TILES = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
   const POLL_MS = 30000;      // il feed si aggiorna ogni ~2,5 min: basta chiedere piu' spesso per non perdere tempo ad accorgersene
   const TICK_MS = 1000;
-  const REALIGN_TAU_S = 150;  // costante di tempo del riallineamento: circa un intervallo SPOT
+  const T_SMOOTH_S = 5;       // decadimento del salto da riancoraggio: pochi secondi, non un intervallo SPOT intero
   const LOST_MS = 3 * 60000;  // SPOT manda un punto ogni ~2,5 min: 3 min e' un margine ragionevole
   const HIGH_KM = 18;         // sopra qui il GPS smette di trasmettere per natura sua, non per un guasto
   const LANDED_TOL_DEG = 0.0003;  // ~30 m: fix fermi allo stesso punto, segno che la sonda e' a terra
@@ -42,8 +49,13 @@ window.COMETA_SPOT = (function(){
 
   let map, trail, ptsLayer, marker, markerHit, trajLine, trajRun, mapReady, pollId, tickId, trajId,
       elMap, elStatus, elAltEst, elAltGps, elRecenter,
-      lastPoints, lastErr, curLang = "it",
-      correctionKm = 0, correctionTargetKm = 0, lastTickMs = null, lastEstKm = null;
+      lastPoints, lastErr, curLang = "it", lastEstKm = null,
+      /* L'ancora: "al tempo reale anchorT (ms) il modello e' al proprio
+         tempo interno anchorTau (s dal lancio)". Si riancora a ogni
+         punto GPS vero; fra un punto e l'altro avanza 1:1 col tempo
+         reale (vedi tauOra). jumpOffsetKm/jumpAtMs sono il salto che un
+         riancoraggio produce, da riassorbire con un decadimento breve. */
+      anchorT = null, anchorTau = 0, jumpOffsetKm = 0, jumpAtMs = null;
 
   /* I numeri del volo stanno in assets/app.js — window.COMETA_FLIGHT —
      cosi' c'e' un solo posto dove aggiornarli il giorno del lancio.
@@ -70,18 +82,22 @@ window.COMETA_SPOT = (function(){
   }
   const RHO0 = densityISA(0);
 
-  /* Quota (km) attesa in volo, solo dalla fisica, a s secondi dal
+  /* tau = secondi dal lancio sull'asse del MODELLO (non per forza uguale
+     al tempo reale trascorso: vedi anchorTau/tauOra piu' sotto). */
+  function tauBurst(flight){ return flight.burstKm * 1000 / flight.ascentMs; }
+
+  /* Quota (km) attesa in volo, solo dalla fisica, a tau secondi dal
      lancio — salita lineare fino allo scoppio, poi discesa integrata
      passo-passo: la velocita' del paracadute scala con 1/sqrt(densita'),
      quindi e' alta appena scoppiato (aria rada) e rallenta scendendo
      (aria piu' densa). */
-  function altPhysicsKm(s, flight){
-    if(s <= 0) return 0;
-    const ascentSec = flight.burstKm * 1000 / flight.ascentMs;
-    if(s <= ascentSec) return s * flight.ascentMs / 1000;
-    let z = flight.burstKm * 1000, t = ascentSec;
+  function altPhysicsKm(tau, flight){
+    if(tau <= 0) return 0;
+    const tb = tauBurst(flight);
+    if(tau <= tb) return tau * flight.ascentMs / 1000;
+    let z = flight.burstKm * 1000, t = tb;
     const dt = 2;
-    while(t < s && z > 0){
+    while(t < tau && z > 0){
       const v = flight.descentV0Ms * Math.sqrt(RHO0 / densityISA(Math.max(z, 0)));
       z -= v * dt;
       t += dt;
@@ -89,9 +105,72 @@ window.COMETA_SPOT = (function(){
     return Math.max(z, 0) / 1000;
   }
 
+  /* tau dell'atterraggio: stessa integrazione di altPhysicsKm, fino a
+     quota zero — serve solo da estremo superiore alla bisezione sul
+     ramo di discesa, cosi' non cerca su un intervallo senza fine. */
+  function tauLand(flight){
+    const tb = tauBurst(flight);
+    let z = flight.burstKm * 1000, t = tb;
+    const dt = 2;
+    while(t < 1e6 && z > 0){
+      const v = flight.descentV0Ms * Math.sqrt(RHO0 / densityISA(Math.max(z, 0)));
+      z -= v * dt;
+      t += dt;
+    }
+    return t;
+  }
+
+  /* Bisezione generica (stessa di bisez() in assets/traiettoria.js):
+     serve f(a) e f(b) di segno opposto, 0,5s di tau bastano come
+     precisione (altPhysicsKm stessa discretizza a passi di 2s). */
+  function bisez(f, a, b){
+    let fa = f(a);
+    for(let i = 0; i < 60; i++){
+      const m = (a + b) / 2, fm = f(m);
+      if(Math.abs(fm) < 1e-4 || (b - a) / 2 < 0.5) return m;
+      if((fa < 0) === (fm < 0)){ a = m; fa = fm; } else b = m;
+    }
+    return (a + b) / 2;
+  }
+
+  /* L'inversa di altPhysicsKm: a quale tau, sul ramo scelto (salita o
+     discesa), il modello passa per la quota hKm? E' il cuore del
+     riancoraggio — dice "dove siamo sulla curva", non solo "quanto
+     siamo scostati in verticale a questo istante". Fuori dal range del
+     ramo (rumore GPS) si aggancia all'estremo piu' vicino. */
+  function tauFromAlt(hKm, descending, flight){
+    const tb = tauBurst(flight);
+    if(!descending){
+      if(hKm <= 0) return 0;
+      if(hKm >= flight.burstKm) return tb;
+      return bisez(function(tau){ return altPhysicsKm(tau, flight) - hKm; }, 0, tb);
+    }
+    const tl = tauLand(flight);
+    if(hKm >= flight.burstKm) return tb;
+    if(hKm <= 0) return tl;
+    return bisez(function(tau){ return altPhysicsKm(tau, flight) - hKm; }, tb, tl);
+  }
+
   function secSinceLaunch(ms){
     const L = window.COMETA_LAUNCH;
     return L ? (ms - L.getTime()) / 1000 : -1e9;
+  }
+
+  /* L'ancora nasce al lancio (tau=0 al tempo reale del lancio) finche'
+     non arriva il primo punto vero a riancorarla. */
+  function ensureAnchor(){
+    if(anchorT != null) return;
+    const L = window.COMETA_LAUNCH;
+    anchorT = L ? L.getTime() : Date.now();
+    anchorTau = 0;
+  }
+
+  /* Tau del modello al tempo reale nowMs, proiettando in avanti
+     dall'ultima ancora (avanza 1:1 col tempo reale fra un punto vero e
+     l'altro). */
+  function tauOra(nowMs){
+    ensureAnchor();
+    return anchorTau + (nowMs - anchorT) / 1000;
   }
 
   function loadLeaflet(){
@@ -215,26 +294,40 @@ window.COMETA_SPOT = (function(){
     el.textContent = txt;
   }
 
-  /* Ogni punto vero sposta il bersaglio del riallineamento: quanto la
-     fisica pura sbaglia, in quel momento. tick() lo insegue con
-     un'esponenziale, non un salto — vedi REALIGN_TAU_S. */
-  function updateRealignTarget(points){
-    if(!points.length) return;
-    const last = points[points.length - 1];
-    if(last.alt == null) return;
+  /* La quota mostrata ora: il modello alla sua tau proiettata, piu' il
+     residuo del salto dell'ultimo riancoraggio, che decade in fretta
+     (T_SMOOTH_S) invece di sparire di scatto. */
+  function quotaMostrata(nowMs, flight){
+    const base = altPhysicsKm(tauOra(nowMs), flight);
+    if(jumpAtMs == null) return base;
+    const dtS = Math.max((nowMs - jumpAtMs) / 1000, 0);
+    return base + jumpOffsetKm * Math.exp(-dtS / T_SMOOTH_S);
+  }
+
+  /* Ogni punto vero riancora l'orologio interno del modello (tau) al
+     punto della curva compatibile con la quota misurata — non solo
+     uno scarto verticale: se il ritmo vero del volo si discosta da
+     quello nominale (salita piu' lenta/veloce, scoppio prima/dopo),
+     da qui in poi il modello riparte dalla pendenza giusta per quel
+     punto della curva, non da quella nominale. Il salto che questo
+     puo' produrre nel valore mostrato si registra qui (jumpOffsetKm) e
+     tick() lo riassorbe con un decadimento breve, non di scatto. */
+  function onNewRealPoint(point){
+    if(point.alt == null) return;
     const flight = flightCfg();
-    const s = secSinceLaunch(new Date(last.time).getTime());
-    correctionTargetKm = last.alt / 1000 - altPhysicsKm(s, flight);
+    const nowMs = Date.now(), tgMs = new Date(point.time).getTime();
+    if(isNaN(tgMs)) return;
+    const prima = quotaMostrata(nowMs, flight);
+    const descending = tauOra(tgMs) > tauBurst(flight);   // con l'ancora vecchia
+    anchorTau = tauFromAlt(point.alt / 1000, descending, flight);
+    anchorT = tgMs;
+    jumpOffsetKm = prima - altPhysicsKm(tauOra(nowMs), flight);
+    jumpAtMs = nowMs;
   }
 
   function tick(){
     const flight = flightCfg();
-    const now = Date.now();
-    const dtS = lastTickMs == null ? 1 : Math.max((now - lastTickMs) / 1000, 0);
-    lastTickMs = now;
-    const alpha = 1 - Math.exp(-dtS / REALIGN_TAU_S);
-    correctionKm += (correctionTargetKm - correctionKm) * alpha;
-    const estKm = altPhysicsKm(secSinceLaunch(now), flight) + correctionKm;
+    const estKm = quotaMostrata(Date.now(), flight);
     /* Una quota "stimata" negativa non ha senso per chi guarda, anche se
        il dato grezzo del GPS (sotto, onesto) puo' esserlo per via del
        rumore a terra: qui mostriamo 0 invece di un numero sottoterra. */
@@ -310,7 +403,7 @@ window.COMETA_SPOT = (function(){
       setAltText(elAltGps, last.alt != null ? last.alt / 1000 : null);
       if(lastRealTime != null && String(last.time) !== String(lastRealTime)){ flashGps(); flashMapMarker(); }
       lastRealTime = last.time;
-      updateRealignTarget(points);
+      onNewRealPoint(last);
     }
     renderStatus();
   }
@@ -411,7 +504,6 @@ window.COMETA_SPOT = (function(){
     if(pollId){ clearInterval(pollId); pollId = null; }
     if(tickId){ clearInterval(tickId); tickId = null; }
     if(trajId){ clearInterval(trajId); trajId = null; }
-    lastTickMs = null;
   }
 
   return {

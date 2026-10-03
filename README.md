@@ -432,12 +432,20 @@ approvare la propria richiesta di modifica.
   quella previsione, perché a correggere la curva ci pensano via via i
   punti GPS veri. Partendo da `FLIGHT_DESCENT_V0_MS` al suolo, la discesa
   è molto veloce appena dopo lo scoppio, dove l'aria è rarefatta, e via
-  via più lenta scendendo. I punti GPS reali correggono questa curva in modo
-  graduale (non a scatti): può succedere che per qualche minuto attorno
+  via più lenta scendendo. I punti GPS reali non spostano la curva in
+  verticale — la riancorano: ogni punto vero dice a `assets/spot.js` "a
+  che punto della curva (quale `tau`, il tempo del modello dal lancio)
+  corrisponde questa quota misurata", trovato per bisezione sul ramo di
+  salita o discesa; da lì il modello riparte con la pendenza giusta per
+  quel punto, non quella nominale — segue cioè anche una deriva nel
+  *ritmo* del volo reale (salita più lenta o veloce, scoppio prima o
+  dopo), non solo uno scarto di quota. Il salto che un riancoraggio può
+  produrre nel valore mostrato si assorbe con un decadimento di pochi
+  secondi, non di scatto: può succedere che per qualche minuto attorno
   allo scoppio la quota stimata scenda già mentre l'ultimo fix GPS mostra
   ancora valori prossimi al massimo — è normale, non un errore, ed è
-  proprio quello che la correzione graduale serve a riallineare appena
-  arrivano nuovi dati.
+  proprio quello che il riancoraggio risolve appena arriva il punto
+  giusto.
 
   `FLIGHT_SITE` (sempre in `assets/app.js`) è il punto di partenza usato
   per la linea grigia tratteggiata della traiettoria prevista, disegnata
