@@ -18,12 +18,25 @@ Per ogni bersaglio T il riferimento e' la previsione con tau = 0, e
     e(tau) = distanza fra il punto d'atterraggio previsto con anticipo tau
              e quello di riferimento
 
-per tutti i bersagli T che hanno il riferimento. Stampa mediana e quartili
-di e(tau), il numero di campioni e l'eta' mediana delle corse in ogni classe.
+per tutti i bersagli T che hanno il riferimento. Stampa mediana, quartili e
+scarto quadratico medio (RMS) di e(tau), il numero di campioni e l'eta'
+mediana delle corse in ogni classe.
 
 e(tau) misura la CONVERGENZA della previsione, non il suo errore: il
-riferimento e' anch'esso una previsione, non la verita'. E' quindi un limite
-inferiore dell'errore vero, ed e(0) e' zero per costruzione.
+riferimento e' anch'esso una previsione, non la verita'. Con X il punto vero,
+
+    P_tau - X = (P_tau - P_0) + (P_0 - X)
+
+e se l'aggiornamento della previsione (primo termine) e' scorrelato
+dall'errore del riferimento (secondo termine), in media quadratica
+
+    RMS_vero(tau)^2 = RMS_e(tau)^2 + RMS_vero(0)^2  >=  RMS_e(tau)^2.
+
+La scorrelazione e' esatta per una previsione ottimale (le previsioni
+successive sono una martingala, i loro incrementi sono ortogonali); per il
+GFS reale vale solo in modo approssimato. Il limite inferiore vale quindi
+per l'RMS e sotto questa ipotesi, non per il singolo volo e non per mediane
+e quartili. e(0) e' zero per costruzione.
 
 Se per lo stesso bersaglio e la stessa classe ci sono piu' righe vale quella
 con il dataset piu' recente.
@@ -39,7 +52,9 @@ from datetime import datetime
 
 NOTA = ("e(tau) misura la CONVERGENZA della previsione, non l'errore: il riferimento "
         "(la previsione con anticipo 0) non e' la verita'.\n"
-        "E' un limite inferiore dell'errore vero; e(0) e' zero per costruzione.")
+        "Non e' un limite per il singolo volo. Se l'aggiornamento della previsione e' scorrelato "
+        "dall'errore del riferimento,\n"
+        "l'errore vero in media quadratica e' almeno l'RMS di e(tau). e(0) e' zero per costruzione.")
 
 
 def dist_km(la1, lo1, la2, lo2):
@@ -103,19 +118,21 @@ def main():
     if scartate: print(f"Righe su corse successive al lancio: {scartate}, escluse")
     print(f"Bersagli con riferimento: {len(rif)} (senza: {senza}, esclusi)\n")
     righe = []
-    print(f"{'tau [g]':>7} {'n':>4} {'eta [h]':>8} {'Q1 [km]':>8} {'mediana':>8} {'Q3 [km]':>8}")
+    print(f"{'tau [g]':>7} {'n':>4} {'eta [h]':>8} {'Q1 [km]':>8} {'mediana':>8} {'Q3 [km]':>8} {'RMS [km]':>9}")
     for tau in sorted(err):
         q1, me, q3 = quartili(sorted(err[tau]))
         eh = statistics.median(eta[tau])
+        rms = math.sqrt(sum(e*e for e in err[tau])/len(err[tau]))
         righe.append({"tau_giorni": tau, "n": len(err[tau]), "eta_mediana_h": f"{eh:.0f}",
-                      "q1_km": f"{q1:.1f}", "mediana_km": f"{me:.1f}", "q3_km": f"{q3:.1f}"})
-        print(f"{tau:>7} {len(err[tau]):>4} {eh:>8.0f} {q1:>8.1f} {me:>8.1f} {q3:>8.1f}")
+                      "q1_km": f"{q1:.1f}", "mediana_km": f"{me:.1f}", "q3_km": f"{q3:.1f}",
+                      "rms_km": f"{rms:.1f}"})
+        print(f"{tau:>7} {len(err[tau]):>4} {eh:>8.0f} {q1:>8.1f} {me:>8.1f} {q3:>8.1f} {rms:>9.1f}")
     print("\n" + NOTA)
 
     if a.out:
         with open(a.out, "w", newline="") as f:
             f.write("# " + NOTA.replace("\n", "\n# ") + "\n")
-            w = csv.DictWriter(f, fieldnames=["tau_giorni", "n", "eta_mediana_h", "q1_km", "mediana_km", "q3_km"],
+            w = csv.DictWriter(f, fieldnames=["tau_giorni", "n", "eta_mediana_h", "q1_km", "mediana_km", "q3_km", "rms_km"],
                                lineterminator="\n")
             w.writeheader(); w.writerows(righe)
         print(f"\nTabella salvata in {a.out}")

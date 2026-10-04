@@ -367,8 +367,15 @@ dataset), a passo di 24 h: così non conta quando è partito il workflow né
 quale corsa ha trovato. Per ogni bersaglio T il riferimento è la
 previsione con τ = 0; e(τ) è la distanza fra il punto previsto con
 anticipo τ e quello di riferimento. Con `--calendario` l'anticipo è
-invece `lead_giorni`, i giorni fra emissione e bersaglio. Misura la *convergenza* della previsione, non l'errore:
-il riferimento non è la verità, quindi è un limite inferiore, ed e(0) è
+invece `lead_giorni`, i giorni fra emissione e bersaglio.
+
+e(τ) misura la *convergenza* della previsione, non l'errore: il
+riferimento non è la verità. Con X il punto vero,
+P_τ − X = (P_τ − P₀) + (P₀ − X); se l'aggiornamento della previsione è
+scorrelato dall'errore del riferimento (esatto per una previsione
+ottimale, approssimato per il GFS), in media quadratica l'errore vero è
+almeno l'RMS di e(τ), che lo script stampa accanto a mediana e quartili.
+Non è un limite per il singolo volo, né per mediane e quartili. e(0) è
 zero per costruzione. Se si cambiano i parametri del volo nello script,
 le righe vecchie non sono più confrontabili: meglio un CSV nuovo.
 
