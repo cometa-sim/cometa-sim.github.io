@@ -561,7 +561,7 @@ function smoothScrollTo(to, dur){
    ========================================================== */
 /* Ora locale di Montevideo (UTC-3). Scritta cosi', il conto alla rovescia
    e' identico per un visitatore di Montevideo, di Roma o di Malargue. */
-const LAUNCH = new Date("2026-10-14T11:00:00-03:00");
+const LAUNCH = new Date("2026-10-28T11:00:00-03:00");
 /* La previsione del giorno (assets/traiettoria.js) propone questo giorno
    e quest'ora, quando cadono dentro la settimana coperta dal GFS. */
 window.COMETA_LAUNCH = LAUNCH;
@@ -604,8 +604,8 @@ window.COMETA_TRACK_URL = TRACK_URL;
    stato rosso "in diretta" (quando comincia davvero la trasmissione,
    non il lancio del pallone: la diretta parte prima). Date
    provvisorie, da confermare insieme al resto. */
-const DIRETTA_WINDOW = new Date("2026-10-11T00:00:00-03:00");
-const DIRETTA_START  = new Date("2026-10-14T10:00:00-03:00");
+const DIRETTA_WINDOW = new Date("2026-10-25T00:00:00-03:00");
+const DIRETTA_START  = new Date("2026-10-28T10:00:00-03:00");
 
 function updateDiretta(){
   const now = Date.now();
