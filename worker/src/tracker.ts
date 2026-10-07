@@ -5,6 +5,7 @@ import { checkWsseSignature, WSSE_FRESHNESS_MS } from "./wsse";
 
 const POLL_INTERVAL_MS = 155_000; // i 150s richiesti da SPOT, piu' un margine
 const MIN_INTERVAL_MS = 150_000; // mai due chiamate vere piu' vicine di questo
+const CLAIM_RECHECK_S = 15; // quanto aspettare prima di richiedere di nuovo /claim se non c'e' ancora niente di nuovo
 const BACKFILL_PAGE = 50; // quanti messaggi per pagina torna il feed SPOT
 const BACKFILL_MAX_PAGES = 20; // 20*50 = 1000 messaggi, ben oltre un volo
 
@@ -203,15 +204,33 @@ export class SpotTracker implements DurableObject {
      insieme: un Durable Object processa le proprie richieste una alla
      volta (non in parallelo) finche' non si passa un'opzione esplicita
      per toglierlo, che qui non si usa — get e put dello storage non
-     vengono mai interallacciati da un'altra richiesta nel mezzo. */
+     vengono mai interallacciati da un'altra richiesta nel mezzo.
+
+     Oltre al limite dei 150s, il permesso e' concesso solo se c'e' un
+     "pushPendingSince" — un Data Push con punti davvero nuovi arrivato
+     da quando l'abbiamo concesso l'ultima volta (vedi handleDataPush):
+     niente piu' interrogare il feed REST a tempo fisso, lo si fa
+     appena il Data Push segnala che c'e' qualcosa di nuovo da prendere
+     (in particolare la quota, che il Data Push non manda mai — vedi
+     piu' sotto), rispettando comunque il limite di 150s. Rete di
+     sicurezza se il Data Push smette di funzionare: concesso comunque
+     ogni POLL_INTERVAL_MS (lo stesso ritmo di prima), push o non push —
+     nessun peggioramento rispetto a prima in quel caso, solo un
+     miglioramento quando il Data Push funziona. */
   private async handleClaim(): Promise<Response> {
     const lastClaimMs = (await this.state.storage.get<number>("lastClaimMs")) ?? 0;
     const now = Date.now();
     const elapsed = now - lastClaimMs;
     if (elapsed < MIN_INTERVAL_MS) {
-      return jsonResponse({ granted: false, retry_after_s: Math.ceil((MIN_INTERVAL_MS - elapsed) / 1000) });
+      return jsonResponse({ granted: false, reason: "rate_limited", retry_after_s: Math.ceil((MIN_INTERVAL_MS - elapsed) / 1000) });
+    }
+    const pushPendingSince = await this.state.storage.get<number>("pushPendingSince");
+    const dueForFallback = elapsed >= POLL_INTERVAL_MS;
+    if (pushPendingSince == null && !dueForFallback) {
+      return jsonResponse({ granted: false, reason: "nothing_new", retry_after_s: CLAIM_RECHECK_S });
     }
     await this.state.storage.put("lastClaimMs", now);
+    await this.state.storage.delete("pushPendingSince");
     return jsonResponse({ granted: true });
   }
 
@@ -271,7 +290,9 @@ export class SpotTracker implements DurableObject {
      upsertPoints() preserva una quota gia' salvata invece di
      sovrascriverla con l'assenza. Il Data Push resta comunque utile:
      posizione quasi in tempo reale, senza bisogno di tenere una scheda
-     del browser aperta. */
+     del browser aperta — e, soprattutto, segnala a /claim quando vale
+     la pena andare a prendere anche la quota (vedi pushPendingSince
+     piu' sotto e il commento su handleClaim). */
   private async handleDataPush(req: Request): Promise<Response> {
     const check = await checkWsseSignature(req.headers.get("X-WSSE"), this.env);
     if (!check.ok) {
@@ -296,6 +317,13 @@ export class SpotTracker implements DurableObject {
       await this.state.storage.put("lastFetchMs", Date.now());
       await this.state.storage.put("lastFetchOk", true);
       await this.state.storage.delete("lastError");
+      // Segnala a /claim che c'e' qualcosa di nuovo da andare a prendere
+      // (in particolare la quota, che qui non arriva mai) — solo se non
+      // c'era gia' un segnale in attesa, cosi' non si resetta l'attesa
+      // di chi sta per ottenere il permesso.
+      if (inserted > 0 && (await this.state.storage.get("pushPendingSince")) == null) {
+        await this.state.storage.put("pushPendingSince", Date.now());
+      }
       console.log(`[SPOT Data Push] ${routerMessageMode}/${routerMessageSeq} — ${points.length} ricevuti, ${inserted} nuovi`);
       return new Response("OK", { status: 200 });
     } catch (err) {
