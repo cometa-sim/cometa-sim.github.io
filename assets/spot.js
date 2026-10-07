@@ -42,6 +42,8 @@ window.COMETA_SPOT = (function(){
   const TRAJ_POLL_MS = 20 * 60000;  // il modello GFS si aggiorna ogni poche ore: ogni 20 min basta per non perdere un aggiornamento
   const LEAFLET = "assets/vendor/leaflet/";
   const TILES = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
+  const METEO = "https://api.open-meteo.com/v1/forecast";  // stesso servizio usato dal previsore, assets/traiettoria.js
+  const TZ = "America/Montevideo";
   const POLL_MS = 30000;      // il feed si aggiorna ogni ~2,5 min: basta chiedere piu' spesso per non perdere tempo ad accorgersene
   const TICK_MS = 1000;
   const T_SMOOTH_S = 5;       // decadimento del salto da riancoraggio: pochi secondi, non un intervallo SPOT intero
@@ -180,8 +182,7 @@ window.COMETA_SPOT = (function(){
   }
 
   function loadLeaflet(){
-    if(window.L) return Promise.resolve();
-    return new Promise(function(ok, ko){
+    const leaflet = window.L ? Promise.resolve() : new Promise(function(ok, ko){
       const css = document.createElement("link");
       css.rel = "stylesheet"; css.href = LEAFLET + "leaflet.css";
       document.head.appendChild(css);
@@ -190,6 +191,13 @@ window.COMETA_SPOT = (function(){
       s.onload = ok; s.onerror = ko;
       document.head.appendChild(s);
     });
+    const mapkit = window.COMETA_MAPKIT ? Promise.resolve() : new Promise(function(ok, ko){
+      const s = document.createElement("script");
+      s.src = "assets/mapkit.js";
+      s.onload = ok; s.onerror = ko;
+      document.head.appendChild(s);
+    });
+    return Promise.all([leaflet, mapkit]);
   }
 
   function ensureMap(){
@@ -202,11 +210,12 @@ window.COMETA_SPOT = (function(){
     mapReady = loadLeaflet().then(function(){
       const L = window.L;
       map = L.map(elMap, {scrollWheelZoom:false, zoomControl:true});
-      L.tileLayer(TILES, {
+      const street = L.tileLayer(TILES, {
         maxZoom:18,
         attribution:'© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'
       }).addTo(map);
       L.control.scale({imperial:false}).addTo(map);
+      window.COMETA_MAPKIT && window.COMETA_MAPKIT.enhance(map, L, elMap, street);
       map.setView([FALLBACK.lat, FALLBACK.lon], FALLBACK.zoom);
       trail = L.polyline([], {color:GREEN, weight:2, opacity:.75}).addTo(map);
       ptsLayer = L.layerGroup().addTo(map);     // i punti precedenti, puntini piccoli
@@ -490,11 +499,43 @@ window.COMETA_SPOT = (function(){
       .catch(function(){ /* silenzioso: offline, CORS, o fuori dall'orizzonte del previsore */ });
   }
 
+  /* Meteo di oggi sul punto di lancio — stesso Open-Meteo gia' usato dal
+     previsore (assets/traiettoria.js). Qui il punto e' sempre quello fisso
+     del lancio (window.COMETA_FLIGHT.site), non scelto da chi guarda: basta
+     chiamarlo una volta, da' solo l'idea di una pagina viva durante la
+     diretta, non serve alla traiettoria (quella usa comunque Tawhiri/GFS). */
+  function loadWeather(){
+    const el = document.getElementById("dirWeather");
+    if(!el) return;
+    const site = (window.COMETA_FLIGHT && window.COMETA_FLIGHT.site) || FALLBACK;
+    const q = new URLSearchParams({
+      latitude: site.lat.toFixed(4), longitude: site.lon.toFixed(4),
+      current: "temperature_2m,cloud_cover", hourly: "precipitation_probability",
+      forecast_days: "1", timezone: TZ
+    });
+    fetch(METEO + "?" + q.toString())
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(d){
+        if(!d || !d.current){ el.hidden = true; return; }
+        el.hidden = false;
+        document.getElementById("dirWTemp").textContent = Math.round(d.current.temperature_2m) + "°C";
+        document.getElementById("dirWClouds").textContent = Math.round(d.current.cloud_cover) + "%";
+        let rainPct = "—";
+        if(d.hourly && d.hourly.time && d.hourly.precipitation_probability){
+          const idx = d.hourly.time.indexOf(d.current.time.slice(0, 13) + ":00");
+          if(idx >= 0) rainPct = Math.round(d.hourly.precipitation_probability[idx]) + "%";
+        }
+        document.getElementById("dirWRain").textContent = rainPct;
+      })
+      .catch(function(){ el.hidden = true; });
+  }
+
   function start(){
     renderStatus(); // "in attesa del segnale" subito, non vuoto finche' arriva la prima risposta
     ensureMap().then(function(){
       poll();
       pollTrajectory();
+      loadWeather();
       if(!pollId) pollId = setInterval(poll, POLL_MS);
       if(!tickId) tickId = setInterval(tick, TICK_MS);
       if(!trajId) trajId = setInterval(pollTrajectory, TRAJ_POLL_MS);
