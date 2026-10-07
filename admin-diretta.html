@@ -66,7 +66,7 @@
 <body>
 <div class="admin-wrap">
   <h1>Amministrazione diretta — SPOT</h1>
-  <p class="sub">SPOT blocca le richieste dai Worker di Cloudflare (403 anti-bot) ma accetta quelle dal browser: questa pagina interroga SPOT da qui, ogni ~155&nbsp;s, e manda il risultato al Worker.</p>
+  <p class="sub">SPOT blocca le richieste dai Worker di Cloudflare (403 anti-bot) ma accetta quelle dal browser: questa pagina interroga SPOT da qui — appena il Data Push segnala un dato nuovo, al massimo ogni ~155&nbsp;s — e manda il risultato al Worker, per prendere anche la quota (che il Data Push non manda mai).</p>
 
   <section id="gate" class="card">
     <h2>Credenziali</h2>
@@ -85,7 +85,7 @@
   </section>
 
   <div id="panel" hidden>
-    <div id="visBanner" class="banner info">Tieni questa scheda in primo piano: i browser rallentano i timer di una scheda in background, e i 155&nbsp;s salterebbero.</div>
+    <div id="visBanner" class="banner info">Tieni questa scheda in primo piano: i browser rallentano i timer di una scheda in background, e il prossimo giro salterebbe.</div>
 
     <section class="card">
       <h2>Stato del polling</h2>
@@ -139,7 +139,14 @@
      assets/app.js (che fa tutt'altro: nav, lingua, conto alla
      rovescia...). */
   const WORKER_BASE = "https://cometa-sim-github-io.de-toni-carlo.workers.dev";
-  const POLL_MS = 155000; // lo stesso ritmo della pagina Diretta vera
+  /* POLL_MS e' la rete di sicurezza (il ritmo di sempre), non piu' il
+     ritmo fisso: /claim concede il permesso appena un Data Push segnala
+     qualcosa di nuovo (vedi handleClaim in worker/src/tracker.ts), e si
+     ricontrolla molto piu' spesso (RECHECK_MS) quando non c'e' ancora
+     niente — il server dice sempre lui quanto aspettare (retry_after_s),
+     questi due valori sono solo i difetti se non lo specifica. */
+  const POLL_MS = 155000;
+  const RECHECK_MS = 15000;
 
   const $ = (id) => document.getElementById(id);
   let adminToken = "", feedId = "", feedPassword = "";
@@ -167,7 +174,7 @@
     $("panel").hidden = false;
     started = true;
     requestWakeLock();
-    logEvent("avviato — un giro ogni " + (POLL_MS / 1000) + "s");
+    logEvent("avviato — chiede a SPOT appena arriva un Data Push, al massimo ogni " + (POLL_MS / 1000) + "s");
     refreshPositions();
     runCycle();
   });
@@ -217,12 +224,24 @@
 
   // ---------------------------------------------------------------- ciclo
 
+  /* Ogni giro chiede il permesso con /claim e lascia decidere al Worker
+     quanto aspettare prima del prossimo (retry_after_s) — nextDelayMs
+     resta POLL_MS (la rete di sicurezza) solo quando si e' davvero
+     interrogato SPOT in questo giro: appena fatto, non ha senso
+     richiedere di nuovo prima che il limite dei 150s possa scadere. */
   function runCycle(){
+    let nextDelayMs = POLL_MS;
     workerPost("/claim", null)
       .then(function(claim){
         if (!claim.granted) {
-          logEvent("turno di un'altra pagina — niente chiamata questo giro (richiesti ancora " + claim.retry_after_s + "s altrove)");
-          setOutcome("saltato", null);
+          const waitS = claim.retry_after_s != null ? claim.retry_after_s : Math.round(RECHECK_MS / 1000);
+          nextDelayMs = waitS * 1000;
+          if (claim.reason === "nothing_new") {
+            logEvent("niente di nuovo dal Data Push — ricontrollo tra " + waitS + "s");
+          } else {
+            logEvent("turno di un'altra pagina — niente chiamata questo giro (richiesti ancora " + waitS + "s altrove)");
+          }
+          setOutcome("in attesa", null);
           return;
         }
         return fetchSpotAndIngest().then(function(r){
@@ -244,14 +263,14 @@
       })
       .then(function(){
         refreshPositions();
-        scheduleNext();
+        scheduleNext(nextDelayMs);
       });
   }
 
-  function scheduleNext(){
-    nextAt = Date.now() + POLL_MS;
+  function scheduleNext(delayMs){
+    nextAt = Date.now() + delayMs;
     if (timer) clearTimeout(timer);
-    timer = setTimeout(runCycle, POLL_MS);
+    timer = setTimeout(runCycle, delayMs);
   }
 
   setInterval(function(){
@@ -356,7 +375,7 @@
       document.title = "⚠ COMETA · Amministrazione diretta";
     } else {
       b.className = "banner info";
-      b.textContent = "Tieni questa scheda in primo piano: i browser rallentano i timer di una scheda in background, e i 155 s salterebbero.";
+      b.textContent = "Tieni questa scheda in primo piano: i browser rallentano i timer di una scheda in background, e il prossimo giro salterebbe.";
       document.title = "COMETA · Amministrazione diretta";
       if (started) requestWakeLock();
     }

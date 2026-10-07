@@ -27,8 +27,7 @@ endpoint.
 con la pagina anti-bot), ma accetta quelle da un browser normale. Per
 questo non è il Worker a interrogare SPOT: lo fa **`admin-diretta.html`**
 (alla radice del sito, non collegata dal sito, `noindex` — vedi più
-sotto), una pagina aperta in un browser il giorno del lancio, che ogni
-~155 secondi:
+sotto), una pagina aperta in un browser il giorno del lancio, che:
 
 1. chiede il permesso al Worker con `POST /claim`;
 2. se concesso, interroga SPOT direttamente dal browser;
@@ -46,6 +45,17 @@ mai interrogato più di una volta ogni 150 secondi in tutto — un Durable
 Object processa le proprie richieste una alla volta, mai in parallelo,
 quindi il controllo e l'aggiornamento del permesso non vengono mai
 interallacciati da un'altra richiesta nel mezzo.
+
+**Oltre al limite dei 150 secondi**, il permesso è concesso solo se
+c'è qualcosa di nuovo da andare a prendere: un Data Push con punti
+davvero nuovi arrivato nel frattempo (vedi sotto), oppure — se il Data
+Push dovesse smettere di funzionare — ogni 155 secondi comunque
+(`POLL_INTERVAL_MS`, la stessa rete di sicurezza di sempre, nessun
+peggioramento in quel caso). Senza questo, `/claim` risponde
+`{"granted":false,"reason":"nothing_new","retry_after_s":15}`, e la
+pagina di amministrazione ricontrolla dopo 15 secondi invece di
+aspettare fino a 155 — così la quota (che solo il feed REST manda, mai
+il Data Push) segue la posizione molto più da vicino.
 
 Ogni messaggio ricevuto si salva deduplicato per `id` (upsert: un
 messaggio già visto si aggiorna, uno nuovo si inserisce), insieme al
@@ -72,10 +82,12 @@ quota** (`altitude` non esiste nel suo formato XML, a differenza del
 feed REST pubblico) — resta la pagina di amministrazione l'unica fonte
 della quota reale. `upsertPoints()` lo sa: un push senza quota non
 cancella mai una quota già salvata per lo stesso `id` (`COALESCE` in
-`tracker.ts`), aggiorna solo gli altri campi (posizione, tra l'altro
-quasi in tempo reale, utile anche se la pagina admin dovesse restare
-indietro). Tenere entrambi i canali attivi è voluto, non un
-doppione da scegliere.
+`tracker.ts`), aggiorna solo gli altri campi. Tenere entrambi i canali
+attivi è voluto, non un doppione da scegliere: il Data Push dà la
+posizione quasi in tempo reale e **dice a `/claim` quando vale la pena
+interrogare anche il feed REST** per prendere la quota di quel punto
+(vedi sopra) — niente più interrogare SPOT a tempo fisso scollegato da
+quando arriva davvero un dato nuovo.
 
 **Autenticazione**: non `ADMIN_TOKEN` — SPOT firma ogni chiamata con
 un header `X-WSSE` (standard WSSE UsernameToken: `Username`, un
@@ -174,10 +186,12 @@ tiene aperta — vedi "Come funziona" sopra.
 - **All'apertura** chiede admin token, Feed ID e password del feed (se
   richiesta): restano solo nella memoria della pagina — niente nel
   repo, niente in `localStorage`. Si perdono ricaricando la pagina.
-- **Ogni ~155s**: `POST /claim` → se concesso, interroga SPOT dal
-  browser → `POST /ingest` col risultato, successo o errore. Se il
-  permesso non è concesso (un'altra pagina di amministrazione ce l'ha
-  già), salta il giro senza chiamare SPOT.
+- **Ricontrolla da sola**: `POST /claim` → se concesso, interroga SPOT
+  dal browser → `POST /ingest` col risultato, successo o errore. Se il
+  permesso non è concesso, aspetta il tempo che il Worker suggerisce e
+  riprova — poco (~15s) se non c'è ancora niente di nuovo dal Data
+  Push, fino a 150s se un'altra pagina di amministrazione ha appena
+  avuto il turno.
 - **Mostra**: ultima chiamata, esito, punti nuovi arrivati, conto alla
   rovescia al prossimo giro, un registro degli ultimi eventi.
 - **Wake Lock API** (`navigator.wakeLock`) per evitare che lo schermo
