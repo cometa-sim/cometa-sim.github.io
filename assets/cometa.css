@@ -645,7 +645,13 @@ td.mercedes{color:var(--mercedes)}
 .tw-badge.escl,.tw-badge.fuori{color:var(--beacon)}
 .tw-canvas{height:min(72vh,620px);background:#02060f}
 @media(max-width:720px){.tw-canvas{height:64vh}}
-.tw-map .leaflet-container{background:#02060f;font-family:var(--text);cursor:crosshair}
+.tw-map .leaflet-container{background:#02060f;font-family:var(--text);cursor:crosshair;
+  -webkit-user-select:none;user-select:none}
+/* Leaflet mette user-select:none solo sulle mattonelle e i marker, non sul
+   contenitore intero: un clic su un pulsante che sposta subito la vista
+   (es. "torna sull'ultima posizione") puo' finire interpretato come un
+   trascinamento di selezione testo, evidenziando a riquadro blu tutta la
+   mappa sotto. */
 /* img,svg{max-width:100%} del sito: Leaflet lo annulla solo nel suo overlayPane,
    non nei pannelli della fascia, che altrimenti restano larghi zero */
 .tw-map .leaflet-pane svg{max-width:none!important;max-height:none!important}
@@ -679,13 +685,24 @@ td.mercedes{color:var(--mercedes)}
    proprio, quale che sia (.tw-canvas nel predittore, #spotMap qui). */
 .mk-is-fullscreen{height:100vh!important;width:100vw!important;border-radius:0!important}
 
-/* Widget meteo (Open-Meteo): tre numeri, usato sia sotto la mappa del
-   predittore sia nella sezione "Previsione meteo lancio" qui sotto. */
-.mk-weather{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;margin-top:14px;
+/* Widget meteo (Open-Meteo): icona piu' quattro numeri, usato sia sotto la
+   mappa del predittore sia nella sezione "Previsione meteo lancio" qui
+   sotto. Sempre su una riga sola, anche da telefono: repeat(5,1fr) non va
+   mai a capo (le colonne si stringono, non impilano), @media qui sotto
+   stringe anche testo e spaziatura perche' restino leggibili. */
+.mk-weather{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;margin-top:14px;
   border:1px solid var(--line-soft);border-radius:14px;overflow:hidden;background:var(--line-soft)}
-.mk-wtile{padding:14px 10px;background:var(--panel);text-align:center}
+.mk-wtile{padding:14px 6px;background:var(--panel);text-align:center}
+.mk-wtile.mk-wicon{display:flex;align-items:center;justify-content:center;color:var(--cyan)}
 .mk-wv{font-family:var(--disp);font-size:20px;font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums}
+.mk-wv small{font-size:.5em;font-weight:400;margin-left:2px;opacity:.7}
 .mk-wl{margin-top:5px;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+@media(max-width:480px){
+  .mk-wtile{padding:10px 3px}
+  .mk-wv{font-size:14px}
+  .mk-wl{font-size:7.5px;letter-spacing:.04em}
+  .mk-wicon svg{width:18px;height:18px}
+}
 
 /* Il lampeggio arancione del puntino GPS sulla mappa: scatto immediato
    (niente transizione), poi flashMapMarker() aggiunge questa classe per
