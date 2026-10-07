@@ -649,8 +649,12 @@ td.mercedes{color:var(--mercedes)}
 .tw-map .leaflet-container .leaflet-control-attribution{background:rgba(2,6,15,.72);color:var(--muted);font-size:10px}
 .tw-map .leaflet-control-attribution a{color:var(--cyan)}
 .tw-map .leaflet-bar a{background:#0b1726;color:var(--ink);border-color:rgba(255,255,255,.12);
-  display:flex;align-items:center;justify-content:center}
-.tw-map .leaflet-bar a:hover{background:#132234}
+  display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent}
+/* :focus oltre a :hover, o da telefono resta scoperta: Leaflet stesso mette
+   .leaflet-bar a:focus{background:#f4f4f4} (quasi bianco), e un tocco lascia
+   il pulsante a fuoco finche' non si tocca altro — es. durante lo scorrimento
+   della mappa subito dopo aver cambiato livello. */
+.tw-map .leaflet-bar a:hover,.tw-map .leaflet-bar a:focus{background:#132234}
 .tw-map .leaflet-control-scale-line{background:rgba(2,6,15,.72);color:var(--ink);border-color:rgba(255,255,255,.25);
   font-family:var(--mono);font-size:10px}
 .tw-map .leaflet-tooltip{background:#0b1726;color:var(--ink);border-color:rgba(255,255,255,.14);
