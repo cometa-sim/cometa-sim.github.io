@@ -32,6 +32,7 @@ window.COMETA_MAPKIT = (function(){
   const ICON_MAXIMIZE = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M16 3h3a2 2 0 0 1 2 2v3"/><path d="M21 16v3a2 2 0 0 1-2 2h-3"/><path d="M8 21H5a2 2 0 0 1-2-2v-3"/></svg>';
   const ICON_MINIMIZE = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3"/><path d="M21 8h-3a2 2 0 0 1-2-2V3"/><path d="M3 16h3a2 2 0 0 1 2 2v3"/><path d="M16 21v-3a2 2 0 0 1 2-2h3"/></svg>';
   const ICON_RAIN = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 15.6A4.5 4.5 0 0 0 17.5 7h-1.8a7 7 0 1 0-11.5 7"/><path d="M8 19v2"/><path d="M12 19v2"/><path d="M16 19v2"/></svg>';
+  const ICON_SAVE = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/><path d="M17 21v-8H7v8"/><path d="M7 3v5h8"/></svg>';
 
   function dict(){ return (window.I18N && (window.I18N[document.documentElement.lang] || window.I18N.it)) || {}; }
 
@@ -69,7 +70,7 @@ window.COMETA_MAPKIT = (function(){
       }
     });
     new Toggle().addTo(map);
-    return satLayer;
+    return {satLayer: satLayer, isSatellite: function(){ return onSat; }};
   }
 
   /* Schermo intero: la vera Fullscreen API del browser sul
@@ -148,14 +149,40 @@ window.COMETA_MAPKIT = (function(){
     new Rain().addTo(map);
   }
 
-  /* Tutto insieme, nell'ordine giusto per i controlli (satellite in
-     alto a destra, poi radar sotto, schermo intero in alto a
-     sinistra accanto allo zoom). */
-  function enhance(map, L, container, streetLayer){
-    addBaseToggle(map, L, streetLayer);
-    addRainLayer(map, L);
-    addFullscreenControl(map, L, container);
+  /* Salva l'immagine: solo dove chi chiama passa onSave (solo il
+     predittore, che sa generare un PNG della sua mappa — la Diretta
+     non ha questo pulsante). */
+  function addSaveControl(map, L, onSave){
+    const Save = L.Control.extend({
+      options: {position: "topright"},
+      onAdd: function(){
+        const div = L.DomUtil.create("div", "leaflet-bar mk-save");
+        const a = L.DomUtil.create("a", "", div);
+        a.href = "#"; a.innerHTML = ICON_SAVE;
+        a.title = dict().mkSave || "Scarica l'immagine della mappa";
+        L.DomEvent.on(a, "click", L.DomEvent.stop).on(a, "click", onSave);
+        return div;
+      }
+    });
+    new Save().addTo(map);
   }
 
-  return {addBaseToggle: addBaseToggle, addFullscreenControl: addFullscreenControl, addRainLayer: addRainLayer, enhance: enhance};
+  /* Tutto insieme, nell'ordine giusto per i controlli (satellite in
+     alto a destra, poi radar, poi salva; schermo intero in alto a
+     sinistra accanto allo zoom). opts.onSave, se c'e', aggiunge il
+     pulsante di salvataggio. Il risultato espone isSatellite(), cosi'
+     chi genera un'immagine della mappa sa quali mattonelle usare. */
+  function enhance(map, L, container, streetLayer, opts){
+    opts = opts || {};
+    const base = addBaseToggle(map, L, streetLayer);
+    addRainLayer(map, L);
+    addFullscreenControl(map, L, container);
+    if(opts.onSave) addSaveControl(map, L, opts.onSave);
+    return {isSatellite: base.isSatellite};
+  }
+
+  return {
+    addBaseToggle: addBaseToggle, addFullscreenControl: addFullscreenControl, addRainLayer: addRainLayer,
+    addSaveControl: addSaveControl, enhance: enhance, ESRI_SAT: ESRI_SAT, ESRI_ATTR: ESRI_ATTR
+  };
 })();

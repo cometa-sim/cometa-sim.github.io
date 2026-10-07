@@ -351,7 +351,7 @@ function flightParams(iso, hhmm){
    2. La partenza
    ========================================================== */
 let launch = null;            /* {name, lat, lon} */
-let map = null, layer = null, launchMk = null, mapReady = null;   /* la mappa nasce dopo */
+let map = null, layer = null, launchMk = null, mapReady = null, mapkit = null;   /* la mappa nasce dopo */
 let last = null;          /* ultimo calcolo, per ridisegnare al cambio di lingua */
 let week = null;          /* confronto dei prossimi giorni: {iso: risultato} */
 /* Risultati di un altro luogo non devono restare a schermo */
@@ -628,7 +628,7 @@ function loadLeaflet(){
      parallelo con leaflet.js. */
   const mapkit = window.COMETA_MAPKIT ? Promise.resolve() : new Promise(function(ok, ko){
     const s = document.createElement("script");
-    s.src = "assets/mapkit.js?v=123";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
+    s.src = "assets/mapkit.js?v=124";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
     s.onload = ok; s.onerror = ko;
     document.head.appendChild(s);
   });
@@ -662,7 +662,7 @@ function ensureMap(){
       attribution:'© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'
     }).addTo(map);
     L.control.scale({imperial:false}).addTo(map);
-    window.COMETA_MAPKIT && window.COMETA_MAPKIT.enhance(map, L, elMap, street);
+    mapkit = window.COMETA_MAPKIT && window.COMETA_MAPKIT.enhance(map, L, elMap, street, {onSave: exportPng});
     L.polygon(EXCL.map(function(p){ return [p[1], p[0]]; }),
               {color:"#FF7A5C", weight:1.5, fillColor:"#FF7A5C", fillOpacity:.16, interactive:false}).addTo(map);
     /* Fascia di piu' partenze: i poligoni si disegnano opachi in un pannello
@@ -1109,8 +1109,12 @@ function loadTile(url){
 }
 function exportPng(){
   if(!map) return;
-  const L = window.L, msg = $("#twPngMsg");
-  msg.textContent = t("twPngWait");
+  const L = window.L;
+  setStatus(t("twPngWait"));
+  /* Le stesse mattonelle che si vedono in quel momento: via (OSM, ordine
+     {z}/{x}/{y}) o satellite (Esri, ordine {z}/{y}/{x} — diverso!). */
+  const sat = !!(mapkit && mapkit.isSatellite && mapkit.isSatellite());
+  const tileUrl = sat ? window.COMETA_MAPKIT.ESRI_SAT : TILES;
   const size = map.getSize(), z0 = map.getZoom();
   /* Immagine sempre larga almeno OUT_W pixel (fattore S rispetto allo
      schermo). Le mattonelle salgono di zoom quanto basta, ma senza
@@ -1145,7 +1149,8 @@ function exportPng(){
     if(ty < 0 || ty >= n) continue;
     for(let tx = Math.floor(origin.x/256); tx <= Math.floor((origin.x + W/k)/256); tx++){
       const wx = ((tx % n) + n) % n;
-      const url = TILES.replace("{z}", z).replace("{x}", wx).replace("{y}", ty);
+      const url = sat ? tileUrl.replace("{z}", z).replace("{y}", ty).replace("{x}", wx)
+                      : tileUrl.replace("{z}", z).replace("{x}", wx).replace("{y}", ty);
       jobs.push(loadTile(url).then(function(im){
         /* +0,5 px per non lasciare fessure fra una mattonella e l'altra quando k non e' intero */
         if(im) g.drawImage(im, (tx*256 - origin.x)*k, (ty*256 - origin.y)*k, 256*k + .5, 256*k + .5);
@@ -1237,21 +1242,21 @@ function exportPng(){
     g.fillStyle = LIGHT.muted; g.font = 12.5*u + "px Inter, system-ui, sans-serif";
     lines.forEach(function(l, i){ g.fillText(l, 18*u, H + (53 + 19*i)*u); });
     g.font = 11*u + "px Inter, system-ui, sans-serif"; g.fillStyle = "#7A8A99";
-    g.fillText("© OpenStreetMap contributors · Tawhiri (SondeHub) · NOAA GFS · cometa.scuolaitaliana.edu.uy", 18*u, H + FOOT - 14*u);
+    g.fillText((sat ? "Tiles © Esri — Source: Esri, Maxar, Earthstar Geographics, GIS User Community" : "© OpenStreetMap contributors")
+      + " · Tawhiri (SondeHub) · NOAA GFS · cometa.scuolaitaliana.edu.uy", 18*u, H + FOOT - 14*u);
     try {
       cv.toBlob(function(blob){
-        if(!blob){ msg.textContent = t("twPngErr"); return; }
+        if(!blob){ setStatus(t("twPngErr"), true); return; }
         const a = document.createElement("a"), day = x && x.ok ? isoDay(x.pts[0].t) : elDate.value;
         a.download = "cometa-traiettoria-" + (launch ? launch.name : "mappa").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") + "-" + day + ".png";
         a.href = URL.createObjectURL(blob);
         document.body.appendChild(a); a.click(); a.remove();
         setTimeout(function(){ URL.revokeObjectURL(a.href); }, 4000);
-        msg.textContent = missing ? t("twPngPart") : "";
+        setStatus(missing ? t("twPngPart") : "");
       }, "image/png");
-    } catch(e){ msg.textContent = t("twPngErr"); }
+    } catch(e){ setStatus(t("twPngErr"), true); }
   });
 }
-$("#twPng") && $("#twPng").addEventListener("click", function(){ ensureMap().then(exportPng); });
 
 /* ---------- Cambio di lingua: si riscrive quello che e' gia' a schermo ---------- */
 function relabel(){
