@@ -648,7 +648,8 @@ td.mercedes{color:var(--mercedes)}
 .tw-map .leaflet-tile-pane{filter:invert(1) hue-rotate(180deg) brightness(.85) contrast(1.06) saturate(.55)}
 .tw-map .leaflet-container .leaflet-control-attribution{background:rgba(2,6,15,.72);color:var(--muted);font-size:10px}
 .tw-map .leaflet-control-attribution a{color:var(--cyan)}
-.tw-map .leaflet-bar a{background:#0b1726;color:var(--ink);border-color:rgba(255,255,255,.12)}
+.tw-map .leaflet-bar a{background:#0b1726;color:var(--ink);border-color:rgba(255,255,255,.12);
+  display:flex;align-items:center;justify-content:center}
 .tw-map .leaflet-bar a:hover{background:#132234}
 .tw-map .leaflet-control-scale-line{background:rgba(2,6,15,.72);color:var(--ink);border-color:rgba(255,255,255,.25);
   font-family:var(--mono);font-size:10px}
@@ -659,15 +660,10 @@ td.mercedes{color:var(--mercedes)}
 /* ---------- mapkit: satellite / schermo intero / radar pioggia ----------
    Condiviso da ogni mappa scura del sito (classe .tw-map: sia quella
    del predittore sia il riquadro della mappa GPS nella Diretta, vedi
-   index.html) — stesso aspetto scuro dei controlli Leaflet gia' sopra,
-   qui solo i pezzi che quelle regole non coprono (il controllo
-   cambio-livello non e' un .leaflet-bar). */
-.tw-map .leaflet-control-layers{
-  background:#0b1726;color:var(--ink);border:1px solid rgba(255,255,255,.12);border-radius:8px;
-  font-family:var(--text);font-size:13px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
-.tw-map .leaflet-control-layers-toggle{filter:invert(1) brightness(1.6)}
-.tw-map .leaflet-control-layers label{padding:2px 0}
-.tw-map .leaflet-control-layers-separator{border-color:rgba(255,255,255,.14)}
+   index.html) — stesso aspetto scuro dei controlli Leaflet gia' sopra.
+   I tre pulsanti (cambio vista, radar, schermo intero) sono tutti
+   .leaflet-bar con un'icona SVG dentro, gia' centrata dal
+   display:flex sopra. */
 .mk-rain.mk-active a{background:#0f3a5c!important;color:#5FE3FF!important}
 /* Schermo intero: l'elemento richiesto riempie lo schermo da solo
    (Fullscreen API) — qui si toglie solo l'altezza fissa normale
