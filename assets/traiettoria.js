@@ -628,7 +628,7 @@ function loadLeaflet(){
      parallelo con leaflet.js. */
   const mapkit = window.COMETA_MAPKIT ? Promise.resolve() : new Promise(function(ok, ko){
     const s = document.createElement("script");
-    s.src = "assets/mapkit.js";
+    s.src = "assets/mapkit.js?v=123";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
     s.onload = ok; s.onerror = ko;
     document.head.appendChild(s);
   });
@@ -917,7 +917,8 @@ function renderCard(r){
    [t("twTBurst"),    num(r.tBurst, 0) + " min"],
    [t("twDur"),       num(r.dur, 0) + " min"],
    [t("twAt"),        fmtTime(r.end.t, false)],
-   [t("twBurstDist"), num(r.burstDist, 0) + " km · " + num(r.burst.alt/1000, 1) + " km"]
+   [t("twBurstDist"), num(r.burstDist, 0) + " km"],
+   [t("twBurstC"),    num(r.burst.alt/1000, 1) + " km"]
   ].concat(r.spread ? [[t("twErrLand"), "± " + num(r.spread.major, 1) + " km"]] : [])
    .concat(r.spread && r.spread.B ? [[t("twBurstRange"),
      num(r.spread.B.lo.burst.alt/1000, 1) + "–" + num(r.spread.B.hi.burst.alt/1000, 1) + " km"]] : [])
