@@ -383,18 +383,34 @@ function setLaunch(pl, keepText, noSave){
   loadWeather(launch);
 }
 
+/* Le quattro icone del meteo (sole, sole e nuvola, nuvola e goccia, nuvola
+   e tre gocce): soglie semplici su nuvolosita' e probabilita' di pioggia,
+   non un vero simbolo meteorologico — bastano a dare un'idea d'insieme
+   accanto ai numeri. SVG inline per lo stesso motivo delle icone di
+   mapkit.js: un'emoji dipende dal font del sistema. */
+const W_ICON_SUN = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.5"/><path d="M12 2.5v2.5M12 19v2.5M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M2.5 12h2.5M19 12h2.5M4.6 19.4l1.8-1.8M17.6 6.4l1.8-1.8"/></svg>';
+const W_ICON_PARTLY = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 5.5a4 4 0 0 1 7.4 2.1"/><path d="M17.5 20H8a4 4 0 1 1 1.3-7.8 5 5 0 0 1 9.6 2A3.5 3.5 0 0 1 17.5 20Z"/></svg>';
+const W_ICON_DRIZZLE = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 15H8a4 4 0 1 1 1.3-7.8 5 5 0 0 1 9.6 2A3.5 3.5 0 0 1 17.5 15Z"/><path d="M12 18.5v2.5"/></svg>';
+const W_ICON_RAIN = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 13H8a4 4 0 1 1 1.3-7.8 5 5 0 0 1 9.6 2A3.5 3.5 0 0 1 17.5 13Z"/><path d="M8 17v2.5M12 17v2.5M16 17v2.5"/></svg>';
+function weatherIcon(cloudPct, rainPct){
+  if(rainPct >= 60) return W_ICON_RAIN;
+  if(rainPct >= 25) return W_ICON_DRIZZLE;
+  if(cloudPct >= 50) return W_ICON_PARTLY;
+  return W_ICON_SUN;
+}
+
 /* Meteo di adesso nel punto di partenza scelto — solo per dare
    un'idea di cosa si vedrebbe oggi, non per decidere la traiettoria
    (quella usa comunque Tawhiri/GFS). Stesso Open-Meteo gia' usato
    per l'atmosfera (loadAtmo), una chiamata a parte perche' "current"
-   e "hourly" qui servono a cose diverse (T/nuvole adesso, probabilita'
-   di pioggia nell'ora in corso). */
+   e "hourly" qui servono a cose diverse (T/nuvole/vento adesso,
+   probabilita' di pioggia nell'ora in corso). */
 function loadWeather(pl){
   const el = document.getElementById("twWeather");
   if(!el) return;
   const q = new URLSearchParams({
     latitude: pl.lat.toFixed(4), longitude: pl.lon.toFixed(4),
-    current: "temperature_2m,cloud_cover", hourly: "precipitation_probability",
+    current: "temperature_2m,cloud_cover,wind_speed_10m", hourly: "precipitation_probability",
     forecast_days: "1", timezone: TZ
   });
   fetch(METEO + "?" + q.toString())
@@ -403,13 +419,15 @@ function loadWeather(pl){
       if(!d || !d.current){ el.hidden = true; return; }
       el.hidden = false;
       document.getElementById("twWTemp").textContent = Math.round(d.current.temperature_2m) + "°C";
+      document.getElementById("twWWind").innerHTML = Math.round(d.current.wind_speed_10m) + "<small>km/h</small>";
       document.getElementById("twWClouds").textContent = Math.round(d.current.cloud_cover) + "%";
-      let rainPct = "—";
+      let rainPct = 0, rainTxt = "—";
       if(d.hourly && d.hourly.time && d.hourly.precipitation_probability){
         const idx = d.hourly.time.indexOf(d.current.time.slice(0, 13) + ":00");
-        if(idx >= 0) rainPct = Math.round(d.hourly.precipitation_probability[idx]) + "%";
+        if(idx >= 0){ rainPct = d.hourly.precipitation_probability[idx]; rainTxt = Math.round(rainPct) + "%"; }
       }
-      document.getElementById("twWRain").textContent = rainPct;
+      document.getElementById("twWRain").textContent = rainTxt;
+      document.getElementById("twWIcon").innerHTML = weatherIcon(d.current.cloud_cover, rainPct);
     })
     .catch(function(){ el.hidden = true; });
 }

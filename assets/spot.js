@@ -242,7 +242,9 @@ window.COMETA_SPOT = (function(){
         onAdd:function(){
           const div = L.DomUtil.create("div", "leaflet-bar spot-recenter");
           const a = elRecenter = L.DomUtil.create("a", "", div);
-          a.href = "#"; a.innerHTML = "⌖"; a.title = dict().dirSpotRecenter || "recenter";
+          a.href = "#";
+          a.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="7"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>';
+          a.title = dict().dirSpotRecenter || "recenter";
           L.DomEvent.on(a, "click", L.DomEvent.stop).on(a, "click", function(){
             if(lastPoints && lastPoints.length){
               const last = lastPoints[lastPoints.length - 1];
@@ -499,6 +501,21 @@ window.COMETA_SPOT = (function(){
       .catch(function(){ /* silenzioso: offline, CORS, o fuori dall'orizzonte del previsore */ });
   }
 
+  /* Le quattro icone del meteo (sole, sole e nuvola, nuvola e goccia, nuvola
+     e tre gocce): soglie semplici su nuvolosita' e probabilita' di pioggia,
+     non un vero simbolo meteorologico. SVG inline, stesso motivo delle
+     icone di mapkit.js (un'emoji dipende dal font del sistema). */
+  const W_ICON_SUN = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.5"/><path d="M12 2.5v2.5M12 19v2.5M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M2.5 12h2.5M19 12h2.5M4.6 19.4l1.8-1.8M17.6 6.4l1.8-1.8"/></svg>';
+  const W_ICON_PARTLY = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 5.5a4 4 0 0 1 7.4 2.1"/><path d="M17.5 20H8a4 4 0 1 1 1.3-7.8 5 5 0 0 1 9.6 2A3.5 3.5 0 0 1 17.5 20Z"/></svg>';
+  const W_ICON_DRIZZLE = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 15H8a4 4 0 1 1 1.3-7.8 5 5 0 0 1 9.6 2A3.5 3.5 0 0 1 17.5 15Z"/><path d="M12 18.5v2.5"/></svg>';
+  const W_ICON_RAIN = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 13H8a4 4 0 1 1 1.3-7.8 5 5 0 0 1 9.6 2A3.5 3.5 0 0 1 17.5 13Z"/><path d="M8 17v2.5M12 17v2.5M16 17v2.5"/></svg>';
+  function weatherIcon(cloudPct, rainPct){
+    if(rainPct >= 60) return W_ICON_RAIN;
+    if(rainPct >= 25) return W_ICON_DRIZZLE;
+    if(cloudPct >= 50) return W_ICON_PARTLY;
+    return W_ICON_SUN;
+  }
+
   /* Meteo di oggi sul punto di lancio — stesso Open-Meteo gia' usato dal
      previsore (assets/traiettoria.js). Qui il punto e' sempre quello fisso
      del lancio (window.COMETA_FLIGHT.site), non scelto da chi guarda: basta
@@ -510,7 +527,7 @@ window.COMETA_SPOT = (function(){
     const site = (window.COMETA_FLIGHT && window.COMETA_FLIGHT.site) || FALLBACK;
     const q = new URLSearchParams({
       latitude: site.lat.toFixed(4), longitude: site.lon.toFixed(4),
-      current: "temperature_2m,cloud_cover", hourly: "precipitation_probability",
+      current: "temperature_2m,cloud_cover,wind_speed_10m", hourly: "precipitation_probability",
       forecast_days: "1", timezone: TZ
     });
     fetch(METEO + "?" + q.toString())
@@ -519,13 +536,15 @@ window.COMETA_SPOT = (function(){
         if(!d || !d.current){ el.hidden = true; return; }
         el.hidden = false;
         document.getElementById("dirWTemp").textContent = Math.round(d.current.temperature_2m) + "°C";
+        document.getElementById("dirWWind").innerHTML = Math.round(d.current.wind_speed_10m) + "<small>km/h</small>";
         document.getElementById("dirWClouds").textContent = Math.round(d.current.cloud_cover) + "%";
-        let rainPct = "—";
+        let rainPct = 0, rainTxt = "—";
         if(d.hourly && d.hourly.time && d.hourly.precipitation_probability){
           const idx = d.hourly.time.indexOf(d.current.time.slice(0, 13) + ":00");
-          if(idx >= 0) rainPct = Math.round(d.hourly.precipitation_probability[idx]) + "%";
+          if(idx >= 0){ rainPct = d.hourly.precipitation_probability[idx]; rainTxt = Math.round(rainPct) + "%"; }
         }
-        document.getElementById("dirWRain").textContent = rainPct;
+        document.getElementById("dirWRain").textContent = rainTxt;
+        document.getElementById("dirWIcon").innerHTML = weatherIcon(d.current.cloud_cover, rainPct);
       })
       .catch(function(){ el.hidden = true; });
   }
