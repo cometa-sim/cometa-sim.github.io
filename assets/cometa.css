@@ -655,7 +655,37 @@ td.mercedes{color:var(--mercedes)}
 .tw-map .leaflet-tooltip{background:#0b1726;color:var(--ink);border-color:rgba(255,255,255,.14);
   box-shadow:0 8px 24px rgba(0,0,0,.45);font-family:var(--mono);font-size:11.5px}
 .tw-map .leaflet-tooltip-top:before{border-top-color:#0b1726}
-.tw-star{background:none;border:0;cursor:grab}
+
+/* ---------- mapkit: satellite / schermo intero / radar pioggia ----------
+   Condiviso da ogni mappa scura del sito (classe .tw-map: sia quella
+   del predittore sia il riquadro della mappa GPS nella Diretta, vedi
+   index.html) — stesso aspetto scuro dei controlli Leaflet gia' sopra,
+   qui solo i pezzi che quelle regole non coprono (il controllo
+   cambio-livello non e' un .leaflet-bar). */
+.tw-map .leaflet-control-layers{
+  background:#0b1726;color:var(--ink);border:1px solid rgba(255,255,255,.12);border-radius:8px;
+  font-family:var(--text);font-size:13px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+.tw-map .leaflet-control-layers-toggle{filter:invert(1) brightness(1.6)}
+.tw-map .leaflet-control-layers label{padding:2px 0}
+.tw-map .leaflet-control-layers-separator{border-color:rgba(255,255,255,.14)}
+.mk-rain.mk-active a{background:#0f3a5c!important;color:#5FE3FF!important}
+/* Schermo intero: l'elemento richiesto riempie lo schermo da solo
+   (Fullscreen API) — qui si toglie solo l'altezza fissa normale
+   (min(72vh,620px) o il riquadro assoluto della mappa GPS), o
+   resterebbe piccola in mezzo allo schermo nero. Nessun selettore
+   piu' specifico: questa classe finisce sull'elemento mappa vero e
+   proprio, quale che sia (.tw-canvas nel predittore, #spotMap nella
+   Diretta). */
+.mk-is-fullscreen{height:100vh!important;width:100vw!important;border-radius:0!important}
+
+/* Widget meteo (Open-Meteo), sotto la mappa: tre numeri, niente di piu' —
+   serve a dare l'idea di una pagina viva, non un altro pannello di calcolo. */
+.mk-weather{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;margin-top:14px;
+  border:1px solid var(--line-soft);border-radius:14px;overflow:hidden;background:var(--line-soft)}
+.mk-wtile{padding:14px 10px;background:var(--panel);text-align:center}
+.mk-wv{font-family:var(--disp);font-size:20px;font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums}
+.mk-wl{margin-top:5px;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+
 .tw-star span{display:block;font-size:26px;line-height:26px;text-align:center;
   text-shadow:0 0 3px #02060f,0 0 12px currentColor}
 .tw-export{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;margin-top:14px}
