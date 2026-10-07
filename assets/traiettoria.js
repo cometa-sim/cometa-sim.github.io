@@ -383,18 +383,27 @@ function setLaunch(pl, keepText, noSave){
   loadWeather(launch);
 }
 
-/* Le quattro icone del meteo (sole, sole e nuvola, nuvola e goccia, nuvola
-   e tre gocce): soglie semplici su nuvolosita' e probabilita' di pioggia,
-   non un vero simbolo meteorologico — bastano a dare un'idea d'insieme
-   accanto ai numeri. SVG inline per lo stesso motivo delle icone di
-   mapkit.js: un'emoji dipende dal font del sistema. */
+/* Le cinque icone del meteo (sole, sole e nuvola, nuvola e goccia, nuvola
+   e tre gocce, vento): soglie semplici su nuvolosita', probabilita' di
+   pioggia e vento a terra, non un vero simbolo meteorologico — bastano a
+   dare un'idea d'insieme accanto ai numeri. SVG inline per lo stesso
+   motivo delle icone di mapkit.js: un'emoji dipende dal font del
+   sistema. Il vento vince su sole/nuvola (ma non su pioggia: un
+   temporale ventoso resta prima di tutto un temporale) perche' e' il
+   primo motivo per cui si rimanda un lancio quando non piove: 24 km/h
+   e' la soglia citata piu' spesso nelle guide amatoriali ai palloni
+   stratosferici, non un limite calcolato da noi — da adattare se la
+   scuola ne segue uno diverso. */
 const W_ICON_SUN = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.5"/><path d="M12 2.5v2.5M12 19v2.5M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M2.5 12h2.5M19 12h2.5M4.6 19.4l1.8-1.8M17.6 6.4l1.8-1.8"/></svg>';
 const W_ICON_PARTLY = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 5.5a4 4 0 0 1 7.4 2.1"/><path d="M17.5 20H8a4 4 0 1 1 1.3-7.8 5 5 0 0 1 9.6 2A3.5 3.5 0 0 1 17.5 20Z"/></svg>';
 const W_ICON_DRIZZLE = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 15H8a4 4 0 1 1 1.3-7.8 5 5 0 0 1 9.6 2A3.5 3.5 0 0 1 17.5 15Z"/><path d="M12 18.5v2.5"/></svg>';
 const W_ICON_RAIN = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 13H8a4 4 0 1 1 1.3-7.8 5 5 0 0 1 9.6 2A3.5 3.5 0 0 1 17.5 13Z"/><path d="M8 17v2.5M12 17v2.5M16 17v2.5"/></svg>';
-function weatherIcon(cloudPct, rainPct){
+const W_ICON_WIND = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h9a2 2 0 1 0-2-2.8"/><path d="M3 12h13a2.2 2.2 0 1 1-2.2 3.1"/><path d="M3 16h7a1.8 1.8 0 1 1-1.8 2.5"/></svg>';
+const W_WIND_STRONG_KMH = 24;   // soglia "vento forte": vedi commento sopra
+function weatherIcon(cloudPct, rainPct, windKmh){
   if(rainPct >= 60) return W_ICON_RAIN;
   if(rainPct >= 25) return W_ICON_DRIZZLE;
+  if(windKmh >= W_WIND_STRONG_KMH) return W_ICON_WIND;
   if(cloudPct >= 50) return W_ICON_PARTLY;
   return W_ICON_SUN;
 }
@@ -427,7 +436,7 @@ function loadWeather(pl){
         if(idx >= 0){ rainPct = d.hourly.precipitation_probability[idx]; rainTxt = Math.round(rainPct) + "%"; }
       }
       document.getElementById("twWRain").textContent = rainTxt;
-      document.getElementById("twWIcon").innerHTML = weatherIcon(d.current.cloud_cover, rainPct);
+      document.getElementById("twWIcon").innerHTML = weatherIcon(d.current.cloud_cover, rainPct, d.current.wind_speed_10m);
     })
     .catch(function(){ el.hidden = true; });
 }
@@ -646,7 +655,7 @@ function loadLeaflet(){
      parallelo con leaflet.js. */
   const mapkit = window.COMETA_MAPKIT ? Promise.resolve() : new Promise(function(ok, ko){
     const s = document.createElement("script");
-    s.src = "assets/mapkit.js?v=124";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
+    s.src = "assets/mapkit.js?v=126";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
     s.onload = ok; s.onerror = ko;
     document.head.appendChild(s);
   });
