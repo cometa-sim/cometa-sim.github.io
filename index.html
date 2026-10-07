@@ -23,7 +23,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@200;300;400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/cometa.css?v=124">
+<link rel="stylesheet" href="assets/cometa.css?v=125">
 </head>
 <body>
 
@@ -718,11 +718,14 @@
       <div class="map-frame tw-map"><div class="tw-canvas" id="twMap"></div></div>
       <div class="map-legend">
         <span id="twLegendTxt" data-i18n="twLegend">Stella: partenza · linea piena: salita · tratteggio: discesa · cerchio bianco: scoppio.</span>
+        <span data-i18n="twNote">Poligono: area di esclusione.</span>
       </div>
       <div class="mk-weather" id="twWeather" hidden>
-        <div class="mk-wtile"><div class="mk-wv" id="twWTemp">—</div><div class="mk-wl" data-i18n="mkWeatherTemp">Temperatura</div></div>
-        <div class="mk-wtile"><div class="mk-wv" id="twWClouds">—</div><div class="mk-wl" data-i18n="mkWeatherClouds">Nuvolosità</div></div>
-        <div class="mk-wtile"><div class="mk-wv" id="twWRain">—</div><div class="mk-wl" data-i18n="mkWeatherRain">Probabilità pioggia</div></div>
+        <div class="mk-wtile mk-wicon"><div class="mk-wv" id="twWIcon"></div></div>
+        <div class="mk-wtile"><div class="mk-wv" id="twWTemp">—</div><div class="mk-wl" data-i18n="mkWeatherTemp">Temp.</div></div>
+        <div class="mk-wtile"><div class="mk-wv" id="twWWind">—</div><div class="mk-wl" data-i18n="mkWeatherWind">Vento</div></div>
+        <div class="mk-wtile"><div class="mk-wv" id="twWClouds">—</div><div class="mk-wl" data-i18n="mkWeatherClouds">Nuvole</div></div>
+        <div class="mk-wtile"><div class="mk-wv" id="twWRain">—</div><div class="mk-wl" data-i18n="mkWeatherRain">Pioggia</div></div>
       </div>
       <div class="tw-res" id="twRes"></div>
 
@@ -735,7 +738,6 @@
         </div>
         <p class="fig-note" data-i18n="twWeekNote"></p>
       </div>
-      <p class="fig-note" data-i18n="twNote"></p>
     </div>
   </section>
 
@@ -785,7 +787,7 @@
       </div>
 
       <div class="map-frame reveal d1">
-        <iframe id="mapFrame" src="mappe/uru2000_footprint.html?v=124"
+        <iframe id="mapFrame" src="mappe/uru2000_footprint.html?v=125"
                 title="Mappa interattiva dei 600 punti di atterraggio simulati con le ellissi di dispersione"
                 loading="lazy"></iframe>
       </div>
@@ -1144,11 +1146,11 @@
 
 </div>
 
-<script src="assets/i18n.js?v=124"></script>
-<script src="assets/sonda.js?v=124"></script>
-<script src="assets/catena.js?v=124"></script>
-<script src="assets/app.js?v=124"></script>
-<script src="assets/msis.js?v=124"></script>
-<script src="assets/traiettoria.js?v=124"></script>
+<script src="assets/i18n.js?v=125"></script>
+<script src="assets/sonda.js?v=125"></script>
+<script src="assets/catena.js?v=125"></script>
+<script src="assets/app.js?v=125"></script>
+<script src="assets/msis.js?v=125"></script>
+<script src="assets/traiettoria.js?v=125"></script>
 </body>
 </html>

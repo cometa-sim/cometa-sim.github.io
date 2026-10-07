@@ -645,20 +645,63 @@ td.mercedes{color:var(--mercedes)}
 .tw-badge.escl,.tw-badge.fuori{color:var(--beacon)}
 .tw-canvas{height:min(72vh,620px);background:#02060f}
 @media(max-width:720px){.tw-canvas{height:64vh}}
-.tw-map .leaflet-container{background:#02060f;font-family:var(--text);cursor:crosshair}
+.tw-map .leaflet-container{background:#02060f;font-family:var(--text);cursor:crosshair;
+  -webkit-user-select:none;user-select:none}
+/* Leaflet mette user-select:none solo sulle mattonelle e i marker, non sul
+   contenitore intero: un clic su un pulsante che sposta subito la vista
+   (es. "torna sull'ultima posizione") puo' finire interpretato come un
+   trascinamento di selezione testo, evidenziando a riquadro blu tutta la
+   mappa sotto. */
 /* img,svg{max-width:100%} del sito: Leaflet lo annulla solo nel suo overlayPane,
    non nei pannelli della fascia, che altrimenti restano larghi zero */
 .tw-map .leaflet-pane svg{max-width:none!important;max-height:none!important}
 .tw-map .leaflet-tile-pane{filter:invert(1) hue-rotate(180deg) brightness(.85) contrast(1.06) saturate(.55)}
 .tw-map .leaflet-container .leaflet-control-attribution{background:rgba(2,6,15,.72);color:var(--muted);font-size:10px}
 .tw-map .leaflet-control-attribution a{color:var(--cyan)}
-.tw-map .leaflet-bar a{background:#0b1726;color:var(--ink);border-color:rgba(255,255,255,.12)}
+.tw-map .leaflet-bar a{background:#0b1726;color:var(--ink);border-color:rgba(255,255,255,.12);
+  display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent}
+/* :focus oltre a :hover, o da telefono resta scoperta: Leaflet stesso mette
+   .leaflet-bar a:focus{background:#f4f4f4} (quasi bianco), e un tocco lascia
+   il pulsante a fuoco finche' non si tocca altro — es. durante lo scorrimento
+   della mappa subito dopo aver cambiato livello. */
 .tw-map .leaflet-bar a:hover,.tw-map .leaflet-bar a:focus{background:#132234}
 .tw-map .leaflet-control-scale-line{background:rgba(2,6,15,.72);color:var(--ink);border-color:rgba(255,255,255,.25);
   font-family:var(--mono);font-size:10px}
 .tw-map .leaflet-tooltip{background:#0b1726;color:var(--ink);border-color:rgba(255,255,255,.14);
   box-shadow:0 8px 24px rgba(0,0,0,.45);font-family:var(--mono);font-size:11.5px}
 .tw-map .leaflet-tooltip-top:before{border-top-color:#0b1726}
+
+/* ---------- mapkit: satellite / schermo intero / radar pioggia ----------
+   Condiviso da ogni mappa scura del sito (classe .tw-map) — stesso
+   aspetto scuro dei controlli Leaflet gia' sopra. I pulsanti (cambio
+   vista, radar, salva, schermo intero) sono tutti .leaflet-bar con
+   un'icona SVG dentro, gia' centrata dal display:flex sopra. */
+.mk-rain.mk-active a{background:#0f3a5c!important;color:#5FE3FF!important}
+/* Schermo intero: l'elemento richiesto riempie lo schermo da solo
+   (Fullscreen API) — qui si toglie solo l'altezza fissa normale
+   (min(72vh,620px) o il riquadro assoluto della mappa GPS), o
+   resterebbe piccola in mezzo allo schermo nero. */
+.mk-is-fullscreen{height:100vh!important;width:100vw!important;border-radius:0!important}
+
+/* Widget meteo (Open-Meteo), sotto la mappa: icona piu' quattro numeri —
+   serve a dare l'idea di una pagina viva, non un altro pannello di calcolo.
+   Sempre su una riga sola, anche da telefono: repeat(5,1fr) non va mai a
+   capo (le colonne si stringono, non impilano), @media qui sotto stringe
+   anche testo e spaziatura perche' restino leggibili. */
+.mk-weather{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;margin-top:14px;
+  border:1px solid var(--line-soft);border-radius:14px;overflow:hidden;background:var(--line-soft)}
+.mk-wtile{padding:14px 6px;background:var(--panel);text-align:center}
+.mk-wtile.mk-wicon{display:flex;align-items:center;justify-content:center;color:var(--cyan)}
+.mk-wv{font-family:var(--disp);font-size:20px;font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums}
+.mk-wv small{font-size:.5em;font-weight:400;margin-left:2px;opacity:.7}
+.mk-wl{margin-top:5px;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+@media(max-width:480px){
+  .mk-wtile{padding:10px 3px}
+  .mk-wv{font-size:14px}
+  .mk-wl{font-size:7.5px;letter-spacing:.04em}
+  .mk-wicon svg{width:18px;height:18px}
+}
+
 .tw-map .leaflet-popup-content-wrapper{background:#0b1726;color:var(--ink);box-shadow:0 8px 24px rgba(0,0,0,.45)}
 .tw-map .leaflet-popup-content{font-family:var(--mono);font-size:11.5px;line-height:1.6;margin:9px 13px}
 .tw-map .leaflet-popup-tip{background:#0b1726}
