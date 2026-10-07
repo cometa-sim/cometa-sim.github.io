@@ -1,6 +1,7 @@
 import type { Env } from "./env";
-import { fetchSpotPage, fetchFakeSpot, parseSpotJson } from "./spot-client";
+import { fetchSpotPage, fetchFakeSpot, parseSpotJson, parseDataPushXml } from "./spot-client";
 import { checkAuth, corsHeaders, jsonResponse, pointsToCsv, type Point } from "./util";
+import { checkWsseSignature, WSSE_FRESHNESS_MS } from "./wsse";
 
 const POLL_INTERVAL_MS = 155_000; // i 150s richiesti da SPOT, piu' un margine
 const MIN_INTERVAL_MS = 150_000; // mai due chiamate vere piu' vicine di questo
@@ -51,6 +52,9 @@ export class SpotTracker implements DurableObject {
     try {
       if (path === "/track.json" && req.method === "GET") res = await this.handleTrackJson();
       else if (path === "/track.csv" && req.method === "GET") res = await this.handleTrackCsv();
+      // SPOT manda qui il Data Push: autenticato con la firma X-WSSE
+      // (vedi wsse.ts), non con ADMIN_TOKEN — percio' prima del gate sotto.
+      else if (path === "/" && req.method === "POST") res = await this.handleDataPush(req);
       // Tutto il resto e' protetto da token.
       else if (!checkAuth(req, this.env)) res = jsonResponse({ error: "non autorizzato" }, { status: 401 });
       else if (path === "/track-all.json" && req.method === "GET") res = await this.handleTrackAll();
@@ -254,6 +258,71 @@ export class SpotTracker implements DurableObject {
     }
   }
 
+  /* SPOT manda qui, da solo, un messaggio XML quasi appena arriva (Data
+     Push — vedi worker/README.md), invece di dover andare a chiederlo:
+     niente piu' bisogno di una pagina admin aperta in un browser, ne'
+     del blocco anti-bot sui Worker, perche' stavolta e' SPOT a chiamare
+     noi, non il contrario. Autenticato con la firma X-WSSE che SPOT
+     stesso manda a ogni chiamata (checkWsseSignature + nonce anti-replay
+     qui sotto), non con ADMIN_TOKEN.
+     IMPORTANTE: il Data Push di SPOT non manda MAI la quota (altitude
+     non esiste nel suo schema XML) — resta il feed REST (via
+     /claim+/ingest dalla pagina admin) l'unica fonte della quota reale;
+     upsertPoints() preserva una quota gia' salvata invece di
+     sovrascriverla con l'assenza. Il Data Push resta comunque utile:
+     posizione quasi in tempo reale, senza bisogno di tenere una scheda
+     del browser aperta. */
+  private async handleDataPush(req: Request): Promise<Response> {
+    const check = await checkWsseSignature(req.headers.get("X-WSSE"), this.env);
+    if (!check.ok) {
+      console.error(`[SPOT Data Push] rifiutato: ${check.reason}`);
+      return jsonResponse({ error: "non autorizzato" }, { status: 401 });
+    }
+    const fresh = await this.checkAndStoreNonce(check.nonceB64 as string);
+    if (!fresh) {
+      console.error(`[SPOT Data Push] nonce gia' visto — scartato (possibile replay)`);
+      return jsonResponse({ error: "non autorizzato" }, { status: 401 });
+    }
+
+    const routerMessageMode = req.headers.get("routerMessageMode") ?? "?";
+    const routerMessageSeq = req.headers.get("routerMessageSeq") ?? "?";
+    const xml = await req.text();
+    try {
+      let { points, raws } = parseDataPushXml(xml);
+      if (this.env.SPOT_PUSH_ESN) {
+        points = points.filter((p) => (raws.get(p.id) as { esn?: string } | undefined)?.esn === this.env.SPOT_PUSH_ESN);
+      }
+      const { inserted } = this.upsertPoints(points, raws);
+      await this.state.storage.put("lastFetchMs", Date.now());
+      await this.state.storage.put("lastFetchOk", true);
+      await this.state.storage.delete("lastError");
+      console.log(`[SPOT Data Push] ${routerMessageMode}/${routerMessageSeq} — ${points.length} ricevuti, ${inserted} nuovi`);
+      return new Response("OK", { status: 200 });
+    } catch (err) {
+      console.error(`[SPOT Data Push] errore nel parsing XML: ${String(err)}\n${xml.slice(0, 2000)}`);
+      await this.state.storage.put("lastFetchOk", false);
+      await this.state.storage.put("lastError", String(err));
+      return jsonResponse({ error: String(err) }, { status: 500 });
+    }
+  }
+
+  /* Anti-replay del Data Push: un nonce gia' visto viene rifiutato (vedi
+     wsse.ts). I nonce si accumulano in storage con il loro orario di
+     arrivo; qui si scartano quelli piu' vecchi della stessa finestra di
+     freschezza usata per accettarli (un'ora, raccomandata da SPOT),
+     cosi' la tabella non cresce senza limite per tutto il volo. */
+  private async checkAndStoreNonce(nonceB64: string): Promise<boolean> {
+    const key = `pushNonce:${nonceB64}`;
+    if ((await this.state.storage.get<number>(key)) != null) return false;
+    const now = Date.now();
+    await this.state.storage.put(key, now);
+    const all = await this.state.storage.list<number>({ prefix: "pushNonce:" });
+    const stale: string[] = [];
+    for (const [k, ts] of all) if (now - ts > WSSE_FRESHNESS_MS) stale.push(k);
+    if (stale.length) await this.state.storage.delete(stale);
+    return true;
+  }
+
   // --------------------------------------------------------------- polling
 
   /* Il cuore del "una sola interrogazione per tutti" — quando era il
@@ -308,7 +377,12 @@ export class SpotTracker implements DurableObject {
 
   /* Upsert per id: un punto gia' visto si aggiorna (nel raro caso in cui
      SPOT lo ritrasmetta corretto), uno nuovo si inserisce. Mai scartati
-     ne' corretti i valori di quota, anche se sembrano anomali.
+     ne' corretti i valori di quota, anche se sembrano anomali — tranne
+     un caso voluto: il Data Push (vedi handleDataPush) non manda MAI la
+     quota, quindi un suo upsert non deve cancellare una quota gia'
+     salvata dal feed REST per lo stesso id; COALESCE(excluded.altitude,
+     points.altitude) tiene la nuova quota se c'e', altrimenti quella
+     vecchia — mai un buco dove prima c'era un valore vero.
      "inserted" (non "processed") e' il numero di punti DAVVERO nuovi —
      serve a /ingest per dire alla pagina di amministrazione quanti
      punti nuovi sono arrivati in questo giro, non solo quanti ne
@@ -331,7 +405,8 @@ export class SpotTracker implements DurableObject {
         `INSERT INTO points (id, time, lat, lon, altitude, messageType, batteryState, raw)
          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
          ON CONFLICT(id) DO UPDATE SET
-           time=excluded.time, lat=excluded.lat, lon=excluded.lon, altitude=excluded.altitude,
+           time=excluded.time, lat=excluded.lat, lon=excluded.lon,
+           altitude=COALESCE(excluded.altitude, points.altitude),
            messageType=excluded.messageType, batteryState=excluded.batteryState, raw=excluded.raw`,
         p.id, p.time, p.lat, p.lon, p.altitude, p.messageType, p.batteryState,
         JSON.stringify(raws.get(p.id) ?? null)

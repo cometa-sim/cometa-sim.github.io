@@ -16,7 +16,7 @@ export interface RawFetchResult {
    non serve alla traccia (un SOS o un OK senza GPS, per esempio) e non
    diventa un Point. Niente scarti ne' correzioni sulla quota (vedi
    spec): se altitude manca resta null, non si inventa uno zero. */
-function normalize(m: Record<string, unknown>): Point | null {
+export function normalize(m: Record<string, unknown>): Point | null {
   if (m.latitude == null || m.longitude == null) return null;
   const time = m.unixTime != null ? Number(m.unixTime) : m.dateTime ? Math.floor(Date.parse(String(m.dateTime)) / 1000) : null;
   if (time == null || Number.isNaN(time)) return null;
@@ -60,6 +60,56 @@ export function parseSpotJson(data: any): RawFetchResult {
   const points: Point[] = [];
   const raws = new Map<string, unknown>();
   for (const raw of msgs as Record<string, unknown>[]) {
+    const p = normalize(raw);
+    if (!p) continue;
+    points.push(p);
+    raws.set(p.id, raw);
+  }
+  return { points, raws };
+}
+
+function xmlUnescape(s: string): string {
+  return s
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&apos;/g, "'")
+    .replace(/&amp;/g, "&");
+}
+
+function xmlTag(block: string, tag: string): string | null {
+  const m = block.match(new RegExp(`<${tag}[^>]*>([\\s\\S]*?)</${tag}>`));
+  return m && m[1] != null ? xmlUnescape(m[1].trim()) : null;
+}
+
+/* Il Data Push di SPOT (vedi POST / in tracker.ts) manda XML, non JSON —
+   un formato diverso dal feed REST pubblico, ma con lo stesso scopo:
+   normalize() li tratta allo stesso modo una volta riportati alla
+   stessa forma (unixTime/dateTime, non solo timeInGMTSecond/timestamp).
+   NOTA: a differenza del feed REST, i messaggi del Data Push non
+   includono MAI la quota (altitude non esiste nello schema XML di
+   SPOT) — upsertPoints() in tracker.ts lo sa e non sovrascrive una
+   quota gia' salvata con un valore assente.
+   Un parser minimale a espressioni regolari basta qui: la struttura e'
+   piatta e fissa (nessun elemento annidato dentro <message>), e la
+   fonte è quella autenticata via X-WSSE, non input arbitrario. */
+export function parseDataPushXml(xml: string): RawFetchResult {
+  const points: Point[] = [];
+  const raws = new Map<string, unknown>();
+  const blocks = xml.match(/<message>[\s\S]*?<\/message>/g) ?? [];
+  for (const block of blocks) {
+    const raw: Record<string, unknown> = {
+      id: xmlTag(block, "id"),
+      esn: xmlTag(block, "esn"),
+      esnName: xmlTag(block, "esnName"),
+      messageType: xmlTag(block, "messageType"),
+      messageDetail: xmlTag(block, "messageDetail"),
+      dateTime: xmlTag(block, "timestamp"), // ISO8601 — fallback se manca timeInGMTSecond
+      unixTime: xmlTag(block, "timeInGMTSecond"), // opzionale per schema SPOT
+      latitude: xmlTag(block, "latitude"), // opzionale per schema SPOT
+      longitude: xmlTag(block, "longitude"),
+      batteryState: xmlTag(block, "batteryState"),
+    };
     const p = normalize(raw);
     if (!p) continue;
     points.push(p);
