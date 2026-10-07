@@ -380,6 +380,38 @@ function setLaunch(pl, keepText, noSave){
   closeSugg();
   if(map) placeLaunchMarker(true);
   loadAtmo(launch).then(renderBalloon);
+  loadWeather(launch);
+}
+
+/* Meteo di adesso nel punto di partenza scelto — solo per dare
+   un'idea di cosa si vedrebbe oggi, non per decidere la traiettoria
+   (quella usa comunque Tawhiri/GFS). Stesso Open-Meteo gia' usato
+   per l'atmosfera (loadAtmo), una chiamata a parte perche' "current"
+   e "hourly" qui servono a cose diverse (T/nuvole adesso, probabilita'
+   di pioggia nell'ora in corso). */
+function loadWeather(pl){
+  const el = document.getElementById("twWeather");
+  if(!el) return;
+  const q = new URLSearchParams({
+    latitude: pl.lat.toFixed(4), longitude: pl.lon.toFixed(4),
+    current: "temperature_2m,cloud_cover", hourly: "precipitation_probability",
+    forecast_days: "1", timezone: TZ
+  });
+  fetch(METEO + "?" + q.toString())
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(d){
+      if(!d || !d.current){ el.hidden = true; return; }
+      el.hidden = false;
+      document.getElementById("twWTemp").textContent = Math.round(d.current.temperature_2m) + "°C";
+      document.getElementById("twWClouds").textContent = Math.round(d.current.cloud_cover) + "%";
+      let rainPct = "—";
+      if(d.hourly && d.hourly.time && d.hourly.precipitation_probability){
+        const idx = d.hourly.time.indexOf(d.current.time.slice(0, 13) + ":00");
+        if(idx >= 0) rainPct = Math.round(d.hourly.precipitation_probability[idx]) + "%";
+      }
+      document.getElementById("twWRain").textContent = rainPct;
+    })
+    .catch(function(){ el.hidden = true; });
 }
 
 /* Coordinate scritte a mano: "-33.38, -56.52", "-33.38 -56.52",
@@ -581,8 +613,7 @@ function parse(pl, d){
 
 /* ---------- Mappa ---------- */
 function loadLeaflet(){
-  if(window.L) return Promise.resolve();
-  return new Promise(function(ok, ko){
+  const leaflet = window.L ? Promise.resolve() : new Promise(function(ok, ko){
     const css = document.createElement("link");
     css.rel = "stylesheet"; css.href = LEAFLET + "leaflet.css";
     document.head.appendChild(css);
@@ -591,6 +622,17 @@ function loadLeaflet(){
     s.onload = ok; s.onerror = ko;
     document.head.appendChild(s);
   });
+  /* mapkit.js (satellite/schermo intero/radar pioggia): condiviso
+     con assets/spot.js, non tocca window.L al caricamento, solo
+     quando i suoi metodi vengono chiamati — puo' caricare in
+     parallelo con leaflet.js. */
+  const mapkit = window.COMETA_MAPKIT ? Promise.resolve() : new Promise(function(ok, ko){
+    const s = document.createElement("script");
+    s.src = "assets/mapkit.js";
+    s.onload = ok; s.onerror = ko;
+    document.head.appendChild(s);
+  });
+  return Promise.all([leaflet, mapkit]);
 }
 function placeLaunchMarker(pan){
   const L = window.L;
@@ -615,11 +657,12 @@ function ensureMap(){
   mapReady = loadLeaflet().then(function(){
     const L = window.L;
     map = L.map(elMap, {scrollWheelZoom:false, zoomControl:true});
-    L.tileLayer(TILES, {
+    const street = L.tileLayer(TILES, {
       maxZoom:18, crossOrigin:true,      /* le stesse mattonelle servono all'esportazione */
       attribution:'© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'
     }).addTo(map);
     L.control.scale({imperial:false}).addTo(map);
+    window.COMETA_MAPKIT && window.COMETA_MAPKIT.enhance(map, L, elMap, street);
     L.polygon(EXCL.map(function(p){ return [p[1], p[0]]; }),
               {color:"#FF7A5C", weight:1.5, fillColor:"#FF7A5C", fillOpacity:.16, interactive:false}).addTo(map);
     /* Fascia di piu' partenze: i poligoni si disegnano opachi in un pannello
