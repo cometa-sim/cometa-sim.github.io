@@ -56,6 +56,48 @@ conservati. Nessun filtro su `messageType`: il tracker manda anche
 messaggio abbia latitudine e longitudine, il tipo resta conservato nel
 dato.
 
+### Data Push: SPOT manda lui i dati (canale aggiuntivo)
+
+SPOT offre anche un **Data Push**: una volta attivato sull'account
+(va chiesto al supporto SPOT — vedi "SPOT Commercial Account Data
+Push User Guide"), manda lui un messaggio XML a `POST /` quasi appena
+arriva, invece di dover essere interrogato. Configurato dalla pagina
+`myaccount.findmespot.com` → **SPOT API** → **Data Push**, protocollo
+**HTTPS**, con l'URL del Worker (quello intero, senza percorso dopo —
+SPOT **non supporta query string** nell'URL, vedi "Known limitations"
+della guida).
+
+Non sostituisce `/claim`+`/ingest`: **il Data Push non manda mai la
+quota** (`altitude` non esiste nel suo formato XML, a differenza del
+feed REST pubblico) — resta la pagina di amministrazione l'unica fonte
+della quota reale. `upsertPoints()` lo sa: un push senza quota non
+cancella mai una quota già salvata per lo stesso `id` (`COALESCE` in
+`tracker.ts`), aggiorna solo gli altri campi (posizione, tra l'altro
+quasi in tempo reale, utile anche se la pagina admin dovesse restare
+indietro). Tenere entrambi i canali attivi è voluto, non un
+doppione da scegliere.
+
+**Autenticazione**: non `ADMIN_TOKEN` — SPOT firma ogni chiamata con
+un header `X-WSSE` (standard WSSE UsernameToken: `Username`, un
+`Nonce` casuale, `Created`, e un `PasswordDigest` calcolato con
+l'algoritmo descritto nella guida SPOT). `src/wsse.ts` verifica la
+firma contro due secret nuovi (**mai nel repo**, si impostano come gli
+altri — vedi "Deploy"):
+- `SPOT_PUSH_USERNAME` — il "token cliente" nella scheda Data Push
+- `SPOT_PUSH_SECRET` — il "token segreto" nella stessa scheda
+
+Respinge anche i replay (lo stesso `Nonce` due volte) e i messaggi con
+`Created` più vecchio di un'ora (la finestra di freschezza raccomandata
+da SPOT) — i nonce già visti si tengono in storage solo per quella
+finestra, poi si puliscono da soli. Senza i due secret configurati,
+il Data Push viene sempre rifiutato (401): non è un guasto, resta
+solo `/claim`+`/ingest` a funzionare.
+
+Se l'account SPOT dovesse avere più di un dispositivo, il Data Push
+manda i messaggi di tutti — `SPOT_PUSH_ESN` (opzionale) filtra solo
+quelli con l'ESN della nostra sonda; vuoto accetta tutto (va bene con
+un solo dispositivo, il caso di oggi).
+
 ### Il vecchio polling interno (presente, spento)
 
 Il Worker sapeva anche interrogare SPOT da solo, con un ciclo basato
@@ -76,6 +118,12 @@ fanno più nulla di utile.
 |---|---|
 | `GET /track.json` | Punti ordinati per tempo + metadati (`last_fetch`, `last_fetch_ok`, `last_point_time`, `polling_active`). Cache 30s. Solo i punti con `time >= PUBLIC_FROM`; se `PUBLIC_FROM` non è impostato, nessun punto. |
 | `GET /track.csv` | Stessi dati in CSV (orario UTC e locale America/Montevideo, lat, lon, quota, tipo messaggio, batteria). |
+
+### Data Push di SPOT (autenticato con firma X-WSSE, non ADMIN_TOKEN)
+
+| | |
+|---|---|
+| `POST /` | SPOT manda qui l'XML del Data Push appena un nuovo messaggio arriva — vedi "Data Push" sopra. Verifica `X-WSSE` (`SPOT_PUSH_USERNAME`/`SPOT_PUSH_SECRET`), scarta replay e messaggi troppo vecchi. Risponde `200 OK` (testo semplice, come SPOT si aspetta) se tutto va bene, `401` se la firma non torna, `500` su un errore di elaborazione (SPOT riprova da solo fino a 10 volte). |
 
 ### Protetti (header `Authorization: Bearer <ADMIN_TOKEN>`)
 
@@ -201,13 +249,18 @@ chiede esplicitamente in fase di collegamento.
    Dopo il primo deploy, sulla pagina del Worker appena creato:
    **Settings** → **Variables and Secrets** → **Add** (o **Edit
    variables**, a seconda della versione).
-   Per ciascuno di questi tre, Nome + Valore, tipo **Secret** (cifrato,
+   Per ciascuno di questi, Nome + Valore, tipo **Secret** (cifrato,
    non più leggibile dopo averlo salvato — non il tipo "Text", che
    resta in chiaro):
    - `FEED_ID` — l'id del feed pubblico SPOT
    - `FEED_PASSWORD` — solo se il canale la richiede
    - `ADMIN_TOKEN` — un token lungo e casuale, per esempio generato con
      `openssl rand -hex 32`
+   - `SPOT_PUSH_USERNAME` — il "token cliente" dalla scheda Data Push
+     di `myaccount.findmespot.com` → SPOT API → Data Push (solo se si
+     usa il Data Push — vedi "Data Push" sopra; senza, resta solo
+     `/claim`+`/ingest`)
+   - `SPOT_PUSH_SECRET` — il "token segreto" nella stessa scheda
 
    `ALLOWED_ORIGINS` **non** va qui: è una variabile normale (non un
    segreto), già definita in `wrangler.toml` sotto `[vars]` — cambia
@@ -258,7 +311,12 @@ committato):
 ```
 FEED_ID=...
 ADMIN_TOKEN=...
+SPOT_PUSH_USERNAME=...
+SPOT_PUSH_SECRET=...
 ```
+(gli ultimi due solo per provare `POST /` in locale — vedi "Data Push"
+sopra; un corpo XML firmato si costruisce con lo stesso algoritmo
+descritto lì, non con `curl` a mano.)
 
 ### Il giorno del lancio
 
@@ -276,7 +334,11 @@ Poi aprire `admin-diretta.html`, inserire admin token/Feed ID/password
 del feed, premere "Avvia" e **tenere quella scheda in primo piano**
 per tutto il volo (vedi "Pagina di amministrazione" sopra — il Wake
 Lock evita che lo schermo si spenga, ma non basta da solo se si cambia
-scheda).
+scheda). Se `SPOT_PUSH_USERNAME`/`SPOT_PUSH_SECRET` sono configurati e
+il Data Push è attivo sull'account SPOT, la posizione arriva comunque
+quasi in tempo reale anche se quella scheda restasse indietro — ma
+tenerla aperta resta necessario per la quota, che il Data Push non
+manda (vedi "Data Push" sopra).
 
 Dopo il volo, se ci sono buchi (per esempio dopo un'interruzione di
 rete), `POST /backfill` riscarica tutto da SPOT e li colma.
@@ -287,8 +349,11 @@ rete), `POST /backfill` riscarica tutto da SPOT e li colma.
 npm run tail
 ```
 mostra i log in diretta: un `/ingest` fallito (errore SPOT, HTTP
-non-ok) logga per intero status e corpo della risposta. `last_fetch`
-in `GET /track.json` conferma che gli `/ingest` arrivano ogni ~155s;
-se più pagine di amministrazione sono aperte insieme, i `/claim`
-negati negli eventi di `admin-diretta.html` confermano che solo una
-alla volta sta davvero chiamando SPOT.
+non-ok) logga per intero status e corpo della risposta; un Data Push
+rifiutato logga il motivo (`[SPOT Data Push] rifiutato: ...`), uno
+accettato logga quanti punti ha ricevuto e quanti erano davvero nuovi.
+`last_fetch` in `GET /track.json` conferma che i dati arrivano (da
+`/ingest` o dal Data Push, ogni ~155s l'uno, quasi subito l'altro); se
+più pagine di amministrazione sono aperte insieme, i `/claim` negati
+negli eventi di `admin-diretta.html` confermano che solo una alla
+volta sta davvero chiamando SPOT.
