@@ -646,12 +646,18 @@ td.mercedes{color:var(--mercedes)}
 .tw-canvas{height:min(72vh,620px);background:#02060f}
 @media(max-width:720px){.tw-canvas{height:64vh}}
 .tw-map .leaflet-container{background:#02060f;font-family:var(--text);cursor:crosshair;
-  -webkit-user-select:none;user-select:none}
-/* Leaflet mette user-select:none solo sulle mattonelle e i marker, non sul
-   contenitore intero: un clic su un pulsante che sposta subito la vista
-   (es. "torna sull'ultima posizione") puo' finire interpretato come un
-   trascinamento di selezione testo, evidenziando a riquadro blu tutta la
-   mappa sotto. */
+  -webkit-user-select:none;user-select:none;outline:none}
+.tw-map .leaflet-container:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+/* La riga blu segnalata sopra e sotto la mappa: non era una selezione di
+   testo (gia' esclusa da user-select:none sopra), ma il contorno di
+   default del browser per l'elemento a fuoco — Leaflet rende il
+   contenitore tabindex="0" per il pan da tastiera, e un clic su un
+   controllo dentro la mappa (es. "torna sull'ultima posizione") gli
+   passa il fuoco. :focus-visible al posto di :focus mostra il contorno
+   solo da tastiera, non al clic del mouse: l'accessibilita' resta,
+   sparisce solo il contorno indesiderato dopo un tocco o un clic.
+   user-select:none resta comunque utile, anche se non era la causa di
+   questo bug. */
 /* img,svg{max-width:100%} del sito: Leaflet lo annulla solo nel suo overlayPane,
    non nei pannelli della fascia, che altrimenti restano larghi zero */
 .tw-map .leaflet-pane svg{max-width:none!important;max-height:none!important}
