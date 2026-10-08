@@ -38,7 +38,7 @@ it:{
   dirSpotRecenter:"Torna sull'ultima posizione",
   dirAltHead:"Quota", dirAltEstLabel:"Stimata", dirAltGpsLabel:"Ultimo punto GPS",
   dirWeatherHead:"Previsione meteo lancio",
-  mkLayerStreet:"Via", mkLayerSat:"Satellite", mkFullscreen:"Schermo intero", mkRain:"Nuvole (satellite NASA)",
+  mkLayerStreet:"Via", mkLayerSat:"Satellite", mkFullscreen:"Schermo intero", mkRain:"Nuvole (foto satellitare)",
   mkWeatherTemp:"Temp.", mkWeatherWind:"Vento", mkWeatherClouds:"Nuvole", mkWeatherRain:"Pioggia", mkWeatherErr:"Meteo non disponibile",
 
   /* — Inizio — */
@@ -481,7 +481,7 @@ es:{
   dirSpotRecenter:"Volver a la última posición",
   dirAltHead:"Altitud", dirAltEstLabel:"Estimada", dirAltGpsLabel:"Último punto GPS",
   dirWeatherHead:"Previsión meteorológica del lanzamiento",
-  mkLayerStreet:"Calle", mkLayerSat:"Satélite", mkFullscreen:"Pantalla completa", mkRain:"Nubes (satélite NASA)",
+  mkLayerStreet:"Calle", mkLayerSat:"Satélite", mkFullscreen:"Pantalla completa", mkRain:"Nubes (foto satelital)",
   mkWeatherTemp:"Temp.", mkWeatherWind:"Viento", mkWeatherClouds:"Nubes", mkWeatherRain:"Lluvia", mkWeatherErr:"Clima no disponible",
 
   heroSchool:"Scuola Italiana di Montevideo",
@@ -918,7 +918,7 @@ en:{
   dirSpotRecenter:"Back to last position",
   dirAltHead:"Altitude", dirAltEstLabel:"Estimated", dirAltGpsLabel:"Latest GPS fix",
   dirWeatherHead:"Launch weather forecast",
-  mkLayerStreet:"Street", mkLayerSat:"Satellite", mkFullscreen:"Fullscreen", mkRain:"Clouds (NASA satellite)",
+  mkLayerStreet:"Street", mkLayerSat:"Satellite", mkFullscreen:"Fullscreen", mkRain:"Clouds (satellite photo)",
   mkWeatherTemp:"Temp.", mkWeatherWind:"Wind", mkWeatherClouds:"Clouds", mkWeatherRain:"Rain", mkWeatherErr:"Weather unavailable",
 
   heroSchool:"Scuola Italiana di Montevideo",
