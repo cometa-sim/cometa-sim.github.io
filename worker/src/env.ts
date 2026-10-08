@@ -33,4 +33,9 @@ export interface Env {
      nemmeno entrare nello storage. Lasciarlo vuoto accetta tutto
      (va bene se l'account ha un solo dispositivo). */
   SPOT_PUSH_ESN?: string;
+  /* Chiave OpenWeatherMap per il proxy /clouds/ — vedi cloud-proxy.ts.
+     Non ha niente a che fare con SPOT: vive qui solo perche' e' lo
+     stesso Worker/stesso repo. Mai nel repo, si imposta con
+     `wrangler secret put`, come gli altri secret sopra. */
+  OWM_KEY: string;
 }
