@@ -1,15 +1,15 @@
 /* ============================================================
    COMETA — estensioni condivise per le mappe Leaflet del sito
-   (vista satellite, schermo intero, pioggia NASA GPM IMERG).
+   (vista satellite, schermo intero, foto satellitare delle nuvole).
    Usato da assets/traiettoria.js (predittore) e assets/spot.js
    (Diretta) — nessuna delle due pagine lo carica da sola: va
    aggiunto dopo leaflet.js, prima di creare i livelli.
 
-   Il satellite e la pioggia vanno in pannelli Leaflet a parte,
+   Il satellite e le nuvole vanno in pannelli Leaflet a parte,
    apposta: il resto del sito applica un filtro CSS (invert) alle
    mattonelle stradali per renderle scure (.leaflet-tile-pane) — un
    filtro non si puo' "togliere" di nuovo su un figlio con altro
-   CSS, quindi le immagini satellitari e la pioggia, che vanno
+   CSS, quindi le immagini satellitari e le nuvole, che vanno
    mostrate con i colori veri, stanno in pannelli propri che quella
    regola non tocca (vedi assets/cometa.css, sezione "mapkit").
 
@@ -25,24 +25,30 @@ window.COMETA_MAPKIT = (function(){
 
   const ESRI_SAT = "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}";
   const ESRI_ATTR = 'Tiles &copy; Esri &mdash; Source: Esri, Maxar, Earthstar Geographics, GIS User Community';
-  /* Pioggia: stima satellitare NASA GPM IMERG via GIBS, non un radar da
-     terra — RainViewer (usato qui prima) si appoggia alle reti radar
-     nazionali, che in Sud America hanno buchi di copertura: sopra
-     l'Uruguay non mostrava mai nulla, non un bug nostro ma nemmeno
-     utile. IMERG e' una stima quasi globale, aggiornata ogni 30 minuti
-     con circa 5 ore di ritardo (il tempo di elaborare i dati satellite),
-     a bassa risoluzione (non va oltre lo zoom nativo 6). time=default
-     lascia scegliere al server la pubblicazione piu' recente, senza
-     dover interrogare prima le capacita' del servizio — a differenza
-     di RainViewer non serve nessuna chiamata preliminare per sapere
-     l'URL del fotogramma. */
-  const RAIN_TILES = "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/IMERG_Precipitation_Rate/default/default/GoogleMapsCompatible_Level6/{z}/{y}/{x}.png";
-  const RAIN_NATIVE_ZOOM = 6;
+  /* Nuvole: foto satellitare vera (colori reali), non una stima di
+     pioggia. Due tentativi prima di questo non andavano bene sopra
+     l'Uruguay: RainViewer si appoggia a radar da terra che in Sud
+     America hanno buchi di copertura (non mostrava mai nulla); GPM
+     IMERG via GIBS (nostro secondo tentativo) non mostrava nulla
+     nemmeno mentre pioveva davvero — l'URL non e' mai stato verificato
+     da qui, la rete di questa sandbox non raggiunge gibs.earthdata.nasa.gov
+     per controllarlo. Questo e' il layer "di bandiera" di NASA GIBS,
+     lo stesso che Worldview mostra di default: l'URL qui sotto e'
+     copiato testuale dall'esempio ufficiale di NASA (nasa-gibs/gibs-
+     web-examples su GitHub), non ricostruito a memoria come i due
+     tentativi precedenti — il piu' alto livello di certezza possibile
+     senza poterlo caricare da qui per vederlo. Mostra sempre qualcosa
+     (nuvole o cielo sereno, mai "niente" come la pioggia quando non
+     piove), ma e' una foto satellitare, non una mappa di pioggia:
+     aggiornata una volta al giorno (passaggio del satellite Terra, non
+     geostazionario) e con qualche ora di ritardo per l'elaborazione. */
+  const CLOUD_TILES = "https://gibs-{s}.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Terra_CorrectedReflectance_TrueColor/default/default/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg";
+  const CLOUD_NATIVE_ZOOM = 9;
 
   const ICON_LAYERS = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 2 9 5-9 5-9-5 9-5Z"/><path d="m3 12 9 5 9-5"/><path d="m3 17 9 5 9-5"/></svg>';
   const ICON_MAXIMIZE = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M16 3h3a2 2 0 0 1 2 2v3"/><path d="M21 16v3a2 2 0 0 1-2 2h-3"/><path d="M8 21H5a2 2 0 0 1-2-2v-3"/></svg>';
   const ICON_MINIMIZE = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3"/><path d="M21 8h-3a2 2 0 0 1-2-2V3"/><path d="M3 16h3a2 2 0 0 1 2 2v3"/><path d="M16 21v-3a2 2 0 0 1 2-2h3"/></svg>';
-  const ICON_RAIN = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 15.6A4.5 4.5 0 0 0 17.5 7h-1.8a7 7 0 1 0-11.5 7"/><path d="M8 19v2"/><path d="M12 19v2"/><path d="M16 19v2"/></svg>';
+  const ICON_CLOUD = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H8a4 4 0 1 1 1.3-7.8 5 5 0 0 1 9.6 2A3.5 3.5 0 0 1 17.5 19Z"/></svg>';
   const ICON_SAVE = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/><path d="M17 21v-8H7v8"/><path d="M7 3v5h8"/></svg>';
 
   function dict(){ return (window.I18N && (window.I18N[document.documentElement.lang] || window.I18N.it)) || {}; }
@@ -114,11 +120,15 @@ window.COMETA_MAPKIT = (function(){
     });
   }
 
-  /* Pioggia (vedi RAIN_TILES sopra): pannello a parte, sopra le
+  /* Nuvole (vedi CLOUD_TILES sopra): pannello a parte, sopra le
      mattonelle di base (z-index piu' alto), sotto a marker/tracce.
      Interruttore separato dal cambio Via/Satellite: si sovrappone a
      entrambi. Niente chiamata preliminare: l'URL delle mattonelle e'
-     gia' completo, il livello si crea una sola volta al primo clic. */
+     gia' completo, il livello si crea una sola volta al primo clic.
+     Nomi interni (pane "mkRain", classe .mk-rain) rimasti da quando
+     qui c'era un livello di pioggia: cambiarli vorrebbe dire toccare
+     anche il CSS in piu' file, per un dettaglio che chi usa il sito
+     non vede mai — l'icona e il testo del pulsante sono gia' giusti. */
   function addRainLayer(map, L){
     map.createPane("mkRain");
     map.getPane("mkRain").style.zIndex = 350;
@@ -128,9 +138,9 @@ window.COMETA_MAPKIT = (function(){
       on = !on;
       if(wrap) wrap.classList.toggle("mk-active", on);
       if(!layer){
-        layer = L.tileLayer(RAIN_TILES, {
-          pane: "mkRain", opacity: .6, maxZoom: 18, maxNativeZoom: RAIN_NATIVE_ZOOM,
-          attribution: 'Pioggia: <a href="https://gpm.nasa.gov/" target="_blank" rel="noopener">NASA GPM IMERG</a>'
+        layer = L.tileLayer(CLOUD_TILES, {
+          pane: "mkRain", subdomains: "abc", opacity: .9, maxZoom: 18, maxNativeZoom: CLOUD_NATIVE_ZOOM,
+          attribution: 'Nuvole: <a href="https://worldview.earthdata.nasa.gov/" target="_blank" rel="noopener">NASA MODIS/Worldview</a>'
         });
       }
       if(on) layer.addTo(map); else map.removeLayer(layer);
@@ -140,8 +150,8 @@ window.COMETA_MAPKIT = (function(){
       onAdd: function(){
         wrap = L.DomUtil.create("div", "leaflet-bar mk-rain");
         const btn = L.DomUtil.create("a", "", wrap);
-        btn.href = "#"; btn.innerHTML = ICON_RAIN;
-        btn.title = dict().mkRain || "Pioggia (NASA GPM IMERG)";
+        btn.href = "#"; btn.innerHTML = ICON_CLOUD;
+        btn.title = dict().mkRain || "Nuvole (satellite NASA)";
         L.DomEvent.on(btn, "click", L.DomEvent.stop).on(btn, "click", toggle);
         return wrap;
       }
@@ -168,7 +178,7 @@ window.COMETA_MAPKIT = (function(){
   }
 
   /* Tutto insieme, nell'ordine giusto per i controlli (satellite in
-     alto a destra, poi pioggia, poi salva; schermo intero in alto a
+     alto a destra, poi nuvole, poi salva; schermo intero in alto a
      sinistra accanto allo zoom). opts.onSave, se c'e', aggiunge il
      pulsante di salvataggio. Il risultato espone isSatellite(), cosi'
      chi genera un'immagine della mappa sa quali mattonelle usare. */
