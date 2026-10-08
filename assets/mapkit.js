@@ -38,9 +38,14 @@ window.COMETA_MAPKIT = (function(){
        giorno come sotto), e il prodotto "true_color_ch13_dsa" unisce
        visibile e infrarosso quindi si vede qualcosa anche di notte
        (verificato: di notte il prodotto "solo visibile" natural_color
-       e' bianco vuoto, questo no). L'indice {CPTEC_INDEX} da' sempre
-       l'orario dell'ultima mattonella pronta, cosi' non si indovina.
-       Mostra nuvole vere, non solo dove piove.
+       e' bianco vuoto, questo no). L'orario dell'ultima mattonella
+       pronta si indovina (vedi cptecFrame/tryCptec sotto): l'indice
+       JSON che CPTEC pubblica non manda intestazioni CORS, quindi un
+       fetch() da pagina non riesce mai a leggerlo (verificato con
+       curl -D: nessuna Access-Control-Allow-Origin, ne' sull'indice
+       ne' sulle mattonelle — curl non applica CORS, un browser si',
+       bug passato inosservato nei due giri precedenti). Mostra nuvole
+       vere, non solo dove piove.
      - Europa: RainViewer, radar pioggia da terra — qui la rete di
        radar nazionali e' densa (a differenza del Sud America, dove
        RainViewer non mostrava mai nulla: il motivo per cui si era
@@ -64,8 +69,30 @@ window.COMETA_MAPKIT = (function(){
 
   const CPTEC_TILES = "https://{s}.cptec.inpe.br/goes/goes16/web_tiles/{d}/true_color_ch13_dsa/{t}/{z}/{x}/{y}.png";
   const CPTEC_SUBDOMAINS = ["s0", "s1", "s2", "s3"];
-  const CPTEC_INDEX = "https://s0.cptec.inpe.br/goes/goes16/web_tiles/json/true_color_ch13_dsa/lastest.json";
   const CPTEC_NATIVE_ZOOM = 6;
+  /* CPTEC pubblica anche un indice JSON con l'orario dell'ultima
+     mattonella pronta (.../lastest.json), ma le sue risposte non hanno
+     l'intestazione CORS Access-Control-Allow-Origin (verificato con
+     curl -D, mattonelle comprese: nessuna delle due la manda) — un
+     fetch() da pagina la vede sempre come richiesta fallita, mai come
+     risposta leggibile, quindi quell'indice non e' utilizzabile da
+     qui (si era creduto funzionasse perche' curl, a differenza di un
+     browser, non applica CORS: il bug e' passato inosservato nei due
+     giri precedenti). Le MATTONELLE invece si caricano benissimo
+     senza CORS (sono <img>, non fetch), quindi l'orario si indovina:
+     scansione ogni 10 minuti, qualche minuto di ritardo per
+     l'elaborazione (osservato fra 10 e 25 minuti). Si parte
+     dall'intervallo di 10 minuti piu' recente e, se le mattonelle
+     rispondono 404 (intervallo non ancora pubblicato — verificato: un
+     orario nel futuro da' 404 su tutte, non un'immagine vuota), si
+     riprova 10 minuti piu' indietro, fino a un limite oltre il quale
+     si rinuncia a favore di MODIS. */
+  function cptecFrame(offsetMin){
+    const d = new Date(Date.now() - offsetMin*60000);
+    const mi = Math.floor(d.getUTCMinutes()/10)*10;
+    function pad(n){ return (n < 10 ? "0" : "") + n; }
+    return "" + d.getUTCFullYear() + pad(d.getUTCMonth() + 1) + pad(d.getUTCDate()) + pad(d.getUTCHours()) + pad(mi);
+  }
   /* Riquadro approssimato dove il satellite GOES-16 (fermo sopra
      l'equatore, circa 75°O) vede bene: oltre questi margini l'angolo
      di vista diventa troppo obliquo (immagine distorta o scura ai
@@ -165,11 +192,14 @@ window.COMETA_MAPKIT = (function(){
      sotto a marker/tracce. Interruttore separato dal cambio
      Via/Satellite: si sovrappone a entrambi. Il livello si crea una
      sola volta, al primo clic, in base al centro della mappa in quel
-     momento (vedi isAmericas/isEurope sopra) — per le Americhe e per
-     l'Europa serve anche interrogare un indice per sapere l'ultima
-     mattonella pronta, quindi quel primo clic e' asincrono; un secondo
-     clic rapido prima che risponda spegne solo l'interruttore, il
-     livello (quando arriva) resta pronto per il prossimo. L'icona
+     momento (vedi isAmericas/isEurope sopra) — per l'Europa serve
+     anche interrogare l'indice RainViewer, per le Americhe si indovina
+     l'orario e si riprova piu' indietro se serve (vedi cptecFrame e
+     tryCptec sotto: l'indice vero di CPTEC non manda intestazioni CORS
+     e un fetch() da pagina non riesce mai a leggerlo), quindi quel
+     primo clic e' asincrono; un secondo clic rapido prima che risponda
+     spegne solo l'interruttore, il livello (quando arriva) resta
+     pronto per il prossimo. L'icona
      cambia da nuvola a pioggia quando la fonte e' RainViewer (unica
      fra le tre che mostra solo precipitazione, non nuvole in
      generale): altrimenti, con cielo coperto ma senza pioggia, un
@@ -214,6 +244,34 @@ window.COMETA_MAPKIT = (function(){
       setButton(!!rainOnly);
       if(on) layer.addTo(map);
     }
+    /* Prova le mattonelle CPTEC per l'intervallo di 10 minuti a
+       offsetMin minuti fa; se rispondono tutte 404 (non ancora
+       pubblicato), riprova 10 minuti piu' indietro. Le mattonelle
+       provate vanno gia' sulla mappa vera (non in un livello di
+       prova a parte): se falliscono restano semplicemente vuote
+       (un 404 non disegna nulla), se funzionano sono gia' a posto,
+       nessun doppio caricamento. */
+    function tryCptec(offsetMin){
+      if(!on){ loading = false; return; } // utente ha gia' rispento mentre si indovinava l'orario
+      if(offsetMin > 50){ ready(modisLayer()); return; } // troppo indietro: rinuncia, meglio una foto di ieri che niente
+      const probe = cptecLayer(cptecFrame(offsetMin));
+      let okCount = 0, settled = false;
+      probe.on("tileload", function(){ okCount++; });
+      probe.on("load", function(){
+        if(settled) return;
+        settled = true;
+        if(okCount > 0){ ready(probe); return; }
+        /* rimozione (e tentativo successivo) rimandati al giro
+           successivo dell'event loop: altri tile "error" dello stesso
+           giro sono ancora in coda quando "load" scatta, e
+           GridLayer._tileOnError si rompe (accede a this._map gia'
+           azzerato) se il livello sparisce mentre quella coda e'
+           ancora a meta' - visto davvero, non solo in teoria: test
+           Playwright con mattonelle finte a 404. */
+        setTimeout(function(){ map.removeLayer(probe); tryCptec(offsetMin + 10); }, 0);
+      });
+      probe.addTo(map);
+    }
     function toggle(){
       on = !on;
       if(wrap) wrap.classList.toggle("mk-active", on);
@@ -222,9 +280,7 @@ window.COMETA_MAPKIT = (function(){
       const c = map.getCenter();
       if(isAmericas(c.lat, c.lng)){
         loading = true;
-        fetch(CPTEC_INDEX).then(function(r){ return r.json(); })
-          .then(function(j){ ready(cptecLayer(j.date)); })
-          .catch(function(){ ready(modisLayer()); }); // indice CPTEC irraggiungibile: foto di ieri meglio di niente
+        tryCptec(0);
       } else if(isEurope(c.lat, c.lng)){
         loading = true;
         fetch(RAIN_INDEX).then(function(r){ return r.json(); })
