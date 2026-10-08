@@ -28,22 +28,24 @@ window.COMETA_MAPKIT = (function(){
   /* Nuvole: foto satellitare vera (colori reali), non una stima di
      pioggia. Due tentativi prima di questo non andavano bene sopra
      l'Uruguay: RainViewer si appoggia a radar da terra che in Sud
-     America hanno buchi di copertura (non mostrava mai nulla); GPM
-     IMERG via GIBS (nostro secondo tentativo) non mostrava nulla
-     nemmeno mentre pioveva davvero — l'URL non e' mai stato verificato
-     da qui, la rete di questa sandbox non raggiunge gibs.earthdata.nasa.gov
-     per controllarlo. Questo e' il layer "di bandiera" di NASA GIBS,
-     lo stesso che Worldview mostra di default: l'URL qui sotto e'
-     copiato testuale dall'esempio ufficiale di NASA (nasa-gibs/gibs-
-     web-examples su GitHub), non ricostruito a memoria come i due
-     tentativi precedenti — il piu' alto livello di certezza possibile
-     senza poterlo caricare da qui per vederlo. Mostra sempre qualcosa
-     (nuvole o cielo sereno, mai "niente" come la pioggia quando non
-     piove), ma e' una foto satellitare, non una mappa di pioggia:
-     aggiornata una volta al giorno (passaggio del satellite Terra, non
-     geostazionario) e con qualche ora di ritardo per l'elaborazione. */
-  const CLOUD_TILES = "https://gibs-{s}.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Terra_CorrectedReflectance_TrueColor/default/default/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg";
+     America hanno buchi di copertura; questo stesso layer, al primo
+     giro, usciva nero — due bug distinti, trovati scaricando davvero
+     le mattonelle dopo aver aggiunto gibs.earthdata.nasa.gov ai domini
+     permessi di questa sandbox (prima non potevamo verificarlo da
+     qui): l'estensione era .jpg, ma il servizio la vuole .jpeg; e la
+     mattonella del giorno corrente puo' restare nera per buona parte
+     della giornata, perche' Terra (orbita polare, un solo passaggio al
+     giorno) non ha ancora sorvolato la zona o i dati non sono stati
+     ancora elaborati — si chiede sempre quella di ieri (funzione
+     cloudTime sotto), che a quel punto e' sempre completa. Questo e'
+     comunque il layer "di bandiera" di NASA GIBS, lo stesso che
+     Worldview mostra di default: mostra sempre qualcosa (nuvole o
+     cielo sereno), mai "niente" come la pioggia quando non piove —
+     limite da tenere presente: e' una foto di un giorno fa, non in
+     tempo reale come un vero radar. */
+  const CLOUD_TILES = "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Terra_CorrectedReflectance_TrueColor/default/{time}/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpeg";
   const CLOUD_NATIVE_ZOOM = 9;
+  function cloudTime(){ return new Date(Date.now() - 86400000).toISOString().slice(0, 10); }
 
   const ICON_LAYERS = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 2 9 5-9 5-9-5 9-5Z"/><path d="m3 12 9 5 9-5"/><path d="m3 17 9 5 9-5"/></svg>';
   const ICON_MAXIMIZE = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M16 3h3a2 2 0 0 1 2 2v3"/><path d="M21 16v3a2 2 0 0 1-2 2h-3"/><path d="M8 21H5a2 2 0 0 1-2-2v-3"/></svg>';
@@ -139,7 +141,7 @@ window.COMETA_MAPKIT = (function(){
       if(wrap) wrap.classList.toggle("mk-active", on);
       if(!layer){
         layer = L.tileLayer(CLOUD_TILES, {
-          pane: "mkRain", subdomains: "abc", opacity: .9, maxZoom: 18, maxNativeZoom: CLOUD_NATIVE_ZOOM,
+          pane: "mkRain", time: cloudTime(), opacity: .9, maxZoom: 18, maxNativeZoom: CLOUD_NATIVE_ZOOM,
           attribution: 'Nuvole: <a href="https://worldview.earthdata.nasa.gov/" target="_blank" rel="noopener">NASA MODIS/Worldview</a>'
         });
       }
