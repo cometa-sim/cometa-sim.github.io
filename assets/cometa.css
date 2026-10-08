@@ -579,8 +579,13 @@ td.mercedes{color:var(--mercedes)}
 .tw-fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px;align-items:end}
 .tw-wide{grid-column:1/-1}
 @media(max-width:560px){.tw-form{padding:18px}.tw-fields{grid-template-columns:1fr 1fr;gap:14px}}
-.tw-f{display:flex;flex-direction:column;gap:8px;min-width:0;font-family:var(--mono);font-size:10.5px;
+.tw-f{display:flex;flex-direction:column;justify-content:flex-end;gap:8px;min-width:0;font-family:var(--mono);font-size:10.5px;
   letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+/* justify-content:flex-end incolla il campo al fondo: se l'etichetta
+   accanto va a capo su due righe (es. "Temperatura di gonfiaggio · °C"
+   contro "Scoppio · km"), i campi restano comunque alla stessa altezza
+   invece di sfalsarsi — il grid gia' pareggia l'altezza delle due
+   colonne, qui serve solo a non lasciare lo spazio in piu' sopra. */
 .tw-f input,.tw-f select{width:100%;min-width:0;padding:10px 12px;border:1px solid var(--line);border-radius:10px;
   background:rgba(2,6,15,.6);color:var(--ink);font-family:var(--mono);font-size:15px;letter-spacing:0;
   text-transform:none;color-scheme:dark}
@@ -627,9 +632,10 @@ td.mercedes{color:var(--mercedes)}
 .tw-status.err{color:var(--beacon)}
 .tw-res{margin-top:26px}
 /* .section.tight azzera solo il padding sopra: quello sotto (120px, come
-   ogni .section) resta enorme qui, dove la sezione dopo (v-calcolo) ha gia'
-   il suo kicker a segnare lo stacco — niente vuoto in piu' a farlo due volte. */
-#v-previsione{padding-bottom:48px}
+   ogni .section) resta enorme in questi due punti, dove la sezione dopo
+   ha gia' il suo kicker a segnare lo stacco — niente vuoto in piu' a
+   farlo due volte. */
+#v-previsione, #v-calcolo{padding-bottom:48px}
 .tw-card{max-width:560px;padding:20px 22px;border:1px solid var(--line-soft);border-top:2px solid var(--cyan);
   border-radius:16px;background:var(--panel-solid)}
 .tw-card h4{margin-bottom:10px;font-family:var(--disp);font-size:19px;font-weight:600;color:var(--cyan)}
@@ -646,12 +652,16 @@ td.mercedes{color:var(--mercedes)}
 .tw-canvas{height:min(72vh,620px);background:#02060f}
 @media(max-width:720px){.tw-canvas{height:64vh}}
 .tw-map .leaflet-container{background:#02060f;font-family:var(--text);cursor:crosshair;
-  -webkit-user-select:none;user-select:none}
-/* Leaflet mette user-select:none solo sulle mattonelle e i marker, non sul
-   contenitore intero: un clic su un pulsante che sposta subito la vista
-   (es. "torna sull'ultima posizione") puo' finire interpretato come un
-   trascinamento di selezione testo, evidenziando a riquadro blu tutta la
-   mappa sotto. */
+  -webkit-user-select:none;user-select:none;outline:none}
+.tw-map .leaflet-container:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+/* La riga blu segnalata sopra e sotto la mappa: non era una selezione di
+   testo (gia' esclusa da user-select:none sopra), ma il contorno di
+   default del browser per l'elemento a fuoco — Leaflet rende il
+   contenitore tabindex="0" per il pan da tastiera, e un clic su un
+   controllo dentro la mappa (es. "torna sull'ultima posizione") gli
+   passa il fuoco. :focus-visible al posto di :focus mostra il contorno
+   solo da tastiera, non al clic del mouse: l'accessibilita' resta,
+   sparisce solo il contorno indesiderato dopo un tocco o un clic. */
 /* img,svg{max-width:100%} del sito: Leaflet lo annulla solo nel suo overlayPane,
    non nei pannelli della fascia, che altrimenti restano larghi zero */
 .tw-map .leaflet-pane svg{max-width:none!important;max-height:none!important}
