@@ -139,6 +139,23 @@ fanno più nulla di utile.
 | `POST /public-from` | Corpo `{"time": <unix secondi>}` oppure `{"time": null}` per nascondere di nuovo tutto. |
 | `POST /simulate` | Corpo `{"enabled": true\|false}`. Riguarda solo il polling interno (spento): con `simulate` attivo e `INTERNAL_POLLING_ENABLED="true"`, l'alarm genera un volo finto invece di chiamare SPOT davvero — vedi sotto. |
 
+## Proxy mattonelle nuvole (OpenWeatherMap)
+
+`GET /clouds/{z}/{x}/{y}.png` — non ha niente a che fare con SPOT: vive
+in questo Worker solo perché è lo stesso repo/stesso deploy. Il
+livello "nuvole" della mappa (`assets/mapkit.js` sul sito) lo usa al
+posto di chiamare `tile.openweathermap.org` direttamente, perché
+OpenWeatherMap non supporta restrizioni per dominio/referrer sulle
+chiavi API: una chiave nel JS pubblico del sito potrebbe essere letta
+e riusata da chiunque, consumando la quota. Qui la chiave vera
+(`OWM_KEY`, secret — vedi "Deploy" sopra) non lascia mai il Worker; il
+controllo di chi può usarla lo fa `src/cloud-proxy.ts` leggendo
+l'header `Referer` (le mattonelle arrivano come `<img src>` di
+Leaflet, non `fetch()`: niente header `Origin` da controllare come per
+gli altri endpoint — vedi `corsHeaders()` in `util.ts`) contro la
+stessa lista `ALLOWED_ORIGINS` degli altri endpoint. Le mattonelle
+restano in cache (Cache API di Cloudflare) 10 minuti.
+
 ## Privacy dei punti di prova
 
 Il feed SPOT può contenere, fino a 7 giorni indietro, punti di prova
@@ -261,6 +278,9 @@ chiede esplicitamente in fase di collegamento.
      usa il Data Push — vedi "Data Push" sopra; senza, resta solo
      `/claim`+`/ingest`)
    - `SPOT_PUSH_SECRET` — il "token segreto" nella stessa scheda
+   - `OWM_KEY` — chiave OpenWeatherMap per il proxy `/clouds/{z}/{x}/{y}.png`
+     (vedi "Proxy mattonelle nuvole" più sotto — non ha niente a che
+     fare con SPOT, vive qui solo perché è lo stesso Worker/repo)
 
    `ALLOWED_ORIGINS` **non** va qui: è una variabile normale (non un
    segreto), già definita in `wrangler.toml` sotto `[vars]` — cambia
@@ -313,6 +333,7 @@ FEED_ID=...
 ADMIN_TOKEN=...
 SPOT_PUSH_USERNAME=...
 SPOT_PUSH_SECRET=...
+OWM_KEY=...
 ```
 (gli ultimi due solo per provare `POST /` in locale — vedi "Data Push"
 sopra; un corpo XML firmato si costruisce con lo stesso algoritmo
