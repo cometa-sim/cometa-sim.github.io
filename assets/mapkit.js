@@ -25,11 +25,9 @@ window.COMETA_MAPKIT = (function(){
 
   const ESRI_SAT = "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}";
   const ESRI_ATTR = 'Tiles &copy; Esri &mdash; Source: Esri, Maxar, Earthstar Geographics, GIS User Community';
-  /* Nuvole: foto satellitare vera (colori reali), non una stima di
-     pioggia. RainViewer (primo tentativo) si appoggia a radar da terra
-     che in Sud America hanno buchi di copertura. Ora due fonti diverse
-     a seconda di dove si lancia, scelte dal centro mappa al momento
-     del clic (vedi isAmericas sotto):
+  /* Nuvole/pioggia: tre fonti diverse a seconda di dove si lancia,
+     scelte dal centro mappa al momento del clic (vedi isAmericas/
+     isEurope sotto) — ognuna la migliore disponibile per quella zona:
 
      - Americhe: CPTEC/INPE (agenzia spaziale brasiliana), mattonelle
        dello stesso satellite GOES-16 che usano loro per il sito
@@ -42,6 +40,15 @@ window.COMETA_MAPKIT = (function(){
        (verificato: di notte il prodotto "solo visibile" natural_color
        e' bianco vuoto, questo no). L'indice {CPTEC_INDEX} da' sempre
        l'orario dell'ultima mattonella pronta, cosi' non si indovina.
+       Mostra nuvole vere, non solo dove piove.
+     - Europa: RainViewer, radar pioggia da terra — qui la rete di
+       radar nazionali e' densa (a differenza del Sud America, dove
+       RainViewer non mostrava mai nulla: il motivo per cui si era
+       passati a una foto satellitare). Aggiornato ogni 10 minuti,
+       funziona anche di notte (radar, non luce visibile) — ma mostra
+       SOLO la pioggia: cielo coperto senza pioggia resta un livello
+       vuoto, per questo il pulsante cambia icona (vedi rainViewerLayer
+       sotto) cosi' chi lo usa sa che non e' una foto delle nuvole.
      - Resto del mondo: MODIS Terra via NASA GIBS, lo stesso layer "di
        bandiera" di Worldview — ma Terra e' in orbita polare (un solo
        passaggio al giorno), quindi qui si chiede sempre la mattonella
@@ -68,10 +75,20 @@ window.COMETA_MAPKIT = (function(){
     return lat >= -55 && lat <= 55 && lon >= -130 && lon <= -30;
   }
 
+  const RAIN_INDEX = "https://api.rainviewer.com/public/weather-maps.json";
+  const RAIN_NATIVE_ZOOM = 7;   // RainViewer non serve mattonelle oltre questo livello (altrimenti risponde "zoom level not supported"): maxNativeZoom fa ingrandire Leaflet da qui in su invece di richiederle davvero
+  /* Riquadro approssimato dell'Europa continentale, UK e Scandinavia
+     comprese: non tarato al pixel, solo per smistare fra radar
+     europeo e foto satellitare globale. */
+  function isEurope(lat, lon){
+    return lat >= 34 && lat <= 72 && lon >= -11 && lon <= 32;
+  }
+
   const ICON_LAYERS = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 2 9 5-9 5-9-5 9-5Z"/><path d="m3 12 9 5 9-5"/><path d="m3 17 9 5 9-5"/></svg>';
   const ICON_MAXIMIZE = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M16 3h3a2 2 0 0 1 2 2v3"/><path d="M21 16v3a2 2 0 0 1-2 2h-3"/><path d="M8 21H5a2 2 0 0 1-2-2v-3"/></svg>';
   const ICON_MINIMIZE = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3"/><path d="M21 8h-3a2 2 0 0 1-2-2V3"/><path d="M3 16h3a2 2 0 0 1 2 2v3"/><path d="M16 21v-3a2 2 0 0 1 2-2h3"/></svg>';
   const ICON_CLOUD = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H8a4 4 0 1 1 1.3-7.8 5 5 0 0 1 9.6 2A3.5 3.5 0 0 1 17.5 19Z"/></svg>';
+  const ICON_RAIN = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 15.6A4.5 4.5 0 0 0 17.5 7h-1.8a7 7 0 1 0-11.5 7"/><path d="M8 19v2"/><path d="M12 19v2"/><path d="M16 19v2"/></svg>';
   const ICON_SAVE = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z"/><path d="M17 21v-8H7v8"/><path d="M7 3v5h8"/></svg>';
 
   function dict(){ return (window.I18N && (window.I18N[document.documentElement.lang] || window.I18N.it)) || {}; }
@@ -143,25 +160,29 @@ window.COMETA_MAPKIT = (function(){
     });
   }
 
-  /* Nuvole (vedi CLOUD_TILES/CPTEC_TILES sopra): pannello a parte,
-     sopra le mattonelle di base (z-index piu' alto), sotto a
-     marker/tracce. Interruttore separato dal cambio Via/Satellite: si
-     sovrappone a entrambi. Il livello si crea una sola volta, al primo
-     clic, in base al centro della mappa in quel momento (lancio nelle
-     Americhe o no) — per le Americhe serve anche interrogare l'indice
-     CPTEC per sapere l'ultima mattonella pronta, quindi quel primo
-     clic e' asincrono; un secondo clic rapido prima che risponda
-     spegne solo l'interruttore, il livello (quando arriva) resta
-     pronto per il prossimo. Nomi interni (pane "mkRain", classe
-     .mk-rain) rimasti da quando qui c'era un livello di pioggia:
-     cambiarli vorrebbe dire toccare anche il CSS in piu' file, per un
-     dettaglio che chi usa il sito non vede mai — l'icona e il testo
-     del pulsante sono gia' giusti. */
+  /* Nuvole/pioggia (vedi CLOUD_TILES/CPTEC_TILES/RAIN_INDEX sopra):
+     pannello a parte, sopra le mattonelle di base (z-index piu' alto),
+     sotto a marker/tracce. Interruttore separato dal cambio
+     Via/Satellite: si sovrappone a entrambi. Il livello si crea una
+     sola volta, al primo clic, in base al centro della mappa in quel
+     momento (vedi isAmericas/isEurope sopra) — per le Americhe e per
+     l'Europa serve anche interrogare un indice per sapere l'ultima
+     mattonella pronta, quindi quel primo clic e' asincrono; un secondo
+     clic rapido prima che risponda spegne solo l'interruttore, il
+     livello (quando arriva) resta pronto per il prossimo. L'icona
+     cambia da nuvola a pioggia quando la fonte e' RainViewer (unica
+     fra le tre che mostra solo precipitazione, non nuvole in
+     generale): altrimenti, con cielo coperto ma senza pioggia, un
+     livello vuoto sembrerebbe un errore invece che "non piove". Nomi
+     interni (pane "mkRain", classe .mk-rain) rimasti da quando qui
+     c'era solo un livello di pioggia: cambiarli vorrebbe dire toccare
+     anche il CSS in piu' file, per un dettaglio che chi usa il sito
+     non vede mai. */
   function addRainLayer(map, L){
     map.createPane("mkRain");
     map.getPane("mkRain").style.zIndex = 350;
     map.getPane("mkRain").style.pointerEvents = "none";
-    let layer = null, wrap = null, on = false, loading = false;
+    let layer = null, wrap = null, btn = null, on = false, loading = false;
     function modisLayer(){
       return L.tileLayer(CLOUD_TILES, {
         pane: "mkRain", time: cloudTime(), opacity: .9, maxZoom: 18, maxNativeZoom: CLOUD_NATIVE_ZOOM,
@@ -175,9 +196,22 @@ window.COMETA_MAPKIT = (function(){
         attribution: 'Nuvole: <a href="https://www.cptec.inpe.br/dsat/" target="_blank" rel="noopener">CPTEC/INPE GOES-16</a>'
       });
     }
-    function ready(l){
+    function rainViewerLayer(host, path){
+      return L.tileLayer(host + path + "/256/{z}/{x}/{y}/2/1_1.png", {
+        pane: "mkRain", opacity: .55, maxZoom: 18, maxNativeZoom: RAIN_NATIVE_ZOOM,
+        attribution: 'Pioggia: <a href="https://www.rainviewer.com" target="_blank" rel="noopener">RainViewer</a>'
+      });
+    }
+    function setButton(rainOnly){
+      if(!btn) return;
+      const d = dict();
+      btn.innerHTML = rainOnly ? ICON_RAIN : ICON_CLOUD;
+      btn.title = rainOnly ? (d.mkRainOnly || "Pioggia (radar)") : (d.mkRain || "Nuvole (foto satellitare)");
+    }
+    function ready(l, rainOnly){
       layer = l;
       loading = false;
+      setButton(!!rainOnly);
       if(on) layer.addTo(map);
     }
     function toggle(){
@@ -191,6 +225,15 @@ window.COMETA_MAPKIT = (function(){
         fetch(CPTEC_INDEX).then(function(r){ return r.json(); })
           .then(function(j){ ready(cptecLayer(j.date)); })
           .catch(function(){ ready(modisLayer()); }); // indice CPTEC irraggiungibile: foto di ieri meglio di niente
+      } else if(isEurope(c.lat, c.lng)){
+        loading = true;
+        fetch(RAIN_INDEX).then(function(r){ return r.json(); })
+          .then(function(j){
+            const frames = j && j.radar && j.radar.past;
+            const last = frames && frames[frames.length - 1];
+            if(last) ready(rainViewerLayer(j.host, last.path), true); else ready(modisLayer());
+          })
+          .catch(function(){ ready(modisLayer()); }); // indice RainViewer irraggiungibile: foto satellitare meglio di niente
       } else {
         ready(modisLayer());
       }
@@ -199,7 +242,7 @@ window.COMETA_MAPKIT = (function(){
       options: {position: "topright"},
       onAdd: function(){
         wrap = L.DomUtil.create("div", "leaflet-bar mk-rain");
-        const btn = L.DomUtil.create("a", "", wrap);
+        btn = L.DomUtil.create("a", "", wrap);
         btn.href = "#"; btn.innerHTML = ICON_CLOUD;
         btn.title = dict().mkRain || "Nuvole (foto satellitare)";
         L.DomEvent.on(btn, "click", L.DomEvent.stop).on(btn, "click", toggle);
