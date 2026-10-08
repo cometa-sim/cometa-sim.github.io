@@ -25,82 +25,39 @@ window.COMETA_MAPKIT = (function(){
 
   const ESRI_SAT = "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}";
   const ESRI_ATTR = 'Tiles &copy; Esri &mdash; Source: Esri, Maxar, Earthstar Geographics, GIS User Community';
-  /* Nuvole/pioggia: tre fonti diverse a seconda di dove si lancia,
-     scelte dal centro mappa al momento del clic (vedi isAmericas/
-     isEurope sotto) — ognuna la migliore disponibile per quella zona:
+  /* Nuvole/pioggia: due fonti a seconda di dove si lancia, scelte dal
+     centro mappa al momento del clic (vedi isEurope sotto).
 
-     - Americhe: CPTEC/INPE (agenzia spaziale brasiliana), mattonelle
-       dello stesso satellite GOES-16 che usano loro per il sito
-       pubblico dsat.cptec.inpe.br — URL e ID prodotto trovati leggendo
-       il loro codice sorgente pubblico (non documentato altrove),
-       verificati scaricando davvero una mattonella. Satellite
-       geostazionario: aggiornato ogni ~10 minuti (non una volta al
-       giorno come sotto), e il prodotto "true_color_ch13_dsa" unisce
-       visibile e infrarosso quindi si vede qualcosa anche di notte
-       (verificato: di notte il prodotto "solo visibile" natural_color
-       e' bianco vuoto, questo no). L'orario dell'ultima mattonella
-       pronta si indovina (vedi cptecFrame/tryCptec sotto): l'indice
-       JSON che CPTEC pubblica non manda intestazioni CORS, quindi un
-       fetch() da pagina non riesce mai a leggerlo (verificato con
-       curl -D: nessuna Access-Control-Allow-Origin, ne' sull'indice
-       ne' sulle mattonelle — curl non applica CORS, un browser si',
-       bug passato inosservato nei due giri precedenti). Mostra nuvole
-       vere, non solo dove piove.
-     - Europa: RainViewer, radar pioggia da terra — qui la rete di
-       radar nazionali e' densa (a differenza del Sud America, dove
-       RainViewer non mostrava mai nulla: il motivo per cui si era
-       passati a una foto satellitare). Aggiornato ogni 10 minuti,
-       funziona anche di notte (radar, non luce visibile) — ma mostra
-       SOLO la pioggia: cielo coperto senza pioggia resta un livello
-       vuoto, per questo il pulsante cambia icona (vedi rainViewerLayer
-       sotto) cosi' chi lo usa sa che non e' una foto delle nuvole.
-     - Resto del mondo: MODIS Terra via NASA GIBS, lo stesso layer "di
-       bandiera" di Worldview — ma Terra e' in orbita polare (un solo
-       passaggio al giorno), quindi qui si chiede sempre la mattonella
-       di ieri (funzione cloudTime sotto): quella di oggi puo' restare
-       nera per buona parte della giornata, prima che il passaggio
-       sulla zona sia avvenuto o elaborato. Anche qui, estensione
-       .jpeg non .jpg (trovato scaricando davvero le mattonelle, dopo
-       aver sbloccato gibs.earthdata.nasa.gov in questa sandbox: l'URL
-       copiato dall'esempio ufficiale NASA usava .jpg ed era nero). */
-  const CLOUD_TILES = "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Terra_CorrectedReflectance_TrueColor/default/{time}/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpeg";
-  const CLOUD_NATIVE_ZOOM = 9;
-  function cloudTime(){ return new Date(Date.now() - 86400000).toISOString().slice(0, 10); }
+     Qui c'erano prima CPTEC/INPE (Americhe) e MODIS/NASA GIBS (resto
+     del mondo), tolti entrambi: le loro mattonelle sono vere foto
+     satellitari, ma CPTEC si e' rivelato un problema serio, non
+     cosmetico. Il loro {z}/{x}/{y} non e' affatto Mercatore come le
+     mattonelle stradali sotto (OSM/Esri): leggendo il codice sorgente
+     del loro visualizzatore pubblico (dsat.cptec.inpe.br/dsat/) si
+     vede che usano L.RasterCoords — un plugin per trattare
+     un'immagine come una semplice griglia di pixel SENZA alcun
+     riferimento geografico — piu' una proiezione geostazionaria fatta
+     in casa (seni/coseni, correzioni dell'ellissoide) per convertire
+     lat/lon in pixel del disco satellitare grezzo. Il loro {z}/{x}/{y}
+     indicizza quei pixel grezzi, non gradi Mercatore: ogni mattonella
+     finiva sistematicamente spostata rispetto alla mappa sotto, non
+     per un offset semplice ma per un'intera proiezione diversa —
+     servirebbe rifare da zero la loro proiezione in JS per
+     riallinearle, lavoro sproporzionato per un livello decorativo.
+     MODIS invece era davvero in Mercatore (GoogleMapsCompatible_Level9
+     e' un TileMatrixSet Mercatore per definizione), ma restava una
+     foto di un giorno prima (orbita polare, un solo passaggio al
+     giorno) e nera di notte.
 
-  const CPTEC_TILES = "https://{s}.cptec.inpe.br/goes/goes16/web_tiles/{d}/true_color_ch13_dsa/{t}/{z}/{x}/{y}.png";
-  const CPTEC_SUBDOMAINS = ["s0", "s1", "s2", "s3"];
-  const CPTEC_NATIVE_ZOOM = 6;
-  /* CPTEC pubblica anche un indice JSON con l'orario dell'ultima
-     mattonella pronta (.../lastest.json), ma le sue risposte non hanno
-     l'intestazione CORS Access-Control-Allow-Origin (verificato con
-     curl -D, mattonelle comprese: nessuna delle due la manda) — un
-     fetch() da pagina la vede sempre come richiesta fallita, mai come
-     risposta leggibile, quindi quell'indice non e' utilizzabile da
-     qui (si era creduto funzionasse perche' curl, a differenza di un
-     browser, non applica CORS: il bug e' passato inosservato nei due
-     giri precedenti). Le MATTONELLE invece si caricano benissimo
-     senza CORS (sono <img>, non fetch), quindi l'orario si indovina:
-     scansione ogni 10 minuti, qualche minuto di ritardo per
-     l'elaborazione (osservato fra 10 e 25 minuti). Si parte
-     dall'intervallo di 10 minuti piu' recente e, se le mattonelle
-     rispondono 404 (intervallo non ancora pubblicato — verificato: un
-     orario nel futuro da' 404 su tutte, non un'immagine vuota), si
-     riprova 10 minuti piu' indietro, fino a un limite oltre il quale
-     si rinuncia a favore di MODIS. */
-  function cptecFrame(offsetMin){
-    const d = new Date(Date.now() - offsetMin*60000);
-    const mi = Math.floor(d.getUTCMinutes()/10)*10;
-    function pad(n){ return (n < 10 ? "0" : "") + n; }
-    return "" + d.getUTCFullYear() + pad(d.getUTCMonth() + 1) + pad(d.getUTCDate()) + pad(d.getUTCHours()) + pad(mi);
-  }
-  /* Riquadro approssimato dove il satellite GOES-16 (fermo sopra
-     l'equatore, circa 75°O) vede bene: oltre questi margini l'angolo
-     di vista diventa troppo obliquo (immagine distorta o scura ai
-     bordi del disco). Generoso per coprire tutte le Americhe con
-     margine, non tarato al pixel. */
-  function isAmericas(lat, lon){
-    return lat >= -55 && lat <= 55 && lon >= -130 && lon <= -30;
-  }
+     Ora, ovunque tranne l'Europa: OpenWeatherMap, mattonelle vere in
+     Mercatore (stesso schema di OSM/Esri, nessun problema di
+     proiezione), copertura mondiale, aggiornamento non documentato ma
+     legato ai loro modelli meteo (non una volta al giorno come MODIS).
+     Serve una chiave gratuita (richiesta dall'utente del sito, non un
+     segreto da proteggere: e' pensata per stare nel JS pubblico). */
+  const OWM_KEY = "452fd393c1161f67c7ed50d0cdc57fbd";
+  const OWM_TILES = "https://tile.openweathermap.org/map/clouds_new/{z}/{x}/{y}.png?appid=" + OWM_KEY;
+  const OWM_NATIVE_ZOOM = 10;   // non documentato un limite preciso da OpenWeatherMap: valore prudente, da aggiustare a vista se le mattonelle sfocano prima o reggono oltre
 
   const RAIN_INDEX = "https://api.rainviewer.com/public/weather-maps.json";
   const RAIN_NATIVE_ZOOM = 7;   // RainViewer non serve mattonelle oltre questo livello (altrimenti risponde "zoom level not supported"): maxNativeZoom fa ingrandire Leaflet da qui in su invece di richiederle davvero
@@ -187,43 +144,31 @@ window.COMETA_MAPKIT = (function(){
     });
   }
 
-  /* Nuvole/pioggia (vedi CLOUD_TILES/CPTEC_TILES/RAIN_INDEX sopra):
-     pannello a parte, sopra le mattonelle di base (z-index piu' alto),
-     sotto a marker/tracce. Interruttore separato dal cambio
-     Via/Satellite: si sovrappone a entrambi. Il livello si crea una
-     sola volta, al primo clic, in base al centro della mappa in quel
-     momento (vedi isAmericas/isEurope sopra) — per l'Europa serve
-     anche interrogare l'indice RainViewer, per le Americhe si indovina
-     l'orario e si riprova piu' indietro se serve (vedi cptecFrame e
-     tryCptec sotto: l'indice vero di CPTEC non manda intestazioni CORS
-     e un fetch() da pagina non riesce mai a leggerlo), quindi quel
-     primo clic e' asincrono; un secondo clic rapido prima che risponda
-     spegne solo l'interruttore, il livello (quando arriva) resta
-     pronto per il prossimo. L'icona
-     cambia da nuvola a pioggia quando la fonte e' RainViewer (unica
-     fra le tre che mostra solo precipitazione, non nuvole in
-     generale): altrimenti, con cielo coperto ma senza pioggia, un
-     livello vuoto sembrerebbe un errore invece che "non piove". Nomi
-     interni (pane "mkRain", classe .mk-rain) rimasti da quando qui
-     c'era solo un livello di pioggia: cambiarli vorrebbe dire toccare
-     anche il CSS in piu' file, per un dettaglio che chi usa il sito
-     non vede mai. */
+  /* Nuvole/pioggia (vedi OWM_TILES/RAIN_INDEX sopra): pannello a
+     parte, sopra le mattonelle di base (z-index piu' alto), sotto a
+     marker/tracce. Interruttore separato dal cambio Via/Satellite: si
+     sovrappone a entrambi. Il livello si crea una sola volta, al primo
+     clic, in base al centro della mappa in quel momento (vedi
+     isEurope sopra) — per l'Europa serve interrogare l'indice
+     RainViewer, quindi quel primo clic e' asincrono; un secondo clic
+     rapido prima che risponda spegne solo l'interruttore, il livello
+     (quando arriva) resta pronto per il prossimo. L'icona cambia da
+     nuvola a pioggia quando la fonte e' RainViewer (mostra solo
+     precipitazione, non nuvole in generale): altrimenti, con cielo
+     coperto ma senza pioggia, un livello vuoto sembrerebbe un errore
+     invece che "non piove". Nomi interni (pane "mkRain", classe
+     .mk-rain) rimasti da quando qui c'era solo un livello di pioggia:
+     cambiarli vorrebbe dire toccare anche il CSS in piu' file, per un
+     dettaglio che chi usa il sito non vede mai. */
   function addRainLayer(map, L){
     map.createPane("mkRain");
     map.getPane("mkRain").style.zIndex = 350;
     map.getPane("mkRain").style.pointerEvents = "none";
     let layer = null, wrap = null, btn = null, on = false, loading = false;
-    function modisLayer(){
-      return L.tileLayer(CLOUD_TILES, {
-        pane: "mkRain", time: cloudTime(), opacity: .9, maxZoom: 18, maxNativeZoom: CLOUD_NATIVE_ZOOM,
-        attribution: 'Nuvole: <a href="https://worldview.earthdata.nasa.gov/" target="_blank" rel="noopener">NASA MODIS/Worldview</a>'
-      });
-    }
-    function cptecLayer(frame){
-      return L.tileLayer(CPTEC_TILES, {
-        pane: "mkRain", subdomains: CPTEC_SUBDOMAINS, d: frame.slice(0, 8), t: frame.slice(8, 12),
-        opacity: .9, maxZoom: 18, maxNativeZoom: CPTEC_NATIVE_ZOOM, noWrap: true,
-        attribution: 'Nuvole: <a href="https://www.cptec.inpe.br/dsat/" target="_blank" rel="noopener">CPTEC/INPE GOES-16</a>'
+    function owmLayer(){
+      return L.tileLayer(OWM_TILES, {
+        pane: "mkRain", opacity: .75, maxZoom: 18, maxNativeZoom: OWM_NATIVE_ZOOM,
+        attribution: 'Nuvole: <a href="https://openweathermap.org/" target="_blank" rel="noopener">OpenWeatherMap</a>'
       });
     }
     function rainViewerLayer(host, path){
@@ -244,54 +189,23 @@ window.COMETA_MAPKIT = (function(){
       setButton(!!rainOnly);
       if(on) layer.addTo(map);
     }
-    /* Prova le mattonelle CPTEC per l'intervallo di 10 minuti a
-       offsetMin minuti fa; se rispondono tutte 404 (non ancora
-       pubblicato), riprova 10 minuti piu' indietro. Le mattonelle
-       provate vanno gia' sulla mappa vera (non in un livello di
-       prova a parte): se falliscono restano semplicemente vuote
-       (un 404 non disegna nulla), se funzionano sono gia' a posto,
-       nessun doppio caricamento. */
-    function tryCptec(offsetMin){
-      if(!on){ loading = false; return; } // utente ha gia' rispento mentre si indovinava l'orario
-      if(offsetMin > 50){ ready(modisLayer()); return; } // troppo indietro: rinuncia, meglio una foto di ieri che niente
-      const probe = cptecLayer(cptecFrame(offsetMin));
-      let okCount = 0, settled = false;
-      probe.on("tileload", function(){ okCount++; });
-      probe.on("load", function(){
-        if(settled) return;
-        settled = true;
-        if(okCount > 0){ ready(probe); return; }
-        /* rimozione (e tentativo successivo) rimandati al giro
-           successivo dell'event loop: altri tile "error" dello stesso
-           giro sono ancora in coda quando "load" scatta, e
-           GridLayer._tileOnError si rompe (accede a this._map gia'
-           azzerato) se il livello sparisce mentre quella coda e'
-           ancora a meta' - visto davvero, non solo in teoria: test
-           Playwright con mattonelle finte a 404. */
-        setTimeout(function(){ map.removeLayer(probe); tryCptec(offsetMin + 10); }, 0);
-      });
-      probe.addTo(map);
-    }
     function toggle(){
       on = !on;
       if(wrap) wrap.classList.toggle("mk-active", on);
       if(layer){ if(on) layer.addTo(map); else map.removeLayer(layer); return; }
       if(loading) return;
       const c = map.getCenter();
-      if(isAmericas(c.lat, c.lng)){
-        loading = true;
-        tryCptec(0);
-      } else if(isEurope(c.lat, c.lng)){
+      if(isEurope(c.lat, c.lng)){
         loading = true;
         fetch(RAIN_INDEX).then(function(r){ return r.json(); })
           .then(function(j){
             const frames = j && j.radar && j.radar.past;
             const last = frames && frames[frames.length - 1];
-            if(last) ready(rainViewerLayer(j.host, last.path), true); else ready(modisLayer());
+            if(last) ready(rainViewerLayer(j.host, last.path), true); else ready(owmLayer());
           })
-          .catch(function(){ ready(modisLayer()); }); // indice RainViewer irraggiungibile: foto satellitare meglio di niente
+          .catch(function(){ ready(owmLayer()); }); // indice RainViewer irraggiungibile: nuvole meglio di niente
       } else {
-        ready(modisLayer());
+        ready(owmLayer());
       }
     }
     const Rain = L.Control.extend({
