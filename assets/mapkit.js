@@ -53,10 +53,15 @@ window.COMETA_MAPKIT = (function(){
      Mercatore (stesso schema di OSM/Esri, nessun problema di
      proiezione), copertura mondiale, aggiornamento non documentato ma
      legato ai loro modelli meteo (non una volta al giorno come MODIS).
-     Serve una chiave gratuita (richiesta dall'utente del sito, non un
-     segreto da proteggere: e' pensata per stare nel JS pubblico). */
-  const OWM_KEY = "452fd393c1161f67c7ed50d0cdc57fbd";
-  const OWM_TILES = "https://tile.openweathermap.org/map/clouds_new/{z}/{x}/{y}.png?appid=" + OWM_KEY;
+     La chiave vera non sta qui: OpenWeatherMap non supporta
+     restrizioni per dominio/referrer sulle chiavi (verificato), quindi
+     una chiave nel JS pubblico potrebbe essere letta e riusata da
+     chiunque. Le mattonelle passano invece dal Worker Cloudflare gia'
+     in produzione per lo SPOT tracker (vedi worker/src/cloud-proxy.ts
+     e worker/README.md, sezione "Proxy mattonelle nuvole"): la chiave
+     resta li' come secret, il Worker controlla lui stesso il Referer
+     e mette le mattonelle in cache. */
+  const OWM_TILES = "https://cometa-sim-github-io.de-toni-carlo.workers.dev/clouds/{z}/{x}/{y}.png";
   const OWM_NATIVE_ZOOM = 10;   // non documentato un limite preciso da OpenWeatherMap: valore prudente, da aggiustare a vista se le mattonelle sfocano prima o reggono oltre
 
   const RAIN_INDEX = "https://api.rainviewer.com/public/weather-maps.json";
