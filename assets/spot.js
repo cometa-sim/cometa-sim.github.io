@@ -193,7 +193,7 @@ window.COMETA_SPOT = (function(){
     });
     const mapkit = window.COMETA_MAPKIT ? Promise.resolve() : new Promise(function(ok, ko){
       const s = document.createElement("script");
-      s.src = "assets/mapkit.js?v=158";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
+      s.src = "assets/mapkit.js?v=159";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
       s.onload = ok; s.onerror = ko;
       document.head.appendChild(s);
     });
@@ -525,35 +525,39 @@ window.COMETA_SPOT = (function(){
     return W_ICON_SUN;
   }
 
-  /* Meteo di oggi sul punto di lancio — stesso Open-Meteo gia' usato dal
-     previsore (assets/traiettoria.js). Qui il punto e' sempre quello fisso
-     del lancio (window.COMETA_FLIGHT.site), non scelto da chi guarda: basta
-     chiamarlo una volta, da' solo l'idea di una pagina viva durante la
-     diretta, non serve alla traiettoria (quella usa comunque Tawhiri/GFS). */
+  /* Meteo previsto sul punto di lancio al giorno e all'ora del lancio
+     (window.COMETA_LAUNCH, assets/app.js) — previsione oraria di
+     Open-Meteo, come il riquadro del predittore (assets/traiettoria.js).
+     Il punto e' sempre quello fisso del lancio (window.COMETA_FLIGHT.site),
+     non scelto da chi guarda. La previsione arriva a 16 giorni: prima di
+     allora quell'ora non c'e' e il riquadro resta nascosto. */
   function loadWeather(){
-    const el = document.getElementById("dirWeather");
-    if(!el) return;
+    const el = document.getElementById("dirWeather"), L0 = window.COMETA_LAUNCH;
+    if(!el || !L0) return;
     const site = (window.COMETA_FLIGHT && window.COMETA_FLIGHT.site) || FALLBACK;
+    const p = {};
+    new Intl.DateTimeFormat("en-CA", {timeZone:TZ, year:"numeric", month:"2-digit", day:"2-digit",
+      hour:"2-digit", minute:"2-digit", hourCycle:"h23"}).formatToParts(L0).forEach(function(x){ p[x.type] = x.value; });
+    const iso = p.year + "-" + p.month + "-" + p.day;
+    const hh = Math.min(23, Math.round(parseInt(p.hour, 10) + parseInt(p.minute, 10)/60));
+    const key = iso + "T" + String(hh).padStart(2, "0") + ":00";
     const q = new URLSearchParams({
       latitude: site.lat.toFixed(4), longitude: site.lon.toFixed(4),
-      current: "temperature_2m,cloud_cover,wind_speed_10m", hourly: "precipitation_probability",
-      forecast_days: "1", timezone: TZ
+      hourly: "temperature_2m,cloud_cover,wind_speed_10m,precipitation_probability",
+      start_date: iso, end_date: iso, timezone: TZ
     });
     fetch(METEO + "?" + q.toString())
       .then(function(r){ return r.ok ? r.json() : null; })
       .then(function(d){
-        if(!d || !d.current){ el.hidden = true; return; }
+        const h = d && d.hourly, i = h && h.time ? h.time.indexOf(key) : -1;
+        if(i < 0 || h.temperature_2m[i] == null){ el.hidden = true; return; }
         el.hidden = false;
-        document.getElementById("dirWTemp").textContent = Math.round(d.current.temperature_2m) + "°C";
-        document.getElementById("dirWWind").innerHTML = Math.round(d.current.wind_speed_10m) + "<small>km/h</small>";
-        document.getElementById("dirWClouds").textContent = Math.round(d.current.cloud_cover) + "%";
-        let rainPct = 0, rainTxt = "—";
-        if(d.hourly && d.hourly.time && d.hourly.precipitation_probability){
-          const idx = d.hourly.time.indexOf(d.current.time.slice(0, 13) + ":00");
-          if(idx >= 0){ rainPct = d.hourly.precipitation_probability[idx]; rainTxt = Math.round(rainPct) + "%"; }
-        }
-        document.getElementById("dirWRain").textContent = rainTxt;
-        document.getElementById("dirWIcon").innerHTML = weatherIcon(d.current.cloud_cover, rainPct, d.current.wind_speed_10m);
+        const rain = h.precipitation_probability ? h.precipitation_probability[i] : null;
+        document.getElementById("dirWTemp").textContent = Math.round(h.temperature_2m[i]) + "°C";
+        document.getElementById("dirWWind").innerHTML = Math.round(h.wind_speed_10m[i]) + "<small>km/h</small>";
+        document.getElementById("dirWClouds").textContent = Math.round(h.cloud_cover[i]) + "%";
+        document.getElementById("dirWRain").textContent = rain == null ? "—" : Math.round(rain) + "%";
+        document.getElementById("dirWIcon").innerHTML = weatherIcon(h.cloud_cover[i], rain || 0, h.wind_speed_10m[i]);
       })
       .catch(function(){ el.hidden = true; });
   }

@@ -74,11 +74,11 @@ Norme e autorizzazioni · Domande · Chi siamo.
 ### Dopo ogni modifica: il numero di versione
 
 In `index.html` i file di `assets/`, e la mappa, sono richiamati con un numero in
-coda — oggi `?v=158`:
+coda — oggi `?v=159`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=158">
-<script src="assets/i18n.js?v=158"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=159">
+<script src="assets/i18n.js?v=159"></script>
 ```
 
 Lo stesso numero compare anche in due punti meno visibili, che vanno alzati
@@ -332,6 +332,10 @@ chi guarda, senza server nostri:
    semi-segmenti): la minima che contiene il parallelogramma ±a±b. Con
    0 in una delle due voci resta solo l'altro segmento.
 
+Sotto la mappa, il riquadro meteo (icona, temperatura, vento, nuvole,
+probabilità di pioggia) è la previsione oraria di Open-Meteo per il punto, il
+giorno e l'ora della partenza scelti, e si aggiorna quando cambiano.
+
 Il giorno proposto è la data di `LAUNCH` in `assets/app.js`, quando cade
 nella settimana della previsione, altrimenti domani. L'area di esclusione
 e il contorno dell'Uruguay sono ripetuti in cima a `assets/traiettoria.js`
@@ -429,7 +433,9 @@ sovrappongono alla mappa.
 ### La pagina Diretta
 
 Sta in `index.html` (sezione `#diretta`) e in `assets/spot.js`: la diretta
-YouTube, la mappa GPS, la quota stimata e il meteo sul punto di lancio.
+YouTube, la mappa GPS, la quota stimata e il meteo sul punto di lancio
+(la previsione per il giorno e l'ora di `LAUNCH`, che compare solo quando
+mancano al massimo 16 giorni).
 
 Per ora non è pubblica: con `DIRETTA_PUBLIC = false` in `assets/app.js` non
 compaiono né la voce in nav né il banner rosso, qualunque sia la data, e in
