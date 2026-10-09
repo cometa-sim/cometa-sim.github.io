@@ -433,7 +433,9 @@ sovrappongono alla mappa.
 ### La pagina Diretta
 
 Sta in `index.html` (sezione `#diretta`) e in `assets/spot.js`: la diretta
-YouTube, la mappa GPS, la quota stimata e il meteo sul punto di lancio.
+YouTube, la mappa GPS, la quota stimata e il meteo sul punto di lancio
+(la previsione per il giorno e l'ora di `LAUNCH`, che compare solo quando
+mancano al massimo 16 giorni).
 
 Per ora non è pubblica: con `DIRETTA_PUBLIC = false` in `assets/app.js` non
 compaiono né la voce in nav né il banner rosso, qualunque sia la data, e in
