@@ -616,7 +616,8 @@ function updateDiretta(){
   const state = now < DIRETTA_WINDOW.getTime() ? "off" : now < DIRETTA_START.getTime() ? "pre" : "live";
   const live = state === "live";
   const navD = $("#navDiretta"), navDM = $("#navDirettaM"),
-        banner = $("#direttaBanner"), dStatus = $("#dStatus");
+        banner = $("#direttaBanner"), dStatus = $("#dStatus"), wip = $("#dirWip");
+  if(wip) wip.hidden = DIRETTA_PUBLIC;
   [navD, navDM].forEach(function(el){
     if(!el) return;
     el.style.display = DIRETTA_PUBLIC && state !== "off" ? "flex" : "none";
