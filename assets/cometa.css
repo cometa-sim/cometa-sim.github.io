@@ -1051,9 +1051,9 @@ nav a.ig:hover svg{transform:translateY(-1px)}
 
 /* "Pagina in costruzione": finche' DIRETTA_PUBLIC e' false (assets/app.js),
    la pagina e' raggiungibile solo dal link e serve per le prove. */
-.dir-wip{margin-bottom:28px;padding:12px 16px;border:1px solid rgba(255,184,77,.45);border-radius:12px;
+.dir-wip{display:inline-block;margin-bottom:28px;padding:12px 16px;border:1px solid rgba(255,184,77,.45);border-radius:12px;
   background:rgba(255,184,77,.08);color:var(--beacon);font-family:var(--mono);font-size:12.5px;line-height:1.55}
-.dir-wip b{text-transform:uppercase;letter-spacing:.14em;font-weight:600;margin-right:6px}
+.dir-wip b{text-transform:uppercase;letter-spacing:.14em;font-weight:600}
 .dir-wip b::before{content:"⚠ "}
 .dir-wip[hidden]{display:none}
 .dstatus{display:inline-flex;align-items:center;gap:9px;font-family:var(--mono);font-size:11px;letter-spacing:.14em;

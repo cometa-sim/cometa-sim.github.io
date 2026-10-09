@@ -23,7 +23,7 @@ it:{
   /* — Diretta (bozza) — */
   dirKicker:"Il giorno del lancio",
   dirSub:"Il video dal campo e la posizione della sonda, in tempo reale.",
-  dirWip:"Pagina in costruzione", dirWipDesc:"Non è ancora pubblica: la usiamo per le prove, e quello che mostra può essere incompleto.",
+  dirWip:"Pagina in costruzione",
   dirStatusPre:"Diretta tra poco", dirStatusLive:"In diretta ora",
   dirBannerDesc:"— video dal campo e posizione GPS", dirBannerCta:"Guarda →",
   dirYoutubeHead:"YouTube · diretta", dirGpsHead:"Tracciatore GPS · SPOT Trace",
@@ -466,7 +466,7 @@ es:{
   /* — En vivo (borrador) — */
   dirKicker:"El día del lanzamiento",
   dirSub:"El video desde el terreno y la posición de la sonda, en tiempo real.",
-  dirWip:"Página en construcción", dirWipDesc:"Todavía no es pública: la usamos para las pruebas, y lo que muestra puede estar incompleto.",
+  dirWip:"Página en construcción",
   dirStatusPre:"En vivo pronto", dirStatusLive:"En vivo ahora",
   dirBannerDesc:"— video desde el terreno y posición GPS", dirBannerCta:"Mirar →",
   dirYoutubeHead:"YouTube · en vivo", dirGpsHead:"Rastreador GPS · SPOT Trace",
@@ -903,7 +903,7 @@ en:{
   /* — Live (draft) — */
   dirKicker:"Launch day",
   dirSub:"Footage from the field and the probe's position, in real time.",
-  dirWip:"Page under construction", dirWipDesc:"Not public yet: we use it for testing, and what it shows may be incomplete.",
+  dirWip:"Page under construction",
   dirStatusPre:"Live soon", dirStatusLive:"Live now",
   dirBannerDesc:"— footage from the field and GPS position", dirBannerCta:"Watch →",
   dirYoutubeHead:"YouTube · live", dirGpsHead:"GPS tracker · SPOT Trace",
