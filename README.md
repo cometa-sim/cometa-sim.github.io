@@ -18,8 +18,6 @@ sonda.html · venti.html             rimandi ai vecchi indirizzi
 simulazione-diretta.html            prova la pagina Diretta con un orologio accelerato
                                      e un feed GPS finto, senza aspettare il lancio vero
                                      (NON è una pagina del sito, non è linkata da nessuna parte)
-diretta-prova.html                  copia della pagina Diretta per le prove col backend vero,
-                                     con i propri assets/*-preview.* — non collegata, noindex
 
 assets/cometa.css                   colori, caratteri, impaginazione
 assets/i18n.js                      i testi in italiano, spagnolo e inglese
@@ -76,17 +74,17 @@ Norme e autorizzazioni · Domande · Chi siamo.
 ### Dopo ogni modifica: il numero di versione
 
 In `index.html` i file di `assets/`, e la mappa, sono richiamati con un numero in
-coda — oggi `?v=156`:
+coda — oggi `?v=157`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=156">
-<script src="assets/i18n.js?v=156"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=157">
+<script src="assets/i18n.js?v=157"></script>
 ```
 
 Lo stesso numero compare anche in due punti meno visibili, che vanno alzati
 insieme: il caricamento di `assets/mapkit.js` dentro `assets/traiettoria.js`
-e dentro `assets/spot.js` (lo caricano loro, non `index.html`), e le pagine di
-prova `simulazione-diretta.html` e `diretta-prova.html`.
+e dentro `assets/spot.js` (lo caricano loro, non `index.html`), e la pagina di
+prova `simulazione-diretta.html`.
 
 Serve a costringere il browser a riscaricarli. **Chi modifica un file in
 `assets/` deve alzare quel numero di uno**, altrimenti i visitatori che hanno
@@ -101,7 +99,7 @@ senza il suo foglio di stile. Prima di pubblicare conviene quindi controllare
 che il numero sia davvero cambiato:
 
 ```
-grep -o '?v=[0-9]*' index.html simulazione-diretta.html diretta-prova.html assets/traiettoria.js assets/spot.js | cut -d: -f2 | sort -u
+grep -o '?v=[0-9]*' index.html simulazione-diretta.html assets/traiettoria.js assets/spot.js | cut -d: -f2 | sort -u
 ```
 
 Deve uscire un solo valore, e diverso da quello di prima.
@@ -434,11 +432,13 @@ Sta in `index.html` (sezione `#diretta`) e in `assets/spot.js`: la diretta
 YouTube, la mappa GPS, la quota stimata e il meteo sul punto di lancio.
 
 Per ora non è pubblica: con `DIRETTA_PUBLIC = false` in `assets/app.js` non
-compaiono né la voce in nav né il banner rosso, qualunque sia la data. La
-pagina funziona comunque per intero, ma ci arriva solo chi conosce il link
-`…/#diretta` — è quella che si usa per le prove. Per renderla pubblica basta
-mettere `true`: da lì in poi voce e banner seguono `DIRETTA_WINDOW` e
-`DIRETTA_START`.
+compaiono né la voce in nav né il banner rosso, qualunque sia la data, e in
+cima alla pagina c'è l'avviso «Pagina in costruzione». La pagina funziona
+comunque per intero, ma ci arriva solo chi conosce il link `…/#diretta` — è
+quella che si usa per le prove (non c'è più una copia a parte).
+
+Per renderla pubblica basta mettere `true`: l'avviso sparisce, e da lì in poi
+voce e banner seguono `DIRETTA_WINDOW` e `DIRETTA_START`.
 
 **Da dove arrivano i punti GPS.** Il browser non chiama mai SPOT: lo fa il
 Worker di Cloudflare in `worker/`, che conserva la traccia e la espone in
@@ -457,12 +457,6 @@ visitatore può aver cambiato nella pagina Traiettoria. La richiede ogni 20
 minuti, anche durante il volo, e la ridisegna solo se nel frattempo è uscita
 una nuova corsa del GFS. Non usa mai i punti GPS: non si corregge seguendo
 il pallone.
-
-**`diretta-prova.html`** è una copia della pagina, non collegata, con i
-propri `assets/cometa-preview.css`, `assets/i18n-preview.js` e
-`assets/app-preview.js` (`assets/spot.js` e `assets/mapkit.js` sono invece
-condivisi). Finché esiste, ogni modifica alla Diretta va riportata anche nei
-file `-preview`.
 
 ### Three.js
 
