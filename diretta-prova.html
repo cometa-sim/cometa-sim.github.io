@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMETA · Sonda Klo-01 — Scuola Italiana di Montevideo</title>
+<title>PROVA — COMETA Diretta</title>
+<meta name="robots" content="noindex, nofollow">
 <meta name="description" id="metaDesc" content="COMETA è un programma di palloni stratosferici della Scuola Italiana di Montevideo: misure atmosferiche fino a più di 37 km di quota, progettate e realizzate dagli studenti.">
 <meta name="theme-color" content="#010308">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='5' fill='%2302060f'/%3E%3Ccircle cx='12' cy='9' r='5.2' fill='none' stroke='%23EAF3FA' stroke-width='1.5'/%3E%3Cpath d='M10 14.4 12 16.8l2-2.4' fill='none' stroke='%23EAF3FA' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Crect x='10.3' y='18' width='3.4' height='3.4' rx='.8' fill='none' stroke='%23FFB84D' stroke-width='1.4'/%3E%3C/svg%3E">
@@ -23,9 +24,13 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@200;300;400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/cometa.css?v=156">
+<link rel="stylesheet" href="assets/cometa-preview.css?v=156">
 </head>
 <body>
+<div class="sim-bar" style="position:sticky;top:0;z-index:90;background:#3a1600;border-bottom:1px solid rgba(255,184,77,.5);padding:11px 20px;font-family:var(--mono);font-size:12.5px;color:#FFB84D;display:flex;gap:16px;flex-wrap:wrap;align-items:center">
+  <span style="text-transform:uppercase;letter-spacing:.14em;font-weight:600">⚠ Pagina di prova — non collegata dal sito</span>
+  <span>Dati veri dal Worker (vedi worker/README.md): orologio reale, nessun feed finto.</span>
+</div>
 
 <a class="skip" href="#app" data-i18n="skip">Vai al contenuto</a>
 
@@ -694,7 +699,12 @@
   <section class="section tight" id="v-previsione">
     <div class="wrap">
       <div class="kicker reveal" data-i18n="twHead">Prevedere il volo</div>
-      <p class="lede reveal d1" data-i18n-html="twP1"></p>
+      <div class="body-col reveal d1">
+        <p data-i18n-html="twP1"></p>
+        <p data-i18n-html="twP1b"></p>
+        <p data-i18n-html="twP1c"></p>
+        <p data-i18n-html="twP2"></p>
+      </div>
 
       <form class="tw-form reveal d1" id="twForm" novalidate>
         <fieldset class="tw-grp">
@@ -780,6 +790,7 @@
           <div class="tw-cv"><div class="sl" data-i18n="twDescC">Discesa al suolo</div><div class="sv" id="twCDesc">—</div></div>
         </div>
         <ul class="tw-warn" id="twWarn"></ul>
+        <p class="tw-hint tw-wide" data-i18n="twIsa"></p>
 
         <div class="tw-acts">
           <button type="submit" class="btn primary" data-i18n="twRun">Calcola la traiettoria</button>
@@ -787,19 +798,16 @@
         </div>
       </form>
       <p class="tw-status" id="twStatus" role="status" aria-live="polite"></p>
+      <div class="tw-res" id="twRes"></div>
 
       <div class="map-frame tw-map"><div class="tw-canvas" id="twMap"></div></div>
       <div class="map-legend">
-        <span id="twLegendTxt" data-i18n="twLegend">Stella: partenza · linea piena: salita · tratteggio: discesa · cerchio bianco: scoppio · poligono: area di esclusione.</span>
+        <span id="twLegendTxt" data-i18n="twLegend">Stella: partenza · linea piena: salita · tratteggio: discesa · cerchio bianco: scoppio.</span>
       </div>
-      <div class="mk-weather" id="twWeather" hidden>
-        <div class="mk-wtile mk-wicon"><div class="mk-wv" id="twWIcon"></div></div>
-        <div class="mk-wtile"><div class="mk-wv" id="twWTemp">—</div><div class="mk-wl" data-i18n="mkWeatherTemp">Temp.</div></div>
-        <div class="mk-wtile"><div class="mk-wv" id="twWWind">—</div><div class="mk-wl" data-i18n="mkWeatherWind">Vento</div></div>
-        <div class="mk-wtile"><div class="mk-wv" id="twWClouds">—</div><div class="mk-wl" data-i18n="mkWeatherClouds">Nuvole</div></div>
-        <div class="mk-wtile"><div class="mk-wv" id="twWRain">—</div><div class="mk-wl" data-i18n="mkWeatherRain">Pioggia</div></div>
+      <div class="tw-export">
+        <button type="button" class="btn" id="twPng" data-i18n="twPng">Scarica l'immagine della mappa</button>
+        <span class="tw-hint" id="twPngMsg" role="status" aria-live="polite"></span>
       </div>
-      <div class="tw-res" id="twRes"></div>
 
       <div class="tw-week" id="twWeekBox" hidden>
         <div class="table-wrap">
@@ -810,21 +818,18 @@
         </div>
         <p class="fig-note" data-i18n="twWeekNote"></p>
       </div>
+      <p class="fig-note" data-i18n="twNote"></p>
     </div>
   </section>
 
   <section class="section tight" id="v-calcolo">
     <div class="wrap">
-      <div class="kicker reveal" data-i18n="wModHead">Come funziona lo script</div>
+      <div class="kicker reveal" data-i18n="wModHead">Come sono calcolati salita e discesa</div>
       <div class="body-col reveal d1">
-        <p data-i18n-html="twP1b"></p>
-        <p data-i18n-html="twP1c"></p>
-        <p data-i18n-html="twP2"></p>
         <p data-i18n-html="wMod1"></p>
         <p data-i18n-html="wMod2"></p>
         <p data-i18n-html="wMod3"></p>
         <p data-i18n-html="wMod4"></p>
-        <p data-i18n="twIsa"></p>
       </div>
     </div>
   </section>
@@ -1218,11 +1223,18 @@
 
 </div>
 
-<script src="assets/i18n.js?v=156"></script>
+<script>
+/* SOLO per questa pagina di prova: apre subito sulla sezione Diretta
+   invece che sulla home — nessun orologio ne' feed finto qui sotto,
+   assets/app-preview.js e assets/spot.js girano col loro codice vero,
+   TRACK_URL vero (assets/app-preview.js) e orologio reale. */
+location.hash = "diretta";
+</script>
+<script src="assets/i18n-preview.js?v=156"></script>
 <script src="assets/sonda.js?v=156"></script>
 <script src="assets/catena.js?v=156"></script>
 <script src="assets/spot.js?v=156"></script>
-<script src="assets/app.js?v=156"></script>
+<script src="assets/app-preview.js?v=156"></script>
 <script src="assets/msis.js?v=156"></script>
 <script src="assets/traiettoria.js?v=156"></script>
 </body>

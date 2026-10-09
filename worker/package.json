@@ -1,0 +1,17 @@
+{
+  "name": "cometa-spot-tracker",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Backend (Cloudflare Worker + Durable Object) che interroga una volta sola il feed SPOT Trace della diretta COMETA e lo espone in JSON/CSV al sito.",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "typecheck": "tsc --noEmit",
+    "tail": "wrangler tail"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20261001.1",
+    "typescript": "^5.6.3",
+    "wrangler": "^4.0.0"
+  }
+}

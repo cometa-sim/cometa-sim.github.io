@@ -1,0 +1,54 @@
+name = "cometa-sim-github-io"
+main = "src/index.ts"
+compatibility_date = "2024-11-01"
+
+# Log e tracce dei log del Worker, visibili in Logs sulla dashboard e
+# con `npm run tail` — niente tracce (non servono qui), issue detection
+# spenta (sveglia da sola su anomalie non interessanti per questo Worker).
+[observability.logs]
+enabled = true
+head_sampling_rate = 1
+invocation_logs = true
+persist = true
+
+[observability.traces]
+enabled = false
+head_sampling_rate = 1
+persist = true
+
+[observability.issue_detection]
+enabled = false
+# Wrangler 4.147.0 (l'ultima disponibile adesso) non riconosce ancora
+# questo blocco e avvisa "Unexpected fields found in observability
+# field: issue_detection" al deploy — e' solo un avviso, non blocca
+# nulla (exit 0, Worker pubblicato comunque): si puo' ignorare finche'
+# una wrangler piu' recente non lo riconosce.
+
+# Dominio/i da cui il sito puo' leggere /track.json e /track.csv, e da
+# cui la pagina di amministrazione (admin-diretta.html, stesso dominio)
+# puo' chiamare /claim e /ingest (CORS). Elenco separato da virgole:
+# il dominio personalizzato del sito (vedi CNAME, e' quello vero usato
+# dai visitatori) e quello "tecnico" di GitHub Pages (utile per le prove
+# dirette su cometa-sim.github.io, es. prima che il CNAME sia attivo).
+[vars]
+ALLOWED_ORIGINS = "https://cometa-sim.github.io,https://cometa.scuolaitaliana.edu.uy"
+# SPOT blocca le richieste dai Worker di Cloudflare (403 anti-bot): il
+# polling lo fa la pagina di amministrazione dal browser, non il Worker
+# da solo. "true" per riattivare l'alarm interno, se SPOT dovesse un
+# giorno smettere di bloccarci — vedi INTERNAL_POLLING_ENABLED in env.ts.
+INTERNAL_POLLING_ENABLED = "false"
+
+# Il Durable Object che fa tutto: polling, storage SQLite, gli endpoint.
+# Un'unica istanza fissa (vedi src/index.ts, idFromName) per tutto il volo.
+[[durable_objects.bindings]]
+name = "TRACKER"
+class_name = "SpotTracker"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["SpotTracker"]
+
+# Secret, NON qui: si impostano con `wrangler secret put <NOME>` (vedi README).
+#   FEED_ID        — id del feed pubblico SPOT (obbligatorio)
+#   FEED_PASSWORD  — password del feed, se il canale la richiede (opzionale)
+#   ADMIN_TOKEN    — token per gli endpoint protetti (start/stop/backfill/reset/...)

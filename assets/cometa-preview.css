@@ -583,13 +583,8 @@ td.mercedes{color:var(--mercedes)}
 .tw-fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px;align-items:end}
 .tw-wide{grid-column:1/-1}
 @media(max-width:560px){.tw-form{padding:18px}.tw-fields{grid-template-columns:1fr 1fr;gap:14px}}
-.tw-f{display:flex;flex-direction:column;justify-content:flex-end;gap:8px;min-width:0;font-family:var(--mono);font-size:10.5px;
+.tw-f{display:flex;flex-direction:column;gap:8px;min-width:0;font-family:var(--mono);font-size:10.5px;
   letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
-/* justify-content:flex-end incolla il campo al fondo: se l'etichetta
-   accanto va a capo su due righe (es. "Temperatura di gonfiaggio · °C"
-   contro "Scoppio · km"), i campi restano comunque alla stessa altezza
-   invece di sfalsarsi — il grid gia' pareggia l'altezza delle due
-   colonne, qui serve solo a non lasciare lo spazio in piu' sopra. */
 .tw-f input,.tw-f select{width:100%;min-width:0;padding:10px 12px;border:1px solid var(--line);border-radius:10px;
   background:rgba(2,6,15,.6);color:var(--ink);font-family:var(--mono);font-size:15px;letter-spacing:0;
   text-transform:none;color-scheme:dark}
@@ -634,12 +629,7 @@ td.mercedes{color:var(--mercedes)}
 .tw-acts .btn[disabled]{opacity:.5;cursor:progress;transform:none}
 .tw-status{min-height:1.6em;margin-top:16px;font-family:var(--mono);font-size:12.5px;color:var(--muted)}
 .tw-status.err{color:var(--beacon)}
-.tw-res{margin-top:26px}
-/* .section.tight azzera solo il padding sopra: quello sotto (120px, come
-   ogni .section) resta enorme in questi due punti, dove la sezione dopo
-   ha gia' il suo kicker a segnare lo stacco — niente vuoto in piu' a
-   farlo due volte. */
-#v-previsione, #v-calcolo{padding-bottom:48px}
+.tw-res{margin-top:6px}
 .tw-card{max-width:560px;padding:20px 22px;border:1px solid var(--line-soft);border-top:2px solid var(--cyan);
   border-radius:16px;background:var(--panel-solid)}
 .tw-card h4{margin-bottom:10px;font-family:var(--disp);font-size:19px;font-weight:600;color:var(--cyan)}
@@ -689,33 +679,24 @@ td.mercedes{color:var(--mercedes)}
 .tw-map .leaflet-tooltip{background:#0b1726;color:var(--ink);border-color:rgba(255,255,255,.14);
   box-shadow:0 8px 24px rgba(0,0,0,.45);font-family:var(--mono);font-size:11.5px}
 .tw-map .leaflet-tooltip-top:before{border-top-color:#0b1726}
-.tw-map .leaflet-popup-content-wrapper{background:#0b1726;color:var(--ink);box-shadow:0 8px 24px rgba(0,0,0,.45)}
-.tw-map .leaflet-popup-content{font-family:var(--mono);font-size:11.5px;line-height:1.6;margin:9px 13px}
-.tw-map .leaflet-popup-tip{background:#0b1726}
-.tw-map .leaflet-popup-close-button{color:var(--muted)!important}
 
 /* ---------- mapkit: satellite / schermo intero / radar pioggia ----------
-   Condiviso da ogni mappa scura del sito (classe .tw-map: sia quella
-   del predittore sia il riquadro della mappa GPS nella Diretta, vedi
-   index.html) — stesso aspetto scuro dei controlli Leaflet gia' sopra.
-   I tre pulsanti (cambio vista, radar, schermo intero) sono tutti
-   .leaflet-bar con un'icona SVG dentro, gia' centrata dal
-   display:flex sopra. */
+   Condiviso da ogni mappa scura del sito (classe .tw-map) — stesso
+   aspetto scuro dei controlli Leaflet gia' sopra. I pulsanti (cambio
+   vista, radar, salva, schermo intero) sono tutti .leaflet-bar con
+   un'icona SVG dentro, gia' centrata dal display:flex sopra. */
 .mk-rain.mk-active a{background:#0f3a5c!important;color:#5FE3FF!important}
 /* Schermo intero: l'elemento richiesto riempie lo schermo da solo
    (Fullscreen API) — qui si toglie solo l'altezza fissa normale
    (min(72vh,620px) o il riquadro assoluto della mappa GPS), o
-   resterebbe piccola in mezzo allo schermo nero. Nessun selettore
-   piu' specifico: questa classe finisce sull'elemento mappa vero e
-   proprio, quale che sia (.tw-canvas nel predittore, #spotMap nella
-   Diretta). */
+   resterebbe piccola in mezzo allo schermo nero. */
 .mk-is-fullscreen{height:100vh!important;width:100vw!important;border-radius:0!important}
 
-/* Widget meteo (Open-Meteo): icona piu' quattro numeri, usato sia sotto la
-   mappa del predittore sia nella sezione "Previsione meteo lancio" qui
-   sotto. Sempre su una riga sola, anche da telefono: repeat(5,1fr) non va
-   mai a capo (le colonne si stringono, non impilano), @media qui sotto
-   stringe anche testo e spaziatura perche' restino leggibili. */
+/* Widget meteo (Open-Meteo), sotto la mappa: icona piu' quattro numeri —
+   serve a dare l'idea di una pagina viva, non un altro pannello di calcolo.
+   Sempre su una riga sola, anche da telefono: repeat(5,1fr) non va mai a
+   capo (le colonne si stringono, non impilano), @media qui sotto stringe
+   anche testo e spaziatura perche' restino leggibili. */
 .mk-weather{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;margin-top:14px;
   border:1px solid var(--line-soft);border-radius:14px;overflow:hidden;background:var(--line-soft)}
 .mk-wtile{padding:14px 6px;background:var(--panel);text-align:center}
@@ -730,6 +711,10 @@ td.mercedes{color:var(--mercedes)}
   .mk-wicon svg{width:18px;height:18px}
 }
 
+.tw-map .leaflet-popup-content-wrapper{background:#0b1726;color:var(--ink);box-shadow:0 8px 24px rgba(0,0,0,.45)}
+.tw-map .leaflet-popup-content{font-family:var(--mono);font-size:11.5px;line-height:1.6;margin:9px 13px}
+.tw-map .leaflet-popup-tip{background:#0b1726}
+.tw-map .leaflet-popup-close-button{color:var(--muted)!important}
 /* Il lampeggio arancione del puntino GPS sulla mappa: scatto immediato
    (niente transizione), poi flashMapMarker() aggiunge questa classe per
    la dissolvenza morbida di ritorno al verde — vedi assets/spot.js. */
@@ -738,6 +723,7 @@ td.mercedes{color:var(--mercedes)}
 .tw-star{background:none;border:0;cursor:grab}
 .tw-star span{display:block;font-size:26px;line-height:26px;text-align:center;
   text-shadow:0 0 3px #02060f,0 0 12px currentColor}
+.tw-export{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;margin-top:14px}
 .tw-week .table-wrap{margin-top:26px}
 .tw-week tbody tr{cursor:pointer}
 .tw-week td.tw-w-ok{color:var(--green)}
@@ -912,7 +898,7 @@ footer{border-top:1px solid var(--line-soft);padding:56px 0 66px;background:rgba
 .figure img{width:100%;height:auto;display:block;border-radius:12px;
   border:1px solid var(--line-soft)}
 .figure figcaption{margin-top:10px;font-family:var(--mono);font-size:11.5px;
-  line-height:1.7;letter-spacing:.02em;color:var(--faint)}
+  line-height:1.7;letter-spacing:.02em;color:var(--faint);max-width:64ch}
 
 /* Colonna «Klo-01» della tabella degli aspetti legali */
 td.ok{color:var(--ice);font-variant-numeric:tabular-nums}

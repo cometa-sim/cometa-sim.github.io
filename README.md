@@ -42,6 +42,10 @@ calcolo/convergenza_raccolta.py     raccolta quotidiana delle previsioni di Tawh
 calcolo/convergenza_analisi.py      di quanto si sposta l'atterraggio previsto al variare dell'anticipo
 .github/workflows/convergenza.yml   il workflow quotidiano, scrive sul branch dati
 
+worker/                             backend SPOT (Cloudflare Worker + Durable Object) — vedi worker/README.md
+admin-diretta.html                  pagina di amministrazione per il polling SPOT il giorno del lancio —
+                                     non collegata dal sito, noindex, vedi worker/README.md
+
 LICENSE · README.md · .gitignore
 ```
 
@@ -67,11 +71,11 @@ Norme e autorizzazioni · Domande · Chi siamo.
 ### Dopo ogni modifica: il numero di versione
 
 In `index.html` i sette file di `assets/`, e la mappa, sono richiamati con un numero in
-coda — oggi `?v=121`:
+coda — oggi `?v=122`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=121">
-<script src="assets/i18n.js?v=121"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=122">
+<script src="assets/i18n.js?v=122"></script>
 ```
 
 Serve a costringere il browser a riscaricarli. **Chi modifica un file in
@@ -370,8 +374,15 @@ dataset), a passo di 24 h: così non conta quando è partito il workflow né
 quale corsa ha trovato. Per ogni bersaglio T il riferimento è la
 previsione con τ = 0; e(τ) è la distanza fra il punto previsto con
 anticipo τ e quello di riferimento. Con `--calendario` l'anticipo è
-invece `lead_giorni`, i giorni fra emissione e bersaglio. Misura la *convergenza* della previsione, non l'errore:
-il riferimento non è la verità, quindi è un limite inferiore, ed e(0) è
+invece `lead_giorni`, i giorni fra emissione e bersaglio.
+
+e(τ) misura la *convergenza* della previsione, non l'errore: il
+riferimento non è la verità. Con X il punto vero,
+P_τ − X = (P_τ − P₀) + (P₀ − X); se l'aggiornamento della previsione è
+scorrelato dall'errore del riferimento (esatto per una previsione
+ottimale, approssimato per il GFS), in media quadratica l'errore vero è
+almeno l'RMS di e(τ), che lo script stampa accanto a mediana e quartili.
+Non è un limite per il singolo volo, né per mediane e quartili. e(0) è
 zero per costruzione. Se si cambiano i parametri del volo nello script,
 le righe vecchie non sono più confrontabili: meglio un CSV nuovo.
 

@@ -351,7 +351,7 @@ function flightParams(iso, hhmm){
    2. La partenza
    ========================================================== */
 let launch = null;            /* {name, lat, lon} */
-let map = null, layer = null, launchMk = null, mapReady = null;   /* la mappa nasce dopo */
+let map = null, layer = null, launchMk = null, mapReady = null, mapkit = null;   /* la mappa nasce dopo */
 let last = null;          /* ultimo calcolo, per ridisegnare al cambio di lingua */
 let week = null;          /* confronto dei prossimi giorni: {iso: risultato} */
 /* Risultati di un altro luogo non devono restare a schermo */
@@ -380,6 +380,67 @@ function setLaunch(pl, keepText, noSave){
   closeSugg();
   if(map) placeLaunchMarker(true);
   loadAtmo(launch).then(renderBalloon);
+  loadWeather(launch);
+}
+
+/* Le cinque icone del meteo (sole, sole e nuvola, nuvola e goccia, nuvola
+   e tre gocce, vento): soglie semplici su nuvolosita', probabilita' di
+   pioggia e vento a terra, non un vero simbolo meteorologico — bastano a
+   dare un'idea d'insieme accanto ai numeri. SVG inline per lo stesso
+   motivo delle icone di mapkit.js: un'emoji dipende dal font del
+   sistema. Il vento vince su sole/nuvola (ma non su pioggia: un
+   temporale ventoso resta prima di tutto un temporale) perche' e' il
+   primo motivo per cui si rimanda un lancio quando non piove: 24 km/h
+   e' la soglia citata piu' spesso nelle guide amatoriali ai palloni
+   stratosferici, non un limite calcolato da noi — da adattare se la
+   scuola ne segue uno diverso. */
+const W_ICON_SUN = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.5"/><path d="M12 2.5v2.5M12 19v2.5M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M2.5 12h2.5M19 12h2.5M4.6 19.4l1.8-1.8M17.6 6.4l1.8-1.8"/></svg>';
+const W_ICON_PARTLY = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 5.5a4 4 0 0 1 7.4 2.1"/><path d="M17.5 20H8a4 4 0 1 1 1.3-7.8 5 5 0 0 1 9.6 2A3.5 3.5 0 0 1 17.5 20Z"/></svg>';
+const W_ICON_CLOUD = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H8a4 4 0 1 1 1.3-7.8 5 5 0 0 1 9.6 2A3.5 3.5 0 0 1 17.5 19Z"/></svg>';
+const W_ICON_DRIZZLE = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 15H8a4 4 0 1 1 1.3-7.8 5 5 0 0 1 9.6 2A3.5 3.5 0 0 1 17.5 15Z"/><path d="M12 18.5v2.5"/></svg>';
+const W_ICON_RAIN = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 13H8a4 4 0 1 1 1.3-7.8 5 5 0 0 1 9.6 2A3.5 3.5 0 0 1 17.5 13Z"/><path d="M8 17v2.5M12 17v2.5M16 17v2.5"/></svg>';
+const W_ICON_WIND = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h9a2 2 0 1 0-2-2.8"/><path d="M3 12h13a2.2 2.2 0 1 1-2.2 3.1"/><path d="M3 16h7a1.8 1.8 0 1 1-1.8 2.5"/></svg>';
+const W_WIND_STRONG_KMH = 24;   // soglia "vento forte": vedi commento sopra
+function weatherIcon(cloudPct, rainPct, windKmh){
+  if(rainPct >= 60) return W_ICON_RAIN;
+  if(rainPct >= 25) return W_ICON_DRIZZLE;
+  if(windKmh >= W_WIND_STRONG_KMH) return W_ICON_WIND;
+  if(cloudPct >= 85) return W_ICON_CLOUD;
+  if(cloudPct >= 50) return W_ICON_PARTLY;
+  return W_ICON_SUN;
+}
+
+/* Meteo di adesso nel punto di partenza scelto — solo per dare
+   un'idea di cosa si vedrebbe oggi, non per decidere la traiettoria
+   (quella usa comunque Tawhiri/GFS). Stesso Open-Meteo gia' usato
+   per l'atmosfera (loadAtmo), una chiamata a parte perche' "current"
+   e "hourly" qui servono a cose diverse (T/nuvole/vento adesso,
+   probabilita' di pioggia nell'ora in corso). */
+function loadWeather(pl){
+  const el = document.getElementById("twWeather");
+  if(!el) return;
+  const q = new URLSearchParams({
+    latitude: pl.lat.toFixed(4), longitude: pl.lon.toFixed(4),
+    current: "temperature_2m,cloud_cover,wind_speed_10m", hourly: "precipitation_probability",
+    forecast_days: "1", timezone: TZ
+  });
+  fetch(METEO + "?" + q.toString())
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(d){
+      if(!d || !d.current){ el.hidden = true; return; }
+      el.hidden = false;
+      document.getElementById("twWTemp").textContent = Math.round(d.current.temperature_2m) + "°C";
+      document.getElementById("twWWind").innerHTML = Math.round(d.current.wind_speed_10m) + "<small>km/h</small>";
+      document.getElementById("twWClouds").textContent = Math.round(d.current.cloud_cover) + "%";
+      let rainPct = 0, rainTxt = "—";
+      if(d.hourly && d.hourly.time && d.hourly.precipitation_probability){
+        const idx = d.hourly.time.indexOf(d.current.time.slice(0, 13) + ":00");
+        if(idx >= 0){ rainPct = d.hourly.precipitation_probability[idx]; rainTxt = Math.round(rainPct) + "%"; }
+      }
+      document.getElementById("twWRain").textContent = rainTxt;
+      document.getElementById("twWIcon").innerHTML = weatherIcon(d.current.cloud_cover, rainPct, d.current.wind_speed_10m);
+    })
+    .catch(function(){ el.hidden = true; });
 }
 
 /* Coordinate scritte a mano: "-33.38, -56.52", "-33.38 -56.52",
@@ -581,8 +642,7 @@ function parse(pl, d){
 
 /* ---------- Mappa ---------- */
 function loadLeaflet(){
-  if(window.L) return Promise.resolve();
-  return new Promise(function(ok, ko){
+  const leaflet = window.L ? Promise.resolve() : new Promise(function(ok, ko){
     const css = document.createElement("link");
     css.rel = "stylesheet"; css.href = LEAFLET + "leaflet.css";
     document.head.appendChild(css);
@@ -591,6 +651,17 @@ function loadLeaflet(){
     s.onload = ok; s.onerror = ko;
     document.head.appendChild(s);
   });
+  /* mapkit.js (satellite/schermo intero/radar pioggia): condiviso
+     con assets/spot.js, non tocca window.L al caricamento, solo
+     quando i suoi metodi vengono chiamati — puo' caricare in
+     parallelo con leaflet.js. */
+  const mapkit = window.COMETA_MAPKIT ? Promise.resolve() : new Promise(function(ok, ko){
+    const s = document.createElement("script");
+    s.src = "assets/mapkit.js?v=156";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
+    s.onload = ok; s.onerror = ko;
+    document.head.appendChild(s);
+  });
+  return Promise.all([leaflet, mapkit]);
 }
 function placeLaunchMarker(pan){
   const L = window.L;
@@ -615,11 +686,12 @@ function ensureMap(){
   mapReady = loadLeaflet().then(function(){
     const L = window.L;
     map = L.map(elMap, {scrollWheelZoom:false, zoomControl:true});
-    L.tileLayer(TILES, {
+    const street = L.tileLayer(TILES, {
       maxZoom:18, crossOrigin:true,      /* le stesse mattonelle servono all'esportazione */
       attribution:'© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'
     }).addTo(map);
     L.control.scale({imperial:false, position:"bottomright"}).addTo(map);  // sopra l'attribuzione, non accanto: da telefono l'attribuzione (lunga col satellite Esri) va su piu' righe e copriva la scala in basso a sinistra
+    mapkit = window.COMETA_MAPKIT && window.COMETA_MAPKIT.enhance(map, L, elMap, street, {onSave: exportPng});
     L.polygon(EXCL.map(function(p){ return [p[1], p[0]]; }),
               {color:"#FF7A5C", weight:1.5, fillColor:"#FF7A5C", fillOpacity:.16, interactive:false}).addTo(map);
     /* Fascia di piu' partenze: i poligoni si disegnano opachi in un pannello
@@ -874,7 +946,8 @@ function renderCard(r){
    [t("twTBurst"),    num(r.tBurst, 0) + " min"],
    [t("twDur"),       num(r.dur, 0) + " min"],
    [t("twAt"),        fmtTime(r.end.t, false)],
-   [t("twBurstDist"), num(r.burstDist, 0) + " km · " + num(r.burst.alt/1000, 1) + " km"]
+   [t("twBurstDist"), num(r.burstDist, 0) + " km"],
+   [t("twBurstC"),    num(r.burst.alt/1000, 1) + " km"]
   ].concat(r.spread ? [[t("twErrLand"), "± " + num(r.spread.major, 1) + " km"]] : [])
    .concat(r.spread && r.spread.B ? [[t("twBurstRange"),
      num(r.spread.B.lo.burst.alt/1000, 1) + "–" + num(r.spread.B.hi.burst.alt/1000, 1) + " km"]] : [])
@@ -1065,8 +1138,12 @@ function loadTile(url){
 }
 function exportPng(){
   if(!map) return;
-  const L = window.L, msg = $("#twPngMsg");
-  msg.textContent = t("twPngWait");
+  const L = window.L;
+  setStatus(t("twPngWait"));
+  /* Le stesse mattonelle che si vedono in quel momento: via (OSM, ordine
+     {z}/{x}/{y}) o satellite (Esri, ordine {z}/{y}/{x} — diverso!). */
+  const sat = !!(mapkit && mapkit.isSatellite && mapkit.isSatellite());
+  const tileUrl = sat ? window.COMETA_MAPKIT.ESRI_SAT : TILES;
   const size = map.getSize(), z0 = map.getZoom();
   /* Immagine sempre larga almeno OUT_W pixel (fattore S rispetto allo
      schermo). Le mattonelle salgono di zoom quanto basta, ma senza
@@ -1101,7 +1178,8 @@ function exportPng(){
     if(ty < 0 || ty >= n) continue;
     for(let tx = Math.floor(origin.x/256); tx <= Math.floor((origin.x + W/k)/256); tx++){
       const wx = ((tx % n) + n) % n;
-      const url = TILES.replace("{z}", z).replace("{x}", wx).replace("{y}", ty);
+      const url = sat ? tileUrl.replace("{z}", z).replace("{y}", ty).replace("{x}", wx)
+                      : tileUrl.replace("{z}", z).replace("{x}", wx).replace("{y}", ty);
       jobs.push(loadTile(url).then(function(im){
         /* +0,5 px per non lasciare fessure fra una mattonella e l'altra quando k non e' intero */
         if(im) g.drawImage(im, (tx*256 - origin.x)*k, (ty*256 - origin.y)*k, 256*k + .5, 256*k + .5);
@@ -1193,21 +1271,21 @@ function exportPng(){
     g.fillStyle = LIGHT.muted; g.font = 12.5*u + "px Inter, system-ui, sans-serif";
     lines.forEach(function(l, i){ g.fillText(l, 18*u, H + (53 + 19*i)*u); });
     g.font = 11*u + "px Inter, system-ui, sans-serif"; g.fillStyle = "#7A8A99";
-    g.fillText("© OpenStreetMap contributors · Tawhiri (SondeHub) · NOAA GFS · cometa.scuolaitaliana.edu.uy", 18*u, H + FOOT - 14*u);
+    g.fillText((sat ? "Tiles © Esri — Source: Esri, Maxar, Earthstar Geographics, GIS User Community" : "© OpenStreetMap contributors")
+      + " · Tawhiri (SondeHub) · NOAA GFS · cometa.scuolaitaliana.edu.uy", 18*u, H + FOOT - 14*u);
     try {
       cv.toBlob(function(blob){
-        if(!blob){ msg.textContent = t("twPngErr"); return; }
+        if(!blob){ setStatus(t("twPngErr"), true); return; }
         const a = document.createElement("a"), day = x && x.ok ? isoDay(x.pts[0].t) : elDate.value;
         a.download = "cometa-traiettoria-" + (launch ? launch.name : "mappa").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") + "-" + day + ".png";
         a.href = URL.createObjectURL(blob);
         document.body.appendChild(a); a.click(); a.remove();
         setTimeout(function(){ URL.revokeObjectURL(a.href); }, 4000);
-        msg.textContent = missing ? t("twPngPart") : "";
+        setStatus(missing ? t("twPngPart") : "");
       }, "image/png");
-    } catch(e){ msg.textContent = t("twPngErr"); }
+    } catch(e){ setStatus(t("twPngErr"), true); }
   });
 }
-$("#twPng") && $("#twPng").addEventListener("click", function(){ ensureMap().then(exportPng); });
 
 /* ---------- Cambio di lingua: si riscrive quello che e' gia' a schermo ---------- */
 function relabel(){
