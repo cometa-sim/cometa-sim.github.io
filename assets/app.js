@@ -606,6 +606,10 @@ window.COMETA_TRACK_URL = TRACK_URL;
    provvisorie, da confermare insieme al resto. */
 const DIRETTA_WINDOW = new Date("2026-10-25T00:00:00-03:00");
 const DIRETTA_START  = new Date("2026-10-28T10:00:00-03:00");
+/* false = la pagina Diretta c'e' ed e' raggiungibile solo da chi conosce
+   il link (#diretta), per le prove: niente voce in nav e niente banner,
+   qualunque siano le due date sopra. true quando la si vuole pubblica. */
+const DIRETTA_PUBLIC = false;
 
 function updateDiretta(){
   const now = Date.now();
@@ -615,10 +619,10 @@ function updateDiretta(){
         banner = $("#direttaBanner"), dStatus = $("#dStatus");
   [navD, navDM].forEach(function(el){
     if(!el) return;
-    el.style.display = state === "off" ? "none" : "flex";
+    el.style.display = DIRETTA_PUBLIC && state !== "off" ? "flex" : "none";
     el.classList.toggle("is-live", live);
   });
-  if(banner) banner.classList.toggle("show", live);
+  if(banner) banner.classList.toggle("show", DIRETTA_PUBLIC && live);
   if(dStatus){
     dStatus.classList.toggle("is-live", live);
     dStatus.querySelectorAll(".txt-pre").forEach(function(e){ e.style.display = live ? "none" : ""; });

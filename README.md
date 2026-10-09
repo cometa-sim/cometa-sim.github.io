@@ -68,7 +68,8 @@ Norme e autorizzazioni · Domande · Chi siamo.
 | Fondo scala delle animazioni | la costante `SCALA_KM` in `assets/app.js` |
 | Quota di scoppio, velocità di salita/discesa e sito di lancio attesi (pagina Diretta) | `FLIGHT_BURST_KM`, `FLIGHT_ASCENT_MS`, `FLIGHT_DESCENT_V0_MS`, `FLIGHT_SITE` in `assets/app.js` |
 | Indirizzo del backend che interroga SPOT (pagina Diretta) | la costante `TRACK_URL` in `assets/app.js` |
-| Quando compare "Diretta" in nav e quando diventa rossa | `DIRETTA_WINDOW` e `DIRETTA_START` in `assets/app.js` |
+| Se la Diretta compare in nav (oggi no: si raggiunge solo col link `#diretta`) | `DIRETTA_PUBLIC` in `assets/app.js` |
+| Quando compare "Diretta" in nav e quando diventa rossa, se pubblica | `DIRETTA_WINDOW` e `DIRETTA_START` in `assets/app.js` |
 | Numeri delle quattro schede della pagina iniziale | direttamente in `index.html` |
 | Stato di una tappa del progetto | la classe `done`, `wip` o `todo` della riga in `index.html` |
 
@@ -432,6 +433,13 @@ sovrappongono alla mappa.
 Sta in `index.html` (sezione `#diretta`) e in `assets/spot.js`: la diretta
 YouTube, la mappa GPS, la quota stimata e il meteo sul punto di lancio.
 
+Per ora non è pubblica: con `DIRETTA_PUBLIC = false` in `assets/app.js` non
+compaiono né la voce in nav né il banner rosso, qualunque sia la data. La
+pagina funziona comunque per intero, ma ci arriva solo chi conosce il link
+`…/#diretta` — è quella che si usa per le prove. Per renderla pubblica basta
+mettere `true`: da lì in poi voce e banner seguono `DIRETTA_WINDOW` e
+`DIRETTA_START`.
+
 **Da dove arrivano i punti GPS.** Il browser non chiama mai SPOT: lo fa il
 Worker di Cloudflare in `worker/`, che conserva la traccia e la espone in
 `/track.json` (la costante `TRACK_URL` in `assets/app.js`). Al Worker i dati
@@ -550,6 +558,10 @@ approvare la propria richiesta di modifica.
   di prova. Resta da attivare quello vero sull'account SPOT, che richiede
   il tracker a portata di mano. Finché non c'è, i punti arrivano
   comunque dalla pagina `admin-diretta.html`.
+
+- **Rendere pubblica la Diretta** (`DIRETTA_PUBLIC = true` in
+  `assets/app.js`), quando si decide. Finché resta `false` le date qui sotto
+  non hanno effetto.
 
 - **Quando compare la voce "Diretta"**, e quando passa dal ciano
   "diretta tra poco" al rosso "in diretta". Sono due date separate in
