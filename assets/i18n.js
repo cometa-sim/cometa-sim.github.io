@@ -18,6 +18,26 @@ it:{
   metaDesc:"COMETA è un programma di palloni stratosferici della Scuola Italiana di Montevideo: misure atmosferiche fino a più di 37 km di quota, progettate e realizzate dagli studenti.",
 
   navHome:"Inizio", navMission:"Missione", navPhysics:"La fisica", navProbe:"La sonda", navWinds:"La traiettoria", navAbout:"Chi siamo", navContact:"Contatti",
+  navDiretta:"Diretta",
+
+  /* — Diretta (bozza) — */
+  dirKicker:"Il giorno del lancio",
+  dirSub:"Il video dal campo e la posizione della sonda, in tempo reale.",
+  dirStatusPre:"Diretta tra poco", dirStatusLive:"In diretta ora",
+  dirBannerDesc:"— video dal campo e posizione GPS", dirBannerCta:"Guarda →",
+  dirYoutubeHead:"YouTube · diretta", dirGpsHead:"Tracciatore GPS · SPOT Trace",
+  dirYoutubePlaceholder:"[ embed YouTube quando attivo ]",
+  dirNoteTag:"Nota",
+  dirNote:"Sopra i 18 km il GPS smette di inviare il segnale: non è un'avaria, è il suo funzionamento normale — riprenderà in discesa. Fino ad allora la mappa resta ferma sull'ultima posizione nota. I punti verdi sono i fix GPS ricevuti: si toccano per vedere orario, coordinate e quota di ognuno; la linea grigia tratteggiata è la traiettoria prevista dal modello dei venti, aggiornata via via che la previsione cambia.",
+  dirSpotWaiting:"in attesa del segnale…",
+  dirSpotUnavailable:"mappa non disponibile",
+  dirSpotAgo:"{t} fa",
+  dirSpotLost:"segnale GPS perso",
+  dirSpotLostHigh:"segnale GPS perso • > 18 km",
+  dirSpotLanded:"sonda atterrata",
+  dirSpotRecenter:"Torna sull'ultima posizione",
+  dirAltHead:"Quota", dirAltEstLabel:"Stimata", dirAltGpsLabel:"Ultimo punto GPS",
+  dirWeatherHead:"Previsione meteo lancio",
 
   /* — Inizio — */
   heroSchool:"Scuola Italiana di Montevideo",
@@ -440,6 +460,26 @@ es:{
   metaDesc:"COMETA es un programa de globos estratosféricos de la Scuola Italiana di Montevideo: mediciones atmosféricas hasta más de 37 km de altura, diseñadas y construidas por los estudiantes.",
 
   navHome:"Inicio", navMission:"Misión", navPhysics:"La física", navProbe:"La sonda", navWinds:"La trayectoria", navAbout:"Quiénes somos", navContact:"Contacto",
+  navDiretta:"En vivo",
+
+  /* — En vivo (borrador) — */
+  dirKicker:"El día del lanzamiento",
+  dirSub:"El video desde el terreno y la posición de la sonda, en tiempo real.",
+  dirStatusPre:"En vivo pronto", dirStatusLive:"En vivo ahora",
+  dirBannerDesc:"— video desde el terreno y posición GPS", dirBannerCta:"Mirar →",
+  dirYoutubeHead:"YouTube · en vivo", dirGpsHead:"Rastreador GPS · SPOT Trace",
+  dirYoutubePlaceholder:"[ embed de YouTube cuando esté activo ]",
+  dirNoteTag:"Nota",
+  dirNote:"Por encima de los 18 km el GPS deja de enviar señal: no es una avería, es su funcionamiento normal — se reanudará en el descenso. Hasta entonces el mapa queda fijo en la última posición conocida. Los puntos verdes son los fixes GPS recibidos: se pueden tocar para ver hora, coordenadas y altitud de cada uno; la línea gris punteada es la trayectoria prevista por el modelo de vientos, que se actualiza a medida que cambia la previsión.",
+  dirSpotWaiting:"esperando la señal…",
+  dirSpotUnavailable:"mapa no disponible",
+  dirSpotAgo:"hace {t}",
+  dirSpotLost:"señal GPS perdida",
+  dirSpotLostHigh:"señal GPS perdida • > 18 km",
+  dirSpotLanded:"sonda aterrizada",
+  dirSpotRecenter:"Volver a la última posición",
+  dirAltHead:"Altitud", dirAltEstLabel:"Estimada", dirAltGpsLabel:"Último punto GPS",
+  dirWeatherHead:"Previsión meteorológica del lanzamiento",
 
   heroSchool:"Scuola Italiana di Montevideo",
 
@@ -856,6 +896,26 @@ en:{
   metaDesc:"COMETA is a stratospheric balloon programme at the Scuola Italiana di Montevideo: atmospheric measurements up to over 37 km, designed and built by students.",
 
   navHome:"Home", navMission:"Mission", navPhysics:"The physics", navProbe:"The probe", navWinds:"The trajectory", navAbout:"About us", navContact:"Contact",
+  navDiretta:"Live",
+
+  /* — Live (draft) — */
+  dirKicker:"Launch day",
+  dirSub:"Footage from the field and the probe's position, in real time.",
+  dirStatusPre:"Live soon", dirStatusLive:"Live now",
+  dirBannerDesc:"— footage from the field and GPS position", dirBannerCta:"Watch →",
+  dirYoutubeHead:"YouTube · live", dirGpsHead:"GPS tracker · SPOT Trace",
+  dirYoutubePlaceholder:"[ YouTube embed, once live ]",
+  dirNoteTag:"Note",
+  dirNote:"Above 18 km the GPS stops sending its signal: that is not a malfunction, it is normal operation — it will resume on the way down. Until then the map stays on the last known position. The green points are the GPS fixes received: tap one to see its time, coordinates and altitude; the dashed grey line is the trajectory predicted by the wind model, updated as the forecast changes.",
+  dirSpotWaiting:"waiting for signal…",
+  dirSpotUnavailable:"map unavailable",
+  dirSpotAgo:"{t} ago",
+  dirSpotLost:"GPS signal lost",
+  dirSpotLostHigh:"GPS signal lost • > 18 km",
+  dirSpotLanded:"probe landed",
+  dirSpotRecenter:"Back to last position",
+  dirAltHead:"Altitude", dirAltEstLabel:"Estimated", dirAltGpsLabel:"Latest GPS fix",
+  dirWeatherHead:"Launch weather forecast",
 
   heroSchool:"Scuola Italiana di Montevideo",
 

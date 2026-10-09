@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COMETA · Sonda Klo-01 — Scuola Italiana di Montevideo</title>
+<title>SIMULAZIONE — COMETA Diretta</title>
+<meta name="robots" content="noindex">
 <meta name="description" id="metaDesc" content="COMETA è un programma di palloni stratosferici della Scuola Italiana di Montevideo: misure atmosferiche fino a più di 37 km di quota, progettate e realizzate dagli studenti.">
 <meta name="theme-color" content="#010308">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='5' fill='%2302060f'/%3E%3Ccircle cx='12' cy='9' r='5.2' fill='none' stroke='%23EAF3FA' stroke-width='1.5'/%3E%3Cpath d='M10 14.4 12 16.8l2-2.4' fill='none' stroke='%23EAF3FA' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3Crect x='10.3' y='18' width='3.4' height='3.4' rx='.8' fill='none' stroke='%23FFB84D' stroke-width='1.4'/%3E%3C/svg%3E">
@@ -26,6 +27,10 @@
 <link rel="stylesheet" href="assets/cometa.css?v=156">
 </head>
 <body>
+<div class="sim-bar" style="position:sticky;top:0;z-index:90;background:#3a1600;border-bottom:1px solid rgba(255,184,77,.5);padding:11px 20px;font-family:var(--mono);font-size:12.5px;color:#FFB84D;display:flex;gap:16px;flex-wrap:wrap;align-items:center">
+  <span style="text-transform:uppercase;letter-spacing:.14em;font-weight:600">⚠ Simulazione — non è il sito vero</span>
+  <span>Orologio 10× più veloce, posizioni GPS finte ogni ~15 s · <b id="simClock" style="color:#fff">—</b></span>
+</div>
 
 <a class="skip" href="#app" data-i18n="skip">Vai al contenuto</a>
 
@@ -694,7 +699,12 @@
   <section class="section tight" id="v-previsione">
     <div class="wrap">
       <div class="kicker reveal" data-i18n="twHead">Prevedere il volo</div>
-      <p class="lede reveal d1" data-i18n-html="twP1"></p>
+      <div class="body-col reveal d1">
+        <p data-i18n-html="twP1"></p>
+        <p data-i18n-html="twP1b"></p>
+        <p data-i18n-html="twP1c"></p>
+        <p data-i18n-html="twP2"></p>
+      </div>
 
       <form class="tw-form reveal d1" id="twForm" novalidate>
         <fieldset class="tw-grp">
@@ -780,6 +790,7 @@
           <div class="tw-cv"><div class="sl" data-i18n="twDescC">Discesa al suolo</div><div class="sv" id="twCDesc">—</div></div>
         </div>
         <ul class="tw-warn" id="twWarn"></ul>
+        <p class="tw-hint tw-wide" data-i18n="twIsa"></p>
 
         <div class="tw-acts">
           <button type="submit" class="btn primary" data-i18n="twRun">Calcola la traiettoria</button>
@@ -787,19 +798,16 @@
         </div>
       </form>
       <p class="tw-status" id="twStatus" role="status" aria-live="polite"></p>
+      <div class="tw-res" id="twRes"></div>
 
       <div class="map-frame tw-map"><div class="tw-canvas" id="twMap"></div></div>
       <div class="map-legend">
-        <span id="twLegendTxt" data-i18n="twLegend">Stella: partenza · linea piena: salita · tratteggio: discesa · cerchio bianco: scoppio · poligono: area di esclusione.</span>
+        <span id="twLegendTxt" data-i18n="twLegend">Stella: partenza · linea piena: salita · tratteggio: discesa · cerchio bianco: scoppio.</span>
       </div>
-      <div class="mk-weather" id="twWeather" hidden>
-        <div class="mk-wtile mk-wicon"><div class="mk-wv" id="twWIcon"></div></div>
-        <div class="mk-wtile"><div class="mk-wv" id="twWTemp">—</div><div class="mk-wl" data-i18n="mkWeatherTemp">Temp.</div></div>
-        <div class="mk-wtile"><div class="mk-wv" id="twWWind">—</div><div class="mk-wl" data-i18n="mkWeatherWind">Vento</div></div>
-        <div class="mk-wtile"><div class="mk-wv" id="twWClouds">—</div><div class="mk-wl" data-i18n="mkWeatherClouds">Nuvole</div></div>
-        <div class="mk-wtile"><div class="mk-wv" id="twWRain">—</div><div class="mk-wl" data-i18n="mkWeatherRain">Pioggia</div></div>
+      <div class="tw-export">
+        <button type="button" class="btn" id="twPng" data-i18n="twPng">Scarica l'immagine della mappa</button>
+        <span class="tw-hint" id="twPngMsg" role="status" aria-live="polite"></span>
       </div>
-      <div class="tw-res" id="twRes"></div>
 
       <div class="tw-week" id="twWeekBox" hidden>
         <div class="table-wrap">
@@ -810,21 +818,18 @@
         </div>
         <p class="fig-note" data-i18n="twWeekNote"></p>
       </div>
+      <p class="fig-note" data-i18n="twNote"></p>
     </div>
   </section>
 
   <section class="section tight" id="v-calcolo">
     <div class="wrap">
-      <div class="kicker reveal" data-i18n="wModHead">Come funziona lo script</div>
+      <div class="kicker reveal" data-i18n="wModHead">Come sono calcolati salita e discesa</div>
       <div class="body-col reveal d1">
-        <p data-i18n-html="twP1b"></p>
-        <p data-i18n-html="twP1c"></p>
-        <p data-i18n-html="twP2"></p>
         <p data-i18n-html="wMod1"></p>
         <p data-i18n-html="wMod2"></p>
         <p data-i18n-html="wMod3"></p>
         <p data-i18n-html="wMod4"></p>
-        <p data-i18n="twIsa"></p>
       </div>
     </div>
   </section>
@@ -1218,6 +1223,176 @@
 
 </div>
 
+<script>
+/* ==========================================================
+   SOLO per questa pagina di prova: orologio accelerato e feed
+   GPS finto, al posto di quelli di SPOT. Da qui in poi caricano
+   i file VERI del sito (assets/spot.js, assets/app.js) — quello
+   che gira e' il codice vero, non una copia riscritta.
+   ========================================================== */
+(function(){
+  var RealDate = Date;
+  var RealSetInterval = window.setInterval.bind(window);
+  var RealSetTimeout = window.setTimeout.bind(window);
+  var SPEED = 10; // il tempo scorre 10 volte piu' in fretta
+  var realStart = RealDate.now();
+  var REAL_LAUNCH_MS = new RealDate("2026-10-28T11:00:00-03:00").getTime();  // deve coincidere con LAUNCH in assets/app.js
+  /* ---- fisica del volo finto: rispecchia FLIGHT_* in assets/app.js ---- */
+  var FLIGHT = {burstKm: 37.9, ascentMs: 5, descentV0Ms: 4.6};
+  var LAT0 = -33.68, LON0 = -56.35;
+
+  function densityISA(h){
+    var T, p;
+    if(h < 11000){ T = 288.15 - 0.0065 * h; p = 101325 * Math.pow(T / 288.15, 5.2559); }
+    else if(h < 20000){ T = 216.65; p = 22632 * Math.exp(-9.80665 * (h - 11000) / (287.05 * T)); }
+    else if(h < 32000){ T = 216.65 + 0.001 * (h - 20000); p = 5474.9 * Math.pow(T / 216.65, -34.1632); }
+    else { T = 228.65 + 0.0028 * (h - 32000); p = 868.02 * Math.pow(T / 228.65, -12.2011); }
+    return p / (287.05 * T);
+  }
+  var RHO0_SIM = densityISA(0);
+  var ASC_SEC = FLIGHT.burstKm * 1000 / FLIGHT.ascentMs; // secondi (finti) dal lancio allo scoppio
+
+  /* Punto di partenza della simulazione: pochi minuti (finti) prima
+     dello scoppio, non dal lancio — per vedere subito quella fase,
+     invece di aspettare tutta la salita anche accelerata 10x. */
+  var LEAD_SIM_MIN = 4;
+  var fakeStart = REAL_LAUNCH_MS + (ASC_SEC - LEAD_SIM_MIN * 60) * 1000;
+
+  function fakeNowMs(){ return fakeStart + (RealDate.now() - realStart) * SPEED; }
+  window.__fakeNow = fakeNowMs;
+
+  window.Date = class extends RealDate {
+    constructor(...args){ if(args.length === 0) super(fakeNowMs()); else super(...args); }
+    static now(){ return fakeNowMs(); }
+  };
+
+  /* Anche i timer vanno accelerati 10x, non solo l'orologio: altrimenti
+     assets/spot.js continua a controllare il feed ogni 30 secondi VERI
+     (fissi nel codice, giusto per il ritmo reale di SPOT), e i punti
+     finti — che qui arrivano ogni 15 s veri — si vedono a scatti di
+     due alla volta invece che uno alla volta. */
+  window.setInterval = function(fn, ms){ return RealSetInterval(fn, (ms || 0) / SPEED); };
+  window.setTimeout = function(fn, ms){ return RealSetTimeout(fn, (ms || 0) / SPEED); };
+
+  location.hash = "diretta";
+
+  RealSetInterval(function(){
+    var el = document.getElementById("simClock");
+    if(el) el.textContent = new Date().toLocaleString("it-IT");
+  }, 250);
+
+  /* Stessa curva di altPhysicsKm() in assets/spot.js, qui in metri e
+     con lo stesso passo: la "verita'" finta deve avere la forma che il
+     vero estimatore si aspetta di dover riallineare, non una salita e
+     discesa lineari — altrimenti la prova non direbbe niente di utile
+     sul riallineamento vero. */
+  function altAtSec(s){
+    if(s <= 0) return 0;
+    var ascSec = FLIGHT.burstKm * 1000 / FLIGHT.ascentMs;
+    if(s <= ascSec) return s * FLIGHT.ascentMs;
+    var z = FLIGHT.burstKm * 1000, t = ascSec, dt = 2;
+    while(t < s && z > 0){
+      var v = FLIGHT.descentV0Ms * Math.sqrt(RHO0_SIM / densityISA(Math.max(z, 0)));
+      z -= v * dt;
+      t += dt;
+    }
+    return Math.max(z, 0);
+  }
+
+  /* Rumore deterministico (funzione di t, non Math.random): ogni punto
+     finto viene rigenerato da zero a ogni poll, perche' fakeMessages()
+     ricostruisce tutta la lista dal tempo di lancio. Con Math.random()
+     lo stesso punto (stesso unixTime, un fix "vecchio" che non cambia
+     piu') cambiava quota a ogni richiesta, come se arrivasse un dato
+     nuovo — ma senza far lampeggiare la tessera, perche' il tempo
+     dell'ultimo punto non era davvero cambiato. Con un vero feed SPOT
+     questo non puo' succedere: un fix già ricevuto resta quello che e'. */
+  function seededNoise(t){
+    const x = Math.sin(t * 12.9898) * 43758.5453;
+    return (x - Math.floor(x)) * 160 - 80;
+  }
+  /* Il momento (finto) dell'atterraggio: dopo, niente altra deriva
+     orizzontale, o il puntino continuerebbe a muoversi verso est per
+     sempre anche a quota 0 — qui e' solo l'artificio della simulazione
+     (la deriva finta e' una retta senza fine), sulla pagina vera la
+     posizione non si muove da sola: avanza solo quando arriva un fix
+     SPOT nuovo. */
+  var cachedLandSec = null;
+  function landingSec(){
+    if(cachedLandSec != null) return cachedLandSec;
+    var ascSec = FLIGHT.burstKm * 1000 / FLIGHT.ascentMs;
+    var z = FLIGHT.burstKm * 1000, t = ascSec, dt = 2;
+    while(t < 1e7 && z > 0){
+      var v = FLIGHT.descentV0Ms * Math.sqrt(RHO0_SIM / densityISA(Math.max(z, 0)));
+      z -= v * dt;
+      t += dt;
+    }
+    cachedLandSec = t;
+    return cachedLandSec;
+  }
+  function fakeMessages(){
+    var nowMs = fakeNowMs();
+    var groundStart = REAL_LAUNCH_MS - 15 * 60 * 1000; // 15 min (finti) di terra prima del lancio
+    var msgs = [], t = groundStart, i = 0;
+    while(t <= nowMs && i < 300){
+      var s = (t - REAL_LAUNCH_MS) / 1000;
+      var alt = altAtSec(s) + seededNoise(t); // stesso rumore, ma fisso per ogni punto
+      var driftKm = Math.max(0, Math.min(s, landingSec())) / 3600 * 15; // deriva finta verso est, ferma dopo l'atterraggio
+      msgs.push({
+        latitude: LAT0 + driftKm / 111,
+        longitude: LON0 + driftKm / 92,
+        altitude: Math.round(alt),
+        unixTime: Math.floor(t / 1000),
+        dateTime: new RealDate(t).toISOString(),
+        messageType: "TRACK"
+      });
+      t += 150000; // 2,5 min (finti) fra un punto e l'altro, come il vero SPOT
+      i++;
+    }
+    return msgs.slice(-50);
+  }
+
+  /* Il sito vero legge solo da window.COMETA_TRACK_URL (il backend in
+     worker/, vedi assets/spot.js), mai da SPOT direttamente. Qui si
+     finge quel backend: si blocca COMETA_TRACK_URL su un indirizzo
+     finto PRIMA che assets/app.js lo sovrascriva (scrivere su una
+     proprieta' non scrivibile, fuori da "use strict", fallisce in
+     silenzio: resta questo valore), e si intercetta il fetch verso
+     quell'indirizzo restituendo la stessa forma di GET /track.json
+     del Worker — non quella grezza di SPOT. */
+  var FAKE_TRACK_URL = "https://simulazione.invalid/track.json";
+  /* Getter/setter, non un valore fisso: assets/app.js assegna
+     window.COMETA_TRACK_URL = "" al proprio caricamento, e quella riga
+     gira in strict mode (lancerebbe un TypeError contro una proprieta'
+     davvero non scrivibile). Il setter qui sotto accetta l'assegnazione
+     senza fare nulla: il valore restituito resta sempre quello finto. */
+  Object.defineProperty(window, "COMETA_TRACK_URL", {
+    get: function(){ return FAKE_TRACK_URL; },
+    set: function(){},
+    configurable: true
+  });
+
+  var REAL_FETCH = window.fetch.bind(window);
+  window.fetch = function(url, opts){
+    if(url === FAKE_TRACK_URL){
+      var msgs = fakeMessages();
+      var points = msgs.map(function(m){
+        return {id:"sim" + m.unixTime, time:m.unixTime, lat:m.latitude, lon:m.longitude,
+                altitude:m.altitude, messageType:m.messageType, batteryState:"GOOD"};
+      });
+      var body = {
+        points: points,
+        last_fetch: new RealDate().toISOString(),
+        last_fetch_ok: true,
+        last_point_time: points.length ? points[points.length - 1].time : null,
+        polling_active: true
+      };
+      return Promise.resolve(new Response(JSON.stringify(body), {status:200, headers:{"Content-Type":"application/json"}}));
+    }
+    return REAL_FETCH(url, opts);
+  };
+})();
+</script>
 <script src="assets/i18n.js?v=156"></script>
 <script src="assets/sonda.js?v=156"></script>
 <script src="assets/catena.js?v=156"></script>

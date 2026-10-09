@@ -62,6 +62,11 @@ sopra:
 - Leaflet 1.9.4 (assets/vendor/leaflet/),
   incluso anche nella mappa .............. BSD-2-Clause — https://leafletjs.com
 - Sfondo cartografico .................... (c) contributori OpenStreetMap, ODbL
+- Immagini satellitari ................... Esri, Maxar, Earthstar Geographics
+                                           (World Imagery, condizioni d'uso Esri)
+- Nuvole sulla mappa ..................... OpenWeatherMap (Weather Maps),
+                                           CC BY-SA 4.0
+- Radar pioggia sulla mappa .............. RainViewer (API pubblica)
 - Dati meteorologici ..................... Open-Meteo, CC BY 4.0
 - Previsione del giorno .................. Tawhiri, servizio di SondeHub;
                                            venti del modello GFS della NOAA

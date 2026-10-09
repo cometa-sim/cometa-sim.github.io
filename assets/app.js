@@ -109,6 +109,7 @@ function setLang(l, remember){
     applyTexts();
     buildChain();
     if(window.COMETA_SONDA) window.COMETA_SONDA.setLang(LANG);
+    if(window.COMETA_SPOT) window.COMETA_SPOT.setLang(LANG);
     updateFlight(); updateCountdown(); checkReveals();
     app.classList.remove("switching");
   };
@@ -129,6 +130,7 @@ $$(".lang button").forEach(function(b){
    ========================================================== */
 const pages = {
   home:     $("#page-home"),
+  diretta:  $("#page-diretta"),
   missione: $("#page-missione"),
   fisica:   $("#page-fisica"),
   sonda:    $("#page-sonda"),
@@ -154,6 +156,7 @@ function showPage(id){
     if(id === "sonda"){ window.COMETA_SONDA.init().then(function(){ window.COMETA_SONDA.setActive(true); }); }
     else { window.COMETA_SONDA.setActive(false); }
   }
+  if(window.COMETA_SPOT) window.COMETA_SPOT.setActive(id === "diretta");
 
   requestAnimationFrame(function(){
     checkReveals();
@@ -562,22 +565,93 @@ const LAUNCH = new Date("2026-10-28T11:00:00-03:00");
 /* La previsione del giorno (assets/traiettoria.js) propone questo giorno
    e quest'ora, quando cadono dentro la settimana coperta dal GFS. */
 window.COMETA_LAUNCH = LAUNCH;
+
+/* ==========================================================
+   Pagina Diretta — quota stimata in volo (bozza, da affinare)
+   ========================================================== */
+/* Numeri provvisori. Quota di scoppio e salita sono gli stessi gia'
+   scritti su Missione (37,9 km, 5 m/s); la discesa non e' un numero
+   fisso — e' la velocita' del paracadute del kit (1,2 m, Cd 1,0) con
+   la massa di oggi (≈1,5 kg), calcolata come in assets/traiettoria.js
+   (vAtterraggio). assets/spot.js la usa solo come velocita' AL SUOLO:
+   piu' in alto, dove l'aria e' rada, la stessa sonda scende molto piu'
+   veloce, e rallenta scendendo — lo stesso motivo per cui qui e' "al
+   suolo" e non "di discesa" e basta. FLIGHT_SITE e' il punto di partenza
+   usato per la traiettoria grigia disegnata in diretta — lo stesso
+   aerodromo di Mercedes che la pagina Traiettoria propone di default
+   (SUGGERITI[0] in assets/traiettoria.js): e' una costante a parte,
+   invece di leggerla dal modulo di quella pagina, apposta — cosi' non
+   dipende da cosa un visitatore potrebbe aver cambiato lì per curiosita'.
+   Il giorno del lancio vanno sostituiti tutti questi valori con quelli
+   precisi di quella previsione specifica — li aggiorna chi segue il
+   lancio, qui e in nessun altro posto. */
+const FLIGHT_BURST_KM = 37.9;
+const FLIGHT_ASCENT_MS = 5;
+const FLIGHT_DESCENT_V0_MS = 4.6;
+const FLIGHT_SITE = {lat: -33.2486, lon: -58.0736};
+window.COMETA_FLIGHT = {burstKm: FLIGHT_BURST_KM, ascentMs: FLIGHT_ASCENT_MS, descentV0Ms: FLIGHT_DESCENT_V0_MS, site: FLIGHT_SITE};
+
+/* Il backend che interroga SPOT una sola volta per tutti i visitatori
+   (worker/, Cloudflare Worker + Durable Object — vedi worker/README.md):
+   assets/spot.js legge solo da qui, mai da SPOT direttamente dal
+   browser. Da sostituire con l'URL vero una volta fatto il deploy —
+   finche' resta vuota, la mappa GPS mostra solo "in attesa del segnale". */
+const TRACK_URL = "https://cometa-sim-github-io.de-toni-carlo.workers.dev/track.json";
+window.COMETA_TRACK_URL = TRACK_URL;
+
+/* Quando compare la voce "Diretta" in nav (qualche giorno prima del
+   lancio, col pallino ciano e "diretta tra poco") e quando passa allo
+   stato rosso "in diretta" (quando comincia davvero la trasmissione,
+   non il lancio del pallone: la diretta parte prima). Date
+   provvisorie, da confermare insieme al resto. */
+const DIRETTA_WINDOW = new Date("2026-10-25T00:00:00-03:00");
+const DIRETTA_START  = new Date("2026-10-28T10:00:00-03:00");
+/* false = la pagina Diretta c'e' ed e' raggiungibile solo da chi conosce
+   il link (#diretta), per le prove: niente voce in nav e niente banner,
+   qualunque siano le due date sopra. true quando la si vuole pubblica. */
+const DIRETTA_PUBLIC = false;
+
+function updateDiretta(){
+  const now = Date.now();
+  const state = now < DIRETTA_WINDOW.getTime() ? "off" : now < DIRETTA_START.getTime() ? "pre" : "live";
+  const live = state === "live";
+  const navD = $("#navDiretta"), navDM = $("#navDirettaM"),
+        banner = $("#direttaBanner"), dStatus = $("#dStatus");
+  [navD, navDM].forEach(function(el){
+    if(!el) return;
+    el.style.display = DIRETTA_PUBLIC && state !== "off" ? "flex" : "none";
+    el.classList.toggle("is-live", live);
+  });
+  if(banner) banner.classList.toggle("show", DIRETTA_PUBLIC && live);
+  if(dStatus){
+    dStatus.classList.toggle("is-live", live);
+    dStatus.querySelectorAll(".txt-pre").forEach(function(e){ e.style.display = live ? "none" : ""; });
+    dStatus.querySelectorAll(".txt-live").forEach(function(e){ e.style.display = live ? "" : "none"; });
+  }
+}
 function updateCountdown(){
   const diff = LAUNCH - Date.now();
-  const d = $("#cd"), h = $("#ch"), m = $("#cm"), s = $("#cs"), cb = $("#cbadge");
-  if(diff <= 0){
-    if(d) d.textContent = "0";
-    [h,m,s].forEach(function(e){ if(e) e.textContent = "00"; });
-    if(cb) cb.textContent = "● LIVE";
-    return;
-  }
-  const dd = Math.floor(diff/864e5), hh = Math.floor(diff/36e5) % 24,
-        mm = Math.floor(diff/6e4) % 60, ss = Math.floor(diff/1e3) % 60;
-  if(d) d.textContent = dd;
-  if(h) h.textContent = String(hh).padStart(2, "0");
-  if(m) m.textContent = String(mm).padStart(2, "0");
-  if(s) s.textContent = String(ss).padStart(2, "0");
-  if(cb) cb.textContent = "T– " + dd + I18N[LANG].cUnit;
+  const cb = $("#cbadge");
+  /* "" = conto alla rovescia in home, "2" = la stessa cosa ripetuta
+     nella pagina Diretta: stesso LAUNCH, id separati per non scontrarsi. */
+  ["", "2"].forEach(function(suffix){
+    const d = $("#cd" + suffix), h = $("#ch" + suffix), m = $("#cm" + suffix), s = $("#cs" + suffix);
+    const count = d && d.closest(".count");
+    if(count) count.classList.toggle("zero", diff <= 0);
+    if(diff <= 0){
+      if(d) d.textContent = "0";
+      [h,m,s].forEach(function(e){ if(e) e.textContent = "00"; });
+      return;
+    }
+    const dd = Math.floor(diff/864e5), hh = Math.floor(diff/36e5) % 24,
+          mm = Math.floor(diff/6e4) % 60, ss = Math.floor(diff/1e3) % 60;
+    if(d) d.textContent = dd;
+    if(h) h.textContent = String(hh).padStart(2, "0");
+    if(m) m.textContent = String(mm).padStart(2, "0");
+    if(s) s.textContent = String(ss).padStart(2, "0");
+  });
+  if(diff <= 0){ if(cb) cb.textContent = "● LIVE"; return; }
+  if(cb) cb.textContent = "T– " + Math.floor(diff/864e5) + I18N[LANG].cUnit;
 }
 
 /* ==========================================================
@@ -808,7 +882,8 @@ darkenMap();
 progBalloon();
 bnumSale();
 updateCountdown();
-setInterval(updateCountdown, 1000);
+updateDiretta();
+setInterval(function(){ updateCountdown(); updateDiretta(); }, 1000);
 requestAnimationFrame(function(){ moveThumb(); onScroll(); updateFlight(); });
 if(!reduced) (function raf(){ updateFlight(); updatePhys(); requestAnimationFrame(raf); })();
 addEventListener("load", function(){ moveThumb(); sfResize(); updateFlight(); });
