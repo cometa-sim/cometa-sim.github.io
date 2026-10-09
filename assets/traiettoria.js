@@ -410,38 +410,46 @@ function weatherIcon(cloudPct, rainPct, windKmh){
   return W_ICON_SUN;
 }
 
-/* Meteo di adesso nel punto di partenza scelto — solo per dare
-   un'idea di cosa si vedrebbe oggi, non per decidere la traiettoria
-   (quella usa comunque Tawhiri/GFS). Stesso Open-Meteo gia' usato
-   per l'atmosfera (loadAtmo), una chiamata a parte perche' "current"
-   e "hourly" qui servono a cose diverse (T/nuvole/vento adesso,
-   probabilita' di pioggia nell'ora in corso). */
+/* Meteo previsto nel punto di partenza, al giorno e all'ora della
+   partenza scelti — gli stessi passati a Tawhiri — solo per dare
+   un'idea di cosa si troverebbe al lancio, non per decidere la
+   traiettoria. Previsione ora per ora di Open-Meteo (la stessa fonte di
+   loadAtmo), che arriva a 16 giorni, piu' dei GIORNI_MAX selezionabili.
+   Si aggiorna quando cambiano luogo, data o ora; weatherSeq scarta una
+   risposta arrivata dopo quella di una richiesta piu' recente (cambi
+   rapidi di data o di ora). */
+let weatherSeq = 0;
 function loadWeather(pl){
   const el = document.getElementById("twWeather");
-  if(!el) return;
+  if(!el || !pl || !elDate.value) return;
+  const iso = elDate.value, hhmm = elTime.value || "11:00";
+  const hh = Math.min(23, Math.round(parseInt(hhmm.slice(0, 2), 10) + parseInt(hhmm.slice(3, 5), 10)/60));
+  const key = iso + "T" + String(hh).padStart(2, "0") + ":00";
+  const seq = ++weatherSeq;
   const q = new URLSearchParams({
     latitude: pl.lat.toFixed(4), longitude: pl.lon.toFixed(4),
-    current: "temperature_2m,cloud_cover,wind_speed_10m", hourly: "precipitation_probability",
-    forecast_days: "1", timezone: TZ
+    hourly: "temperature_2m,cloud_cover,wind_speed_10m,precipitation_probability",
+    start_date: iso, end_date: iso, timezone: TZ
   });
   fetch(METEO + "?" + q.toString())
     .then(function(r){ return r.ok ? r.json() : null; })
     .then(function(d){
-      if(!d || !d.current){ el.hidden = true; return; }
+      if(seq !== weatherSeq) return;
+      const h = d && d.hourly, i = h && h.time ? h.time.indexOf(key) : -1;
+      if(i < 0 || h.temperature_2m[i] == null){ el.hidden = true; return; }
       el.hidden = false;
-      document.getElementById("twWTemp").textContent = Math.round(d.current.temperature_2m) + "°C";
-      document.getElementById("twWWind").innerHTML = Math.round(d.current.wind_speed_10m) + "<small>km/h</small>";
-      document.getElementById("twWClouds").textContent = Math.round(d.current.cloud_cover) + "%";
-      let rainPct = 0, rainTxt = "—";
-      if(d.hourly && d.hourly.time && d.hourly.precipitation_probability){
-        const idx = d.hourly.time.indexOf(d.current.time.slice(0, 13) + ":00");
-        if(idx >= 0){ rainPct = d.hourly.precipitation_probability[idx]; rainTxt = Math.round(rainPct) + "%"; }
-      }
-      document.getElementById("twWRain").textContent = rainTxt;
-      document.getElementById("twWIcon").innerHTML = weatherIcon(d.current.cloud_cover, rainPct, d.current.wind_speed_10m);
+      const rain = h.precipitation_probability ? h.precipitation_probability[i] : null;
+      document.getElementById("twWTemp").textContent = Math.round(h.temperature_2m[i]) + "°C";
+      document.getElementById("twWWind").innerHTML = Math.round(h.wind_speed_10m[i]) + "<small>km/h</small>";
+      document.getElementById("twWClouds").textContent = Math.round(h.cloud_cover[i]) + "%";
+      document.getElementById("twWRain").textContent = rain == null ? "—" : Math.round(rain) + "%";
+      document.getElementById("twWIcon").innerHTML = weatherIcon(h.cloud_cover[i], rain || 0, h.wind_speed_10m[i]);
     })
-    .catch(function(){ el.hidden = true; });
+    .catch(function(){ if(seq === weatherSeq) el.hidden = true; });
 }
+[elDate, elTime].forEach(function(e){
+  e.addEventListener("change", function(){ if(launch) loadWeather(launch); });
+});
 
 /* Coordinate scritte a mano: "-33.38, -56.52", "-33.38 -56.52",
    "-33,38; -56,52". La virgola decimale vale solo con ; o spazio. */
@@ -657,7 +665,7 @@ function loadLeaflet(){
      parallelo con leaflet.js. */
   const mapkit = window.COMETA_MAPKIT ? Promise.resolve() : new Promise(function(ok, ko){
     const s = document.createElement("script");
-    s.src = "assets/mapkit.js?v=158";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
+    s.src = "assets/mapkit.js?v=159";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
     s.onload = ok; s.onerror = ko;
     document.head.appendChild(s);
   });
@@ -1079,6 +1087,7 @@ function renderWeek(){
     const pick = function(){
       if(!r || !r.ok) return;
       elDate.value = iso; last = r;
+      loadWeather(launch);              /* cambiare elDate da codice non fa scattare "change" */
       ensureMap().then(function(){ show(r); });
       form.scrollIntoView({behavior:"smooth", block:"end"});
     };
