@@ -18,6 +18,8 @@ sonda.html · venti.html             rimandi ai vecchi indirizzi
 simulazione-diretta.html            prova la pagina Diretta con un orologio accelerato
                                      e un feed GPS finto, senza aspettare il lancio vero
                                      (NON è una pagina del sito, non è linkata da nessuna parte)
+diretta-prova.html                  copia della pagina Diretta per le prove col backend vero,
+                                     con i propri assets/*-preview.* — non collegata, noindex
 
 assets/cometa.css                   colori, caratteri, impaginazione
 assets/i18n.js                      i testi in italiano, spagnolo e inglese
@@ -27,6 +29,8 @@ assets/app.js                       lingua, navigazione, salita, fisica, conto a
 assets/traiettoria.js               prevedere il volo: pallone, partenza, Tawhiri
 assets/msis.js                      NRLMSIS 2.1 tabulato, generato da calcolo/genera_msis.py
 assets/spot.js                      pagina Diretta: mappa GPS e quota stimata in volo
+assets/mapkit.js                    controlli comuni alle due mappe: satellite, nuvole/pioggia,
+                                     schermo intero, salva — vedi «I livelli della mappa»
 assets/vendor/three.min.js          Three.js r128, copia locale (vedi sotto)
 assets/vendor/leaflet/              Leaflet 1.9.4, copia locale, per la previsione del giorno
 
@@ -70,13 +74,18 @@ Norme e autorizzazioni · Domande · Chi siamo.
 
 ### Dopo ogni modifica: il numero di versione
 
-In `index.html` i sette file di `assets/`, e la mappa, sono richiamati con un numero in
-coda — oggi `?v=122`:
+In `index.html` i file di `assets/`, e la mappa, sono richiamati con un numero in
+coda — oggi `?v=156`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=122">
-<script src="assets/i18n.js?v=122"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=156">
+<script src="assets/i18n.js?v=156"></script>
 ```
+
+Lo stesso numero compare anche in due punti meno visibili, che vanno alzati
+insieme: il caricamento di `assets/mapkit.js` dentro `assets/traiettoria.js`
+e dentro `assets/spot.js` (lo caricano loro, non `index.html`), e le pagine di
+prova `simulazione-diretta.html` e `diretta-prova.html`.
 
 Serve a costringere il browser a riscaricarli. **Chi modifica un file in
 `assets/` deve alzare quel numero di uno**, altrimenti i visitatori che hanno
@@ -91,13 +100,13 @@ senza il suo foglio di stile. Prima di pubblicare conviene quindi controllare
 che il numero sia davvero cambiato:
 
 ```
-grep -o '?v=[0-9]*' index.html | sort -u
+grep -o '?v=[0-9]*' index.html simulazione-diretta.html diretta-prova.html assets/traiettoria.js assets/spot.js | cut -d: -f2 | sort -u
 ```
 
 Deve uscire un solo valore, e diverso da quello di prima.
 
-Riguarda solo `index.html`: `sonda.html` e `venti.html` sono rimandi con il
-foglio di stile scritto dentro, e non richiamano nessun file di `assets/`.
+`sonda.html` e `venti.html` sono rimandi con il foglio di stile scritto
+dentro, e non richiamano nessun file di `assets/`.
 
 ### Lingua
 
@@ -386,6 +395,67 @@ Non è un limite per il singolo volo, né per mediane e quartili. e(0) è
 zero per costruzione. Se si cambiano i parametri del volo nello script,
 le righe vecchie non sono più confrontabili: meglio un CSV nuovo.
 
+### I livelli della mappa
+
+Le due mappe del sito — quella della Traiettoria e quella GPS della Diretta —
+hanno gli stessi controlli, scritti una volta sola in `assets/mapkit.js`:
+
+- **Via / satellite**: sfondo OpenStreetMap (scurito dal CSS) oppure
+  immagini satellitari Esri, a colori veri.
+- **Nuvole / pioggia**: un livello sopra lo sfondo, scelto in base a dove è
+  centrata la mappa quando si preme il pulsante. In Europa è il radar
+  pioggia di **RainViewer** (lì la rete di radar a terra è fitta; mostra solo
+  dove piove, e per questo il pulsante prende l'icona della pioggia).
+  Altrove è la copertura nuvolosa di **OpenWeatherMap**. È lo stato attuale
+  delle nuvole, non quello previsto per il giorno del lancio.
+- **Schermo intero**, e solo nella Traiettoria **salva l'immagine**.
+
+La chiave di OpenWeatherMap non sta nel sito: OpenWeatherMap non permette
+di limitarla a un dominio, quindi chiunque la vedesse nel codice potrebbe
+consumarne la quota. Le mattonelle passano dal Worker di Cloudflare
+(`/clouds/{z}/{x}/{y}.png`, vedi `worker/README.md`), che tiene la chiave
+come secret, risponde solo alle richieste che arrivano dal sito e conserva
+ogni mattonella 10 minuti, così molti visitatori sulla stessa zona
+consumano una sola chiamata.
+
+La scala sta in basso a destra, sopra l'attribuzione: da telefono
+l'attribuzione va su più righe, e in basso a sinistra la copriva.
+
+Fonti scartate, per non riprovarle: GPM IMERG e MODIS (NASA GIBS) — IMERG
+non mostrava nulla sopra l'Uruguay, MODIS è una foto di un giorno prima e
+nera di notte; CPTEC/INPE — le sue mattonelle pubbliche non sono in
+proiezione di Mercatore ma nella griglia del disco del satellite, e non si
+sovrappongono alla mappa.
+
+### La pagina Diretta
+
+Sta in `index.html` (sezione `#diretta`) e in `assets/spot.js`: la diretta
+YouTube, la mappa GPS, la quota stimata e il meteo sul punto di lancio.
+
+**Da dove arrivano i punti GPS.** Il browser non chiama mai SPOT: lo fa il
+Worker di Cloudflare in `worker/`, che conserva la traccia e la espone in
+`/track.json` (la costante `TRACK_URL` in `assets/app.js`). Al Worker i dati
+arrivano in due modi, entrambi attivi: il **Data Push** di SPOT, che manda
+la posizione quasi subito (ma mai la quota), e la pagina
+`admin-diretta.html`, che il giorno del lancio va tenuta aperta in un
+browser e porta anche la quota. Il Data Push arriva al Worker attraverso il
+dominio `cometa.gripe`, perché SPOT non consegnava agli indirizzi
+`*.workers.dev`. Tutti i dettagli sono in `worker/README.md`.
+
+**La linea grigia tratteggiata** è la traiettoria prevista: `assets/spot.js`
+la chiede a Tawhiri con i parametri fissi di `FLIGHT_*` in `assets/app.js`
+(partenza da `FLIGHT_SITE`, all'ora di `LAUNCH`) — non quelli che un
+visitatore può aver cambiato nella pagina Traiettoria. La richiede ogni 20
+minuti, anche durante il volo, e la ridisegna solo se nel frattempo è uscita
+una nuova corsa del GFS. Non usa mai i punti GPS: non si corregge seguendo
+il pallone.
+
+**`diretta-prova.html`** è una copia della pagina, non collegata, con i
+propri `assets/cometa-preview.css`, `assets/i18n-preview.js` e
+`assets/app-preview.js` (`assets/spot.js` e `assets/mapkit.js` sono invece
+condivisi). Finché esiste, ogni modifica alla Diretta va riportata anche nei
+file `-preview`.
+
 ### Three.js
 
 I due modelli 3D — la sonda e la catena di volo — usano **Three.js r128**,
@@ -421,7 +491,7 @@ approvare la propria richiesta di modifica.
 ## Da completare
 
 - **La data definitiva del lancio**, quando la DINACIA autorizza. Oggi la
-  costante `LAUNCH` in `assets/app.js` vale `2026-10-14T11:00:00-03:00`: è
+  costante `LAUNCH` in `assets/app.js` vale `2026-10-28T11:00:00-03:00`: è
   provvisoria, e il conto alla rovescia la mostra come se fosse certa.
   È anche il via vero: il lancio **è** la scadenza di `LAUNCH`, non un
   segnale a parte — se il giorno stesso il lancio slitta rispetto all'ora
@@ -467,28 +537,25 @@ approvare la propria richiesta di modifica.
   previsore usato lì) in background, in silenzio, con questi parametri —
   non quelli che un visitatore potrebbe aver cambiato giocando col modulo
   della pagina Traiettoria — e ridisegna la linea ogni volta che la
-  previsione (la corsa del modello GFS) cambia. Se la data del lancio è
-  troppo lontana per l'orizzonte del previsore la richiesta fallisce e
-  non succede nulla: ci riprova da sola più avanti, senza bisogno di
-  intervenire.
+  previsione (la corsa del modello GFS) cambia — vedi «La pagina
+  Diretta». Se la data del lancio è troppo lontana per l'orizzonte del
+  previsore la richiesta fallisce e non succede nulla: ci riprova da sola
+  più avanti, senza bisogno di intervenire. Se si sposta `LAUNCH`, va
+  spostata anche `REAL_LAUNCH_MS` in `simulazione-diretta.html`.
 
-- **L'indirizzo del backend che interroga SPOT**. Il browser non chiama
-  mai SPOT direttamente (con tanti spettatori durante la diretta,
-  rischierebbe di far bloccare il feed): a interrogarlo una sola volta
-  per tutti è un Cloudflare Worker a parte, nella cartella `worker/`
-  (non in questo branch: vive sul proprio, con la sua pull request —
-  vedi `worker/README.md` per il deploy). La costante `TRACK_URL` in
-  `assets/app.js` è l'indirizzo di quel Worker una volta distribuito
-  (`https://cometa-spot-tracker.<account>.workers.dev` o simile);
-  finché resta vuota (`""`, il valore di oggi) `assets/spot.js` non
-  chiama nessuno e la mappa GPS mostra solo "in attesa del segnale" —
-  niente di rotto, solo il backend non ancora collegato.
+- **Il Data Push vero di SPOT**. Il backend è pronto e già collegato
+  (`TRACK_URL` punta a
+  `https://cometa-sim-github-io.de-toni-carlo.workers.dev/track.json`), i
+  secret del Data Push sono impostati ed è stato provato con un Data Push
+  di prova. Resta da attivare quello vero sull'account SPOT, che richiede
+  il tracker a portata di mano. Finché non c'è, i punti arrivano
+  comunque dalla pagina `admin-diretta.html`.
 
 - **Quando compare la voce "Diretta"**, e quando passa dal ciano
   "diretta tra poco" al rosso "in diretta". Sono due date separate in
-  `assets/app.js`: `DIRETTA_WINDOW` (oggi 11 ottobre, qualche giorno prima
+  `assets/app.js`: `DIRETTA_WINDOW` (oggi 25 ottobre, qualche giorno prima
   del lancio — da quel momento la voce appare in nav, in grigio/ciano) e
-  `DIRETTA_START` (oggi 10:00, un'ora prima del lancio — da li' in poi
+  `DIRETTA_START` (oggi 28 ottobre alle 10:00, un'ora prima del lancio — da li' in poi
   diventa rossa e compare il banner sotto la nav). A differenza del via
   alla quota, questo passaggio non ha bisogno di un file da pushare
   nell'istante: la diretta la si accende quando si vuole, quindi basta
@@ -497,9 +564,9 @@ approvare la propria richiesta di modifica.
 ## Licenza
 
 Codice: MIT (vedi `LICENSE`). Testi e immagini: CC BY 4.0.
-I materiali di terze parti — Three.js, Leaflet, OpenStreetMap, Open-Meteo,
-i caratteri — sono elencati con le rispettive licenze nella sezione 3 del
-`LICENSE`.
+I materiali di terze parti — Three.js, Leaflet, OpenStreetMap, Esri,
+OpenWeatherMap, RainViewer, Open-Meteo, i caratteri — sono elencati con le
+rispettive licenze nella sezione 3 del `LICENSE`.
 
 ## I dati dello studio dei venti
 
