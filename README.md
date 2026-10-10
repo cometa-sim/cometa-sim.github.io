@@ -454,7 +454,9 @@ la posizione quasi subito (ma mai la quota), e la pagina
 `admin-diretta.html`, che il giorno del lancio va tenuta aperta in un
 browser e porta anche la quota. Il Data Push arriva al Worker attraverso il
 dominio `cometa.gripe`, perché SPOT non consegnava agli indirizzi
-`*.workers.dev`. Tutti i dettagli sono in `worker/README.md`.
+`*.workers.dev`. È attivo sull'account SPOT dal 10 ottobre 2026: provato
+con il tracker e la pagina admin chiusa, il punto è arrivato al Worker
+pochi secondi dopo il messaggio. Tutti i dettagli sono in `worker/README.md`.
 
 **La linea grigia tratteggiata** è la traiettoria prevista: `assets/spot.js`
 la chiede a Tawhiri con i parametri fissi di `FLIGHT_*` in `assets/app.js`
@@ -550,14 +552,6 @@ approvare la propria richiesta di modifica.
   previsore la richiesta fallisce e non succede nulla: ci riprova da sola
   più avanti, senza bisogno di intervenire. Se si sposta `LAUNCH`, va
   spostata anche `REAL_LAUNCH_MS` in `simulazione-diretta.html`.
-
-- **Il Data Push vero di SPOT**. Il backend è pronto e già collegato
-  (`TRACK_URL` punta a
-  `https://cometa-sim-github-io.de-toni-carlo.workers.dev/track.json`), i
-  secret del Data Push sono impostati ed è stato provato con un Data Push
-  di prova. Resta da attivare quello vero sull'account SPOT, che richiede
-  il tracker a portata di mano. Finché non c'è, i punti arrivano
-  comunque dalla pagina `admin-diretta.html`.
 
 - **Rendere pubblica la Diretta** (`DIRETTA_PUBLIC = true` in
   `assets/app.js`), quando si decide. Finché resta `false` le date qui sotto
