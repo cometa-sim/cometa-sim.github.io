@@ -74,11 +74,11 @@ Norme e autorizzazioni · Domande · Chi siamo.
 ### Dopo ogni modifica: il numero di versione
 
 In `index.html` i file di `assets/`, e la mappa, sono richiamati con un numero in
-coda — oggi `?v=162`:
+coda — oggi `?v=163`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=162">
-<script src="assets/i18n.js?v=162"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=163">
+<script src="assets/i18n.js?v=163"></script>
 ```
 
 Lo stesso numero compare anche in due punti meno visibili, che vanno alzati
@@ -324,13 +324,15 @@ chi guarda, senza server nostri:
    arancione la zona di atterraggio, e la scheda dà gli intervalli.
    Sempre lì, «Intervallo di atterraggio»: per una partenza singola si
    ricalcola la traiettoria con il diametro di scoppio a ±s % (quota di
-   scoppio dal modello, stessa atmosfera) e con la velocità di salita a
-   ±s % (quota di scoppio invariata), 5 % proposto per entrambi: fino a
-   cinque richieste a Tawhiri. Sulla mappa un segmento arancione (scoppio)
-   e uno viola (salita) uniscono gli atterraggi estremi; con entrambi c'è
-   anche l'ellisse xᵀC⁻¹x ≤ 2 con C = a·aᵀ + b·bᵀ (a, b i due
-   semi-segmenti): la minima che contiene il parallelogramma ±a±b. Con
-   0 in una delle due voci resta solo l'altro segmento.
+   scoppio dal modello, stessa atmosfera), con la velocità di salita a
+   ±s % e con quella di discesa a ±s % (5 % proposto per tutti). Con un
+   solo parametro attivo si fanno 2 richieste a Tawhiri e la mappa
+   disegna la linea fra i due atterraggi estremi passando per il nominale;
+   con due o tre si ricalcola ogni combinazione degli estremi (4 o 8
+   richieste) e l'area è l'involucro convesso di tutti gli atterraggi,
+   nominale compreso (5 o 9 voli), senza ipotesi di linearità. Linea e
+   area sono viola; la didascalia elenca i parametri attivi e la loro
+   percentuale. Con 0 in una voce quel parametro non entra.
 
 Sotto la mappa, il riquadro meteo (icona, temperatura, vento, nuvole,
 probabilità di pioggia) è la previsione oraria di Open-Meteo per il punto, il

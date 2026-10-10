@@ -69,7 +69,7 @@ const elWhere = $("#twWhere"), elSugg = $("#twSugg"), elGeo = $("#twGeo"),
       elStatus = $("#twStatus"), elRes = $("#twRes"), elMap = $("#twMap"),
       elWeekBtn = $("#twWeekBtn"), elWeekBox = $("#twWeekBox"), elWeekBody = $("#twWeekBody"),
       elToDay = $("#twToDay"), elToTime = $("#twToTime"), elEvery = $("#twEvery"), elLegend = $("#twLegendTxt"),
-      elErrOn = $("#twErrOn"), elErrSig = $("#twErrSig"), elErrAsc = $("#twErrAsc");
+      elErrOn = $("#twErrOn"), elErrSig = $("#twErrSig"), elErrAsc = $("#twErrAsc"), elErrDesc = $("#twErrDesc");
 
 /* ---------- Testi: seguono la lingua scelta nel sito ---------- */
 function lang(){ return document.documentElement.lang || "it"; }
@@ -667,7 +667,7 @@ function loadLeaflet(){
      parallelo con leaflet.js. */
   const mapkit = window.COMETA_MAPKIT ? Promise.resolve() : new Promise(function(ok, ko){
     const s = document.createElement("script");
-    s.src = "assets/mapkit.js?v=162";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
+    s.src = "assets/mapkit.js?v=163";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
     s.onload = ok; s.onerror = ko;
     document.head.appendChild(s);
   });
@@ -708,7 +708,6 @@ function ensureMap(){
        reso trasparente per intero, cosi' le sovrapposizioni non si sommano. */
     map.createPane("twBand").style.cssText = "z-index:395;opacity:.3";
     map.createPane("twLandZ").style.cssText = "z-index:396;opacity:.7";
-    map.createPane("twEll").style.cssText = "z-index:394";
     layer = L.layerGroup().addTo(map);
     /* il contenitore cambia misura (rotazione del telefono, pagina che
        si riassesta): Leaflet va avvisato, o centra su misure vecchie */
@@ -756,76 +755,42 @@ function draw(r, noFit){
     .bindTooltip(t("twLand") + " " + fmtTime(r.end.t, false)).addTo(layer);
   const bb = L.latLngBounds(up.concat(down));
   bb.extend([r.from.lat, r.from.lon]);
-  if(r.spread){       /* intervallo di atterraggio */
-    const g = r.spread;
-    if(g.ellipse){
-      new (smoothPolygon())(g.ellipse, {pane:"twEll", color:"#CFE4F5", weight:1.5, opacity:.8, fillColor:"#CFE4F5", fillOpacity:.1,
-        smoothFactor:0, lineJoin:"round", interactive:false}).addTo(layer);
-      g.ellipse.forEach(function(ll){ bb.extend(ll); });
-    }
-    [[g.B, "#FFB84D"], [g.A, "#A98CFF"]].forEach(function(x){
-      if(!x[0]) return;
-      const seg = [[x[0].lo.end.lat, x[0].lo.end.lon], [r.end.lat, r.end.lon], [x[0].hi.end.lat, x[0].hi.end.lon]];
-      L.polyline(seg, {pane:"twLandZ", color:x[1], weight:6, opacity:1, lineCap:"round", interactive:false}).addTo(layer);
-      seg.forEach(function(ll){ bb.extend(ll); });
-    });
+  if(r.spread){       /* area (o linea) di atterraggio: un solo colore */
+    const g = r.spread, VI = "#A98CFF";
+    if(g.poly) L.polygon(g.poly, {pane:"twLandZ", color:VI, weight:3, opacity:1, fillColor:VI, fillOpacity:.35,
+      lineJoin:"round", interactive:false}).addTo(layer);
+    else L.polyline(g.line, {pane:"twLandZ", color:VI, weight:6, opacity:1, lineCap:"round", interactive:false}).addTo(layer);
+    (g.poly || g.line).forEach(function(ll){ bb.extend(ll); });
   }
   if(!noFit){ map.invalidateSize(); map.fitBounds(bb, {padding:[30,30], maxZoom:10}); }
 }
 
-/* ---------- Intervallo di atterraggio ----------
-   Ogni coppia di estremi da' un semi-vettore di spostamento
-   dell'atterraggio (meta' della distanza fra i due): a per lo scoppio,
-   b per la salita. Con C = a·aT + b·bT = M·MT (M = [a b]) e x = αa + βb
-   si ha xT·C^-1·x = α² + β²: i vertici ±a±b del parallelogramma stanno
-   su xT·C^-1·x = 2. Quella e' l'ellisse di area minima che lo contiene
-   (Löwner–John: nelle coordinate α, β e' il cerchio circoscritto al
-   quadrato), quindi semiassi = √2 · √autovalori di C. */
-/* Leaflet arrotonda ogni vertice al pixel intero: su un'ellisse di poche
-   decine di pixel il contorno diventa a scalini. Questo poligono proietta
-   i vertici senza arrotondare, e l'SVG li disegna con i decimali. */
-let SmoothPolygon = null;
-function smoothPolygon(){
-  if(SmoothPolygon) return SmoothPolygon;
-  const L = window.L;
-  SmoothPolygon = L.Polygon.extend({
-    _projectLatlngs: function(latlngs, result, projectedBounds){
-      if(latlngs[0] instanceof L.LatLng){
-        const origin = this._map.getPixelOrigin(), ring = [];
-        for(let i = 0; i < latlngs.length; i++){
-          const p = this._map.project(latlngs[i])._subtract(origin);
-          ring.push(p); projectedBounds.extend(p);
-        }
-        result.push(ring);
-      } else {
-        for(let i = 0; i < latlngs.length; i++) this._projectLatlngs(latlngs[i], result, projectedBounds);
-      }
-    }
-  });
-  return SmoothPolygon;
-}
-function kmVec(from, to){
-  return [(to.lon - from.lon)*111.32*Math.cos(from.lat*RAD), (to.lat - from.lat)*110.57];
-}
-function spreadGeom(r, B, A){
-  const g = {B:B, A:A};
-  const half = function(X){ const u = kmVec(X.lo.end, X.hi.end); return [u[0]/2, u[1]/2]; };
-  const a = B ? half(B) : [0, 0], b = A ? half(A) : [0, 0];
-  const c11 = a[0]*a[0] + b[0]*b[0], c22 = a[1]*a[1] + b[1]*b[1], c12 = a[0]*a[1] + b[0]*b[1];
-  const tr = (c11 + c22)/2, dt = Math.sqrt(Math.max(0, (c11 - c22)*(c11 - c22)/4 + c12*c12));
-  const l1 = tr + dt, l2 = Math.max(0, tr - dt), th = Math.atan2(l1 - c11, c12 || 1e-12);
-  const k2 = B && A ? Math.SQRT2 : 1;     /* con un solo segmento: meta' segmento */
-  g.major = k2*Math.sqrt(l1); g.minor = k2*Math.sqrt(l2); g.theta = th;
-  if(B && A){       /* ellisse solo con entrambe le incertezze */
-    const lat0 = r.end.lat, lon0 = r.end.lon, k = Math.cos(lat0*RAD), pts = [];
-    for(let i = 0; i <= 360; i++){
-      const u = 2*Math.PI*i/360, ex = g.major*Math.cos(u), ey = g.minor*Math.sin(u);
-      const x = ex*Math.cos(g.theta) - ey*Math.sin(g.theta), y = ex*Math.sin(g.theta) + ey*Math.cos(g.theta);
-      pts.push([lat0 + y/110.57, lon0 + x/(111.32*k)]);
-    }
-    g.ellipse = pts;
-  }
+/* ---------- Area di atterraggio ----------
+   Ogni parametro con incertezza attivo (diametro di scoppio, salita,
+   discesa) ha un estremo basso e uno alto. Con un solo parametro si
+   ricalcola il volo ai due estremi e si traccia la linea
+   basso-nominale-alto (3 voli). Con due o tre si ricalcola ogni
+   combinazione degli estremi (4 o 8 voli, piu' il nominale: 5 o 9) e
+   l'area e' l'involucro convesso di tutti gli atterraggi, senza
+   ipotesi di linearita' o di effetti che si sommano. */
+function spreadGeom(r, specs, cs){
+  const g = {n:specs.length, specs:specs}, nom = [r.end.lat, r.end.lon];
+  const pts = cs.map(function(c){ return [c.end.lat, c.end.lon]; });
+  if(g.n === 1) g.line = [pts[0], nom, pts[1]];
+  else g.poly = hull(pts.concat([nom]).map(function(q){ return [q[1], q[0]]; })).map(function(q){ return [q[1], q[0]]; });
+  const all = pts.concat([nom]);
+  g.extent = 0;
+  for(let i = 0; i < all.length; i++) for(let j = i + 1; j < all.length; j++)
+    g.extent = Math.max(g.extent, distKm(all[i][0], all[i][1], all[j][0], all[j][1]));
   return g;
+}
+/* Didascalia dell'area: parametri attivi con la loro percentuale */
+function legendLand(g){
+  const names = g.specs.map(function(x){
+    return t({B:"twLegPB", A:"twLegPA", D:"twLegPD"}[x.k]) + " (±" + num(x.s*100, (x.s*1000) % 10 ? 1 : 0) + " %)";
+  });
+  const list = names.length < 2 ? names[0] : names.slice(0, -1).join(", ") + " " + t("twAnd") + " " + names[names.length - 1];
+  return t("twLegend") + " " + t(g.n > 1 ? "twLegLand" : "twLegLine") + " " + list + ". " + t("twLegWind");
 }
 
 /* ---------- Piu' partenze: una fascia sola ----------
@@ -928,11 +893,7 @@ function show(x, noFit){
   if(band){ renderBand(x); statusDone(x.list); if(map) drawBand(x, noFit); }
   else {
     renderCard(x); statusDone([x]); if(map) draw(x, noFit);
-    if(elLegend && x && x.spread){
-      const e = [x.spread.B ? t("twLegendErrB") : "", x.spread.A ? t("twLegendErrA") : "", x.spread.ellipse ? t("twLegendErrE") : ""]
-        .filter(Boolean).join(" · ");
-      elLegend.textContent = t("twLegend") + " " + e.charAt(0).toUpperCase() + e.slice(1) + ".";
-    }
+    if(elLegend && x && x.spread) elLegend.textContent = legendLand(x.spread);
   }
 }
 
@@ -958,11 +919,11 @@ function renderCard(r){
    [t("twAt"),        fmtTime(r.end.t, false)],
    [t("twBurstDist"), num(r.burstDist, 0) + " km"],
    [t("twBurstC"),    num(r.burst.alt/1000, 1) + " km"]
-  ].concat(r.spread ? [[t("twErrLand"), "± " + num(r.spread.major, 1) + " km"]] : [])
-   .concat(r.spread && r.spread.B ? [[t("twBurstRange"),
-     num(r.spread.B.lo.burst.alt/1000, 1) + "–" + num(r.spread.B.hi.burst.alt/1000, 1) + " km"]] : [])
-   .concat(r.spread && r.spread.A ? [[t("twAscRange"),
-     num(r.spread.A.vLo, 2) + "–" + num(r.spread.A.vHi, 2) + " m/s"]] : [])
+  ].concat(r.spread ? [[t("twErrLand"), num(r.spread.extent, 1) + " km"]] : [])
+   .concat(r.spread ? r.spread.specs.map(function(x){
+     const k = {B:"twBurstRange", A:"twAscRange", D:"twDescRange"}[x.k], u = x.k === "B" ? " km" : " m/s", d = x.k === "B" ? 1 : 2;
+     return [t(k), num(x.lov, d) + "–" + num(x.hiv, d) + u];
+   }) : [])
    .forEach(function(row){ dl.appendChild(el("dt", null, row[0])); dl.appendChild(el("dd", null, row[1])); });
   card.appendChild(dl);
   if(r.atmo) card.appendChild(el("p", "tw-hint tw-card-note",
@@ -1021,23 +982,27 @@ form.addEventListener("submit", function(e){
   setStatus(t("twLoading"));
   Promise.all([ensureMap(), loadAtmo(pl).then(function(){
     const p = flightParams(iso, hhmm);
-    /* Intervallo di atterraggio: la stessa partenza con il diametro di
-       scoppio a d(1±sB) e con la velocita' di salita a v(1±sA) (quota di
-       scoppio invariata); fino a cinque traiettorie. */
+    /* Area di atterraggio: la stessa partenza con il diametro di scoppio a
+       d(1±sB), la velocita' di salita a v(1±sA) e quella di discesa a
+       v(1±sD), tutte le combinazioni degli estremi; fino a nove voli. */
     const on = elErrOn && elErrOn.checked, valid = function(x){ return x > 0 && x < 0.5; };
-    const sB = on ? parseFloat(elErrSig.value)/100 : 0, sA = on ? parseFloat(elErrAsc.value)/100 : 0;
-    const soft = function(q){ return q ? predict(pl, when, q).catch(function(){ return null; }) : Promise.resolve(null); };
-    let bLo = null, bHi = null, aLo = null, aHi = null;
+    const sB = on ? parseFloat(elErrSig.value)/100 : 0, sA = on ? parseFloat(elErrAsc.value)/100 : 0,
+          sD = on && elErrDesc ? parseFloat(elErrDesc.value)/100 : 0;
+    const soft = function(q){ return predict(pl, when, q).catch(function(){ return null; }); };
+    const specs = [];
     if(valid(sB)){
-      const d = burstSpread(readBalloon(), iso, hhmm, sB);
-      bLo = Object.assign({}, p, {burst:p.burst + d.lo/1000}); bHi = Object.assign({}, p, {burst:p.burst + d.hi/1000});
+      const d = burstSpread(readBalloon(), iso, hhmm, sB), lo = p.burst + d.lo/1000, hi = p.burst + d.hi/1000;
+      specs.push({k:"B", s:sB, lov:lo, hiv:hi, lo:{burst:lo}, hi:{burst:hi}});
     }
-    if(valid(sA)){ aLo = Object.assign({}, p, {asc:p.asc*(1 - sA)}); aHi = Object.assign({}, p, {asc:p.asc*(1 + sA)}); }
-    return Promise.all([predict(pl, when, p), soft(bLo), soft(bHi), soft(aLo), soft(aHi)]).then(function(rr){
+    if(valid(sA)) specs.push({k:"A", s:sA, lov:p.asc*(1 - sA), hiv:p.asc*(1 + sA), lo:{asc:p.asc*(1 - sA)}, hi:{asc:p.asc*(1 + sA)}});
+    if(valid(sD)) specs.push({k:"D", s:sD, lov:p.desc*(1 - sD), hiv:p.desc*(1 + sD), lo:{desc:p.desc*(1 - sD)}, hi:{desc:p.desc*(1 + sD)}});
+    const runs = [];
+    for(let m = 0; m < (specs.length ? 1 << specs.length : 0); m++)
+      runs.push(Object.assign.apply(null, [{}, p].concat(specs.map(function(x, i){ return (m >> i) & 1 ? x.hi : x.lo; }))));
+    return Promise.all([predict(pl, when, p)].concat(runs.map(soft))).then(function(rr){
       const r = rr[0]; r.atmo = p.atmo;
-      const B = rr[1] && rr[2] ? {s:sB, lo:rr[1], hi:rr[2]} : null;
-      const A = rr[3] && rr[4] ? {s:sA, lo:rr[3], hi:rr[4], vLo:aLo.asc, vHi:aHi.asc} : null;
-      if(B || A) r.spread = spreadGeom(r, B, A);
+      const cs = rr.slice(1);
+      if(specs.length && cs.every(function(c){ return c && c.ok; })) r.spread = spreadGeom(r, specs, cs);
       return r;
     });
   }).catch(function(e){ return {ok:false, from:pl, err:e.message}; })])
@@ -1137,7 +1102,7 @@ elWeekBtn.addEventListener("click", function(){
    chiaro, piu' una riga con luogo, data, legenda, scala e attribuzione.
    Le mattonelle sono al massimo MAX_TILES, per rispetto del server OSM. */
 const MAX_TILES = 200, OUT_W = 3200;
-const LIGHT = {track:"#0B6FA4", band:"#0B6FA4", land:"#E08E0B", asc:"#6C4FD1", ell:"#1F2D3D",
+const LIGHT = {track:"#0B6FA4", band:"#0B6FA4", land:"#E08E0B", asc:"#6C4FD1",
                excl:"#C0392B", ink:"#0E1620", muted:"#4A5B6C", paper:"#FFFFFF"};
 function loadTile(url){
   return new Promise(function(ok){
@@ -1241,13 +1206,9 @@ function exportPng(){
       g.setLineDash([6*u, 7*u]); path(down); g.lineWidth = 2.5*u; g.stroke(); g.setLineDash([]);
       if(r.spread){
         const s = r.spread;
-        if(s.ellipse){ path(s.ellipse, true); g.fillStyle = LIGHT.ell; g.globalAlpha = .08; g.fill(); g.globalAlpha = 1;
-                       g.lineWidth = 1.5*u; g.strokeStyle = LIGHT.ell; g.stroke(); }
-        [[s.B, LIGHT.land], [s.A, LIGHT.asc]].forEach(function(q){
-          if(!q[0]) return;
-          path([[q[0].lo.end.lat, q[0].lo.end.lon], [r.end.lat, r.end.lon], [q[0].hi.end.lat, q[0].hi.end.lon]]);
-          g.lineWidth = 6*u; g.strokeStyle = q[1]; g.globalAlpha = .85; g.stroke(); g.globalAlpha = 1;
-        });
+        if(s.poly){ path(s.poly, true); g.globalAlpha = .3; g.fillStyle = LIGHT.asc; g.fill();
+                    g.globalAlpha = .85; g.lineWidth = 3*u; g.strokeStyle = LIGHT.asc; g.stroke(); g.globalAlpha = 1; }
+        else { path(s.line); g.lineWidth = 6*u; g.strokeStyle = LIGHT.asc; g.globalAlpha = .85; g.stroke(); g.globalAlpha = 1; }
       }
       dot(r.burst.lat, r.burst.lon, 5, "#FFFFFF", LIGHT.track, 2);
       dot(r.end.lat, r.end.lon, 8, LIGHT.land, LIGHT.ink, 2);
