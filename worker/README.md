@@ -65,7 +65,9 @@ arriva, invece di dover essere interrogato. Configurato dalla pagina
 `myaccount.findmespot.com` → **SPOT API** → **Data Push**, protocollo
 **HTTPS**, con l'URL del Worker (quello intero, senza percorso dopo —
 SPOT **non supporta query string** nell'URL, vedi "Known limitations"
-della guida).
+della guida). Oggi è configurato su `https://cometa.gripe/` ("Forward
+911 to me" disattivato) ed è attivo: provato il 10 ottobre 2026 con il
+tracker, il punto arriva pochi secondi dopo il messaggio.
 
 Non sostituisce `/claim`+`/ingest`: **il Data Push non manda mai la
 quota** (`altitude` non esiste nel suo formato XML, a differenza del
