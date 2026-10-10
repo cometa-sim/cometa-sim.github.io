@@ -516,6 +516,14 @@ def quota_del_giorno(cfg,h,lat,lon,q):
     if col is None: return cfg.quota,"isa"
     return quota_scoppio(cfg.V_elio,cfg.diametro,col.rho),"giorno+"+cfg.rif
 
+def _etichetta_fonte(fonte):
+    """Dicitura leggibile del modello atmosferico usato per la quota di scoppio."""
+    if fonte=="giorno+msis": return "atmosfera del giorno, sopra 24 km NRLMSIS"
+    if fonte=="giorno+isa":  return "atmosfera del giorno, sopra 24 km ISA"
+    if fonte=="isa":         return "atmosfera standard ISA"
+    if fonte=="imposta":     return "quota imposta a mano"
+    return fonte
+
 def previsione_tawhiri(cfg):
     istanti=istanti_lancio(cfg)
     print(f"PREVISIONE TAWHIRI (SondeHub, venti NOAA GFS){' [MOCK]' if cfg.mock else ''}")
@@ -551,7 +559,7 @@ def previsione_tawhiri(cfg):
             print(f"{sito:22s}{etq:>18}{v['lat']:>10.3f},{v['lon']:>9.3f}"
                   f"{v['deriva']:>6.0f}km{v['rotta']:>6.0f}°{v['durata']:>5.0f}min"
                   f"{v['dist_scoppio']:>8.0f} km{v['quota_max']/1000:>6.2f}km{v['stato']:>7}"
-                  f"{'' if fonte.startswith('giorno') else '  ('+fonte+')'}")
+                  f"  ({_etichetta_fonte(fonte)})")
     print()
     if not voli:
         print("Nessuna traiettoria: la data e' fuori dalla previsione GFS (circa una settimana"
@@ -1181,6 +1189,12 @@ def main():
     if cfg.rif=="msis" and not msis_disponibile():
         print("  [!] pymsis non installato (pip install pymsis): estrapolazione su ISA.")
         cfg.rif="isa"
+    if cfg.rif=="msis" and cfg.atm=="reale" and cfg.siti:     # prova subito, cosi' le intestazioni dicono il modello vero
+        _la,_lo=next(iter(cfg.siti.values()))
+        try: densita_msis(30000.0,_la,_lo,datetime.now(timezone.utc).strftime("%Y-%m-%dT12:00"))
+        except Exception as e:
+            print(f"  [!] NRLMSIS non utilizzabile ({e}): estrapolazione su ISA.")
+            cfg.rif="isa"; cfg._msis_warned=True
     if cfg.quota is None and V: cfg.quota=burst   # valore ISA, usato come fallback
     print(f"PALLONE: d_scoppio {cfg.diametro} m | massa {cfg.massa} kg | payload {cfg.payload} kg | salita {cfg.vsalita} m/s")
     if cfg.vatt_src=="paracadute":
