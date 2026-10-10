@@ -32,12 +32,11 @@ enabled = false
 # dirette su cometa-sim.github.io, es. prima che il CNAME sia attivo).
 [vars]
 ALLOWED_ORIGINS = "https://cometa-sim.github.io,https://cometa.scuolaitaliana.edu.uy"
-# SPOT bloccava le richieste dai Worker di Cloudflare (403 anti-bot), e
-# il polling lo faceva solo la pagina di amministrazione dal browser.
-# Riacceso in prova (ottobre 2026) per verificare se SPOT ha tolto il
-# blocco: l'alarm interno parte solo dopo POST /start (e si ferma con
-# /stop). Se torna il 403, rimettere "false" — vedi
-# INTERNAL_POLLING_ENABLED in env.ts.
+# Il Worker interroga SPOT da solo (polling periodico tra /start e /stop,
+# e una lettura dopo ogni Data Push per la quota). SPOT bloccava le
+# richieste dai Worker di Cloudflare (403 anti-bot), ma il blocco e' stato
+# tolto (verificato a ottobre 2026). Se tornasse, rimettere "false": resta
+# la pagina di amministrazione — vedi INTERNAL_POLLING_ENABLED in env.ts.
 INTERNAL_POLLING_ENABLED = "true"
 
 # Il Durable Object che fa tutto: polling, storage SQLite, gli endpoint.

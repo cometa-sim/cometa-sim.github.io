@@ -23,29 +23,40 @@ Un'unica istanza del Durable Object `SpotTracker` (sempre la stessa,
 stato del polling, la tabella SQLite dei punti, e risponde a tutti gli
 endpoint.
 
-**SPOT blocca le richieste che arrivano dai Worker di Cloudflare** (403
-con la pagina anti-bot), ma accetta quelle da un browser normale. Per
-questo non è il Worker a interrogare SPOT: lo fa **`admin-diretta.html`**
-(alla radice del sito, non collegata dal sito, `noindex` — vedi più
-sotto), una pagina aperta in un browser il giorno del lancio, che ogni
-~155 secondi:
+I punti arrivano al Worker per tre strade, tutte attive insieme:
 
-1. chiede il permesso al Worker con `POST /claim`;
-2. se concesso, interroga SPOT direttamente dal browser;
-3. manda il risultato (successo o errore) al Worker con `POST /ingest`,
-   che lo salva con la stessa logica di sempre (deduplica per `id`,
-   `last_fetch`/`last_fetch_ok`/`last_error`).
+1. **Data Push** (`POST /`): SPOT manda lui la posizione, pochi
+   secondi dopo il messaggio del tracker — ma **mai la quota**. Vedi
+   "Data Push" sotto.
+2. **Lettura del feed dal Worker** (`alarm()` in `src/tracker.ts`):
+   - subito dopo ogni Data Push con punti, una lettura del feed REST
+     per avere la quota dello stesso messaggio (appena il limite dei
+     150s lo permette: la quota arriva al massimo ~150s dopo la
+     posizione);
+   - in più, tra `POST /start` e `POST /stop`, una lettura ogni ~155s:
+     la rete di sicurezza se un Data Push tarda o si perde.
+3. **Pagina di amministrazione** (`admin-diretta.html`, la riserva): se
+   il Worker non riesce a leggere il feed, può interrogarlo lei dal
+   browser — `POST /claim` per il turno, poi il feed SPOT, poi `POST
+   /ingest` col risultato.
 
-`/claim` concede il permesso solo se sono passati almeno 150 secondi
-(`MIN_INTERVAL_MS`, lo stesso limite di SPOT) dall'ultimo permesso
-concesso — non da quando è arrivato l'ultimo `/ingest`: il permesso è
-speso appena concesso, anche se chi lo ottiene non arriva mai a
-chiamare `/ingest` (pagina chiusa, rete caduta). Così, se più pagine di
-amministrazione sono aperte insieme (una di riserva), SPOT non viene
-mai interrogato più di una volta ogni 150 secondi in tutto — un Durable
-Object processa le proprie richieste una alla volta, mai in parallelo,
-quindi il controllo e l'aggiornamento del permesso non vengono mai
-interallacciati da un'altra richiesta nel mezzo.
+**SPOT bloccava le richieste dai Worker di Cloudflare** (403 con la
+pagina anti-bot) e per un periodo la pagina di amministrazione è stata
+l'unica a poter leggere il feed. A ottobre 2026 il blocco è stato
+tolto (verificato: con la pagina admin chiusa, `last_fetch` avanzava
+ogni 155s con `last_fetch_ok: true`). Se tornasse, `INTERNAL_POLLING_ENABLED
+= "false"` in `wrangler.toml` spegne le letture del Worker e resta la
+pagina admin.
+
+**Un solo limite di 150s per tutti** (`MIN_INTERVAL_MS`, il limite di
+SPOT): `reserveSpotCall()` lo applica sia alle letture del Worker sia
+ai `/claim` delle pagine admin. Il turno è speso appena concesso, anche
+se chi lo ottiene non arriva mai a chiamare `/ingest` (pagina chiusa,
+rete caduta). Così, con il polling del Worker e una o più pagine admin
+attive insieme, SPOT non viene mai interrogato più di una volta ogni
+150s in tutto — un Durable Object processa le proprie richieste una
+alla volta, mai in parallelo, quindi il controllo e l'aggiornamento
+del turno non vengono mai interallacciati da un'altra richiesta.
 
 Ogni messaggio ricevuto si salva deduplicato per `id` (upsert: un
 messaggio già visto si aggiorna, uno nuovo si inserisce), insieme al
@@ -69,15 +80,13 @@ della guida). Oggi è configurato su `https://cometa.gripe/` ("Forward
 911 to me" disattivato) ed è attivo: provato il 10 ottobre 2026 con il
 tracker, il punto arriva pochi secondi dopo il messaggio.
 
-Non sostituisce `/claim`+`/ingest`: **il Data Push non manda mai la
-quota** (`altitude` non esiste nel suo formato XML, a differenza del
-feed REST pubblico) — resta la pagina di amministrazione l'unica fonte
-della quota reale. `upsertPoints()` lo sa: un push senza quota non
+Non sostituisce il feed: **il Data Push non manda mai la quota**
+(`altitude` non esiste nel suo formato XML, a differenza del feed REST
+pubblico). Per questo ogni push con punti fa partire una lettura del
+feed dal Worker (`schedulePushFetch()`), che porta la quota dello
+stesso messaggio. `upsertPoints()` lo sa: un push senza quota non
 cancella mai una quota già salvata per lo stesso `id` (`COALESCE` in
-`tracker.ts`), aggiorna solo gli altri campi (posizione, tra l'altro
-quasi in tempo reale, utile anche se la pagina admin dovesse restare
-indietro). Tenere entrambi i canali attivi è voluto, non un
-doppione da scegliere.
+`tracker.ts`), aggiorna solo gli altri campi.
 
 **Autenticazione**: non `ADMIN_TOKEN` — SPOT firma ogni chiamata con
 un header `X-WSSE` (standard WSSE UsernameToken: `Username`, un
@@ -100,17 +109,15 @@ manda i messaggi di tutti — `SPOT_PUSH_ESN` (opzionale) filtra solo
 quelli con l'ESN della nostra sonda; vuoto accetta tutto (va bene con
 un solo dispositivo, il caso di oggi).
 
-### Il vecchio polling interno (presente, spento)
+### Il polling del Worker
 
-Il Worker sapeva anche interrogare SPOT da solo, con un ciclo basato
-sull'**alarm** del Durable Object (i Cron Trigger di Cloudflare hanno
-granularità di un minuto, non permettono 150s) invece che sui Cron
-Trigger. Quel codice c'è ancora — non è stato cancellato, solo spento,
-nel caso SPOT smetta un giorno di bloccare i Worker. `alarm()` esce
-subito a meno che la variabile `INTERNAL_POLLING_ENABLED` in
-`wrangler.toml` non sia `"true"` (oggi è `"false"`); `/start` e `/stop`
-restano gli endpoint di allora, ma con il polling interno spento non
-fanno più nulla di utile.
+I Cron Trigger di Cloudflare hanno granularità di un minuto (non
+permettono 150s): il ritmo lo tiene l'**alarm** del Durable Object, che
+si riprogramma da solo. `POST /start` lo avvia, `POST /stop` lo ferma
+(il giorno del lancio si fa dalla pagina admin, con i pulsanti del
+riquadro "Worker"). Anche fermo, la lettura dopo un Data Push avviene
+lo stesso: una sola, poi l'alarm non si riprogramma.
+`INTERNAL_POLLING_ENABLED` diverso da `"true"` spegne entrambe le cose.
 
 ## Endpoint
 
@@ -131,15 +138,15 @@ fanno più nulla di utile.
 
 | | |
 |---|---|
-| `GET /track-all.json` | Tutti i punti salvati, senza il filtro `PUBLIC_FROM` — per verificare le prove. |
-| `POST /claim` | Chiede il permesso di interrogare SPOT. Risponde `{"granted":true}` se sono passati almeno 150s dall'ultimo permesso concesso (a chiunque), altrimenti `{"granted":false,"retry_after_s":N}`. Lo usa `admin-diretta.html`. |
+| `GET /track-all.json` | Tutti i punti salvati, senza il filtro `PUBLIC_FROM`, più `last_error` (l'ultimo errore registrato) — per verificare le prove; lo usa `admin-diretta.html`. |
+| `POST /claim` | Chiede il permesso di interrogare SPOT. Risponde `{"granted":true}` se sono passati almeno 150s dall'ultima chiamata concessa a chiunque (Worker compreso), altrimenti `{"granted":false,"retry_after_s":N}`. Lo usa `admin-diretta.html`. |
 | `POST /ingest` | Corpo `{"ok":bool,"status"?:number,"body"?:JSON\|testo,"error"?:string}` — il risultato di una chiamata a SPOT fatta dal browser (da `admin-diretta.html`), così com'è arrivata. `ok:false` = il fetch dal browser è fallito del tutto (rete/CORS); altrimenti `status`/`body` sono quelli della risposta HTTP di SPOT, errore applicativo incluso. Risponde sempre `{"ok":true,"spot_ok":bool,"upserted":N,"received":M}` — anche quando `spot_ok` è `false`: l'errore si registra comunque (`last_error`), non si rifiuta l'ingest. "Nessun messaggio ancora" (`E-0195`) conta come successo. |
-| `POST /start` | Avvia il *polling interno* (oggi spento, vedi sopra — non serve più per l'uso normale). |
-| `POST /stop` | Ferma il polling interno. |
+| `POST /start` | Avvia il polling del Worker (una lettura del feed ogni ~155s). |
+| `POST /stop` | Lo ferma. La lettura dopo ogni Data Push resta. |
 | `POST /reset` | Cancella tutti i punti salvati. Da usare dopo le prove, prima del giorno vero. Non tocca `publicFrom`/`simulate`. |
-| `POST /backfill` | Riscarica l'intero volo da SPOT **dal Worker** (occasionale e manuale: se anche questa iniziasse a essere bloccata da SPOT andrà spostata sul browser come il resto) e lo reinserisce, stessa deduplica. Corpo vuoto → pagina con `start=51,101,…` fino a 7 giorni; oppure `{"startDate":"...", "endDate":"..."}` (formato SPOT) per un intervallo preciso. |
+| `POST /backfill` | Riscarica l'intero volo da SPOT **dal Worker** (occasionale e manuale; non passa dal limite dei 150s, quindi non usarlo durante il volo) e lo reinserisce, stessa deduplica. Corpo vuoto → pagina con `start=51,101,…` fino a 7 giorni; oppure `{"startDate":"...", "endDate":"..."}` (formato SPOT) per un intervallo preciso. |
 | `POST /public-from` | Corpo `{"time": <unix secondi>}` oppure `{"time": null}` per nascondere di nuovo tutto. |
-| `POST /simulate` | Corpo `{"enabled": true\|false}`. Riguarda solo il polling interno (spento): con `simulate` attivo e `INTERNAL_POLLING_ENABLED="true"`, l'alarm genera un volo finto invece di chiamare SPOT davvero — vedi sotto. |
+| `POST /simulate` | Corpo `{"enabled": true\|false}`. Riguarda solo le letture del Worker: con `simulate` attivo l'alarm genera un volo finto invece di chiamare SPOT davvero — vedi sotto. |
 
 ## Proxy mattonelle nuvole (OpenWeatherMap)
 
@@ -167,48 +174,51 @@ pubblici restituiscono solo i punti con `time >= PUBLIC_FROM`, e senza
 lancio**: usare `POST /reset` per ripulire le prove, poi `POST
 /public-from` con l'orario reale di decollo (o un po' prima).
 
-## Modalità simulazione (per il vecchio polling interno)
+## Modalità simulazione
 
-Riguarda solo `alarm()`, oggi spento (vedi sopra): `POST /simulate
-{"enabled": true}`, con `INTERNAL_POLLING_ENABLED="true"`, fa generare
-invece di chiamare SPOT un volo finto che segue lo stesso ritmo vero
-(un punto ogni 150s reali — la simulazione non accelera il tempo,
-prova proprio la cadenza del Worker), con buchi di segnale e messaggi
-duplicati inclusi apposta (circa 1 su 10 ciascuno, scelta
+Riguarda solo `alarm()`: `POST /simulate {"enabled": true}` fa
+generare, invece di chiamare SPOT, un volo finto che segue lo stesso
+ritmo vero (un punto ogni 150s reali — la simulazione non accelera il
+tempo, prova proprio la cadenza del Worker), con buchi di segnale e
+messaggi duplicati inclusi apposta (circa 1 su 10 ciascuno, scelta
 deterministica — lo stesso slot dà sempre lo stesso risultato), per
 verificare la deduplica e la cadenza senza il tracker vero. `POST
-/simulate {"enabled": false}` torna al feed vero. Per provare
-`/claim`+`/ingest` (il meccanismo vero, oggi) basta aprire
-`admin-diretta.html` in locale (`npm run dev`) con un `WORKER_BASE`
-che punta al Worker locale — non serve la modalità simulazione per
-quello.
+/simulate {"enabled": false}` torna al feed vero: **va rimesso a
+`false` prima del volo**, o il Worker continuerebbe a salvare punti
+finti.
 
 ## Pagina di amministrazione
 
 `admin-diretta.html`, alla radice del sito (non in `worker/`): non è
 collegata da nessuna parte nel sito e ha `<meta name="robots"
-content="noindex">`. È lei a interrogare SPOT, dal browser di chi la
-tiene aperta — vedi "Come funziona" sopra.
+content="noindex">`. Serve a tre cose: controllare le posizioni che
+arrivano, decidere quali punti vanno sulla mappa, e — se il Worker non
+riesce a leggere il feed — interrogare SPOT da questo browser.
 
 - **All'apertura** chiede admin token, Feed ID e password del feed (se
-  richiesta): restano solo nella memoria della pagina — niente nel
-  repo, niente in `localStorage`. Si perdono ricaricando la pagina.
-- **Ogni ~155s**: `POST /claim` → se concesso, interroga SPOT dal
-  browser → `POST /ingest` col risultato, successo o errore. Se il
-  permesso non è concesso (un'altra pagina di amministrazione ce l'ha
-  già), salta il giro senza chiamare SPOT.
-- **Mostra**: ultima chiamata, esito, punti nuovi arrivati, conto alla
-  rovescia al prossimo giro, un registro degli ultimi eventi.
-- **Wake Lock API** (`navigator.wakeLock`) per evitare che lo schermo
-  si spenga da solo — da sola non basta: se il browser manda la scheda
-  in background (si passa a un'altra scheda, si minimizza la finestra)
-  i timer rallentano comunque, indipendentemente dallo schermo. La
-  pagina lo segnala con un avviso che diventa urgente quando rileva
-  che è andata in background (`document.visibilityState`), e con un
-  simbolo nel titolo della scheda.
-- **Niente pulsanti `/start`/`/stop`** (non servono più): restano
-  `/reset` e l'impostazione di `PUBLIC_FROM` (con un selettore di data
-  e ora, più una scorciatoia "ora").
+  richiesta; Feed ID e password servono per la riserva, ma si chiedono
+  subito per averli pronti): restano solo nella
+  memoria della pagina — niente nel repo, niente in `localStorage`. Si
+  perdono ricaricando la pagina.
+- **Riquadro "Worker"**, aggiornato ogni 30s da `/track-all.json`:
+  ultimo contatto con SPOT, esito (con l'ultimo errore, se c'è),
+  polling del Worker attivo o fermo, ultimo punto. Pulsanti per
+  avviare e fermare il polling (`/start`, `/stop`).
+- **Ultime posizioni salvate**: le ultime 15, con data e ora (nel fuso
+  del browser), coordinate, quota se c'è, tipo di messaggio.
+- **Comandi**: `PUBLIC_FROM` (con un selettore di data e ora, più una
+  scorciatoia "ora") e `/reset`.
+- **Riserva: interroga SPOT da questo browser**:
+  ogni ~155s `POST /claim` → se concesso, interroga SPOT dal browser →
+  `POST /ingest` col risultato, successo o errore. Se il turno non è
+  concesso (SPOT interrogato da poco dal Worker o da un'altra pagina),
+  salta il giro. Mostra ultima chiamata, esito, punti nuovi, conto
+  alla rovescia. Mentre è attiva usa la **Wake Lock API**
+  (`navigator.wakeLock`) per evitare che lo schermo si spenga, e
+  avvisa se la scheda va in background, dove i browser rallentano i
+  timer (`document.visibilityState`, con un simbolo nel titolo della
+  scheda).
+- **Registro** degli ultimi eventi.
 
 Prima di poterla usare va impostato `WORKER_BASE` nel file stesso (una
 costante in cima allo `<script>`, vuota di default) con l'URL del
@@ -353,15 +363,13 @@ curl -X POST https://<url-worker>/public-from -H "Authorization: Bearer <ADMIN_T
   -H "Content-Type: application/json" -d '{"time": 1760000000}'
 ```
 
-Poi aprire `admin-diretta.html`, inserire admin token/Feed ID/password
-del feed, premere "Avvia" e **tenere quella scheda in primo piano**
-per tutto il volo (vedi "Pagina di amministrazione" sopra — il Wake
-Lock evita che lo schermo si spenga, ma non basta da solo se si cambia
-scheda). Se `SPOT_PUSH_USERNAME`/`SPOT_PUSH_SECRET` sono configurati e
-il Data Push è attivo sull'account SPOT, la posizione arriva comunque
-quasi in tempo reale anche se quella scheda restasse indietro — ma
-tenerla aperta resta necessario per la quota, che il Data Push non
-manda (vedi "Data Push" sopra).
+Poi aprire `admin-diretta.html`, controllare che la simulazione sia
+spenta e premere **Avvia il polling** nel riquadro "Worker": da lì il
+Worker riceve le posizioni dal Data Push e legge il feed da solo, anche
+con la pagina chiusa. Tenerla aperta serve solo per controllare; se
+l'esito del Worker passa a "errore" (per esempio un nuovo 403 di
+SPOT), avviare la riserva dal browser e tenere quella scheda in primo
+piano.
 
 Dopo il volo, se ci sono buchi (per esempio dopo un'interruzione di
 rete), `POST /backfill` riscarica tutto da SPOT e li colma.
@@ -375,8 +383,9 @@ mostra i log in diretta: un `/ingest` fallito (errore SPOT, HTTP
 non-ok) logga per intero status e corpo della risposta; un Data Push
 rifiutato logga il motivo (`[SPOT Data Push] rifiutato: ...`), uno
 accettato logga quanti punti ha ricevuto e quanti erano davvero nuovi.
-`last_fetch` in `GET /track.json` conferma che i dati arrivano (da
-`/ingest` o dal Data Push, ogni ~155s l'uno, quasi subito l'altro); se
-più pagine di amministrazione sono aperte insieme, i `/claim` negati
-negli eventi di `admin-diretta.html` confermano che solo una alla
-volta sta davvero chiamando SPOT.
+Una lettura del feed fallita dal Worker logga `[SPOT dal Worker] ...`.
+`last_fetch` in `GET /track.json` conferma che i dati arrivano (dalle
+letture del Worker ogni ~155s, dal Data Push quasi subito, o da
+`/ingest`); con la riserva dal browser attiva insieme al polling del
+Worker, i turni negati nel registro di `admin-diretta.html` confermano
+che SPOT viene interrogato una volta sola ogni 150s.

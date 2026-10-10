@@ -45,7 +45,7 @@ calcolo/convergenza_analisi.py      di quanto si sposta l'atterraggio previsto a
 .github/workflows/convergenza.yml   il workflow quotidiano, scrive sul branch dati
 
 worker/                             backend SPOT (Cloudflare Worker + Durable Object) — vedi worker/README.md
-admin-diretta.html                  pagina di amministrazione per il polling SPOT il giorno del lancio —
+admin-diretta.html                  pagina di amministrazione della diretta (posizioni, polling, riserva) —
                                      non collegata dal sito, noindex, vedi worker/README.md
 
 LICENSE · README.md · .gitignore
@@ -74,11 +74,11 @@ Norme e autorizzazioni · Domande · Chi siamo.
 ### Dopo ogni modifica: il numero di versione
 
 In `index.html` i file di `assets/`, e la mappa, sono richiamati con un numero in
-coda — oggi `?v=159`:
+coda — oggi `?v=160`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=159">
-<script src="assets/i18n.js?v=159"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=160">
+<script src="assets/i18n.js?v=160"></script>
 ```
 
 Lo stesso numero compare anche in due punti meno visibili, che vanno alzati
@@ -448,15 +448,19 @@ voce e banner seguono `DIRETTA_WINDOW` e `DIRETTA_START`.
 
 **Da dove arrivano i punti GPS.** Il browser non chiama mai SPOT: lo fa il
 Worker di Cloudflare in `worker/`, che conserva la traccia e la espone in
-`/track.json` (la costante `TRACK_URL` in `assets/app.js`). Al Worker i dati
-arrivano in due modi, entrambi attivi: il **Data Push** di SPOT, che manda
-la posizione quasi subito (ma mai la quota), e la pagina
-`admin-diretta.html`, che il giorno del lancio va tenuta aperta in un
-browser e porta anche la quota. Il Data Push arriva al Worker attraverso il
-dominio `cometa.gripe`, perché SPOT non consegnava agli indirizzi
-`*.workers.dev`. È attivo sull'account SPOT dal 10 ottobre 2026: provato
-con il tracker e la pagina admin chiusa, il punto è arrivato al Worker
-pochi secondi dopo il messaggio. Tutti i dettagli sono in `worker/README.md`.
+`/track.json` (la costante `TRACK_URL` in `assets/app.js`). Il **Data
+Push** di SPOT manda al Worker la posizione pochi secondi dopo il
+messaggio, ma mai la quota: subito dopo il Worker legge il feed di SPOT
+per avere la quota dello stesso messaggio, e con il polling avviato lo
+legge comunque ogni ~155 s, nel caso un push tardi. La pagina
+`admin-diretta.html` serve a controllare le posizioni, avviare il
+polling e scegliere quali punti vanno sulla mappa; se il Worker non
+riuscisse a leggere il feed, può interrogarlo lei dal browser. Il Data
+Push arriva al Worker attraverso il dominio `cometa.gripe`, perché SPOT
+non consegnava agli indirizzi `*.workers.dev`. È attivo sull'account SPOT
+dal 10 ottobre 2026: provato con il tracker e la pagina admin chiusa, il
+punto è arrivato al Worker pochi secondi dopo il messaggio. Tutti i
+dettagli sono in `worker/README.md`.
 
 **La linea grigia tratteggiata** è la traiettoria prevista: `assets/spot.js`
 la chiede a Tawhiri con i parametri fissi di `FLIGHT_*` in `assets/app.js`

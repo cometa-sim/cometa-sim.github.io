@@ -5,6 +5,7 @@ import { checkWsseSignature, WSSE_FRESHNESS_MS } from "./wsse";
 
 const POLL_INTERVAL_MS = 155_000; // i 150s richiesti da SPOT, piu' un margine
 const MIN_INTERVAL_MS = 150_000; // mai due chiamate vere piu' vicine di questo
+const PUSH_FETCH_DELAY_MS = 5_000; // dopo un Data Push, un attimo prima di leggere il feed (la quota)
 const BACKFILL_PAGE = 50; // quanti messaggi per pagina torna il feed SPOT
 const BACKFILL_MAX_PAGES = 20; // 20*50 = 1000 messaggi, ben oltre un volo
 
@@ -115,15 +116,18 @@ export class SpotTracker implements DurableObject {
 
   // ------------------------------------------------------ endpoint protetti
 
+  /* Come track.json ma senza il filtro PUBLIC_FROM, e con in piu'
+     l'ultimo errore registrato — per la pagina di amministrazione. */
   private async handleTrackAll(): Promise<Response> {
     const points = this.selectPoints(0);
     const meta = await this.metaForPublic();
-    return jsonResponse({ points, ...meta });
+    const lastError = (await this.state.storage.get<string>("lastError")) ?? null;
+    return jsonResponse({ points, ...meta, last_error: lastError });
   }
 
   /* Avvia il polling: segna attivo e programma subito il primo alarm. Se
-     c'era gia' un lastFetchMs recente (riavvio ravvicinato) il guardiano
-     nell'alarm() si occupa comunque di non richiamare SPOT troppo presto. */
+     SPOT e' stato interrogato da poco (da qui o da una pagina admin),
+     reserveSpotCall() nell'alarm() fa comunque aspettare il resto. */
   private async handleStart(): Promise<Response> {
     await this.state.storage.put("pollingActive", true);
     await this.state.storage.setAlarm(Date.now());
@@ -205,19 +209,28 @@ export class SpotTracker implements DurableObject {
      per toglierlo, che qui non si usa — get e put dello storage non
      vengono mai interallacciati da un'altra richiesta nel mezzo. */
   private async handleClaim(): Promise<Response> {
-    const lastClaimMs = (await this.state.storage.get<number>("lastClaimMs")) ?? 0;
-    const now = Date.now();
-    const elapsed = now - lastClaimMs;
-    if (elapsed < MIN_INTERVAL_MS) {
-      return jsonResponse({ granted: false, retry_after_s: Math.ceil((MIN_INTERVAL_MS - elapsed) / 1000) });
-    }
-    await this.state.storage.put("lastClaimMs", now);
+    const wait = await this.reserveSpotCall();
+    if (wait > 0) return jsonResponse({ granted: false, retry_after_s: Math.ceil(wait / 1000) });
     return jsonResponse({ granted: true });
   }
 
-  /* La pagina di amministrazione manda qui cosa le ha risposto SPOT,
-     cosi' com'e' — non e' il Worker a chiamare SPOT (vedi
-     INTERNAL_POLLING_ENABLED). "ok" dice se e' arrivata una risposta
+  /* L'unico limite verso SPOT, condiviso da tutti quelli che lo
+     interrogano: l'alarm del Worker (alarm() sotto) e le pagine di
+     amministrazione (/claim). Se sono passati almeno MIN_INTERVAL_MS
+     dall'ultima chiamata concessa a chiunque, prenota questa e torna 0;
+     altrimenti non prenota niente e dice quanti ms mancano. La chiave
+     resta "lastClaimMs" perche' e' quella gia' in storage. */
+  private async reserveSpotCall(): Promise<number> {
+    const last = (await this.state.storage.get<number>("lastClaimMs")) ?? 0;
+    const now = Date.now();
+    if (now - last < MIN_INTERVAL_MS) return MIN_INTERVAL_MS - (now - last);
+    await this.state.storage.put("lastClaimMs", now);
+    return 0;
+  }
+
+  /* La pagina di amministrazione, quando interroga SPOT dal browser
+     (la riserva, se il Worker non riesce a farlo da solo), manda qui
+     cosa le ha risposto SPOT, cosi' com'e'. "ok" dice se e' arrivata una risposta
      HTTP qualunque da SPOT (anche di errore applicativo): se e' false
      il fetch dal browser e' fallito del tutto (rete, CORS) e non c'e'
      nessun corpo da leggere. Un esito negativo si registra comunque
@@ -259,19 +272,17 @@ export class SpotTracker implements DurableObject {
   }
 
   /* SPOT manda qui, da solo, un messaggio XML quasi appena arriva (Data
-     Push — vedi worker/README.md), invece di dover andare a chiederlo:
-     niente piu' bisogno di una pagina admin aperta in un browser, ne'
-     del blocco anti-bot sui Worker, perche' stavolta e' SPOT a chiamare
-     noi, non il contrario. Autenticato con la firma X-WSSE che SPOT
-     stesso manda a ogni chiamata (checkWsseSignature + nonce anti-replay
-     qui sotto), non con ADMIN_TOKEN.
+     Push — vedi worker/README.md), invece di dover andare a chiederlo.
+     Autenticato con la firma X-WSSE che SPOT stesso manda a ogni
+     chiamata (checkWsseSignature + nonce anti-replay qui sotto), non
+     con ADMIN_TOKEN.
      IMPORTANTE: il Data Push di SPOT non manda MAI la quota (altitude
-     non esiste nel suo schema XML) — resta il feed REST (via
-     /claim+/ingest dalla pagina admin) l'unica fonte della quota reale;
-     upsertPoints() preserva una quota gia' salvata invece di
-     sovrascriverla con l'assenza. Il Data Push resta comunque utile:
-     posizione quasi in tempo reale, senza bisogno di tenere una scheda
-     del browser aperta. */
+     non esiste nel suo schema XML) — la quota arriva solo dal feed
+     REST. Per questo, a ogni push con punti nuovi, si chiede all'alarm
+     una lettura del feed appena possibile (schedulePushFetch): la
+     posizione arriva subito dal push, la quota dello stesso messaggio
+     poco dopo dal feed. upsertPoints() preserva una quota gia' salvata
+     invece di sovrascriverla con l'assenza. */
   private async handleDataPush(req: Request): Promise<Response> {
     const check = await checkWsseSignature(req.headers.get("X-WSSE"), this.env);
     if (!check.ok) {
@@ -297,6 +308,7 @@ export class SpotTracker implements DurableObject {
       await this.state.storage.put("lastFetchOk", true);
       await this.state.storage.delete("lastError");
       console.log(`[SPOT Data Push] ${routerMessageMode}/${routerMessageSeq} — ${points.length} ricevuti, ${inserted} nuovi`);
+      if (points.length) await this.schedulePushFetch();
       return new Response("OK", { status: 200 });
     } catch (err) {
       console.error(`[SPOT Data Push] errore nel parsing XML: ${String(err)}\n${xml.slice(0, 2000)}`);
@@ -325,32 +337,51 @@ export class SpotTracker implements DurableObject {
 
   // --------------------------------------------------------------- polling
 
-  /* Il cuore del "una sola interrogazione per tutti" — quando era il
-     Worker a interrogare SPOT. SPOT pero' blocca le richieste dai
-     Worker di Cloudflare con un 403 anti-bot (accetta solo quelle da un
-     browser): finche' non cambia, il polling lo fa la pagina di
-     amministrazione via /claim+/ingest, e questo alarm non fa nulla.
-     Il codice resta (non cancellato: vedi INTERNAL_POLLING_ENABLED in
-     env.ts), per il giorno in cui si potesse riaccendere. Quando era
-     attivo: i Cron Trigger di Cloudflare hanno granularita' di un
-     minuto (non permettono 150s), quindi il ritmo lo teneva l'alarm
-     del Durable Object, che si riprogramma da solo a ogni esecuzione;
-     il guardiano su lastFetchMs garantiva i 150s minimi anche con
-     alarm duplicati o un riavvio del Worker. */
+  /* Dopo un Data Push: una lettura del feed appena il limite dei 150s lo
+     permette, per avere la quota del messaggio appena arrivato. Vale
+     anche con il polling periodico fermo (/stop): in quel caso e' una
+     lettura sola, poi l'alarm non si riprogramma. Un Durable Object ha
+     un solo alarm: se ce n'e' gia' uno piu' vicino si lascia quello. */
+  private async schedulePushFetch(): Promise<void> {
+    if (this.env.INTERNAL_POLLING_ENABLED !== "true") return;
+    await this.state.storage.put("pushFetchPending", true);
+    const last = (await this.state.storage.get<number>("lastClaimMs")) ?? 0;
+    const at = Math.max(Date.now() + PUSH_FETCH_DELAY_MS, last + MIN_INTERVAL_MS);
+    const current = await this.state.storage.getAlarm();
+    if (current == null || current > at) await this.state.storage.setAlarm(at);
+  }
+
+  /* Il Worker interroga SPOT da solo: SPOT ha tolto il blocco 403 sulle
+     richieste dai Worker di Cloudflare (verificato a ottobre 2026). Due
+     motivi per farlo:
+     - il polling periodico, ogni ~155s, attivo tra /start e /stop: la
+       rete di sicurezza se un Data Push tarda o si perde;
+     - la lettura subito dopo un Data Push (pushFetchPending), per la
+       quota, che il push non manda.
+     I Cron Trigger di Cloudflare hanno granularita' di un minuto (non
+     permettono 150s), quindi il ritmo lo tiene l'alarm del Durable
+     Object, che si riprogramma da solo. Il limite dei 150s e' quello
+     condiviso con /claim (reserveSpotCall): con una pagina di
+     amministrazione aperta in parallelo, SPOT non viene comunque mai
+     interrogato piu' di una volta ogni 150s in tutto.
+     INTERNAL_POLLING_ENABLED diverso da "true" spegne tutto (se SPOT
+     tornasse a bloccare i Worker): resta solo la pagina admin. */
   async alarm(): Promise<void> {
     if (this.env.INTERNAL_POLLING_ENABLED !== "true") return;
 
     const active = (await this.state.storage.get<boolean>("pollingActive")) ?? false;
-    if (!active) return; // non si riprogramma da solo: ci pensa /start
+    const pending = (await this.state.storage.get<boolean>("pushFetchPending")) ?? false;
+    if (!active && !pending) return; // non si riprogramma da solo: ci pensa /start o il prossimo push
 
-    const lastFetchMs = (await this.state.storage.get<number>("lastFetchMs")) ?? 0;
-    const now = Date.now();
-    if (now - lastFetchMs < MIN_INTERVAL_MS) {
-      // alarm scattato in anticipo (duplicato, riavvio): aspetta il resto, non richiama SPOT
-      await this.state.storage.setAlarm(lastFetchMs + POLL_INTERVAL_MS);
+    const wait = await this.reserveSpotCall();
+    if (wait > 0) {
+      // qualcun altro (una pagina admin) ha appena chiamato SPOT: si aspetta il resto
+      await this.state.storage.setAlarm(Date.now() + wait + (active ? POLL_INTERVAL_MS - MIN_INTERVAL_MS : 0));
       return;
     }
 
+    await this.state.storage.delete("pushFetchPending");
+    const now = Date.now();
     await this.state.storage.put("lastFetchMs", now);
     try {
       const simulate = (await this.state.storage.get<boolean>("simulate")) ?? false;
@@ -366,11 +397,12 @@ export class SpotTracker implements DurableObject {
       await this.state.storage.delete("lastError");
     } catch (err) {
       // Un giro fallito non perde i dati gia' salvati: si riprova al prossimo,
-      // sempre rispettando i 150s (vedi il guardiano sopra).
+      // sempre rispettando i 150s (vedi reserveSpotCall).
+      console.error(`[SPOT dal Worker] ${String(err)}`);
       await this.state.storage.put("lastFetchOk", false);
       await this.state.storage.put("lastError", String(err));
     }
-    await this.state.storage.setAlarm(Date.now() + POLL_INTERVAL_MS);
+    if (active) await this.state.storage.setAlarm(Date.now() + POLL_INTERVAL_MS);
   }
 
   // ----------------------------------------------------------------- dati
