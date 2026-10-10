@@ -38,7 +38,7 @@
   .err{color:#FF7A5C;font-size:13px;margin-top:10px;min-height:1.2em}
   .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
   .stat{border:1px solid var(--line-soft);border-radius:12px;padding:14px;text-align:center}
-  .stat .v{font-family:var(--disp);font-size:22px;color:var(--ink);font-variant-numeric:tabular-nums}
+  .stat .v{font-family:var(--disp);font-size:20px;color:var(--ink);font-variant-numeric:tabular-nums}
   .stat .l{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin-top:4px}
   .stat.ok .v{color:var(--green)}
   .stat.bad .v{color:#FF7A5C}
@@ -51,7 +51,7 @@
   #positions{list-style:none;margin:14px 0 0;padding:0;max-height:280px;overflow-y:auto;font-family:var(--mono);font-size:12px;line-height:1.7}
   #positions li{border-bottom:1px solid var(--line-soft);padding:6px 0;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap}
   #positions li:first-child{color:var(--ink)}
-  #positions .t{color:var(--faint);min-width:64px}
+  #positions .t{color:var(--faint);min-width:150px}
   #positions .ty{color:var(--faint)}
   .banner{border-radius:12px;padding:12px 16px;font-size:13px;line-height:1.5;margin-bottom:18px}
   .banner.info{background:var(--panel-2);border:1px solid var(--line);color:var(--muted)}
@@ -60,50 +60,52 @@
   @keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
   .wl-status{font-size:12px;color:var(--faint);margin-top:8px}
   .hint{font-size:12px;color:var(--faint);margin-top:6px;line-height:1.5}
+  .card h2 + .hint{margin:-6px 0 14px}
   [hidden]{display:none!important}
 </style>
 </head>
 <body>
 <div class="admin-wrap">
   <h1>Amministrazione diretta — SPOT</h1>
-  <p class="sub">SPOT blocca le richieste dai Worker di Cloudflare (403 anti-bot) ma accetta quelle dal browser: questa pagina interroga SPOT da qui, ogni ~155&nbsp;s, e manda il risultato al Worker.</p>
+  <p class="sub">Il Worker riceve le posizioni da SPOT con il Data Push e legge da solo il feed per la quota. Da qui si controllano le posizioni salvate, si decide quali punti vanno sulla mappa e, se il Worker non riesce a leggere il feed, lo si interroga da questo browser.</p>
 
   <section id="gate" class="card">
     <h2>Credenziali</h2>
-    <p class="hint">Restano solo nella memoria di questa pagina — niente repo, niente localStorage. Si perdono ricaricando la pagina.</p>
+    <p class="hint">Restano solo nella memoria di questa pagina — niente repo, niente localStorage. Si perdono ricaricando la pagina. Feed ID e password servono solo per interrogare SPOT da questo browser (la riserva).</p>
     <label for="fAdminToken">Admin token del Worker</label>
     <input type="password" id="fAdminToken" autocomplete="off">
-    <label for="fFeedId">Feed ID SPOT</label>
+    <label for="fFeedId">Feed ID SPOT (facoltativo)</label>
     <input type="password" id="fFeedId" autocomplete="off">
     <label for="fFeedPw">Password del feed (se richiesta)</label>
     <input type="password" id="fFeedPw" autocomplete="off">
     <div class="row" style="margin-top:14px">
-      <button class="primary" id="btnStart">Avvia</button>
+      <button class="primary" id="btnStart">Entra</button>
       <span class="show-toggle" id="toggleShow">mostra i valori</span>
     </div>
     <p class="err" id="gateErr"></p>
   </section>
 
   <div id="panel" hidden>
-    <div id="visBanner" class="banner info">Tieni questa scheda in primo piano: i browser rallentano i timer di una scheda in background, e i 155&nbsp;s salterebbero.</div>
+    <div id="visBanner" class="banner info" hidden></div>
 
     <section class="card">
-      <h2>Stato del polling</h2>
+      <h2>Worker</h2>
+      <p class="hint">Il Data Push porta la posizione in pochi secondi; subito dopo il Worker legge il feed per la quota. Con il polling attivo legge il feed anche ogni ~155&nbsp;s, nel caso un push tardi. Aggiornato ogni 30&nbsp;s.</p>
       <div class="stat-grid">
-        <div class="stat" id="statLast"><div class="v">—</div><div class="l">Ultima chiamata</div></div>
-        <div class="stat" id="statOutcome"><div class="v">—</div><div class="l">Esito</div></div>
-        <div class="stat" id="statNew"><div class="v">—</div><div class="l">Punti nuovi</div></div>
-        <div class="stat" id="statNext"><div class="v">—</div><div class="l">Prossima tra</div></div>
+        <div class="stat" id="wContact"><div class="v">—</div><div class="l">Ultimo contatto con SPOT</div></div>
+        <div class="stat" id="wOutcome"><div class="v">—</div><div class="l">Esito</div></div>
+        <div class="stat" id="wPolling"><div class="v">—</div><div class="l">Polling del Worker</div></div>
+        <div class="stat" id="wLastPoint"><div class="v">—</div><div class="l">Ultimo punto</div></div>
       </div>
-      <p class="wl-status" id="wlStatus">Wake Lock: —</p>
+      <p class="err" id="wErr"></p>
+      <div class="row">
+        <button class="primary" id="btnWStart">Avvia il polling</button>
+        <button id="btnWStop">Ferma il polling</button>
+      </div>
+      <p class="hint">Il giorno del lancio va avviato. Anche fermo, il Worker legge comunque il feed una volta dopo ogni Data Push.</p>
     </section>
 
-    <section class="card">
-      <h2>Registro</h2>
-      <ul id="log"></ul>
-    </section>
-
-    <details class="card" id="positionsCard">
+    <details class="card" id="positionsCard" open>
       <summary>Ultime posizioni salvate</summary>
       <ul id="positions"><li class="hint">—</li></ul>
     </details>
@@ -125,6 +127,28 @@
       <p class="hint">Da usare dopo le prove, prima del giorno vero.</p>
       <p class="hint" id="cmdMsg"></p>
     </section>
+
+    <section class="card">
+      <h2>Riserva: interroga SPOT da questo browser</h2>
+      <p class="hint">Solo se il Worker non riesce a leggere il feed (esito in errore qui sopra). Ogni ~155&nbsp;s questa pagina chiede il turno al Worker, interroga SPOT e gli manda il risultato. Il limite dei 150&nbsp;s è unico, condiviso con il Worker: tenerla attiva insieme al polling non fa superare il limite a SPOT. Serve il Feed ID.</p>
+      <div class="row">
+        <button class="primary" id="btnBStart">Avvia dal browser</button>
+        <button id="btnBStop" disabled>Ferma</button>
+      </div>
+      <div class="stat-grid" style="margin-top:14px">
+        <div class="stat" id="statLast"><div class="v">—</div><div class="l">Ultima chiamata</div></div>
+        <div class="stat" id="statOutcome"><div class="v">—</div><div class="l">Esito</div></div>
+        <div class="stat" id="statNew"><div class="v">—</div><div class="l">Punti nuovi</div></div>
+        <div class="stat" id="statNext"><div class="v">—</div><div class="l">Prossima tra</div></div>
+      </div>
+      <p class="wl-status" id="wlStatus">Wake Lock: —</p>
+      <p class="err" id="bErr"></p>
+    </section>
+
+    <section class="card">
+      <h2>Registro</h2>
+      <ul id="log"></ul>
+    </section>
   </div>
 </div>
 
@@ -139,7 +163,8 @@
      assets/app.js (che fa tutt'altro: nav, lingua, conto alla
      rovescia...). */
   const WORKER_BASE = "https://cometa-sim-github-io.de-toni-carlo.workers.dev";
-  const POLL_MS = 155000; // lo stesso ritmo della pagina Diretta vera
+  const POLL_MS = 155000; // lo stesso ritmo del polling del Worker
+  const REFRESH_MS = 30000; // stato del Worker e posizioni: track.json ha comunque 30s di cache
 
   const $ = (id) => document.getElementById(id);
   let adminToken = "", feedId = "", feedPassword = "";
@@ -159,17 +184,44 @@
     feedId = $("fFeedId").value.trim();
     feedPassword = $("fFeedPw").value.trim();
     $("gateErr").textContent = "";
-    if (!adminToken || !feedId) { $("gateErr").textContent = "Servono almeno admin token e Feed ID."; return; }
+    if (!adminToken) { $("gateErr").textContent = "Serve l'admin token."; return; }
     if (!WORKER_BASE) { $("gateErr").textContent = "WORKER_BASE è vuota in questa pagina: va impostata nel file prima di poterla usare."; return; }
     // Svuota subito i campi a video, i valori restano solo nelle variabili sopra.
     ["fAdminToken", "fFeedId", "fFeedPw"].forEach(function(id){ $(id).value = ""; });
     $("gate").hidden = true;
     $("panel").hidden = false;
+    if (!feedId) {
+      $("btnBStart").disabled = true;
+      $("bErr").textContent = "Senza Feed ID la riserva non si può usare: ricarica la pagina e inseriscilo.";
+    }
+    refresh();
+    setInterval(refresh, REFRESH_MS);
+  });
+
+  // ------------------------------------------------- riserva dal browser
+
+  $("btnBStart").addEventListener("click", function(){
+    if (started) return;
     started = true;
+    this.disabled = true;
+    $("btnBStop").disabled = false;
     requestWakeLock();
-    logEvent("avviato — un giro ogni " + (POLL_MS / 1000) + "s");
-    refreshPositions();
+    updateVisibilityBanner();
+    logEvent("riserva dal browser avviata — un giro ogni " + (POLL_MS / 1000) + "s");
     runCycle();
+  });
+  $("btnBStop").addEventListener("click", function(){
+    if (!started) return;
+    started = false;
+    if (timer) clearTimeout(timer);
+    timer = null;
+    this.disabled = true;
+    $("btnBStart").disabled = false;
+    $("statNext").querySelector(".v").textContent = "—";
+    if (wakeLock) wakeLock.release().catch(function(){});
+    wakeLock = null;
+    updateVisibilityBanner();
+    logEvent("riserva dal browser fermata");
   });
 
   // --------------------------------------------------------------- fetch
@@ -198,9 +250,10 @@
     return "https://api.findmespot.com/spot-main-web/consumer/rest-api/2.0/public/feed/" + encodeURIComponent(feedId) + "/message.json" + (qs ? "?" + qs : "");
   }
 
-  /* Il fetch vero a SPOT, dal browser — qui funziona perche' SPOT
-     accetta le richieste da un browser, non quelle da un Worker. Si
-     manda a /ingest cosi' com'e' arrivato, successo o fallimento. */
+  /* Il fetch vero a SPOT, dal browser — la riserva se il Worker non
+     riesce a farlo da solo (SPOT bloccava le richieste dai Worker con un
+     403 anti-bot, ma accetta sempre quelle da un browser). Si manda a
+     /ingest cosi' com'e' arrivato, successo o fallimento. */
   function fetchSpotAndIngest(){
     return fetch(spotUrl(), { headers: { "Accept": "application/json" } })
       .then(function(res){
@@ -221,7 +274,7 @@
     workerPost("/claim", null)
       .then(function(claim){
         if (!claim.granted) {
-          logEvent("turno di un'altra pagina — niente chiamata questo giro (richiesti ancora " + claim.retry_after_s + "s altrove)");
+          logEvent("SPOT interrogato da poco (dal Worker o da un'altra pagina) — niente chiamata questo giro");
           setOutcome("saltato", null);
           return;
         }
@@ -243,8 +296,8 @@
         if (/HTTP 401/.test(err.message)) $("visBanner").textContent = "Admin token rifiutato dal Worker: ricarica la pagina e ricontrollalo.";
       })
       .then(function(){
-        refreshPositions();
-        scheduleNext();
+        refresh();
+        if (started) scheduleNext();
       });
   }
 
@@ -262,6 +315,18 @@
 
   // ---------------------------------------------------------------- stato UI
 
+  /* Data e ora insieme (solo l'ora confonde quando nella lista ci sono
+     anche le prove di altri giorni), nel fuso di questo browser. */
+  function fmtDateTime(ms){
+    return new Date(ms).toLocaleString("it-IT", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit", second: "2-digit" });
+  }
+  function setStat(id, text, ok){
+    const el = $(id);
+    el.querySelector(".v").textContent = text;
+    el.classList.remove("ok", "bad");
+    if (ok === true) el.classList.add("ok"); else if (ok === false) el.classList.add("bad");
+  }
+
   function setLast(){ $("statLast").querySelector(".v").textContent = new Date().toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit", second: "2-digit" }); }
   function setOutcome(text, ok){
     const el = $("statOutcome");
@@ -271,16 +336,38 @@
   }
   function setNew(n){ $("statNew").querySelector(".v").textContent = String(n); }
 
-  /* Lista a tendina delle ultime posizioni salvate sul Worker — solo per
+  /* Stato del Worker e ultime posizioni salvate, da /track-all.json
+     (senza il filtro PUBLIC_FROM, quindi anche le prove) — solo per
      controllo rapido, non e' la mappa vera (quella e' nella pagina
-     Diretta). Aggiornata a ogni giro, successo o no: /track-all.json
-     non ha il filtro PUBLIC_FROM, quindi mostra anche le prove. */
-  function refreshPositions(){
+     Diretta). Ogni REFRESH_MS e dopo ogni giro della riserva. */
+  function refresh(){
     fetch(WORKER_BASE + "/track-all.json", { headers: authHeaders() })
       .then(function(res){ if (!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
-      .then(function(data){ renderPositions((data.points || []).slice(-15).reverse()); })
-      .catch(function(err){ renderPositions(null, err); });
+      .then(function(data){
+        renderWorker(data);
+        renderPositions((data.points || []).slice(-15).reverse());
+      })
+      .catch(function(err){
+        $("wErr").textContent = "impossibile leggere /track-all.json: " + err.message;
+        renderPositions(null, err);
+      });
   }
+
+  function renderWorker(d){
+    setStat("wContact", d.last_fetch ? fmtDateTime(Date.parse(d.last_fetch)) : "mai", null);
+    setStat("wOutcome", d.last_fetch_ok == null ? "—" : d.last_fetch_ok ? "ok" : "errore", d.last_fetch_ok == null ? null : d.last_fetch_ok);
+    setStat("wPolling", d.polling_active ? "attivo" : "fermo", d.polling_active ? true : null);
+    setStat("wLastPoint", d.last_point_time ? fmtDateTime(d.last_point_time * 1000) : "nessuno", null);
+    $("wErr").textContent = d.last_error ? "Ultimo errore: " + d.last_error : "";
+  }
+
+  function workerCommand(path, label){
+    workerPost(path, null)
+      .then(function(){ logEvent(label); refresh(); })
+      .catch(function(err){ $("wErr").textContent = "Errore: " + err.message; });
+  }
+  $("btnWStart").addEventListener("click", function(){ workerCommand("/start", "polling del Worker avviato"); });
+  $("btnWStop").addEventListener("click", function(){ workerCommand("/stop", "polling del Worker fermato"); });
 
   function renderPositions(points, err){
     const ul = $("positions");
@@ -301,7 +388,7 @@
     points.forEach(function(p){
       const li = document.createElement("li");
       const t = document.createElement("span"); t.className = "t";
-      t.textContent = new Date(p.time * 1000).toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+      t.textContent = fmtDateTime(p.time * 1000);
       const coords = document.createElement("span");
       coords.textContent = p.lat.toFixed(5) + ", " + p.lon.toFixed(5) + (p.altitude != null ? " · " + Math.round(p.altitude) + " m" : "");
       const ty = document.createElement("span"); ty.className = "ty";
@@ -350,6 +437,8 @@
      di spegnersi. */
   function updateVisibilityBanner(){
     const b = $("visBanner");
+    b.hidden = !started; // conta solo mentre la riserva dal browser e' attiva
+    if (!started) { document.title = "COMETA · Amministrazione diretta"; return; }
     if (document.hidden) {
       b.className = "banner urgent";
       b.textContent = "ATTENZIONE — questa scheda è in background: i tempi potrebbero saltare. Torna su questa scheda.";
@@ -386,7 +475,7 @@
   $("btnReset").addEventListener("click", function(){
     if (!confirm("Cancellare TUTTI i punti salvati? Non si può annullare.")) return;
     workerPost("/reset", null)
-      .then(function(){ $("cmdMsg").textContent = "Punti cancellati."; logEvent("reset eseguito"); })
+      .then(function(){ $("cmdMsg").textContent = "Punti cancellati."; logEvent("reset eseguito"); refresh(); })
       .catch(function(err){ $("cmdMsg").textContent = "Errore: " + err.message; });
   });
 })();

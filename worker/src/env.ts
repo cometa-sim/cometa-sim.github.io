@@ -7,13 +7,12 @@ export interface Env {
   FEED_ID: string;
   FEED_PASSWORD?: string;
   ADMIN_TOKEN: string;
-  /* "true" per far interrogare SPOT al Worker stesso (alarm interno).
-     SPOT blocca le richieste dai Worker di Cloudflare (403 anti-bot) ma
-     accetta quelle da un browser: finche' non si trova un modo per
-     farla funzionare da qui, resta spento (assente o diverso da "true")
-     e il polling lo fa la pagina di amministrazione via /claim+/ingest.
-     Il codice del polling interno resta, solo disattivato — vedi
-     alarm() in tracker.ts. */
+  /* "true" perche' il Worker interroghi SPOT da solo (alarm interno:
+     polling periodico tra /start e /stop, e una lettura dopo ogni Data
+     Push per la quota — vedi alarm() in tracker.ts). SPOT bloccava le
+     richieste dai Worker di Cloudflare (403 anti-bot); il blocco e'
+     stato tolto (verificato a ottobre 2026). Se tornasse, rimetterlo a
+     "false": resta la pagina di amministrazione via /claim+/ingest. */
   INTERNAL_POLLING_ENABLED?: string;
   /* Data Push: SPOT manda lui i dati a POST / (XML), invece di farceli
      chiedere — vedi handleDataPush in tracker.ts. Autenticato con la

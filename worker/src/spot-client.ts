@@ -118,13 +118,11 @@ export function parseDataPushXml(xml: string): RawFetchResult {
   return { points, raws };
 }
 
-/* Una chiamata al feed pubblico SPOT, fatta dal Worker stesso — usata
-   solo da /backfill (SPOT blocca il resto delle chiamate del Worker con
-   un 403 anti-bot, vedi INTERNAL_POLLING_ENABLED in env.ts; /backfill
-   e' occasionale e manuale, non il polling regolare, e per ora resta
-   cosi': se anche questa iniziasse a essere bloccata andra' spostata
-   sul browser come il resto). extraParams permette la paginazione
-   (start=51, 101, ... oppure startDate/endDate).
+/* Una chiamata al feed pubblico SPOT, fatta dal Worker stesso — dal
+   polling interno (alarm() in tracker.ts) e da /backfill. SPOT bloccava
+   queste chiamate con un 403 anti-bot, ma il blocco e' stato tolto
+   (vedi INTERNAL_POLLING_ENABLED in env.ts). extraParams permette la
+   paginazione (start=51, 101, ... oppure startDate/endDate).
 
    Un HTTP non-ok finisce per intero nei log (status, statusText e
    corpo completo) prima di lanciare un'eccezione piu' corta (troncata
@@ -137,9 +135,8 @@ export async function fetchSpotPage(env: Env, extraParams: Record<string, string
   if (env.FEED_PASSWORD) q.set("feedPassword", env.FEED_PASSWORD);
   const qs = q.toString();
   const url = `${SPOT_BASE}/${env.FEED_ID}/message.json${qs ? "?" + qs : ""}`;
-  /* Questi header non bastano a evitare il 403 anti-bot dalle IP dei
-     Worker — vedi sopra — ma restano: non fanno danno, e aiutano se un
-     giorno smette di essere un problema. */
+  /* Header da browser: non bastavano da soli a evitare il 403 anti-bot
+     di un tempo (vedi sopra), ma restano: non fanno danno. */
   const res = await fetch(url, {
     cf: { cacheTtl: 0 },
     headers: {
