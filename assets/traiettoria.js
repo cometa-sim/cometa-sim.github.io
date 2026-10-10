@@ -254,10 +254,11 @@ function groundAt(iso, hhmm){
   if(i < 0 || h.temperature_2m[i] == null) return null;
   return {T:h.temperature_2m[i], p:h.surface_pressure && h.surface_pressure[i] != null ? h.surface_pressure[i]*100 : P_STD};
 }
-/* Quota di scoppio per un giorno e un'ora: {m, day} con day=false se ISA */
+/* Quota di scoppio per un giorno e un'ora: {m, day, isa} con day=false se tutta ISA;
+   isa=true se il giorno e' reale ma sopra l'ultimo livello manca NRLMSIS (ripiego su ISA) */
 function burstFor(b, iso, hhmm){
   const col = launch && atmo.key === atmoKey(launch) ? dayColumn(atmo.h, iso, hhmm, launch.lat) : null;
-  return col ? {m:quotaScoppioCol(b.V, b.diam, col), day:true} : {m:b.burst, day:false};
+  return col ? {m:quotaScoppioCol(b.V, b.diam, col), day:true, isa:!window.COMETA_MSIS} : {m:b.burst, day:false, isa:true};
 }
 
 function readBalloon(){
@@ -325,7 +326,7 @@ function renderBalloon(){
   const hand = " · " + t("twHand");
   const bd = burstFor(b, elDate.value, elTime.value || "11:00");
   set("#twCBurst", elBurst.value !== "" && mb > 0 ? num(mb, 1) + " km" + hand : num(bd.m/1000, 1) + " km");
-  set("#twCBurstSrc", elBurst.value !== "" && mb > 0 ? "" : t(bd.day ? "twAtmoDay" : "twAtmoStd"));
+  set("#twCBurstSrc", elBurst.value !== "" && mb > 0 ? "" : t(!bd.day ? "twAtmoStd" : bd.isa ? "twAtmoDayIsa" : "twAtmoDay"));
   set("#twCDesc", elDesc.value !== "" && md > 0 ? num(md, 1) + " m/s" + hand : num(b.desc, 1) + " m/s");
   elBurst.placeholder = (bd.m/1000).toFixed(1); elDesc.placeholder = b.desc.toFixed(1);
   b.warn.forEach(function(w){ elWarn.appendChild(el("li", null, w)); });
@@ -341,7 +342,7 @@ function flightParams(iso, hhmm){
   if(!b.V) return null;
   const mb = parseFloat(elBurst.value), md = parseFloat(elDesc.value);
   const bd = burstFor(b, iso || elDate.value, hhmm || elTime.value || "11:00");
-  const p = {asc:b.asc, burst:bd.m/1000, desc:b.desc, atmo:bd.day ? "day" : "std"};
+  const p = {asc:b.asc, burst:bd.m/1000, desc:b.desc, atmo:!bd.day ? "std" : bd.isa ? "dayIsa" : "day"};
   if(elBurst.value !== ""){ if(!(mb >= 10 && mb <= 45)) return null; p.burst = mb; p.atmo = "hand"; }
   if(elDesc.value !== ""){ if(!(md >= 1 && md <= 15)) return null; p.desc = md; }
   return p;
@@ -665,7 +666,7 @@ function loadLeaflet(){
      parallelo con leaflet.js. */
   const mapkit = window.COMETA_MAPKIT ? Promise.resolve() : new Promise(function(ok, ko){
     const s = document.createElement("script");
-    s.src = "assets/mapkit.js?v=160";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
+    s.src = "assets/mapkit.js?v=161";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
     s.onload = ok; s.onerror = ko;
     document.head.appendChild(s);
   });
@@ -912,7 +913,7 @@ function renderBand(x){
   rows.forEach(function(row){ dl.appendChild(el("dt", null, row[0])); dl.appendChild(el("dd", null, row[1])); });
   card.appendChild(dl);
   if(ok[0].atmo) card.appendChild(el("p", "tw-hint tw-card-note",
-    t({day:"twCardDay", std:"twCardStd", hand:"twCardHand"}[ok[0].atmo])));
+    t({day:"twCardDay", dayIsa:"twCardDayIsa", std:"twCardStd", hand:"twCardHand"}[ok[0].atmo])));
   const a = el("a", null, t("twMapsMid") + " →");
   a.href = "https://www.google.com/maps/search/?api=1&query=" + mLat.toFixed(5) + "," + mLon.toFixed(5);
   a.target = "_blank"; a.rel = "noopener";
@@ -964,7 +965,7 @@ function renderCard(r){
    .forEach(function(row){ dl.appendChild(el("dt", null, row[0])); dl.appendChild(el("dd", null, row[1])); });
   card.appendChild(dl);
   if(r.atmo) card.appendChild(el("p", "tw-hint tw-card-note",
-    t({day:"twCardDay", std:"twCardStd", hand:"twCardHand"}[r.atmo])));
+    t({day:"twCardDay", dayIsa:"twCardDayIsa", std:"twCardStd", hand:"twCardHand"}[r.atmo])));
   const a = el("a", null, t("twMaps") + " →");
   a.href = "https://www.google.com/maps/search/?api=1&query=" + r.end.lat.toFixed(5) + "," + r.end.lon.toFixed(5);
   a.target = "_blank"; a.rel = "noopener";
