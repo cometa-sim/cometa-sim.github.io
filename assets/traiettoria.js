@@ -232,7 +232,12 @@ function loadAtmo(pl){
   atmo = cur;
   cur.promise = fetch(METEO + "?" + q.toString())
     .then(function(r){ return r.ok ? r.json() : null; })
-    .then(function(d){ cur.h = d && d.hourly ? d.hourly : null; return cur.h; }, function(){ return null; });
+    .then(function(d){ cur.h = d && d.hourly ? d.hourly : null; return cur.h; }, function(){ return null; })
+    .then(function(h){
+      /* una risposta fallita (429, rete) non si ricorda: la prossima richiesta per questo luogo riprova */
+      if(!h && atmo === cur) atmo = {key:null, promise:null, h:null};
+      return h;
+    });
   return cur.promise;
 }
 /* Scarti della quota di scoppio se il lattice cede a d(1-s) o d(1+s):
@@ -667,7 +672,7 @@ function loadLeaflet(){
      parallelo con leaflet.js. */
   const mapkit = window.COMETA_MAPKIT ? Promise.resolve() : new Promise(function(ok, ko){
     const s = document.createElement("script");
-    s.src = "assets/mapkit.js?v=163";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
+    s.src = "assets/mapkit.js?v=164";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
     s.onload = ok; s.onerror = ko;
     document.head.appendChild(s);
   });
