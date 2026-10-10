@@ -205,7 +205,8 @@ riesce a leggere il feed — interrogare SPOT da questo browser.
   polling del Worker attivo o fermo, ultimo punto. Pulsanti per
   avviare e fermare il polling (`/start`, `/stop`).
 - **Ultime posizioni salvate**: le ultime 15, con data e ora (nel fuso
-  del browser), coordinate, quota se c'è, tipo di messaggio.
+  del browser), coordinate, quota se c'è, tipo di messaggio e `id` del
+  messaggio SPOT (lo stesso nel Data Push e nel feed).
 - **Comandi**: `PUBLIC_FROM` (con un selettore di data e ora, più una
   scorciatoia "ora") e `/reset`.
 - **Riserva: interroga SPOT da questo browser**:
