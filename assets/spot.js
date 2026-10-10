@@ -193,7 +193,7 @@ window.COMETA_SPOT = (function(){
     });
     const mapkit = window.COMETA_MAPKIT ? Promise.resolve() : new Promise(function(ok, ko){
       const s = document.createElement("script");
-      s.src = "assets/mapkit.js?v=159";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
+      s.src = "assets/mapkit.js?v=160";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
       s.onload = ok; s.onerror = ko;
       document.head.appendChild(s);
     });
@@ -357,7 +357,7 @@ window.COMETA_SPOT = (function(){
     renderStatus();
   }
 
-  let lastRealTime = null;
+  let lastRealTime = null, lastAltKey = null;
 
   function flashGps(){
     const el = document.getElementById("altGpsRow");
@@ -417,10 +417,21 @@ window.COMETA_SPOT = (function(){
       markerHit.setLatLng([last.lat, last.lon]);
       if(markerHit.getPopup()) markerHit.setPopupContent(popupHtml(last)); else markerHit.bindPopup(popupHtml(last));
       map.setView([last.lat, last.lon], Math.max(map.getZoom(), 10));
-      setAltText(elAltGps, last.alt != null ? last.alt / 1000 : null);
-      if(lastRealTime != null && String(last.time) !== String(lastRealTime)){ flashGps(); flashMapMarker(); }
+      /* Il Data Push porta la posizione pochi secondi dopo il messaggio ma
+         senza quota; la quota dello stesso messaggio arriva poco dopo, con
+         la lettura del feed (vedi worker/README.md). Nel frattempo la quota
+         GPS resta l'ultima misurata invece di passare a "—": il puntino si
+         sposta e lampeggia subito, la tessera della quota quando arriva
+         una quota nuova. */
+      let altPt = null;
+      for(let i = points.length - 1; i >= 0; i--){ if(points[i].alt != null){ altPt = points[i]; break; } }
+      setAltText(elAltGps, altPt ? altPt.alt / 1000 : null);
+      if(lastRealTime != null && String(last.time) !== String(lastRealTime)) flashMapMarker();
+      const altKey = altPt ? altPt.time + "|" + altPt.alt : null;
+      if(lastAltKey != null && altKey !== lastAltKey) flashGps();
       lastRealTime = last.time;
-      onNewRealPoint(last);
+      lastAltKey = altKey;
+      if(altPt) onNewRealPoint(altPt);
     }
     renderStatus();
   }

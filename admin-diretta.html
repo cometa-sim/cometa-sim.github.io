@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@200;300;400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/cometa.css?v=159">
+<link rel="stylesheet" href="assets/cometa.css?v=160">
 <style>
   /* Pagina a parte, non collegata dal sito: qui basta un contenitore
      stretto e pochi widget, niente nav/header del sito. */
@@ -71,10 +71,10 @@
 
   <section id="gate" class="card">
     <h2>Credenziali</h2>
-    <p class="hint">Restano solo nella memoria di questa pagina — niente repo, niente localStorage. Si perdono ricaricando la pagina. Feed ID e password servono solo per interrogare SPOT da questo browser (la riserva).</p>
+    <p class="hint">Restano solo nella memoria di questa pagina — niente repo, niente localStorage. Si perdono ricaricando la pagina. Feed ID e password servono per interrogare SPOT da questo browser (la riserva): si chiedono subito, così sono già pronti se servono.</p>
     <label for="fAdminToken">Admin token del Worker</label>
     <input type="password" id="fAdminToken" autocomplete="off">
-    <label for="fFeedId">Feed ID SPOT (facoltativo)</label>
+    <label for="fFeedId">Feed ID SPOT</label>
     <input type="password" id="fFeedId" autocomplete="off">
     <label for="fFeedPw">Password del feed (se richiesta)</label>
     <input type="password" id="fFeedPw" autocomplete="off">
@@ -130,7 +130,7 @@
 
     <section class="card">
       <h2>Riserva: interroga SPOT da questo browser</h2>
-      <p class="hint">Solo se il Worker non riesce a leggere il feed (esito in errore qui sopra). Ogni ~155&nbsp;s questa pagina chiede il turno al Worker, interroga SPOT e gli manda il risultato. Il limite dei 150&nbsp;s è unico, condiviso con il Worker: tenerla attiva insieme al polling non fa superare il limite a SPOT. Serve il Feed ID.</p>
+      <p class="hint">Solo se il Worker non riesce a leggere il feed (esito in errore qui sopra). Ogni ~155&nbsp;s questa pagina chiede il turno al Worker, interroga SPOT e gli manda il risultato. Il limite dei 150&nbsp;s è unico, condiviso con il Worker: tenerla attiva insieme al polling non fa superare il limite a SPOT.</p>
       <div class="row">
         <button class="primary" id="btnBStart">Avvia dal browser</button>
         <button id="btnBStop" disabled>Ferma</button>
@@ -142,7 +142,6 @@
         <div class="stat" id="statNext"><div class="v">—</div><div class="l">Prossima tra</div></div>
       </div>
       <p class="wl-status" id="wlStatus">Wake Lock: —</p>
-      <p class="err" id="bErr"></p>
     </section>
 
     <section class="card">
@@ -184,16 +183,12 @@
     feedId = $("fFeedId").value.trim();
     feedPassword = $("fFeedPw").value.trim();
     $("gateErr").textContent = "";
-    if (!adminToken) { $("gateErr").textContent = "Serve l'admin token."; return; }
+    if (!adminToken || !feedId) { $("gateErr").textContent = "Servono almeno admin token e Feed ID."; return; }
     if (!WORKER_BASE) { $("gateErr").textContent = "WORKER_BASE è vuota in questa pagina: va impostata nel file prima di poterla usare."; return; }
     // Svuota subito i campi a video, i valori restano solo nelle variabili sopra.
     ["fAdminToken", "fFeedId", "fFeedPw"].forEach(function(id){ $(id).value = ""; });
     $("gate").hidden = true;
     $("panel").hidden = false;
-    if (!feedId) {
-      $("btnBStart").disabled = true;
-      $("bErr").textContent = "Senza Feed ID la riserva non si può usare: ricarica la pagina e inseriscilo.";
-    }
     refresh();
     setInterval(refresh, REFRESH_MS);
   });

@@ -195,8 +195,9 @@ content="noindex">`. Serve a tre cose: controllare le posizioni che
 arrivano, decidere quali punti vanno sulla mappa, e — se il Worker non
 riesce a leggere il feed — interrogare SPOT da questo browser.
 
-- **All'apertura** chiede l'admin token e, facoltativi, Feed ID e
-  password del feed (servono solo per la riserva): restano solo nella
+- **All'apertura** chiede admin token, Feed ID e password del feed (se
+  richiesta; Feed ID e password servono per la riserva, ma si chiedono
+  subito per averli pronti): restano solo nella
   memoria della pagina — niente nel repo, niente in `localStorage`. Si
   perdono ricaricando la pagina.
 - **Riquadro "Worker"**, aggiornato ogni 30s da `/track-all.json`:
@@ -207,7 +208,7 @@ riesce a leggere il feed — interrogare SPOT da questo browser.
   del browser), coordinate, quota se c'è, tipo di messaggio.
 - **Comandi**: `PUBLIC_FROM` (con un selettore di data e ora, più una
   scorciatoia "ora") e `/reset`.
-- **Riserva: interroga SPOT da questo browser** (solo con il Feed ID):
+- **Riserva: interroga SPOT da questo browser**:
   ogni ~155s `POST /claim` → se concesso, interroga SPOT dal browser →
   `POST /ingest` col risultato, successo o errore. Se il turno non è
   concesso (SPOT interrogato da poco dal Worker o da un'altra pagina),
