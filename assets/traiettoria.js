@@ -313,7 +313,7 @@ function renderBalloon(){
   const set = function(id, v){ $(id).textContent = v; };
   elWarn.innerHTML = "";
   if(!b.V){
-    ["#twCHe","#twCNeck","#twCBurst","#twCDesc","#twCBurstSrc","#twCHeSrc"].forEach(function(id){ set(id, /Src$/.test(id) ? "" : "—"); });
+    ["#twCHe","#twCNeck","#twCBurst","#twCDesc","#twCBurstSrc","#twCDescSrc","#twCHeSrc"].forEach(function(id){ set(id, /Src$/.test(id) ? "" : "—"); });
     b.warn.forEach(function(w){ elWarn.appendChild(el("li", null, w)); });
     return b;
   }
@@ -328,6 +328,7 @@ function renderBalloon(){
   set("#twCBurst", elBurst.value !== "" && mb > 0 ? num(mb, 1) + " km" + hand : num(bd.m/1000, 1) + " km");
   set("#twCBurstSrc", elBurst.value !== "" && mb > 0 ? "" : t(!bd.day ? "twAtmoStd" : bd.isa ? "twAtmoDayIsa" : "twAtmoDay"));
   set("#twCDesc", elDesc.value !== "" && md > 0 ? num(md, 1) + " m/s" + hand : num(b.desc, 1) + " m/s");
+  set("#twCDescSrc", elDesc.value !== "" && md > 0 ? "" : t("twDescSrc"));
   elBurst.placeholder = (bd.m/1000).toFixed(1); elDesc.placeholder = b.desc.toFixed(1);
   b.warn.forEach(function(w){ elWarn.appendChild(el("li", null, w)); });
   return b;
@@ -666,7 +667,7 @@ function loadLeaflet(){
      parallelo con leaflet.js. */
   const mapkit = window.COMETA_MAPKIT ? Promise.resolve() : new Promise(function(ok, ko){
     const s = document.createElement("script");
-    s.src = "assets/mapkit.js?v=161";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
+    s.src = "assets/mapkit.js?v=162";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
     s.onload = ok; s.onerror = ko;
     document.head.appendChild(s);
   });
