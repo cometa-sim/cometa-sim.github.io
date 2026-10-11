@@ -58,11 +58,18 @@ jobs:
       - name: Otto previsioni per sito
         run: python3 calcolo/convergenza_raccolta.py --dir ${{ runner.temp }}/dati
 
+      - name: Curva per la pagina La traiettoria
+        # la legge assets/traiettoria.js (opzione «Errore di previsione»);
+        # se fallisce, i dati raccolti si salvano comunque
+        continue-on-error: true
+        run: python3 calcolo/convergenza_analisi.py ${{ runner.temp }}/dati/convergenza.csv --json ${{ runner.temp }}/dati/convergenza_curva.json
+
       - name: Commit sul branch dati
         working-directory: ${{ runner.temp }}/dati
         run: |
           # *.csv e' nel .gitignore di main: qui serve -f
           git add -f convergenza*.csv
+          if [ -f convergenza_curva.json ]; then git add -f convergenza_curva.json; fi
           if git diff --cached --quiet; then
             echo "Nessuna riga nuova (stesso dataset del giro precedente)."
             exit 0

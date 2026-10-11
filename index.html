@@ -23,7 +23,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@200;300;400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/cometa.css?v=164">
+<link rel="stylesheet" href="assets/cometa.css?v=165">
 </head>
 <body>
 
@@ -772,7 +772,13 @@
             <label class="tw-f"><span data-i18n="twErrAsc">Velocità di salita · ± %</span><input type="number" id="twErrAsc" value="5" min="0" max="20" step="0.5" inputmode="decimal"></label>
             <label class="tw-f"><span data-i18n="twErrDesc">Velocità di discesa · ± %</span><input type="number" id="twErrDesc" value="5" min="0" max="20" step="0.5" inputmode="decimal"></label>
           </div>
-          <p class="tw-hint" data-i18n="twErrHint">Solo per partenza singola. Se il volo è lontano nel tempo, l'errore sulla previsione potrebbe essere maggiore.</p>
+          <p class="tw-hint" data-i18n="twErrHint">Solo per partenza singola.</p>
+          <!-- Errore di previsione: di quanto puo' ancora spostarsi l'atterraggio
+               previsto fino al giorno del lancio (curva sul branch dati). -->
+          <div class="tw-man-f">
+            <label class="tw-check"><input type="checkbox" id="twFcOn"><span data-i18n="twFcOn">Errore di previsione</span></label>
+          </div>
+          <p class="tw-hint" data-i18n="twFcHint">Di quanto può ancora spostarsi l'atterraggio previsto fino al giorno del lancio, misurato statisticamente. Per ora affidabile solo in Uruguay.</p>
         </details>
 
         <div class="tw-calc" id="twCalc" aria-live="polite">
@@ -826,7 +832,7 @@
         <p data-i18n-html="wMod2"></p>
         <p data-i18n-html="wMod3"></p>
         <p data-i18n-html="wMod4"></p>
-        <p data-i18n="twIsa"></p>
+        <p data-i18n="twAdv"></p>
       </div>
     </div>
   </section>
@@ -861,7 +867,7 @@
       </div>
 
       <div class="map-frame reveal d1">
-        <iframe id="mapFrame" src="mappe/uru2000_footprint.html?v=164"
+        <iframe id="mapFrame" src="mappe/uru2000_footprint.html?v=165"
                 title="Mappa interattiva dei 600 punti di atterraggio simulati con le ellissi di dispersione"
                 loading="lazy"></iframe>
       </div>
@@ -1220,12 +1226,12 @@
 
 </div>
 
-<script src="assets/i18n.js?v=164"></script>
-<script src="assets/sonda.js?v=164"></script>
-<script src="assets/catena.js?v=164"></script>
-<script src="assets/spot.js?v=164"></script>
-<script src="assets/app.js?v=164"></script>
-<script src="assets/msis.js?v=164"></script>
-<script src="assets/traiettoria.js?v=164"></script>
+<script src="assets/i18n.js?v=165"></script>
+<script src="assets/sonda.js?v=165"></script>
+<script src="assets/catena.js?v=165"></script>
+<script src="assets/spot.js?v=165"></script>
+<script src="assets/app.js?v=165"></script>
+<script src="assets/msis.js?v=165"></script>
+<script src="assets/traiettoria.js?v=165"></script>
 </body>
 </html>
