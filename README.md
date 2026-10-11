@@ -376,11 +376,23 @@ si rigenera. Una riga con lo stesso `(dataset, bersaglio)` di una già
 presente si scarta, così un giro caduto sulla stessa corsa GFS del
 precedente non aggiunge nulla.
 
+Dal 12 ottobre 2026 lo stesso volo si chiede anche per altri siti, per
+capire se la curva si può trasferire: Durazno, Rivera e Rocha in Uruguay,
+Comodoro Rivadavia (Patagonia, correnti forti), Cuiabá (tropici, venti
+deboli), Bologna (emisfero nord, altra stagione), e Mercedes con scoppio a
+22 km (profilo diverso). Partenza alle 11 locali; un CSV per sito,
+`convergenza_<sito>.csv`. Ogni riga registra anche durata del volo,
+lunghezza del percorso e deriva: l'analisi ne ricava l'errore di vento
+efficace e/T e l'errore relativo e/L, e con più file li confronta fra i
+siti. Se le curve di e/T coincidono, scalare con la durata del volo regge.
+L'elenco dei siti è `SITI` in `calcolo/convergenza_raccolta.py`.
+
 L'analisi si fa a mano:
 
 ```
-git fetch origin dati && git show origin/dati:convergenza.csv > convergenza.csv
-python3 calcolo/convergenza_analisi.py convergenza.csv
+git fetch origin dati && mkdir -p dati && git archive origin/dati | tar -x -C dati
+python3 calcolo/convergenza_analisi.py dati/convergenza.csv          # Mercedes
+python3 calcolo/convergenza_analisi.py dati/convergenza*.csv         # tutti, con il confronto
 ```
 
 L'anticipo τ è l'età della corsa GFS all'ora del lancio (bersaglio meno
