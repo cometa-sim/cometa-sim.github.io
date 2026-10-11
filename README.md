@@ -74,11 +74,11 @@ Norme e autorizzazioni · Domande · Chi siamo.
 ### Dopo ogni modifica: il numero di versione
 
 In `index.html` i file di `assets/`, e la mappa, sono richiamati con un numero in
-coda — oggi `?v=166`:
+coda — oggi `?v=167`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=166">
-<script src="assets/i18n.js?v=166"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=167">
+<script src="assets/i18n.js?v=167"></script>
 ```
 
 Lo stesso numero compare anche in due punti meno visibili, che vanno alzati
@@ -400,7 +400,9 @@ GFS usata e lo scala con la durata del volo (r = Q3 · T / T_rif). Il raggio
 si somma all'area del pallone come somma di Minkowski: lo stesso errore di
 vento trasla tutti i voli dell'area: gli spigoli dell'area diventano archi
 di cerchio (contorno a 180 punti per vertice, disegnato senza
-semplificazione). Il giorno stesso del lancio vale zero per definizione:
+semplificazione e senza arrotondare i vertici al pixel, con lo stesso
+`smoothPolygon` usato prima per l'ellisse: altrimenti i punti, più fitti di
+un pixel, fanno un bordo a scalini). Il giorno stesso del lancio vale zero per definizione:
 con la casella attiva e il giorno di oggi, l'avviso compare subito, fra
 quelli del pallone sotto le tessere. Le classi con meno di 8 campioni non
 si usano. Se il file non si carica, lo dice un avviso nello stesso posto e
