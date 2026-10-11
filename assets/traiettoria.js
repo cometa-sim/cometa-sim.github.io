@@ -343,10 +343,22 @@ function renderBalloon(){
   set("#twCDescSrc", elDesc.value !== "" && md > 0 ? "" : t("twDescSrc"));
   elBurst.placeholder = (bd.m/1000).toFixed(1); elDesc.placeholder = b.desc.toFixed(1);
   b.warn.forEach(function(w){ elWarn.appendChild(el("li", null, w)); });
+  fcWarn(null);
   return b;
 }
-[elBal, elDiam, elMass, elPay, elAsc, elCyl, elPCyl, elTGonf, elChute, elBurst, elDesc, elDate, elTime].forEach(function(e){
-  e.addEventListener("input", renderBalloon);
+/* Avviso dell'errore di previsione, fra quelli del pallone: per un lancio
+   oggi e' zero per definizione (si vede subito, prima del calcolo); dopo
+   il calcolo puo' dire che la curva non e' disponibile. */
+function fcWarn(r){
+  const old = elWarn.querySelector(".tw-fc");
+  if(old) old.remove();
+  if(!elFcOn || !elFcOn.checked) return;
+  const zero = r && r.fc ? r.fc.zero : elDate.value && elDate.value <= today;
+  const na = r && r.fc && r.fc.na;
+  if(zero || na) elWarn.appendChild(el("li", "tw-fc", t(zero ? "twFcZero" : "twFcNa")));
+}
+[elBal, elDiam, elMass, elPay, elAsc, elCyl, elPCyl, elTGonf, elChute, elBurst, elDesc, elDate, elTime, elFcOn].forEach(function(e){
+  if(e) e.addEventListener("input", renderBalloon);
 });
 
 /* Parametri del volo: quelli del pallone, salvo quelli imposti a mano */
@@ -679,7 +691,7 @@ function loadLeaflet(){
      parallelo con leaflet.js. */
   const mapkit = window.COMETA_MAPKIT ? Promise.resolve() : new Promise(function(ok, ko){
     const s = document.createElement("script");
-    s.src = "assets/mapkit.js?v=165";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
+    s.src = "assets/mapkit.js?v=166";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
     s.onload = ok; s.onerror = ko;
     document.head.appendChild(s);
   });
@@ -769,8 +781,10 @@ function draw(r, noFit){
   bb.extend([r.from.lat, r.from.lon]);
   if(r.spread){       /* area (o linea) di atterraggio: un solo colore */
     const g = r.spread, VI = "#A98CFF";
+    /* smoothFactor 0: Leaflet non semplifica il contorno, cosi' gli archi
+       della somma con il cerchio dell'errore di previsione restano lisci */
     if(g.poly) L.polygon(g.poly, {pane:"twLandZ", color:VI, weight:3, opacity:1, fillColor:VI, fillOpacity:.35,
-      lineJoin:"round", interactive:false}).addTo(layer);
+      lineJoin:"round", smoothFactor:0, interactive:false}).addTo(layer);
     else L.polyline(g.line, {pane:"twLandZ", color:VI, weight:6, opacity:1, lineCap:"round", interactive:false}).addTo(layer);
     (g.poly || g.line).forEach(function(ll){ bb.extend(ll); });
   }
@@ -846,7 +860,7 @@ function fcRadius(d, r, iso){
    attraversano gli stessi venti: la somma e' lineare, non in quadratura. */
 function addForecast(r, g, fc){
   const base = g ? (g.poly || g.line) : [[r.end.lat, r.end.lon]];
-  const N = 48, k = Math.cos(r.end.lat*RAD), pts = [];
+  const N = 180, k = Math.cos(r.end.lat*RAD), pts = [];
   base.forEach(function(q){
     for(let i = 0; i < N; i++){
       const u = 2*Math.PI*i/N;
@@ -963,6 +977,7 @@ function show(x, noFit){
   if(band){ renderBand(x); statusDone(x.list); if(map) drawBand(x, noFit); }
   else {
     renderCard(x); statusDone([x]); if(map) draw(x, noFit);
+    if(x && x.ok) fcWarn(x);
     if(elLegend && x && x.spread) elLegend.textContent = legendLand(x.spread);
   }
 }
@@ -997,11 +1012,6 @@ function renderCard(r){
    .concat(r.fc && r.fc.km > 0 ? [[t("twFcRow"), "± " + num(r.fc.km, 0) + " km · " + t("twFcAge").replace("{h}", num(r.fc.age, 0))]] : [])
    .forEach(function(row){ dl.appendChild(el("dt", null, row[0])); dl.appendChild(el("dd", null, row[1])); });
   card.appendChild(dl);
-  if(r.fc && (r.fc.zero || r.fc.na)){       /* stesso stile degli avvisi del pallone */
-    const ul = el("ul", "tw-warn");
-    ul.appendChild(el("li", null, t(r.fc.zero ? "twFcZero" : "twFcNa")));
-    card.appendChild(ul);
-  }
   if(r.atmo) card.appendChild(el("p", "tw-hint tw-card-note",
     t({day:"twCardDay", dayIsa:"twCardDayIsa", std:"twCardStd", hand:"twCardHand"}[r.atmo])));
   const a = el("a", null, t("twMaps") + " →");

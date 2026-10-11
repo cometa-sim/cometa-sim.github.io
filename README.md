@@ -74,11 +74,11 @@ Norme e autorizzazioni · Domande · Chi siamo.
 ### Dopo ogni modifica: il numero di versione
 
 In `index.html` i file di `assets/`, e la mappa, sono richiamati con un numero in
-coda — oggi `?v=165`:
+coda — oggi `?v=166`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=165">
-<script src="assets/i18n.js?v=165"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=166">
+<script src="assets/i18n.js?v=166"></script>
 ```
 
 Lo stesso numero compare anche in due punti meno visibili, che vanno alzati
@@ -333,6 +333,10 @@ chi guarda, senza server nostri:
    nominale compreso (5 o 9 voli), senza ipotesi di linearità. Linea e
    area sono viola; la didascalia elenca i parametri attivi e la loro
    percentuale. Con 0 in una voce quel parametro non entra.
+   Sotto, «Errore di previsione»: allarga linea o area (o, da solo, fa un
+   cerchio intorno all'atterraggio) di quanto la previsione può ancora
+   spostarsi fino al giorno del lancio; vedi «Quanto ci si può fidare
+   della previsione a qualche giorno» più sotto.
 
 Sotto la mappa, il riquadro meteo (icona, temperatura, vento, nuvole,
 probabilità di pioggia) è la previsione oraria di Open-Meteo per il punto, il
@@ -394,10 +398,16 @@ classe di anticipo); `assets/traiettoria.js` lo legge da
 raw.githubusercontent.com, interpola il terzo quartile sull'età della corsa
 GFS usata e lo scala con la durata del volo (r = Q3 · T / T_rif). Il raggio
 si somma all'area del pallone come somma di Minkowski: lo stesso errore di
-vento trasla tutti i voli dell'area. Il giorno stesso del lancio vale zero
-per definizione e compare l'avviso; le classi con meno di 8 campioni non si
-usano. Se il file non si carica, la scheda lo dice e l'area resta quella
-del pallone.
+vento trasla tutti i voli dell'area: gli spigoli dell'area diventano archi
+di cerchio (contorno a 180 punti per vertice, disegnato senza
+semplificazione). Il giorno stesso del lancio vale zero per definizione:
+con la casella attiva e il giorno di oggi, l'avviso compare subito, fra
+quelli del pallone sotto le tessere. Le classi con meno di 8 campioni non
+si usano. Se il file non si carica, lo dice un avviso nello stesso posto e
+l'area resta quella del pallone. Accanto alla casella la pagina scrive solo
+«Terzo quartile. Per ora affidabile solo in Uruguay» (`twFcHint` in
+`assets/i18n.js`): va aggiornato quando la raccolta su più siti dirà dove
+la curva vale (vedi «Da completare»).
 
 L'analisi si fa a mano:
 
@@ -529,6 +539,15 @@ L'unica cosa che GitHub impedisce sempre, anche senza regole, è
 approvare la propria richiesta di modifica.
 
 ## Da completare
+
+- **«Per ora affidabile solo in Uruguay»**, accanto all'opzione «Errore di
+  previsione» (`twFcHint` in `assets/i18n.js`, nelle tre lingue, e il
+  testo di riserva in `index.html` e `simulazione-diretta.html`). Dalla
+  fine di ottobre 2026 la raccolta su più siti (`convergenza_*.csv` sul
+  branch `dati`) basta a dire se la curva di e/T vale anche altrove:
+  `python3 calcolo/convergenza_analisi.py dati/convergenza*.csv`. Se le
+  curve dei siti coincidono, la frase si allarga o si toglie; se no,
+  resta, e magari la pagina usa la curva solo per partenze in Uruguay.
 
 - **La data definitiva del lancio**, quando la DINACIA autorizza. Oggi la
   costante `LAUNCH` in `assets/app.js` vale `2026-10-28T11:00:00-03:00`: è
