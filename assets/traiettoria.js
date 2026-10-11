@@ -691,7 +691,7 @@ function loadLeaflet(){
      parallelo con leaflet.js. */
   const mapkit = window.COMETA_MAPKIT ? Promise.resolve() : new Promise(function(ok, ko){
     const s = document.createElement("script");
-    s.src = "assets/mapkit.js?v=166";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
+    s.src = "assets/mapkit.js?v=167";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
     s.onload = ok; s.onerror = ko;
     document.head.appendChild(s);
   });
@@ -781,9 +781,10 @@ function draw(r, noFit){
   bb.extend([r.from.lat, r.from.lon]);
   if(r.spread){       /* area (o linea) di atterraggio: un solo colore */
     const g = r.spread, VI = "#A98CFF";
-    /* smoothFactor 0: Leaflet non semplifica il contorno, cosi' gli archi
-       della somma con il cerchio dell'errore di previsione restano lisci */
-    if(g.poly) L.polygon(g.poly, {pane:"twLandZ", color:VI, weight:3, opacity:1, fillColor:VI, fillOpacity:.35,
+    /* smoothFactor 0: Leaflet non semplifica il contorno; smoothPolygon:
+       non arrotonda i vertici al pixel. Cosi' gli archi della somma con il
+       cerchio dell'errore di previsione restano lisci. */
+    if(g.poly) new (smoothPolygon())(g.poly, {pane:"twLandZ", color:VI, weight:3, opacity:1, fillColor:VI, fillOpacity:.35,
       lineJoin:"round", smoothFactor:0, interactive:false}).addTo(layer);
     else L.polyline(g.line, {pane:"twLandZ", color:VI, weight:6, opacity:1, lineCap:"round", interactive:false}).addTo(layer);
     (g.poly || g.line).forEach(function(ll){ bb.extend(ll); });
@@ -818,6 +819,31 @@ function legendLand(g){
   if(g.fc) names.push(t("twLegFc").replace("{r}", num(g.fc.km, 0)));
   const list = names.length < 2 ? names[0] : names.slice(0, -1).join(", ") + " " + t("twAnd") + " " + names[names.length - 1];
   return t("twLegend") + " " + t(g.n > 1 || g.fc ? "twLegLand" : "twLegLine") + " " + list + ". " + t("twLegWind");
+}
+
+/* Leaflet arrotonda ogni vertice al pixel intero: su un arco con i punti a
+   meno di un pixel l'uno dall'altro il contorno diventa a scalini. Questo
+   poligono proietta i vertici senza arrotondare, e l'SVG li disegna con i
+   decimali. */
+let SmoothPolygon = null;
+function smoothPolygon(){
+  if(SmoothPolygon) return SmoothPolygon;
+  const L = window.L;
+  SmoothPolygon = L.Polygon.extend({
+    _projectLatlngs: function(latlngs, result, projectedBounds){
+      if(latlngs[0] instanceof L.LatLng){
+        const origin = this._map.getPixelOrigin(), ring = [];
+        for(let i = 0; i < latlngs.length; i++){
+          const p = this._map.project(latlngs[i])._subtract(origin);
+          ring.push(p); projectedBounds.extend(p);
+        }
+        result.push(ring);
+      } else {
+        for(let i = 0; i < latlngs.length; i++) this._projectLatlngs(latlngs[i], result, projectedBounds);
+      }
+    }
+  });
+  return SmoothPolygon;
 }
 
 /* ---------- Errore di previsione ----------
