@@ -55,9 +55,10 @@ relativo.
 Uso:  git fetch origin dati && git archive origin/dati | tar -x -C dati/
       python3 calcolo/convergenza_analisi.py dati/convergenza.csv [--out tabella.csv]
       python3 calcolo/convergenza_analisi.py dati/convergenza*.csv
+      python3 calcolo/convergenza_analisi.py dati/convergenza.csv --json curva.json
 """
-import argparse, csv, math, os, statistics, sys
-from datetime import datetime
+import argparse, csv, json, math, os, statistics, sys
+from datetime import datetime, timezone
 
 NOTA = ("e(tau) misura la CONVERGENZA della previsione, non l'errore: il riferimento "
         "(la previsione con anticipo 0) non e' la verita'.\n"
@@ -112,6 +113,7 @@ def analizza(path, calendario=False):
                 prev[k] = r
 
     rif = {b: r for (b, tau), r in prev.items() if tau == 0}
+    durate = [d for d in (_num(r.get("durata_min")) for r in rif.values()) if d]
     err, eta, ev, el = {}, {}, {}, {}
     for (b, tau), r in prev.items():
         if b not in rif: continue                 # bersaglio senza riferimento
@@ -133,7 +135,8 @@ def analizza(path, calendario=False):
         if el.get(tau): x["rel"] = statistics.median(el[tau])
         stat[tau] = x
     senza = len({b for b, _ in prev} - set(rif))
-    return stat, len(rif), senza, scartate
+    stat_durata = statistics.median(durate) if durate else None
+    return stat, len(rif), senza, scartate, stat_durata
 
 
 def stampa(path, stat, nrif, senza, scartate, calendario):
@@ -161,11 +164,12 @@ def main():
     ap.add_argument("--out", help="salva anche la tabella in CSV (con un solo file)")
     ap.add_argument("--calendario", action="store_true",
                     help="anticipo = lead_giorni (giorni fra emissione e bersaglio)")
+    ap.add_argument("--json", help="salva la curva per la pagina La traiettoria (con un solo file)")
     a = ap.parse_args()
 
-    tutti = {}
+    tutti, durata = {}, None
     for path in a.csv:
-        stat, nrif, senza, scartate = analizza(path, a.calendario)
+        stat, nrif, senza, scartate, durata = analizza(path, a.calendario)
         stampa(path, stat, nrif, senza, scartate, a.calendario)
         tutti[path] = stat
 
@@ -188,6 +192,20 @@ def main():
                 print(f"{nomi[p]:<16}" + "".join(celle))
             print()
     print(NOTA)
+
+    if a.json and len(tutti) == 1:
+        # la curva che legge assets/traiettoria.js: eta' mediana e quartili per
+        # classe; la pagina interpola Q3 sull'eta' della corsa e lo scala con
+        # la durata del volo (durata_ref_min e' quella del volo misurato)
+        stat = next(iter(tutti.values()))
+        out = {"aggiornato": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+               "sito": "Mercedes (Uruguay)", "durata_ref_min": round(durata or 176.0, 1),
+               "classi": [{"tau": tau, "n": x["n"], "eta_h": round(x["eta"], 1),
+                           "q1_km": round(x["q1"], 2), "mediana_km": round(x["me"], 2),
+                           "q3_km": round(x["q3"], 2), "rms_km": round(x["rms"], 2)}
+                          for tau, x in stat.items()]}
+        with open(a.json, "w") as f: json.dump(out, f, indent=1)
+        print(f"\nCurva salvata in {a.json}")
 
     if a.out and len(tutti) == 1:
         stat = next(iter(tutti.values()))

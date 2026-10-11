@@ -34,6 +34,12 @@ const GIORNI_MAX = 7;               /* orizzonte della corsa GFS di Tawhiri */
 const LEAFLET = "assets/vendor/leaflet/";
 const COL = "#5FE3FF";              /* --cyan */
 const TILES = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
+/* Curva di convergenza delle previsioni, calcolata ogni giorno dal workflow
+   .github/workflows/convergenza.yml sul branch `dati` (non pubblicato con
+   il sito): per ogni anticipo, di quanto si e' spostato l'atterraggio
+   previsto rispetto alla previsione del giorno stesso, a Mercedes. */
+const CURVA = "https://raw.githubusercontent.com/cometa-sim/cometa-sim.github.io/dati/convergenza_curva.json";
+const CURVA_NMIN = 8;               /* classi con meno campioni non si usano */
 /* v2: la prima versione salvava anche la partenza predefinita (Durazno)
    come se l'avesse scelta il visitatore; con una chiave nuova si riparte */
 const KEY = "cometa-partenza-v2";
@@ -69,7 +75,8 @@ const elWhere = $("#twWhere"), elSugg = $("#twSugg"), elGeo = $("#twGeo"),
       elStatus = $("#twStatus"), elRes = $("#twRes"), elMap = $("#twMap"),
       elWeekBtn = $("#twWeekBtn"), elWeekBox = $("#twWeekBox"), elWeekBody = $("#twWeekBody"),
       elToDay = $("#twToDay"), elToTime = $("#twToTime"), elEvery = $("#twEvery"), elLegend = $("#twLegendTxt"),
-      elErrOn = $("#twErrOn"), elErrSig = $("#twErrSig"), elErrAsc = $("#twErrAsc"), elErrDesc = $("#twErrDesc");
+      elErrOn = $("#twErrOn"), elErrSig = $("#twErrSig"), elErrAsc = $("#twErrAsc"), elErrDesc = $("#twErrDesc"),
+      elFcOn = $("#twFcOn");
 
 /* ---------- Testi: seguono la lingua scelta nel sito ---------- */
 function lang(){ return document.documentElement.lang || "it"; }
@@ -672,7 +679,7 @@ function loadLeaflet(){
      parallelo con leaflet.js. */
   const mapkit = window.COMETA_MAPKIT ? Promise.resolve() : new Promise(function(ok, ko){
     const s = document.createElement("script");
-    s.src = "assets/mapkit.js?v=164";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
+    s.src = "assets/mapkit.js?v=165";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
     s.onload = ok; s.onerror = ko;
     document.head.appendChild(s);
   });
@@ -794,8 +801,66 @@ function legendLand(g){
   const names = g.specs.map(function(x){
     return t({B:"twLegPB", A:"twLegPA", D:"twLegPD"}[x.k]) + " (±" + num(x.s*100, (x.s*1000) % 10 ? 1 : 0) + " %)";
   });
+  if(g.fc) names.push(t("twLegFc").replace("{r}", num(g.fc.km, 0)));
   const list = names.length < 2 ? names[0] : names.slice(0, -1).join(", ") + " " + t("twAnd") + " " + names[names.length - 1];
-  return t("twLegend") + " " + t(g.n > 1 ? "twLegLand" : "twLegLine") + " " + list + ". " + t("twLegWind");
+  return t("twLegend") + " " + t(g.n > 1 || g.fc ? "twLegLand" : "twLegLine") + " " + list + ". " + t("twLegWind");
+}
+
+/* ---------- Errore di previsione ----------
+   La curva dice di quanto si e' spostato, in media su molti giorni,
+   l'atterraggio previsto fra una corsa GFS di una certa eta' e la
+   previsione del giorno stesso (terzo quartile, Q3). Il raggio si
+   interpola sull'eta' della corsa usata (lancio - corsa) e si scala con
+   la durata del volo: r = Q3(eta) * T / T_rif. Il giorno stesso del
+   lancio e' zero per definizione: la curva misura la convergenza della
+   previsione meteorologica, non l'errore del predittore. */
+let curva = null;
+function loadCurva(){
+  if(curva) return curva;
+  curva = fetch(CURVA, {cache:"no-cache"}).then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(d){ return d && d.classi ? d : null; }, function(){ return null; })
+    .then(function(d){ if(!d) curva = null; return d; });       /* un fallimento non si ricorda */
+  return curva;
+}
+function fcRadius(d, r, iso){
+  if(iso <= today) return {km:0, zero:true};
+  if(!d || !r.run) return {km:0, na:true};
+  const age = (r.pts[0].t - r.run)/36e5;                       /* eta' della corsa al lancio, h */
+  const C = d.classi.filter(function(c){ return c.n >= CURVA_NMIN; })
+    .sort(function(a, b){ return a.eta_h - b.eta_h; });
+  if(C.length < 2 || age > C[C.length - 1].eta_h + 12) return {km:0, na:true, age:age};
+  let q = 0;
+  if(age >= C[C.length - 1].eta_h) q = C[C.length - 1].q3_km;
+  else if(age > C[0].eta_h){
+    for(let i = 0; i < C.length - 1; i++){
+      const a = C[i], b = C[i + 1];
+      if(age <= b.eta_h){ q = a.q3_km + (age - a.eta_h)/(b.eta_h - a.eta_h)*(b.q3_km - a.q3_km); break; }
+    }
+  }
+  const k = d.durata_ref_min > 0 ? r.dur/d.durata_ref_min : 1;
+  return {km:q*k, age:age, q:q, k:k};
+}
+/* Somma di Minkowski: ogni punto dell'area (o della linea, o il solo
+   atterraggio nominale) si sposta di un vettore qualunque lungo al piu'
+   r. Lo stesso errore di vento trasla tutti i voli dell'area, che
+   attraversano gli stessi venti: la somma e' lineare, non in quadratura. */
+function addForecast(r, g, fc){
+  const base = g ? (g.poly || g.line) : [[r.end.lat, r.end.lon]];
+  const N = 48, k = Math.cos(r.end.lat*RAD), pts = [];
+  base.forEach(function(q){
+    for(let i = 0; i < N; i++){
+      const u = 2*Math.PI*i/N;
+      pts.push([q[1] + fc.km*Math.cos(u)/(111.32*k), q[0] + fc.km*Math.sin(u)/110.57]);
+    }
+  });
+  const out = g ? Object.assign({}, g) : {n:0, specs:[]};
+  out.poly = hull(pts).map(function(q){ return [q[1], q[0]]; });
+  delete out.line;
+  out.fc = fc;
+  out.extent = 0;
+  for(let i = 0; i < out.poly.length; i++) for(let j = i + 1; j < out.poly.length; j++)
+    out.extent = Math.max(out.extent, distKm(out.poly[i][0], out.poly[i][1], out.poly[j][0], out.poly[j][1]));
+  return out;
 }
 
 /* ---------- Piu' partenze: una fascia sola ----------
@@ -929,8 +994,14 @@ function renderCard(r){
      const k = {B:"twBurstRange", A:"twAscRange", D:"twDescRange"}[x.k], u = x.k === "B" ? " km" : " m/s", d = x.k === "B" ? 1 : 2;
      return [t(k), num(x.lov, d) + "–" + num(x.hiv, d) + u];
    }) : [])
+   .concat(r.fc && r.fc.km > 0 ? [[t("twFcRow"), "± " + num(r.fc.km, 0) + " km · " + t("twFcAge").replace("{h}", num(r.fc.age, 0))]] : [])
    .forEach(function(row){ dl.appendChild(el("dt", null, row[0])); dl.appendChild(el("dd", null, row[1])); });
   card.appendChild(dl);
+  if(r.fc && (r.fc.zero || r.fc.na)){       /* stesso stile degli avvisi del pallone */
+    const ul = el("ul", "tw-warn");
+    ul.appendChild(el("li", null, t(r.fc.zero ? "twFcZero" : "twFcNa")));
+    card.appendChild(ul);
+  }
   if(r.atmo) card.appendChild(el("p", "tw-hint tw-card-note",
     t({day:"twCardDay", dayIsa:"twCardDayIsa", std:"twCardStd", hand:"twCardHand"}[r.atmo])));
   const a = el("a", null, t("twMaps") + " →");
@@ -1004,10 +1075,15 @@ form.addEventListener("submit", function(e){
     const runs = [];
     for(let m = 0; m < (specs.length ? 1 << specs.length : 0); m++)
       runs.push(Object.assign.apply(null, [{}, p].concat(specs.map(function(x, i){ return (m >> i) & 1 ? x.hi : x.lo; }))));
-    return Promise.all([predict(pl, when, p)].concat(runs.map(soft))).then(function(rr){
+    const fcOn = !!(elFcOn && elFcOn.checked);
+    return Promise.all([predict(pl, when, p), fcOn ? loadCurva() : null].concat(runs.map(soft))).then(function(rr){
       const r = rr[0]; r.atmo = p.atmo;
-      const cs = rr.slice(1);
+      const cs = rr.slice(2);
       if(specs.length && cs.every(function(c){ return c && c.ok; })) r.spread = spreadGeom(r, specs, cs);
+      if(fcOn){
+        r.fc = fcRadius(rr[1], r, iso);
+        if(r.fc.km > 0) r.spread = addForecast(r, r.spread, r.fc);
+      }
       return r;
     });
   }).catch(function(e){ return {ok:false, from:pl, err:e.message}; })])

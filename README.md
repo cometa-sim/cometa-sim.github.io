@@ -74,11 +74,11 @@ Norme e autorizzazioni · Domande · Chi siamo.
 ### Dopo ogni modifica: il numero di versione
 
 In `index.html` i file di `assets/`, e la mappa, sono richiamati con un numero in
-coda — oggi `?v=164`:
+coda — oggi `?v=165`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=164">
-<script src="assets/i18n.js?v=164"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=165">
+<script src="assets/i18n.js?v=165"></script>
 ```
 
 Lo stesso numero compare anche in due punti meno visibili, che vanno alzati
@@ -386,6 +386,18 @@ lunghezza del percorso e deriva: l'analisi ne ricava l'errore di vento
 efficace e/T e l'errore relativo e/L, e con più file li confronta fra i
 siti. Se le curve di e/T coincidono, scalare con la durata del volo regge.
 L'elenco dei siti è `SITI` in `calcolo/convergenza_raccolta.py`.
+
+La pagina usa la curva di Mercedes nell'opzione «Errore di previsione»
+delle impostazioni avanzate. Ogni giorno il workflow scrive anche
+`convergenza_curva.json` sul branch `dati` (età mediana e quartili per
+classe di anticipo); `assets/traiettoria.js` lo legge da
+raw.githubusercontent.com, interpola il terzo quartile sull'età della corsa
+GFS usata e lo scala con la durata del volo (r = Q3 · T / T_rif). Il raggio
+si somma all'area del pallone come somma di Minkowski: lo stesso errore di
+vento trasla tutti i voli dell'area. Il giorno stesso del lancio vale zero
+per definizione e compare l'avviso; le classi con meno di 8 campioni non si
+usano. Se il file non si carica, la scheda lo dice e l'area resta quella
+del pallone.
 
 L'analisi si fa a mano:
 
