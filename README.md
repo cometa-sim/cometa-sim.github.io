@@ -1,7 +1,7 @@
 # cometa-sim.github.io
 
 Sito del **Progetto COMETA** — Scuola Italiana di Montevideo.
-Un pallone stratosferico fino a 38 km di quota, progettato, costruito e
+Un pallone stratosferico oltre i 37 km di quota, progettato, costruito e
 programmato dagli studenti di 2EMS, IIIS, 3EMS, IVL e IVS.
 
 🌐 https://cometa.scuolaitaliana.edu.uy
