@@ -55,6 +55,7 @@ window.COMETA_SPOT = (function(){
      centrata sull'Uruguay invece che sull'oceano a (0,0). */
   const FALLBACK = {lat:-33.0, lon:-56.5, zoom:7};
 
+  let view = null, trajFull = null;   /* vista 3D (assets/map3d.js): il pulsante 2D/3D; trajFull = traiettoria prevista con le quote */
   let map, trail, ptsLayer, marker, markerHit, trajLine, trajRun, mapReady, pollId, tickId, trajId,
       elMap, elStatus, elAltEst, elAltGps, elRecenter,
       lastPoints, lastErr, curLang = "it", lastEstKm = null,
@@ -193,11 +194,17 @@ window.COMETA_SPOT = (function(){
     });
     const mapkit = window.COMETA_MAPKIT ? Promise.resolve() : new Promise(function(ok, ko){
       const s = document.createElement("script");
-      s.src = "assets/mapkit.js?v=173";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
+      s.src = "assets/mapkit.js?v=174";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
       s.onload = ok; s.onerror = ko;
       document.head.appendChild(s);
     });
-    return Promise.all([leaflet, mapkit]);
+    const map3d = window.COMETA_MAP3D ? Promise.resolve() : new Promise(function(ok){
+      const s = document.createElement("script");
+      s.src = "assets/map3d.js?v=174";
+      s.onload = ok; s.onerror = ok;     // senza, resta il 2D e basta
+      document.head.appendChild(s);
+    });
+    return Promise.all([leaflet, mapkit, map3d]);
   }
 
   function ensureMap(){
@@ -255,8 +262,41 @@ window.COMETA_SPOT = (function(){
         }
       });
       new Recenter().addTo(map);
+      /* 2D / 3D: nel 3D si segue il volo con la quota vera. La traiettoria
+         prevista e' tutta grigia (in 3D salita e discesa si distinguono da
+         sole, e i colori non si confondono con la traccia vera, verde). */
+      if(window.COMETA_MAP3D) view = window.COMETA_MAP3D.attach({
+        L:L, map:map, elMap:elMap, el3Style:"position:absolute;inset:0",
+        create:{color:GREEN, colorDown:GREEN},
+        onEnter:function(c){ c.render(scene3d(), true); },
+        onLeave:function(){
+          if(lastPoints && lastPoints.length){
+            const last = lastPoints[lastPoints.length - 1];
+            map.setView([last.lat, last.lon], Math.max(map.getZoom(), 10));
+          }
+        },
+        onFail:function(){ lastErr = dict().mk3dFail || "3D"; renderStatus(); }
+      });
     });
     return mapReady;
+  }
+
+  /* Cio' che il 3D deve mostrare: la traccia GPS vera (verde, con la quota di
+     ogni punto: dove manca, resta l'ultima nota) e la traiettoria prevista
+     (grigia, piu' sottile e trasparente). */
+  function scene3d(){
+    let a = 0;
+    const live = (lastPoints || []).map(function(p){
+      if(p.alt != null) a = Math.max(0, p.alt);
+      return {lat:p.lat, lon:p.lon, alt:a};
+    });
+    return {
+      runs:trajFull ? [{pts:trajFull}] : [], main:false, col:{up:GREY, down:GREY},
+      live:{pts:live, color:GREEN}
+    };
+  }
+  function redraw3d(fit){
+    if(view && view.isOn() && view.ctl()) view.ctl().render(scene3d(), !!fit);
   }
 
   function dict(){ return (window.I18N && (window.I18N[curLang] || window.I18N.it)) || {}; }
@@ -416,7 +456,7 @@ window.COMETA_SPOT = (function(){
       marker.setStyle({opacity:1, fillOpacity:.9});
       markerHit.setLatLng([last.lat, last.lon]);
       if(markerHit.getPopup()) markerHit.setPopupContent(popupHtml(last)); else markerHit.bindPopup(popupHtml(last));
-      map.setView([last.lat, last.lon], Math.max(map.getZoom(), 10));
+      if(!(view && view.isOn())) map.setView([last.lat, last.lon], Math.max(map.getZoom(), 10));   // il 2D nascosto non ha misura
       /* Il Data Push porta la posizione pochi secondi dopo il messaggio ma
          senza quota; la quota dello stesso messaggio arriva poco dopo, con
          la lettura del feed (vedi worker/README.md). Nel frattempo la quota
@@ -433,6 +473,7 @@ window.COMETA_SPOT = (function(){
       lastAltKey = altKey;
       if(altPt) onNewRealPoint(altPt);
     }
+    redraw3d(false);
     renderStatus();
   }
 
@@ -496,17 +537,23 @@ window.COMETA_SPOT = (function(){
         if(!d || d.error || !d.prediction) return;      // silenzioso: fuori orizzonte, o previsore non pronto
         const run = d.request && d.request.dataset;
         if(run && run === trajRun) return;               // stessa corsa GFS di prima: niente da ridisegnare
-        const pts = [];
+        const pts = [], full = [];
         d.prediction.forEach(function(stage){
-          stage.trajectory.forEach(function(p){ pts.push([p.latitude, p.longitude >= 180 ? p.longitude - 360 : p.longitude]); });
+          stage.trajectory.forEach(function(p){
+            const lon = p.longitude >= 180 ? p.longitude - 360 : p.longitude;
+            pts.push([p.latitude, lon]);
+            full.push({lat:p.latitude, lon:lon, alt:p.altitude, up:stage.stage === "ascent"});
+          });
         });
         if(pts.length < 2) return;
         trajRun = run;
+        trajFull = full;
         ensureMap().then(function(){
           const L = window.L;
           if(!trajLine) trajLine = L.polyline(pts, {color:GREY, weight:2, opacity:.85, dashArray:"5 8", interactive:false}).addTo(map);
           else trajLine.setLatLngs(pts);
           trajLine.bringToBack();
+          redraw3d(false);
         });
       })
       .catch(function(){ /* silenzioso: offline, CORS, o fuori dall'orizzonte del previsore */ });

@@ -276,6 +276,6 @@ window.COMETA_MAPKIT = (function(){
     /* per la vista 3D (assets/map3d.js): stesse fonti e stesse icone */
     OWM_TILES: OWM_TILES, OWM_NATIVE_ZOOM: OWM_NATIVE_ZOOM, RAIN_INDEX: RAIN_INDEX, RAIN_NATIVE_ZOOM: RAIN_NATIVE_ZOOM,
     isEurope: isEurope,
-    ICONS: {layers: ICON_LAYERS, maximize: ICON_MAXIMIZE, minimize: ICON_MINIMIZE, cloud: ICON_CLOUD, rain: ICON_RAIN}
+    ICONS: {layers: ICON_LAYERS, maximize: ICON_MAXIMIZE, minimize: ICON_MINIMIZE, cloud: ICON_CLOUD, rain: ICON_RAIN, save: ICON_SAVE}
   };
 })();

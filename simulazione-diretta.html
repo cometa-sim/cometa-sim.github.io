@@ -24,7 +24,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@200;300;400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/cometa.css?v=173">
+<link rel="stylesheet" href="assets/cometa.css?v=174">
 </head>
 <body>
 <div class="sim-bar" style="position:sticky;top:0;z-index:90;background:#3a1600;border-bottom:1px solid rgba(255,184,77,.5);padding:11px 20px;font-family:var(--mono);font-size:12.5px;color:#FFB84D;display:flex;gap:16px;flex-wrap:wrap;align-items:center">
@@ -769,6 +769,7 @@
                 <option value="60" selected>1 h</option>
                 <option value="120">2 h</option>
                 <option value="180">3 h</option>
+                <option value="1440" data-i18n="twEvery24">1 giorno</option>
               </select></label>
           </div>
           <p class="tw-hint" data-i18n="twMultiHint">Dal giorno e dall'ora scelti sopra fino a questi. Se restano vuoti si calcola una sola partenza.</p>
@@ -798,6 +799,9 @@
         </div>
         <ul class="tw-warn" id="twWarn"></ul>
         <p class="tw-hint tw-wide" data-i18n="twIsa"></p>
+
+        <!-- Compare solo se si sono scelte piu' partenze (vedi updateMulti in assets/traiettoria.js) -->
+        <p class="tw-hint tw-multi" id="twMultiBar" hidden><span id="twMultiInfo"></span><button type="button" class="tw-link" id="twMultiOff" data-i18n="twMultiOff">Una sola partenza</button></p>
 
         <div class="tw-acts">
           <button type="submit" class="btn primary" data-i18n="twRun">Calcola la traiettoria</button>
@@ -871,7 +875,7 @@
       </div>
 
       <div class="map-frame reveal d1">
-        <iframe id="mapFrame" src="mappe/uru2000_footprint.html?v=173"
+        <iframe id="mapFrame" src="mappe/uru2000_footprint.html?v=174"
                 title="Mappa interattiva dei 600 punti di atterraggio simulati con le ellissi di dispersione"
                 loading="lazy"></iframe>
       </div>
@@ -1400,12 +1404,12 @@
   };
 })();
 </script>
-<script src="assets/i18n.js?v=173"></script>
-<script src="assets/sonda.js?v=173"></script>
-<script src="assets/catena.js?v=173"></script>
-<script src="assets/spot.js?v=173"></script>
-<script src="assets/app.js?v=173"></script>
-<script src="assets/msis.js?v=173"></script>
-<script src="assets/traiettoria.js?v=173"></script>
+<script src="assets/i18n.js?v=174"></script>
+<script src="assets/sonda.js?v=174"></script>
+<script src="assets/catena.js?v=174"></script>
+<script src="assets/spot.js?v=174"></script>
+<script src="assets/app.js?v=174"></script>
+<script src="assets/msis.js?v=174"></script>
+<script src="assets/traiettoria.js?v=174"></script>
 </body>
 </html>

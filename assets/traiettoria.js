@@ -76,7 +76,8 @@ const elWhere = $("#twWhere"), elSugg = $("#twSugg"), elGeo = $("#twGeo"),
       elWeekBtn = $("#twWeekBtn"), elWeekBox = $("#twWeekBox"), elWeekBody = $("#twWeekBody"),
       elToDay = $("#twToDay"), elToTime = $("#twToTime"), elEvery = $("#twEvery"), elLegend = $("#twLegendTxt"),
       elErrOn = $("#twErrOn"), elErrSig = $("#twErrSig"), elErrAsc = $("#twErrAsc"), elErrDesc = $("#twErrDesc"),
-      elFcOn = $("#twFcOn");
+      elFcOn = $("#twFcOn"),
+      elMultiBar = $("#twMultiBar"), elMultiInfo = $("#twMultiInfo"), elMultiOff = $("#twMultiOff");
 
 /* ---------- Testi: seguono la lingua scelta nel sito ---------- */
 function lang(){ return document.documentElement.lang || "it"; }
@@ -379,8 +380,8 @@ function flightParams(iso, hhmm){
 let launch = null;            /* {name, lat, lon} */
 let map = null, layer = null, launchMk = null, mapReady = null, mapkit = null;   /* la mappa nasce dopo */
 let last = null;          /* ultimo calcolo, per ridisegnare al cambio di lingua */
-let m3 = null, m3Ready = null, elMap3 = null, view3 = false, shown = null, viewA = null;   /* vista 3D (assets/map3d.js): nasce solo se la si sceglie; shown = cio' che e' a schermo */
-const KEY_VIEW = "cometa-vista-v1";
+let view = null, shown = null;   /* vista 3D (assets/map3d.js): il pulsante 2D/3D; shown = cio' che e' a schermo */
+function c3(){ return view && view.isOn() ? view.ctl() : null; }   /* la mappa 3D, se e' quella a vista */
 let week = null;          /* confronto dei prossimi giorni: {iso: risultato} */
 /* Risultati di un altro luogo non devono restare a schermo */
 function clearResults(){
@@ -388,7 +389,7 @@ function clearResults(){
   elRes.innerHTML = ""; elWeekBody.innerHTML = ""; elWeekBox.hidden = true;
   if(layer) layer.clearLayers();
   shown = null;
-  if(m3) m3.render(null, false);
+  if(c3()) c3().render(null, false);
   if(elLegend){ elLegend.setAttribute("data-i18n", "twLegend"); elLegend.textContent = t("twLegend"); }
 }
 function saveLaunch(){
@@ -705,15 +706,21 @@ function loadLeaflet(){
      parallelo con leaflet.js. */
   const mapkit = window.COMETA_MAPKIT ? Promise.resolve() : new Promise(function(ok, ko){
     const s = document.createElement("script");
-    s.src = "assets/mapkit.js?v=173";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
+    s.src = "assets/mapkit.js?v=174";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
     s.onload = ok; s.onerror = ko;
     document.head.appendChild(s);
   });
-  return Promise.all([leaflet, mapkit]);
+  const map3d = window.COMETA_MAP3D ? Promise.resolve() : new Promise(function(ok){
+    const s = document.createElement("script");
+    s.src = "assets/map3d.js?v=174";
+    s.onload = ok; s.onerror = ok;       /* senza, resta il 2D e basta */
+    document.head.appendChild(s);
+  });
+  return Promise.all([leaflet, mapkit, map3d]);
 }
 function placeLaunchMarker(pan){
   const L = window.L;
-  if(m3) m3.setLaunch(launch, pan && view3);
+  if(view && view.ctl()) view.ctl().setLaunch(launch, pan && view.isOn());
   if(!launch){ if(launchMk){ launchMk.remove(); launchMk = null; } return; }
   if(!launchMk){
     launchMk = L.marker([launch.lat, launch.lon], {
@@ -741,18 +748,6 @@ function ensureMap(){
     }).addTo(map);
     L.control.scale({imperial:false, position:"bottomright"}).addTo(map);  // sopra l'attribuzione, non accanto: da telefono l'attribuzione (lunga col satellite Esri) va su piu' righe e copriva la scala in basso a sinistra
     mapkit = window.COMETA_MAPKIT && window.COMETA_MAPKIT.enhance(map, L, elMap, street, {onSave: exportPng});
-    /* 2D / 3D: un pulsante a testo (non un'icona: "3D" si capisce da solo) accanto allo schermo intero */
-    const View = L.Control.extend({
-      options: {position: "topleft"},
-      onAdd: function(){
-        const div = L.DomUtil.create("div", "leaflet-bar mk-view");
-        viewA = L.DomUtil.create("a", "", div);
-        viewA.href = "#"; viewA.textContent = "3D"; viewA.title = t("mkView3d");
-        L.DomEvent.on(viewA, "click", L.DomEvent.stop).on(viewA, "click", function(){ setView(true); });
-        return div;
-      }
-    });
-    new View().addTo(map);
     L.polygon(EXCL.map(function(p){ return [p[1], p[0]]; }),
               {color:"#FF7A5C", weight:1.5, fillColor:"#FF7A5C", fillOpacity:.16, interactive:false}).addTo(map);
     /* Fascia di piu' partenze: i poligoni si disegnano opachi in un pannello
@@ -774,70 +769,49 @@ function ensureMap(){
        un'animazione che, finendo dopo, annullerebbe il primo disegno */
     if(launch) map.setView([launch.lat, launch.lon], 8);
     else map.fitBounds([[-35.1,-58.6],[-30.1,-53.1]]);
-    if(loadView() === "3d") setView(true, true);
+    /* 2D / 3D: pulsante accanto allo schermo intero; la scelta si ricorda */
+    if(window.COMETA_MAP3D) view = window.COMETA_MAP3D.attach({
+      L:L, map:map, elMap:elMap, el3Class:"tw-canvas",
+      create:{
+        color:COL, excl:EXCL,
+        onPick:function(lat, lon){ setLaunch({lat:lat, lon:lon}); },
+        onDrag:function(lat, lon){ setLaunch({lat:lat, lon:lon}); },
+        onSave:info3d, onSaveError:function(){ setStatus(t("twPngErr"), true); }
+      },
+      onEnter:function(c){
+        c.setLaunch(launch, false);
+        if(shown) c.render(scene3d(shown), true);
+        else { c.render(null, false); const ctr = map.getCenter(); c.jump(ctr.lat, ctr.lng, map.getZoom()); }
+      },
+      onLeave:function(){      /* il 2D non si e' inquadrato mentre era nascosto */
+        if(shown){ if(shown.band) drawBand(shown, false); else draw(shown, false); }
+      },
+      onFail:function(){ setStatus(t("mk3dFail"), true); }
+    });
   });
   return mapReady;
 }
 /* ---------- Vista 3D ----------
    Stesso calcolo, stessi risultati: cambia solo chi li disegna. Il 2D
    (Leaflet) resta sempre aggiornato; il 3D (MapLibre, assets/map3d.js)
-   si crea alla prima richiesta e da li' segue show(). La scelta si
-   ricorda fra una visita e l'altra. */
-function loadView(){ try { return localStorage.getItem(KEY_VIEW); } catch(e){ return null; } }
-function saveView(v){ try { localStorage.setItem(KEY_VIEW, v); } catch(e){ /* navigazione privata */ } }
-function loadMap3dScript(){
-  if(window.COMETA_MAP3D) return Promise.resolve();
-  return new Promise(function(ok, ko){
-    const s = document.createElement("script");
-    s.src = "assets/map3d.js?v=173";
-    s.onload = ok; s.onerror = ko;
-    document.head.appendChild(s);
-  });
-}
-function ensure3d(){
-  if(m3Ready) return m3Ready;
-  if(!elMap3){
-    elMap3 = document.createElement("div");
-    elMap3.className = "tw-canvas";
-    elMap3.setAttribute("role", "application");
-    elMap.parentNode.insertBefore(elMap3, elMap.nextSibling);
+   si crea alla prima richiesta e da li' segue show(). Il pulsante 2D/3D
+   e la scelta ricordata stanno in COMETA_MAP3D.attach(). */
+/* Titolo e righe della striscia sotto l'immagine 3D salvata */
+function info3d(){
+  const x = shown, name = launch ? launch.name : "";
+  let title = "COMETA · " + name, lines = [], day = elDate.value;
+  if(x && x.band){
+    const ok = x.list.filter(function(r){ return r.ok; });
+    title += " · " + t("twNFlights").toLowerCase() + " " + ok.length;
+  } else if(x && x.ok){
+    title += " · " + fmtTime(x.pts[0].t, true) + (x.run ? " · GFS " + fmtTime(x.run, true) : "");
+    day = isoDay(x.pts[0].t);
+    lines.push(t("twDrift") + " " + num(x.drift, 0) + " km · " + t("twBear") + " " + num(x.bear, 0) + "° · " +
+      t("twBurstC") + " " + num(x.burst.alt/1000, 1) + " km · " + t("twDur") + " " + num(x.dur, 0) + " min");
+    lines.push(t("twLand") + " " + num(x.end.lat, 4) + ", " + num(x.end.lon, 4) + " · Tawhiri (SondeHub) · NOAA GFS");
   }
-  m3Ready = loadMap3dScript().then(function(){
-    return window.COMETA_MAP3D.create({
-      container:elMap3, color:COL, excl:EXCL,
-      onToggle:function(){ setView(false); },
-      onPick:function(lat, lon){ setLaunch({lat:lat, lon:lon}); },
-      onDrag:function(lat, lon){ setLaunch({lat:lat, lon:lon}); }
-    });
-  }).then(function(c){ m3 = c; return c; }, function(e){ m3Ready = null; throw e; });
-  return m3Ready;
-}
-function setView(on, noSave){
-  if(!!on === view3) return;
-  if(document.fullscreenElement) document.exitFullscreen();
-  if(on){
-    view3 = true;
-    elMap.hidden = true;
-    if(elMap3) elMap3.hidden = false;
-    ensure3d().then(function(c){
-      /* il contenitore e' appena diventato visibile: MapLibre va avvisato */
-      c.resize(); c.relabel();
-      c.setLaunch(launch, false);
-      if(shown) c.render(scene3d(shown), true);
-      else { c.render(null, false); const ctr = map.getCenter(); c.jump(ctr.lat, ctr.lng, map.getZoom()); }
-    }, function(){
-      view3 = false; elMap.hidden = false; if(elMap3) elMap3.hidden = true;
-      map.invalidateSize();
-      setStatus(t("mk3dFail"), true);
-    });
-  } else {
-    view3 = false;
-    if(elMap3) elMap3.hidden = true;
-    elMap.hidden = false;
-    map.invalidateSize();
-    if(shown){ if(shown.band) drawBand(shown, false); else draw(shown, false); }   /* il 2D non si e' inquadrato mentre era nascosto */
-  }
-  if(!noSave) saveView(on ? "3d" : "2d");
+  return {title:title, lines:lines,
+    filename:"cometa-traiettoria-3d-" + (name || "mappa").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") + "-" + day};
 }
 /* I risultati di show() come li vuole map3d.js: [lon, lat] ovunque */
 function scene3d(x){
@@ -847,12 +821,14 @@ function scene3d(x){
     const ok = x.list.filter(function(r){ return r.ok; });
     if(!ok.length) return null;
     if(ok.length < 2) return scene3d(ok[0]);
-    const g = bandGeom(ok), AMB = "#FFB84D";
+    const g = bandGeom(ok, 120), AMB = "#FFB84D";      /* piu' fette del 2D: in 3D i gradini della quota si vedono */
     return {
       runs:ok, main:false,
-      extr:g.slices.map(function(h){ return {ring:h}; }),
-      fills:g.land.length >= 3 ? [{ring:g.land, color:AMB, opacity:.55}] : [],
-      lines:g.land.length < 3 ? [{coords:g.land, color:AMB, width:8}] : []
+      extr:g.slices.map(function(s){
+        return {ring:s.ring.map(function(p){ return [p[0], p[1]]; }), base:Math.max(0, s.lo - 60), top:s.hi + 60, color:s.up ? COL : AMB};
+      }),
+      fills:g.land.length >= 3 ? [{ring:g.land.map(function(p){ return [p[0], p[1]]; }), color:AMB, opacity:.55}] : [],
+      lines:g.land.length < 3 ? [{coords:g.land.map(function(p){ return [p[0], p[1]]; }), color:AMB, width:8}] : []
     };
   }
   if(!x.ok) return null;
@@ -1034,7 +1010,7 @@ function resample(r, N){
     while(j < P.length - 2 && P[j + 1].t.getTime() < tt) j++;
     const a = P[j], b = P[j + 1], span = b.t - a.t;
     const f = span > 0 ? Math.min(1, Math.max(0, (tt - a.t)/span)) : 0;
-    out.push([a.lon + f*(b.lon - a.lon), a.lat + f*(b.lat - a.lat)]);
+    out.push([a.lon + f*(b.lon - a.lon), a.lat + f*(b.lat - a.lat), a.alt + f*(b.alt - a.alt)]);
   }
   return out;
 }
@@ -1053,11 +1029,18 @@ function hull(P){      /* catena monotona di Andrew, punti [x, y] */
 }
 /* Geometria della fascia, comune a 2D e 3D: le «fette» e l'area di
    atterraggio, come liste di [lon, lat] */
-function bandGeom(ok){
-  const R = ok.map(function(r){ return resample(r, FETTE); }), slices = [];
-  for(let k = 0; k < FETTE; k++){
-    const h = hull(R.map(function(r){ return r[k]; }).concat(R.map(function(r){ return r[k + 1]; })));
-    if(h.length >= 3) slices.push(h);
+function bandGeom(ok, N){
+  N = N || FETTE;
+  const R = ok.map(function(r){ return resample(r, N); }), slices = [];
+  /* quanta parte del volo e' salita, in media: serve per colorare le fette in 3D */
+  const fb = ok.reduce(function(a, r){ return a + (r.dur > 0 ? r.tBurst/r.dur : .5); }, 0)/ok.length;
+  for(let k = 0; k < N; k++){
+    const P = R.map(function(r){ return r[k]; }).concat(R.map(function(r){ return r[k + 1]; }));
+    const h = hull(P);
+    if(h.length < 3) continue;
+    let lo = Infinity, hi = -Infinity;
+    P.forEach(function(p){ lo = Math.min(lo, p[2]); hi = Math.max(hi, p[2]); });
+    slices.push({ring:h, lo:lo, hi:hi, up:(k + .5)/N < fb});
   }
   return {slices:slices, land:hull(ok.map(function(r){ return [r.end.lon, r.end.lat]; }))};
 }
@@ -1068,7 +1051,8 @@ function drawBand(x, noFit){
   const g = bandGeom(ok);
   const bb = L.latLngBounds([[x.from.lat, x.from.lon]]);
   const ll = function(p){ return [p[1], p[0]]; };
-  g.slices.forEach(function(h){
+  g.slices.forEach(function(sl){
+    const h = sl.ring;
     L.polygon(h.map(ll), {pane:"twBand", color:COL, weight:2, opacity:1, fillColor:COL, fillOpacity:1, interactive:false}).addTo(layer);
     h.forEach(function(p){ bb.extend(ll(p)); });
   });
@@ -1127,13 +1111,13 @@ function show(x, noFit){
   const band = !!(x && x.band);
   if(elLegend){ elLegend.setAttribute("data-i18n", band ? "twLegendBand" : "twLegend"); elLegend.textContent = t(band ? "twLegendBand" : "twLegend"); }
   shown = x || null;
-  if(band){ renderBand(x); statusDone(x.list); if(map) drawBand(x, noFit || view3); }
+  if(band){ renderBand(x); statusDone(x.list); if(map) drawBand(x, noFit || !!(view && view.isOn())); }
   else {
-    renderCard(x); statusDone([x]); if(map) draw(x, noFit || view3);
+    renderCard(x); statusDone([x]); if(map) draw(x, noFit || !!(view && view.isOn()));
     if(x && x.ok) fcWarn(x);
     if(elLegend && x && x.spread) elLegend.textContent = legendLand(x.spread);
   }
-  if(view3 && m3) m3.render(scene3d(x), !noFit);
+  if(c3()) c3().render(scene3d(x), !noFit);
 }
 
 /* ---------- Risultati ---------- */
@@ -1197,6 +1181,26 @@ function launchList(){
   if(list.length > MAX_VOLI) return {err:"twTooMany", n:list.length};
   return {list:list};
 }
+
+/* Più partenze: si attivano da sole quando si sceglie un «fino a» (giorno o
+   ora); finche' sono attive compare una riga sopra il pulsante di calcolo
+   che dice quante sono e permette di tornare a una sola con un tocco. */
+function updateMulti(){
+  if(!elMultiBar) return;
+  const active = !!((elToDay && elToDay.value) || (elToTime && elToTime.value));
+  if(!active || !elDate.value || !elTime.value){ elMultiBar.hidden = true; return; }
+  const LL = launchList();
+  elMultiInfo.textContent = LL.err ? t(LL.err).replace("{n}", LL.n).replace("{m}", MAX_VOLI)
+    : t("twMultiN").replace("{n}", LL.list.length);
+  elMultiBar.hidden = !LL.err && LL.list.length < 2;
+}
+[elDate, elTime, elToDay, elToTime, elEvery].forEach(function(e){
+  if(e){ e.addEventListener("input", updateMulti); e.addEventListener("change", updateMulti); }
+});
+if(elMultiOff) elMultiOff.addEventListener("click", function(){
+  elToDay.value = ""; elToTime.value = "";
+  updateMulti();
+});
 
 /* Prima di calcolare: un luogo scelto (o coordinate appena scritte) e parametri validi */
 function ready(){
@@ -1508,8 +1512,8 @@ function exportPng(){
 function relabel(){
   elWhere.placeholder = t("twWherePh");
   renderBalloon();
-  if(viewA) viewA.title = t("mkView3d");
-  if(m3) m3.relabel();
+  if(view) view.relabel();
+  updateMulti();
   if(last) show(last, true);
   renderWeek();
 }
