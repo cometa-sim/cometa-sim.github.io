@@ -146,9 +146,13 @@ window.COMETA_MAP3D = (function(){
     runs.forEach(function(r){
       feats = feats.concat(tubeFeats(r.pts, sc.main ? hwMain : hwThin, sc.main ? 0 : 1, col.up, col.down));
     });
-    if(live){
-      const c = sc.live.color || "#4ADE9B";
-      feats = feats.concat(tubeFeats(live.map(function(p){ return {lat:p.lat, lon:p.lon, alt:p.alt || 0, up:true}; }), hwMain, 0, c, c));
+    if(live){      /* un cubetto per ogni fix GPS con la quota: nessuna linea fra un fix e l'altro */
+      const c = sc.live.color || "#4ADE9B", hp = hwMain*1.3;
+      live.forEach(function(p, k){
+        if(p.alt == null) return;
+        const s = k === live.length - 1 ? hp*1.8 : hp;
+        feats.push(box(p.lat, p.lon, s, Math.max(0, p.alt - s), p.alt + s, {m:0, c:c}));
+      });
     }
     return {type:"FeatureCollection", features:feats};
   }
@@ -159,6 +163,8 @@ window.COMETA_MAP3D = (function(){
     const mk = window.COMETA_MAPKIT || {};
     const ICONS = mk.ICONS || {};
     const lang = document.documentElement.lang;
+    /* Dispositivo touch (telefono, tablet): puntatore "grossolano" */
+    const touch = !!(window.matchMedia && window.matchMedia("(pointer: coarse)").matches);
     const col = {up:o.color, down:o.colorDown || "#FFB84D"};
     const PITCH = 70;           /* inclinazione della vista laterale */
 
@@ -170,7 +176,8 @@ window.COMETA_MAP3D = (function(){
         dem:DEM, hill:DEM,
         excl:{type:"geojson", data:o.excl ? {type:"Feature", properties:{}, geometry:{type:"Polygon", coordinates:[o.excl.concat([o.excl[0]])]}} : empty()},
         fills:{type:"geojson", data:empty()}, band:{type:"geojson", data:empty()},
-        lines:{type:"geojson", data:empty()}, shadow:{type:"geojson", data:empty()}, tube:{type:"geojson", data:empty()}
+        lines:{type:"geojson", data:empty()}, shadow:{type:"geojson", data:empty()}, tube:{type:"geojson", data:empty()},
+        livepts:{type:"geojson", data:empty()}
       },
       layers:[
         {id:"bg", type:"background", paint:{"background-color":"#02060f"}},
@@ -186,6 +193,9 @@ window.COMETA_MAP3D = (function(){
         /* proiezione a terra: piena in salita, tratteggiata in discesa, come nel 2D */
         {id:"shadow", type:"line", source:"shadow", filter:["==",["get","d"],0], paint:{"line-color":"#ffffff", "line-width":1.8, "line-opacity":.85}},
         {id:"shadowd", type:"line", source:"shadow", filter:["==",["get","d"],1], paint:{"line-color":"#ffffff", "line-width":1.8, "line-opacity":.85, "line-dasharray":[3,3]}},
+        /* Diretta: proiezione a terra di ogni fix GPS */
+        {id:"livepts", type:"circle", source:"livepts", paint:{"circle-radius":3.5, "circle-color":["get","c"],
+          "circle-stroke-color":"#02060f", "circle-stroke-width":1, "circle-pitch-alignment":"map"}},
         /* fascia di piu' partenze: prismi alti quanto l'escursione di quota dei voli in quell'istante;
            l'opacita' si applica all'insieme (come il pannello trasparente del 2D), le sovrapposizioni non si sommano */
         {id:"band", type:"fill-extrusion", source:"band", paint:{"fill-extrusion-color":["get","c"], "fill-extrusion-height":["get","h"], "fill-extrusion-base":["get","b"], "fill-extrusion-opacity":.38, "fill-extrusion-vertical-gradient":false}},
@@ -194,12 +204,18 @@ window.COMETA_MAP3D = (function(){
         {id:"tube", type:"fill-extrusion", source:"tube", filter:["==",["get","m"],0],
          paint:{"fill-extrusion-color":["get","c"], "fill-extrusion-height":["get","h"], "fill-extrusion-base":["get","b"], "fill-extrusion-opacity":.96}}
       ],
-      terrain:{source:"dem", exaggeration:1.5}
+      terrain:{source:"dem", exaggeration:1.5},
+      sky:{"sky-color":"#0e2a4a", "horizon-color":"#6f93b8", "fog-color":"#a9c2dc", "sky-horizon-blend":.5, "horizon-fog-blend":.6, "fog-ground-blend":.8}
     };
 
     const map = new ml.Map({
       container:o.container, style:style, center:[-56, -33], zoom:5.5, pitch:55, maxPitch:80,
-      cooperativeGestures:true, locale:GESTURES[lang] || GESTURES.it,
+      /* Da computer: rotella solo con ctrl (la pagina scorre normalmente).
+         Da telefono niente gesti "cooperativi": un dito sposta la mappa,
+         due dita avvicinate/allontanate zoomano e ruotano, due dita
+         trascinate insieme in alto o in basso cambiano l'inclinazione
+         (touchPitch, attivo di suo in MapLibre). */
+      cooperativeGestures:!touch, touchPitch:true, locale:GESTURES[lang] || GESTURES.it,
       attributionControl:{compact:true}, canvasContextAttributes:{antialias:true}
     });
     map.addControl(new ml.NavigationControl({visualizePitch:true}), "top-right");
@@ -340,7 +356,7 @@ window.COMETA_MAP3D = (function(){
     const sideCtl = button(ICON_CUBE, d.mk3dSide || "Vista laterale", function(){ fit(); }, "mk-side");
     map.addControl(sideCtl, "top-right");
 
-    /* Inclinazione con due pulsanti: da telefono il gesto a due dita verticali e' difficile da scoprire */
+    /* Inclinazione con due pulsanti, solo da telefono/tablet (da computer basta ctrl + trascina) */
     const tiltWrap = document.createElement("div");
     tiltWrap.className = "maplibregl-ctrl maplibregl-ctrl-group mk-tilt";
     const tiltUp = document.createElement("button"), tiltDown = document.createElement("button");
@@ -352,7 +368,7 @@ window.COMETA_MAP3D = (function(){
       });
       tiltWrap.appendChild(a[0]);
     });
-    map.addControl({onAdd:function(){ return tiltWrap; }, onRemove:function(){ tiltWrap.remove(); }}, "top-right");
+    if(touch) map.addControl({onAdd:function(){ return tiltWrap; }, onRemove:function(){ tiltWrap.remove(); }}, "top-right");
 
     /* ----- marcatori ----- */
     function dot(color){
@@ -427,8 +443,11 @@ window.COMETA_MAP3D = (function(){
       map.getSource("lines").setData({type:"FeatureCollection", features:(sc && sc.lines || []).map(function(f){
         return {type:"Feature", properties:{c:f.color, w:f.width}, geometry:{type:"LineString", coordinates:f.coords}};
       })});
-      const ground = runs.map(function(r){ return r.pts; });
-      if(sc && sc.live && sc.live.pts && sc.live.pts.length > 1) ground.push(sc.live.pts);
+      const ground = runs.map(function(r){ return r.pts; });     /* solo le traiettorie: i fix GPS restano punti */
+      const lc = sc && sc.live && sc.live.color || "#4ADE9B";
+      map.getSource("livepts").setData({type:"FeatureCollection", features:(sc && sc.live && sc.live.pts || []).map(function(p){
+        return {type:"Feature", properties:{c:lc}, geometry:{type:"Point", coordinates:[p.lon, p.lat]}};
+      })});
       const gl = [];
       ground.forEach(function(L){
         const up = L.filter(function(p){ return p.up !== false; }), down = L.filter(function(p){ return p.up === false; });

@@ -194,13 +194,13 @@ window.COMETA_SPOT = (function(){
     });
     const mapkit = window.COMETA_MAPKIT ? Promise.resolve() : new Promise(function(ok, ko){
       const s = document.createElement("script");
-      s.src = "assets/mapkit.js?v=175";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
+      s.src = "assets/mapkit.js?v=176";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
       s.onload = ok; s.onerror = ko;
       document.head.appendChild(s);
     });
     const map3d = window.COMETA_MAP3D ? Promise.resolve() : new Promise(function(ok){
       const s = document.createElement("script");
-      s.src = "assets/map3d.js?v=175";
+      s.src = "assets/map3d.js?v=176";
       s.onload = ok; s.onerror = ok;     // senza, resta il 2D e basta
       document.head.appendChild(s);
     });
@@ -281,14 +281,12 @@ window.COMETA_SPOT = (function(){
     return mapReady;
   }
 
-  /* Cio' che il 3D deve mostrare: la traccia GPS vera (verde, con la quota di
-     ogni punto: dove manca, resta l'ultima nota) e la traiettoria prevista
-     (grigia, piu' sottile e trasparente). */
+  /* Cio' che il 3D deve mostrare: i fix GPS veri (verdi, uno per uno, alla
+     loro quota; un fix arrivato senza quota resta solo come punto a terra)
+     e la traiettoria prevista (grigia, piu' sottile e trasparente). */
   function scene3d(){
-    let a = 0;
     const live = (lastPoints || []).map(function(p){
-      if(p.alt != null) a = Math.max(0, p.alt);
-      return {lat:p.lat, lon:p.lon, alt:a};
+      return {lat:p.lat, lon:p.lon, alt:p.alt != null ? Math.max(0, p.alt) : null};
     });
     return {
       runs:trajFull ? [{pts:trajFull}] : [], main:false, col:{up:GREY, down:GREY},
