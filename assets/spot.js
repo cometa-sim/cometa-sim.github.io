@@ -193,7 +193,7 @@ window.COMETA_SPOT = (function(){
     });
     const mapkit = window.COMETA_MAPKIT ? Promise.resolve() : new Promise(function(ok, ko){
       const s = document.createElement("script");
-      s.src = "assets/mapkit.js?v=167";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
+      s.src = "assets/mapkit.js?v=170";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
       s.onload = ok; s.onerror = ko;
       document.head.appendChild(s);
     });
@@ -516,10 +516,10 @@ window.COMETA_SPOT = (function(){
      e tre gocce, vento): soglie semplici su nuvolosita', probabilita' di
      pioggia e vento a terra, non un vero simbolo meteorologico. SVG
      inline, stesso motivo delle icone di mapkit.js (un'emoji dipende dal
-     font del sistema). Il vento vince su sole/nuvola (ma non su pioggia)
-     perche' e' il primo motivo per cui si rimanda un lancio quando non
-     piove: 24 km/h e' la soglia citata piu' spesso nelle guide amatoriali
-     ai palloni stratosferici, non un limite calcolato da noi. */
+     font del sistema). Ordine di priorita': pioggia (debole o forte),
+     cielo coperto, vento, parzialmente nuvoloso, sole. 24 km/h e' la
+     soglia citata piu' spesso nelle guide amatoriali ai palloni
+     stratosferici, non un limite calcolato da noi. */
   const W_ICON_SUN = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.5"/><path d="M12 2.5v2.5M12 19v2.5M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M2.5 12h2.5M19 12h2.5M4.6 19.4l1.8-1.8M17.6 6.4l1.8-1.8"/></svg>';
   const W_ICON_PARTLY = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 5.5a4 4 0 0 1 7.4 2.1"/><path d="M17.5 20H8a4 4 0 1 1 1.3-7.8 5 5 0 0 1 9.6 2A3.5 3.5 0 0 1 17.5 20Z"/></svg>';
   const W_ICON_CLOUD = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H8a4 4 0 1 1 1.3-7.8 5 5 0 0 1 9.6 2A3.5 3.5 0 0 1 17.5 19Z"/></svg>';
@@ -530,8 +530,8 @@ window.COMETA_SPOT = (function(){
   function weatherIcon(cloudPct, rainPct, windKmh){
     if(rainPct >= 60) return W_ICON_RAIN;
     if(rainPct >= 25) return W_ICON_DRIZZLE;
-    if(windKmh >= W_WIND_STRONG_KMH) return W_ICON_WIND;
     if(cloudPct >= 85) return W_ICON_CLOUD;
+    if(windKmh >= W_WIND_STRONG_KMH) return W_ICON_WIND;
     if(cloudPct >= 50) return W_ICON_PARTLY;
     return W_ICON_SUN;
   }
@@ -542,6 +542,11 @@ window.COMETA_SPOT = (function(){
      Il punto e' sempre quello fisso del lancio (window.COMETA_FLIGHT.site),
      non scelto da chi guarda. La previsione arriva a 16 giorni: prima di
      allora quell'ora non c'e' e il riquadro resta nascosto. */
+  /* Come cloudsTip in assets/traiettoria.js: i tre strati nel title, in inglese. */
+  function cloudsTip(h, i){
+    const g = function(k){ return h[k] && h[k][i] != null ? Math.round(h[k][i]) + " %" : "—"; };
+    return h.cloud_cover_low ? "low " + g("cloud_cover_low") + " · mid " + g("cloud_cover_mid") + " · high " + g("cloud_cover_high") : "";
+  }
   function loadWeather(){
     const el = document.getElementById("dirWeather"), L0 = window.COMETA_LAUNCH;
     if(!el || !L0) return;
@@ -554,7 +559,7 @@ window.COMETA_SPOT = (function(){
     const key = iso + "T" + String(hh).padStart(2, "0") + ":00";
     const q = new URLSearchParams({
       latitude: site.lat.toFixed(4), longitude: site.lon.toFixed(4),
-      hourly: "temperature_2m,cloud_cover,wind_speed_10m,precipitation_probability",
+      hourly: "temperature_2m,cloud_cover,cloud_cover_low,cloud_cover_mid,cloud_cover_high,wind_speed_10m,precipitation_probability",
       start_date: iso, end_date: iso, timezone: TZ
     });
     fetch(METEO + "?" + q.toString())
@@ -566,7 +571,9 @@ window.COMETA_SPOT = (function(){
         const rain = h.precipitation_probability ? h.precipitation_probability[i] : null;
         document.getElementById("dirWTemp").textContent = Math.round(h.temperature_2m[i]) + "°C";
         document.getElementById("dirWWind").innerHTML = Math.round(h.wind_speed_10m[i]) + "<small>km/h</small>";
-        document.getElementById("dirWClouds").textContent = Math.round(h.cloud_cover[i]) + "%";
+        const tile = document.getElementById("dirWClouds"), tip = cloudsTip(h, i);
+        tile.textContent = Math.round(h.cloud_cover[i]) + "%";
+        if(tip) tile.parentNode.title = tip; else tile.parentNode.removeAttribute("title");
         document.getElementById("dirWRain").textContent = rain == null ? "—" : Math.round(rain) + "%";
         document.getElementById("dirWIcon").innerHTML = weatherIcon(h.cloud_cover[i], rain || 0, h.wind_speed_10m[i]);
       })
