@@ -414,12 +414,12 @@ function setLaunch(pl, keepText, noSave){
    pioggia e vento a terra, non un vero simbolo meteorologico — bastano a
    dare un'idea d'insieme accanto ai numeri. SVG inline per lo stesso
    motivo delle icone di mapkit.js: un'emoji dipende dal font del
-   sistema. Il vento vince su sole/nuvola (ma non su pioggia: un
-   temporale ventoso resta prima di tutto un temporale) perche' e' il
-   primo motivo per cui si rimanda un lancio quando non piove: 24 km/h
-   e' la soglia citata piu' spesso nelle guide amatoriali ai palloni
-   stratosferici, non un limite calcolato da noi — da adattare se la
-   scuola ne segue uno diverso. */
+   sistema. Ordine di priorita': pioggia (debole o forte), cielo coperto,
+   vento, parzialmente nuvoloso, sole. Il vento vince su sole e su
+   parzialmente nuvoloso, ma non su pioggia e cielo coperto: la copertura
+   conta di piu' per decidere se partire. 24 km/h e' la soglia citata piu'
+   spesso nelle guide amatoriali ai palloni stratosferici, non un limite
+   calcolato da noi — da adattare se la scuola ne segue uno diverso. */
 const W_ICON_SUN = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4.5"/><path d="M12 2.5v2.5M12 19v2.5M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M2.5 12h2.5M19 12h2.5M4.6 19.4l1.8-1.8M17.6 6.4l1.8-1.8"/></svg>';
 const W_ICON_PARTLY = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 5.5a4 4 0 0 1 7.4 2.1"/><path d="M17.5 20H8a4 4 0 1 1 1.3-7.8 5 5 0 0 1 9.6 2A3.5 3.5 0 0 1 17.5 20Z"/></svg>';
 const W_ICON_CLOUD = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H8a4 4 0 1 1 1.3-7.8 5 5 0 0 1 9.6 2A3.5 3.5 0 0 1 17.5 19Z"/></svg>';
@@ -430,8 +430,8 @@ const W_WIND_STRONG_KMH = 24;   // soglia "vento forte": vedi commento sopra
 function weatherIcon(cloudPct, rainPct, windKmh){
   if(rainPct >= 60) return W_ICON_RAIN;
   if(rainPct >= 25) return W_ICON_DRIZZLE;
-  if(windKmh >= W_WIND_STRONG_KMH) return W_ICON_WIND;
   if(cloudPct >= 85) return W_ICON_CLOUD;
+  if(windKmh >= W_WIND_STRONG_KMH) return W_ICON_WIND;
   if(cloudPct >= 50) return W_ICON_PARTLY;
   return W_ICON_SUN;
 }
@@ -699,7 +699,7 @@ function loadLeaflet(){
      parallelo con leaflet.js. */
   const mapkit = window.COMETA_MAPKIT ? Promise.resolve() : new Promise(function(ok, ko){
     const s = document.createElement("script");
-    s.src = "assets/mapkit.js?v=169";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
+    s.src = "assets/mapkit.js?v=170";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
     s.onload = ok; s.onerror = ko;
     document.head.appendChild(s);
   });
