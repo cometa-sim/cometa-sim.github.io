@@ -38,7 +38,6 @@ window.COMETA_MAP3D = (function(){
 
   const VENDOR = "assets/vendor/maplibre/";
   const M_LAT = 111320, RAD = Math.PI/180;
-  const KEY_VIEW = "cometa-vista-v1";
   const TILES_OSM = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
   const ATTR_OSM = '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>';
   const DEM = {
@@ -147,11 +146,6 @@ window.COMETA_MAP3D = (function(){
     runs.forEach(function(r){
       feats = feats.concat(tubeFeats(r.pts, sc.main ? hwMain : hwThin, sc.main ? 0 : 1, col.up, col.down));
     });
-    if(sc.main && runs[0]){      /* scoppio: cubo bianco + colonna sottile fino a terra */
-      const b = runs[0].burst, big = hwMain*2.6;
-      feats.push(box(b.lat, b.lon, big, Math.max(0, b.alt - big), b.alt + big, {m:0, c:"#ffffff"}));
-      feats.push(box(b.lat, b.lon, hwMain*.35, 0, Math.max(0, b.alt - big), {m:0, c:"#9fb4c8"}));
-    }
     if(live){
       const c = sc.live.color || "#4ADE9B";
       feats = feats.concat(tubeFeats(live.map(function(p){ return {lat:p.lat, lon:p.lon, alt:p.alt || 0, up:true}; }), hwMain, 0, c, c));
@@ -189,7 +183,9 @@ window.COMETA_MAP3D = (function(){
         {id:"fills-fill", type:"fill", source:"fills", paint:{"fill-color":["get","c"], "fill-opacity":["get","o"]}},
         {id:"fills-line", type:"line", source:"fills", paint:{"line-color":["get","c"], "line-width":2.5}},
         {id:"lines", type:"line", source:"lines", layout:{"line-cap":"round", "line-join":"round"}, paint:{"line-color":["get","c"], "line-width":["get","w"]}},
-        {id:"shadow", type:"line", source:"shadow", paint:{"line-color":"#ffffff", "line-width":1.5, "line-opacity":.7, "line-dasharray":[2,2]}},
+        /* proiezione a terra: piena in salita, tratteggiata in discesa, come nel 2D */
+        {id:"shadow", type:"line", source:"shadow", filter:["==",["get","d"],0], paint:{"line-color":"#ffffff", "line-width":1.8, "line-opacity":.85}},
+        {id:"shadowd", type:"line", source:"shadow", filter:["==",["get","d"],1], paint:{"line-color":"#ffffff", "line-width":1.8, "line-opacity":.85, "line-dasharray":[3,3]}},
         /* fascia di piu' partenze: prismi alti quanto l'escursione di quota dei voli in quell'istante;
            l'opacita' si applica all'insieme (come il pannello trasparente del 2D), le sovrapposizioni non si sommano */
         {id:"band", type:"fill-extrusion", source:"band", paint:{"fill-extrusion-color":["get","c"], "fill-extrusion-height":["get","h"], "fill-extrusion-base":["get","b"], "fill-extrusion-opacity":.38, "fill-extrusion-vertical-gradient":false}},
@@ -433,9 +429,15 @@ window.COMETA_MAP3D = (function(){
       })});
       const ground = runs.map(function(r){ return r.pts; });
       if(sc && sc.live && sc.live.pts && sc.live.pts.length > 1) ground.push(sc.live.pts);
-      map.getSource("shadow").setData({type:"FeatureCollection", features:ground.map(function(L){
-        return {type:"Feature", properties:{}, geometry:{type:"LineString", coordinates:L.map(function(p){ return [p.lon, p.lat]; })}};
-      })});
+      const gl = [];
+      ground.forEach(function(L){
+        const up = L.filter(function(p){ return p.up !== false; }), down = L.filter(function(p){ return p.up === false; });
+        if(down.length && up.length) down.unshift(up[up.length - 1]);        /* la discesa parte dallo scoppio */
+        [[up, 0], [down, 1]].forEach(function(a){
+          if(a[0].length > 1) gl.push({type:"Feature", properties:{d:a[1]}, geometry:{type:"LineString", coordinates:a[0].map(function(p){ return [p.lon, p.lat]; })}});
+        });
+      });
+      map.getSource("shadow").setData({type:"FeatureCollection", features:gl});
       map.getSource("tube").setData(sc ? buildTubes(sc, sc.col || col) : empty());
       const first = runs[0];
       landMk = pin(landMk, "#FFB84D", first && sc.main ? [first.end.lon, first.end.lat] : null, sc && sc.labels && sc.labels.land);
@@ -481,7 +483,7 @@ window.COMETA_MAP3D = (function(){
         create (le opzioni di create(), senza container/onToggle),
         onEnter(ctl) quando si passa al 3D (contenitore gia' visibile e misurato),
         onLeave() quando si torna al 2D, onFail() se il 3D non parte.
-     Ritorna {set(on, noSave), isOn(), ctl(), relabel()}. */
+     Ritorna {set(on), isOn(), ctl(), relabel()}. Si parte sempre in 2D. */
   function attach(o){
     const L = o.L;
     let ctl = null, ready = null, el3 = null, on = false, a = null;
@@ -511,7 +513,7 @@ window.COMETA_MAP3D = (function(){
         .then(function(c){ ctl = c; return c; }, function(e){ ready = null; throw e; });
       return ready;
     }
-    function set(v, noSave){
+    function set(v){
       if(!!v === on) return;
       if(document.fullscreenElement) document.exitFullscreen();
       if(v){
@@ -533,11 +535,7 @@ window.COMETA_MAP3D = (function(){
         o.map.invalidateSize();
         if(o.onLeave) o.onLeave();
       }
-      if(!noSave){ try { localStorage.setItem(KEY_VIEW, v ? "3d" : "2d"); } catch(e){ /* navigazione privata */ } }
     }
-    let saved = null;
-    try { saved = localStorage.getItem(KEY_VIEW); } catch(e){ /* niente */ }
-    if(saved === "3d") set(true, true);
     return {
       set:set,
       isOn:function(){ return on; },

@@ -706,13 +706,13 @@ function loadLeaflet(){
      parallelo con leaflet.js. */
   const mapkit = window.COMETA_MAPKIT ? Promise.resolve() : new Promise(function(ok, ko){
     const s = document.createElement("script");
-    s.src = "assets/mapkit.js?v=174";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
+    s.src = "assets/mapkit.js?v=175";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
     s.onload = ok; s.onerror = ko;
     document.head.appendChild(s);
   });
   const map3d = window.COMETA_MAP3D ? Promise.resolve() : new Promise(function(ok){
     const s = document.createElement("script");
-    s.src = "assets/map3d.js?v=174";
+    s.src = "assets/map3d.js?v=175";
     s.onload = ok; s.onerror = ok;       /* senza, resta il 2D e basta */
     document.head.appendChild(s);
   });
@@ -773,7 +773,7 @@ function ensureMap(){
     if(window.COMETA_MAP3D) view = window.COMETA_MAP3D.attach({
       L:L, map:map, elMap:elMap, el3Class:"tw-canvas",
       create:{
-        color:COL, excl:EXCL,
+        color:COL, colorDown:COL, excl:EXCL,     /* tutta la traiettoria azzurra, anche la discesa */
         onPick:function(lat, lon){ setLaunch({lat:lat, lon:lon}); },
         onDrag:function(lat, lon){ setLaunch({lat:lat, lon:lon}); },
         onSave:info3d, onSaveError:function(){ setStatus(t("twPngErr"), true); }
@@ -825,7 +825,7 @@ function scene3d(x){
     return {
       runs:ok, main:false,
       extr:g.slices.map(function(s){
-        return {ring:s.ring.map(function(p){ return [p[0], p[1]]; }), base:Math.max(0, s.lo - 60), top:s.hi + 60, color:s.up ? COL : AMB};
+        return {ring:s.ring.map(function(p){ return [p[0], p[1]]; }), base:Math.max(0, s.lo - 60), top:s.hi + 60, color:COL};
       }),
       fills:g.land.length >= 3 ? [{ring:g.land.map(function(p){ return [p[0], p[1]]; }), color:AMB, opacity:.55}] : [],
       lines:g.land.length < 3 ? [{coords:g.land.map(function(p){ return [p[0], p[1]]; }), color:AMB, width:8}] : []
