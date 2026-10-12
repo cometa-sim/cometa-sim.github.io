@@ -445,6 +445,12 @@ function weatherIcon(cloudPct, rainPct, windKmh){
    risposta arrivata dopo quella di una richiesta piu' recente (cambi
    rapidi di data o di ora). */
 let weatherSeq = 0;
+/* Title del riquadro nuvole: i tre strati, sempre in inglese (low/mid/high)
+   in tutte le lingue; il numero e l'icona restano la copertura totale. */
+function cloudsTip(h, i){
+  const g = function(k){ return h[k] && h[k][i] != null ? Math.round(h[k][i]) + " %" : "—"; };
+  return h.cloud_cover_low ? "low " + g("cloud_cover_low") + " · mid " + g("cloud_cover_mid") + " · high " + g("cloud_cover_high") : "";
+}
 function loadWeather(pl){
   const el = document.getElementById("twWeather");
   if(!el || !pl || !elDate.value) return;
@@ -454,7 +460,7 @@ function loadWeather(pl){
   const seq = ++weatherSeq;
   const q = new URLSearchParams({
     latitude: pl.lat.toFixed(4), longitude: pl.lon.toFixed(4),
-    hourly: "temperature_2m,cloud_cover,wind_speed_10m,precipitation_probability",
+    hourly: "temperature_2m,cloud_cover,cloud_cover_low,cloud_cover_mid,cloud_cover_high,wind_speed_10m,precipitation_probability",
     start_date: iso, end_date: iso, timezone: TZ
   });
   fetch(METEO + "?" + q.toString())
@@ -467,7 +473,9 @@ function loadWeather(pl){
       const rain = h.precipitation_probability ? h.precipitation_probability[i] : null;
       document.getElementById("twWTemp").textContent = Math.round(h.temperature_2m[i]) + "°C";
       document.getElementById("twWWind").innerHTML = Math.round(h.wind_speed_10m[i]) + "<small>km/h</small>";
-      document.getElementById("twWClouds").textContent = Math.round(h.cloud_cover[i]) + "%";
+      const tile = document.getElementById("twWClouds"), tip = cloudsTip(h, i);
+      tile.textContent = Math.round(h.cloud_cover[i]) + "%";
+      if(tip) tile.parentNode.title = tip; else tile.parentNode.removeAttribute("title");
       document.getElementById("twWRain").textContent = rain == null ? "—" : Math.round(rain) + "%";
       document.getElementById("twWIcon").innerHTML = weatherIcon(h.cloud_cover[i], rain || 0, h.wind_speed_10m[i]);
     })
@@ -691,7 +699,7 @@ function loadLeaflet(){
      parallelo con leaflet.js. */
   const mapkit = window.COMETA_MAPKIT ? Promise.resolve() : new Promise(function(ok, ko){
     const s = document.createElement("script");
-    s.src = "assets/mapkit.js?v=167";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
+    s.src = "assets/mapkit.js?v=169";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
     s.onload = ok; s.onerror = ko;
     document.head.appendChild(s);
   });
