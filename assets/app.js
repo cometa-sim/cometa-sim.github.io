@@ -889,4 +889,36 @@ requestAnimationFrame(function(){ moveThumb(); onScroll(); updateFlight(); });
 if(!reduced) (function raf(){ updateFlight(); updatePhys(); requestAnimationFrame(raf); })();
 addEventListener("load", function(){ moveThumb(); sfResize(); updateFlight(); });
 
+
+/* Suggerimento al tocco: su telefono il title (per ora i tre strati delle
+   nuvole) non compare mai, quindi un tocco sul riquadro lo mostra in un
+   fumetto che sparisce da solo. Sui dispositivi con mouse non cambia
+   nulla: resta il title del browser. Il fumetto sta nel body perche'
+   .mk-weather ha overflow:hidden e lo taglierebbe. */
+(function(){
+  const touch = window.matchMedia ? window.matchMedia("(hover: none)") : null;
+  let tip = null, timer = 0, from = null;
+  function hide(){
+    clearTimeout(timer); from = null;
+    if(tip){ tip.remove(); tip = null; }
+  }
+  document.addEventListener("click", function(e){
+    const tile = e.target.closest ? e.target.closest(".mk-wtile[title]") : null;
+    if(!touch || !touch.matches || !tile){ hide(); return; }
+    if(tile === from){ hide(); return; }                 /* secondo tocco: chiude */
+    hide(); from = tile;
+    tip = document.createElement("div");
+    tip.className = "mk-wtip"; tip.setAttribute("role", "status");
+    tip.textContent = tile.getAttribute("title");
+    document.body.appendChild(tip);
+    const r = tile.getBoundingClientRect(), w = tip.offsetWidth, h = tip.offsetHeight, m = 8;
+    let x = r.left + r.width/2 - w/2;
+    x = Math.max(m, Math.min(innerWidth - w - m, x));
+    let y = r.top - h - 6;
+    if(y < m) y = r.bottom + 6;                           /* niente posto sopra: sotto */
+    tip.style.left = x + "px"; tip.style.top = y + "px";
+    timer = setTimeout(hide, 4000);
+  });
+  addEventListener("scroll", hide, {passive:true});
+})();
 })();
