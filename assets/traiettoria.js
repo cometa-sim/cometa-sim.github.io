@@ -460,7 +460,7 @@ function loadWeather(pl){
   const seq = ++weatherSeq;
   const q = new URLSearchParams({
     latitude: pl.lat.toFixed(4), longitude: pl.lon.toFixed(4),
-    hourly: "temperature_2m,cloud_cover,cloud_cover_low,cloud_cover_mid,cloud_cover_high,wind_speed_10m,precipitation_probability",
+    hourly: "temperature_2m,cloud_cover,cloud_cover_low,cloud_cover_mid,cloud_cover_high,wind_speed_10m,wind_gusts_10m,precipitation_probability",
     start_date: iso, end_date: iso, timezone: TZ
   });
   fetch(METEO + "?" + q.toString())
@@ -473,6 +473,8 @@ function loadWeather(pl){
       const rain = h.precipitation_probability ? h.precipitation_probability[i] : null;
       document.getElementById("twWTemp").textContent = Math.round(h.temperature_2m[i]) + "°C";
       document.getElementById("twWWind").innerHTML = Math.round(h.wind_speed_10m[i]) + "<small>km/h</small>";
+      const wtile = document.getElementById("twWWind").parentNode, gust = h.wind_gusts_10m && h.wind_gusts_10m[i];
+      if(gust != null) wtile.title = "gusts " + Math.round(gust) + " km/h"; else wtile.removeAttribute("title");
       const tile = document.getElementById("twWClouds"), tip = cloudsTip(h, i);
       tile.textContent = Math.round(h.cloud_cover[i]) + "%";
       if(tip) tile.parentNode.title = tip; else tile.parentNode.removeAttribute("title");
@@ -699,7 +701,7 @@ function loadLeaflet(){
      parallelo con leaflet.js. */
   const mapkit = window.COMETA_MAPKIT ? Promise.resolve() : new Promise(function(ok, ko){
     const s = document.createElement("script");
-    s.src = "assets/mapkit.js?v=171";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
+    s.src = "assets/mapkit.js?v=172";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
     s.onload = ok; s.onerror = ko;
     document.head.appendChild(s);
   });
