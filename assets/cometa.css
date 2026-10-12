@@ -711,6 +711,33 @@ td.mercedes{color:var(--mercedes)}
    Diretta). */
 .mk-is-fullscreen{height:100vh!important;width:100vw!important;border-radius:0!important}
 
+/* Vista 3D (assets/map3d.js, MapLibre): stesso aspetto scuro dei controlli
+   Leaflet sopra. I pulsanti nativi di MapLibre hanno icone nere su fondo
+   chiaro (immagini): qui si invertono. */
+.tw-map .mk-view a,.tw-map .mk-view button{width:auto;min-width:30px;padding:0 9px;
+  font:600 12px/30px var(--mono);letter-spacing:.04em}
+.tw-map .maplibregl-canvas{cursor:crosshair;outline:none}
+.tw-map .maplibregl-ctrl-group{background:#0b1726;border:1px solid rgba(255,255,255,.12);box-shadow:none}
+.tw-map .maplibregl-ctrl-group button{color:var(--ink);background:transparent;border-color:rgba(255,255,255,.12);
+  display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent}
+.tw-map .maplibregl-ctrl-group button:hover,.tw-map .maplibregl-ctrl-group button:focus{background:#132234}
+.tw-map .maplibregl-ctrl-group button .maplibregl-ctrl-icon{filter:invert(1)}
+.tw-map .maplibregl-ctrl-group.mk-rain.mk-active button{background:#0f3a5c;color:#5FE3FF}
+.tw-map .maplibregl-ctrl-attrib{background:rgba(2,6,15,.72)!important;color:var(--muted);font-size:10px}
+.tw-map .maplibregl-ctrl-attrib a{color:var(--cyan)}
+.tw-map .maplibregl-ctrl-attrib-button{filter:invert(1)}
+.tw-map .maplibregl-ctrl-scale{background:rgba(2,6,15,.72);color:var(--ink);border-color:rgba(255,255,255,.25);
+  font-family:var(--mono);font-size:10px}
+.tw-map .maplibregl-popup-content{background:#0b1726;color:var(--ink);box-shadow:0 8px 24px rgba(0,0,0,.45);
+  font-family:var(--mono);font-size:11.5px;line-height:1.6;padding:9px 13px}
+.tw-map .maplibregl-popup-anchor-top .maplibregl-popup-tip,
+.tw-map .maplibregl-popup-anchor-top-left .maplibregl-popup-tip,
+.tw-map .maplibregl-popup-anchor-top-right .maplibregl-popup-tip{border-bottom-color:#0b1726}
+.tw-map .maplibregl-popup-anchor-bottom .maplibregl-popup-tip,
+.tw-map .maplibregl-popup-anchor-bottom-left .maplibregl-popup-tip,
+.tw-map .maplibregl-popup-anchor-bottom-right .maplibregl-popup-tip{border-top-color:#0b1726}
+.tw3-dot{width:14px;height:14px;border-radius:50%;border:2px solid #02060f;box-shadow:0 0 0 2px rgba(255,255,255,.75)}
+
 /* Widget meteo (Open-Meteo): icona piu' quattro numeri, usato sia sotto la
    mappa del predittore sia nella sezione "Previsione meteo lancio" qui
    sotto. Sempre su una riga sola, anche da telefono: repeat(5,1fr) non va

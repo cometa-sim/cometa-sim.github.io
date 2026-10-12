@@ -379,12 +379,16 @@ function flightParams(iso, hhmm){
 let launch = null;            /* {name, lat, lon} */
 let map = null, layer = null, launchMk = null, mapReady = null, mapkit = null;   /* la mappa nasce dopo */
 let last = null;          /* ultimo calcolo, per ridisegnare al cambio di lingua */
+let m3 = null, m3Ready = null, elMap3 = null, view3 = false, shown = null, viewA = null;   /* vista 3D (assets/map3d.js): nasce solo se la si sceglie; shown = cio' che e' a schermo */
+const KEY_VIEW = "cometa-vista-v1";
 let week = null;          /* confronto dei prossimi giorni: {iso: risultato} */
 /* Risultati di un altro luogo non devono restare a schermo */
 function clearResults(){
   last = null; week = null;
   elRes.innerHTML = ""; elWeekBody.innerHTML = ""; elWeekBox.hidden = true;
   if(layer) layer.clearLayers();
+  shown = null;
+  if(m3) m3.render(null, false);
   if(elLegend){ elLegend.setAttribute("data-i18n", "twLegend"); elLegend.textContent = t("twLegend"); }
 }
 function saveLaunch(){
@@ -701,7 +705,7 @@ function loadLeaflet(){
      parallelo con leaflet.js. */
   const mapkit = window.COMETA_MAPKIT ? Promise.resolve() : new Promise(function(ok, ko){
     const s = document.createElement("script");
-    s.src = "assets/mapkit.js?v=172";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
+    s.src = "assets/mapkit.js?v=173";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
     s.onload = ok; s.onerror = ko;
     document.head.appendChild(s);
   });
@@ -709,6 +713,7 @@ function loadLeaflet(){
 }
 function placeLaunchMarker(pan){
   const L = window.L;
+  if(m3) m3.setLaunch(launch, pan && view3);
   if(!launch){ if(launchMk){ launchMk.remove(); launchMk = null; } return; }
   if(!launchMk){
     launchMk = L.marker([launch.lat, launch.lon], {
@@ -736,6 +741,18 @@ function ensureMap(){
     }).addTo(map);
     L.control.scale({imperial:false, position:"bottomright"}).addTo(map);  // sopra l'attribuzione, non accanto: da telefono l'attribuzione (lunga col satellite Esri) va su piu' righe e copriva la scala in basso a sinistra
     mapkit = window.COMETA_MAPKIT && window.COMETA_MAPKIT.enhance(map, L, elMap, street, {onSave: exportPng});
+    /* 2D / 3D: un pulsante a testo (non un'icona: "3D" si capisce da solo) accanto allo schermo intero */
+    const View = L.Control.extend({
+      options: {position: "topleft"},
+      onAdd: function(){
+        const div = L.DomUtil.create("div", "leaflet-bar mk-view");
+        viewA = L.DomUtil.create("a", "", div);
+        viewA.href = "#"; viewA.textContent = "3D"; viewA.title = t("mkView3d");
+        L.DomEvent.on(viewA, "click", L.DomEvent.stop).on(viewA, "click", function(){ setView(true); });
+        return div;
+      }
+    });
+    new View().addTo(map);
     L.polygon(EXCL.map(function(p){ return [p[1], p[0]]; }),
               {color:"#FF7A5C", weight:1.5, fillColor:"#FF7A5C", fillOpacity:.16, interactive:false}).addTo(map);
     /* Fascia di piu' partenze: i poligoni si disegnano opachi in un pannello
@@ -757,9 +774,100 @@ function ensureMap(){
        un'animazione che, finendo dopo, annullerebbe il primo disegno */
     if(launch) map.setView([launch.lat, launch.lon], 8);
     else map.fitBounds([[-35.1,-58.6],[-30.1,-53.1]]);
+    if(loadView() === "3d") setView(true, true);
   });
   return mapReady;
 }
+/* ---------- Vista 3D ----------
+   Stesso calcolo, stessi risultati: cambia solo chi li disegna. Il 2D
+   (Leaflet) resta sempre aggiornato; il 3D (MapLibre, assets/map3d.js)
+   si crea alla prima richiesta e da li' segue show(). La scelta si
+   ricorda fra una visita e l'altra. */
+function loadView(){ try { return localStorage.getItem(KEY_VIEW); } catch(e){ return null; } }
+function saveView(v){ try { localStorage.setItem(KEY_VIEW, v); } catch(e){ /* navigazione privata */ } }
+function loadMap3dScript(){
+  if(window.COMETA_MAP3D) return Promise.resolve();
+  return new Promise(function(ok, ko){
+    const s = document.createElement("script");
+    s.src = "assets/map3d.js?v=173";
+    s.onload = ok; s.onerror = ko;
+    document.head.appendChild(s);
+  });
+}
+function ensure3d(){
+  if(m3Ready) return m3Ready;
+  if(!elMap3){
+    elMap3 = document.createElement("div");
+    elMap3.className = "tw-canvas";
+    elMap3.setAttribute("role", "application");
+    elMap.parentNode.insertBefore(elMap3, elMap.nextSibling);
+  }
+  m3Ready = loadMap3dScript().then(function(){
+    return window.COMETA_MAP3D.create({
+      container:elMap3, color:COL, excl:EXCL,
+      onToggle:function(){ setView(false); },
+      onPick:function(lat, lon){ setLaunch({lat:lat, lon:lon}); },
+      onDrag:function(lat, lon){ setLaunch({lat:lat, lon:lon}); }
+    });
+  }).then(function(c){ m3 = c; return c; }, function(e){ m3Ready = null; throw e; });
+  return m3Ready;
+}
+function setView(on, noSave){
+  if(!!on === view3) return;
+  if(document.fullscreenElement) document.exitFullscreen();
+  if(on){
+    view3 = true;
+    elMap.hidden = true;
+    if(elMap3) elMap3.hidden = false;
+    ensure3d().then(function(c){
+      /* il contenitore e' appena diventato visibile: MapLibre va avvisato */
+      c.resize(); c.relabel();
+      c.setLaunch(launch, false);
+      if(shown) c.render(scene3d(shown), true);
+      else { c.render(null, false); const ctr = map.getCenter(); c.jump(ctr.lat, ctr.lng, map.getZoom()); }
+    }, function(){
+      view3 = false; elMap.hidden = false; if(elMap3) elMap3.hidden = true;
+      map.invalidateSize();
+      setStatus(t("mk3dFail"), true);
+    });
+  } else {
+    view3 = false;
+    if(elMap3) elMap3.hidden = true;
+    elMap.hidden = false;
+    map.invalidateSize();
+    if(shown){ if(shown.band) drawBand(shown, false); else draw(shown, false); }   /* il 2D non si e' inquadrato mentre era nascosto */
+  }
+  if(!noSave) saveView(on ? "3d" : "2d");
+}
+/* I risultati di show() come li vuole map3d.js: [lon, lat] ovunque */
+function scene3d(x){
+  if(!x) return null;
+  const ll = function(p){ return [p[1], p[0]]; };
+  if(x.band){
+    const ok = x.list.filter(function(r){ return r.ok; });
+    if(!ok.length) return null;
+    if(ok.length < 2) return scene3d(ok[0]);
+    const g = bandGeom(ok), AMB = "#FFB84D";
+    return {
+      runs:ok, main:false,
+      extr:g.slices.map(function(h){ return {ring:h}; }),
+      fills:g.land.length >= 3 ? [{ring:g.land, color:AMB, opacity:.55}] : [],
+      lines:g.land.length < 3 ? [{coords:g.land, color:AMB, width:8}] : []
+    };
+  }
+  if(!x.ok) return null;
+  const sc = {
+    runs:[x], main:true, fills:[], lines:[],
+    labels:{burst:t("twBurstDist") + " " + num(x.burst.alt/1000, 1) + " km", land:t("twLand") + " " + fmtTime(x.end.t, false)}
+  };
+  if(x.spread){
+    const g = x.spread, VI = "#A98CFF";
+    if(g.poly) sc.fills.push({ring:g.poly.map(ll), color:VI, opacity:.35});
+    else sc.lines.push({coords:g.line.map(ll), color:VI, width:6});
+  }
+  return sc;
+}
+
 /* Leaflet misura il contenitore quando nasce: se la pagina era nascosta
    va rimisurato quando torna visibile. */
 addEventListener("hashchange", function(){
@@ -943,20 +1051,28 @@ function hull(P){      /* catena monotona di Andrew, punti [x, y] */
   }
   return lo.slice(0, -1).concat(hi.slice(0, -1));
 }
+/* Geometria della fascia, comune a 2D e 3D: le «fette» e l'area di
+   atterraggio, come liste di [lon, lat] */
+function bandGeom(ok){
+  const R = ok.map(function(r){ return resample(r, FETTE); }), slices = [];
+  for(let k = 0; k < FETTE; k++){
+    const h = hull(R.map(function(r){ return r[k]; }).concat(R.map(function(r){ return r[k + 1]; })));
+    if(h.length >= 3) slices.push(h);
+  }
+  return {slices:slices, land:hull(ok.map(function(r){ return [r.end.lon, r.end.lat]; }))};
+}
 function drawBand(x, noFit){
   const L = window.L, ok = x.list.filter(function(r){ return r.ok; });
   layer.clearLayers();
   if(ok.length < 2){ if(ok.length) draw(ok[0], noFit); return; }
-  const R = ok.map(function(r){ return resample(r, FETTE); });
+  const g = bandGeom(ok);
   const bb = L.latLngBounds([[x.from.lat, x.from.lon]]);
   const ll = function(p){ return [p[1], p[0]]; };
-  for(let k = 0; k < FETTE; k++){
-    const h = hull(R.map(function(r){ return r[k]; }).concat(R.map(function(r){ return r[k + 1]; })));
-    if(h.length < 3) continue;
+  g.slices.forEach(function(h){
     L.polygon(h.map(ll), {pane:"twBand", color:COL, weight:2, opacity:1, fillColor:COL, fillOpacity:1, interactive:false}).addTo(layer);
     h.forEach(function(p){ bb.extend(ll(p)); });
-  }
-  const land = hull(ok.map(function(r){ return [r.end.lon, r.end.lat]; }));
+  });
+  const land = g.land;
   const st = {pane:"twLandZ", color:"#FFB84D", weight:land.length < 3 ? 8 : 2, opacity:1, fillColor:"#FFB84D", fillOpacity:1, interactive:false};
   (land.length < 3 ? L.polyline(land.map(ll), st) : L.polygon(land.map(ll), st)).addTo(layer);
   if(!noFit){ map.invalidateSize(); map.fitBounds(bb, {padding:[30,30], maxZoom:10}); }
@@ -1010,12 +1126,14 @@ function renderBand(x){
 function show(x, noFit){
   const band = !!(x && x.band);
   if(elLegend){ elLegend.setAttribute("data-i18n", band ? "twLegendBand" : "twLegend"); elLegend.textContent = t(band ? "twLegendBand" : "twLegend"); }
-  if(band){ renderBand(x); statusDone(x.list); if(map) drawBand(x, noFit); }
+  shown = x || null;
+  if(band){ renderBand(x); statusDone(x.list); if(map) drawBand(x, noFit || view3); }
   else {
-    renderCard(x); statusDone([x]); if(map) draw(x, noFit);
+    renderCard(x); statusDone([x]); if(map) draw(x, noFit || view3);
     if(x && x.ok) fcWarn(x);
     if(elLegend && x && x.spread) elLegend.textContent = legendLand(x.spread);
   }
+  if(view3 && m3) m3.render(scene3d(x), !noFit);
 }
 
 /* ---------- Risultati ---------- */
@@ -1390,6 +1508,8 @@ function exportPng(){
 function relabel(){
   elWhere.placeholder = t("twWherePh");
   renderBalloon();
+  if(viewA) viewA.title = t("mkView3d");
+  if(m3) m3.relabel();
   if(last) show(last, true);
   renderWeek();
 }
