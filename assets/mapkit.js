@@ -156,12 +156,11 @@ window.COMETA_MAPKIT = (function(){
      clic, in base al centro della mappa in quel momento (vedi
      isEurope sopra) — per l'Europa serve interrogare l'indice
      RainViewer, quindi quel primo clic e' asincrono; un secondo clic
-     rapido prima che risponda spegne solo l'interruttore, il livello
-     (quando arriva) resta pronto per il prossimo. L'icona cambia da
-     nuvola a pioggia quando la fonte e' RainViewer (mostra solo
-     precipitazione, non nuvole in generale): altrimenti, con cielo
-     coperto ma senza pioggia, un livello vuoto sembrerebbe un errore
-     invece che "non piove". Nomi interni (pane "mkRain", classe
+     rapido prima che risponda spegne solo l'interruttore. Dove
+     RainViewer funziona, clic ripetuti scorrono pioggia -> nuvole ->
+     spento; altrove nuvole -> spento. L'icona segue il livello
+     mostrato (la pioggia mostra solo precipitazione: con cielo coperto
+     ma senza pioggia un livello vuoto sembrerebbe un errore). Nomi interni (pane "mkRain", classe
      .mk-rain) rimasti da quando qui c'era solo un livello di pioggia:
      cambiarli vorrebbe dire toccare anche il CSS in piu' file, per un
      dettaglio che chi usa il sito non vede mai. */
@@ -169,7 +168,18 @@ window.COMETA_MAPKIT = (function(){
     map.createPane("mkRain");
     map.getPane("mkRain").style.zIndex = 350;
     map.getPane("mkRain").style.pointerEvents = "none";
-    let layer = null, wrap = null, btn = null, on = false, loading = false;
+    /* modes: elenco dei livelli disponibili (si scopre al primo clic);
+       step: 0 = spento, 1..modes.length = livello mostrato. Ogni clic
+       avanza di uno e dopo l'ultimo livello spegne. In Europa i livelli
+       sono pioggia (RainViewer) e nuvole (OpenWeatherMap); altrove
+       solo nuvole. */
+    let modes = null, layers = {}, step = 0, wrap = null, btn = null, loading = false, cancelled = false;
+    function setButton(kind){
+      if(!btn) return;
+      const d = dict();
+      btn.innerHTML = kind === "rain" ? ICON_RAIN : ICON_CLOUD;
+      btn.title = kind === "rain" ? (d.mkRainOnly || "Pioggia (radar)") : (d.mkRain || "Nuvole (foto satellitare)");
+    }
     function owmLayer(){
       return L.tileLayer(OWM_TILES, {
         pane: "mkRain", opacity: .75, maxZoom: 18, maxNativeZoom: OWM_NATIVE_ZOOM,
@@ -182,35 +192,36 @@ window.COMETA_MAPKIT = (function(){
         attribution: 'Pioggia: <a href="https://www.rainviewer.com" target="_blank" rel="noopener">RainViewer</a>'
       });
     }
-    function setButton(rainOnly){
-      if(!btn) return;
-      const d = dict();
-      btn.innerHTML = rainOnly ? ICON_RAIN : ICON_CLOUD;
-      btn.title = rainOnly ? (d.mkRainOnly || "Pioggia (radar)") : (d.mkRain || "Nuvole (foto satellitare)");
-    }
-    function ready(l, rainOnly){
-      layer = l;
-      loading = false;
-      setButton(!!rainOnly);
-      if(on) layer.addTo(map);
+    function apply(){
+      Object.keys(layers).forEach(function(k){ if(map.hasLayer(layers[k])) map.removeLayer(layers[k]); });
+      const kind = step ? modes[step - 1] : null;
+      if(wrap) wrap.classList.toggle("mk-active", !!kind);
+      if(kind){ layers[kind].addTo(map); setButton(kind); }
+      else setButton(modes && modes[0]);
     }
     function toggle(){
-      on = !on;
-      if(wrap) wrap.classList.toggle("mk-active", on);
-      if(layer){ if(on) layer.addTo(map); else map.removeLayer(layer); return; }
-      if(loading) return;
+      if(modes){ step = (step + 1) % (modes.length + 1); apply(); return; }
+      if(loading){ cancelled = true; if(wrap) wrap.classList.remove("mk-active"); return; } // secondo clic prima della risposta: spegne, i livelli restano pronti
       const c = map.getCenter();
+      function start(m, ls){
+        modes = m; layers = ls; loading = false;
+        step = cancelled ? 0 : 1;
+        cancelled = false;
+        apply();
+      }
       if(isEurope(c.lat, c.lng)){
-        loading = true;
+        loading = true; cancelled = false;
+        if(wrap) wrap.classList.add("mk-active");
         fetch(RAIN_INDEX).then(function(r){ return r.json(); })
           .then(function(j){
             const frames = j && j.radar && j.radar.past;
             const last = frames && frames[frames.length - 1];
-            if(last) ready(rainViewerLayer(j.host, last.path), true); else ready(owmLayer());
+            if(last) start(["rain", "clouds"], {rain: rainViewerLayer(j.host, last.path), clouds: owmLayer()});
+            else start(["clouds"], {clouds: owmLayer()});
           })
-          .catch(function(){ ready(owmLayer()); }); // indice RainViewer irraggiungibile: nuvole meglio di niente
+          .catch(function(){ start(["clouds"], {clouds: owmLayer()}); }); // indice RainViewer irraggiungibile: nuvole meglio di niente
       } else {
-        ready(owmLayer());
+        start(["clouds"], {clouds: owmLayer()});
       }
     }
     const Rain = L.Control.extend({
