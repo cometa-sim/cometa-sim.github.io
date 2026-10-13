@@ -47,8 +47,6 @@ window.COMETA_MAP3D = (function(){
   };
   const SVG = function(inner){ return '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + inner + '</svg>'; };
   const ICON_CUBE = SVG('<path d="M21 8 12 3 3 8v8l9 5 9-5V8Z"/><path d="m3 8 9 5 9-5"/><path d="M12 13v8"/>');
-  const ICON_TILT_UP = SVG('<path d="m6 15 6-6 6 6"/><path d="M4 20h16"/>');       /* piu' inclinata (verso l'orizzonte) */
-  const ICON_TILT_DOWN = SVG('<path d="m6 9 6 6 6-6"/><path d="M4 4h16"/>');       /* piu' dall'alto */
 
   let loading = null;
   function load(){
@@ -149,8 +147,6 @@ window.COMETA_MAP3D = (function(){
     const ml = window.maplibregl;
     const mk = window.COMETA_MAPKIT || {};
     const ICONS = mk.ICONS || {};
-    /* Dispositivo touch (telefono, tablet): solo per mostrare i pulsanti di inclinazione */
-    const touch = (navigator.maxTouchPoints || 0) > 0 || !!(window.matchMedia && window.matchMedia("(any-pointer: coarse)").matches);
     const fsTarget = o.fsTarget || o.container;
     const col = {up:o.color, down:o.colorDown || "#FFB84D"};
     const PITCH = 70;           /* inclinazione della vista laterale */
@@ -348,20 +344,6 @@ window.COMETA_MAP3D = (function(){
     const sideCtl = button(ICON_CUBE, d.mk3dSide || "Vista laterale", function(){ fit(); }, "mk-side");
     map.addControl(sideCtl, "top-right");
 
-    /* Inclinazione con due pulsanti, solo da telefono/tablet (da computer basta ctrl + trascina) */
-    const tiltWrap = document.createElement("div");
-    tiltWrap.className = "maplibregl-ctrl maplibregl-ctrl-group mk-tilt";
-    const tiltUp = document.createElement("button"), tiltDown = document.createElement("button");
-    [[tiltUp, ICON_TILT_UP, "mk3dTiltMore", "Inclina di piu'", 12], [tiltDown, ICON_TILT_DOWN, "mk3dTiltLess", "Inclina meno", -12]].forEach(function(a){
-      a[0].type = "button"; a[0].innerHTML = a[1]; a[0].title = d[a[2]] || a[3]; a[0].setAttribute("aria-label", a[0].title);
-      a[0].addEventListener("click", function(e){
-        e.preventDefault();
-        map.easeTo({pitch:Math.max(0, Math.min(80, map.getPitch() + a[4])), duration:300});
-      });
-      tiltWrap.appendChild(a[0]);
-    });
-    if(touch) map.addControl({onAdd:function(){ return tiltWrap; }, onRemove:function(){ tiltWrap.remove(); }}, "top-right");
-
     /* ----- marcatori ----- */
     function dot(color){
       const e = document.createElement("div");
@@ -472,8 +454,6 @@ window.COMETA_MAP3D = (function(){
         viewBtn.btn.title = dd.mkView2d || "Vista 2D";
         satCtl.btn.title = dd[onSat ? "mkLayerStreet" : "mkLayerSat"] || "";
         sideCtl.btn.title = dd.mk3dSide || "Vista laterale";
-        tiltUp.title = dd.mk3dTiltMore || "Inclina di piu'";
-        tiltDown.title = dd.mk3dTiltLess || "Inclina meno";
         if(saveCtl) saveCtl.btn.title = dd.mkSave || "";
       }
     };
@@ -525,8 +505,28 @@ window.COMETA_MAP3D = (function(){
         .then(function(c){ ctl = c; return c; }, function(e){ ready = null; throw e; });
       return ready;
     }
+    /* Alcuni browser da telefono escono dallo schermo intero quando la mappa
+       che lo occupava viene nascosta, anche se a schermo intero c'e' il
+       riquadro che le contiene entrambe. Se succede, si rientra subito: vale
+       ancora il tocco sul pulsante 2D/3D (i browser lo chiedono). */
+    function keepFullscreen(frame, ms){
+      function back(){
+        if(document.fullscreenElement || !frame.requestFullscreen) return;
+        const r = frame.requestFullscreen();
+        if(r && r.catch) r.catch(function(){ /* il browser non lo permette piu': resta a finestra */ });
+      }
+      function onChange(){ if(!document.fullscreenElement){ document.removeEventListener("fullscreenchange", onChange); back(); } }
+      document.addEventListener("fullscreenchange", onChange);
+      setTimeout(function(){ document.removeEventListener("fullscreenchange", onChange); }, ms);
+    }
     function set(v){
       if(!!v === on) return;
+      const frame = o.elMap.parentNode;
+      if(document.fullscreenElement === frame){
+        /* il pulsante appena toccato sta per sparire: niente fuoco su un elemento nascosto */
+        if(document.activeElement && frame.contains(document.activeElement)) document.activeElement.blur();
+        keepFullscreen(frame, v && !ctl ? 8000 : 1500);    /* la prima volta il 3D deve ancora caricarsi */
+      }
       if(v){
         on = true;
         o.elMap.hidden = true;
