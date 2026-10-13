@@ -272,6 +272,10 @@ window.COMETA_MAPKIT = (function(){
 
   return {
     addBaseToggle: addBaseToggle, addFullscreenControl: addFullscreenControl, addRainLayer: addRainLayer,
-    addSaveControl: addSaveControl, enhance: enhance, ESRI_SAT: ESRI_SAT, ESRI_ATTR: ESRI_ATTR
+    addSaveControl: addSaveControl, enhance: enhance, ESRI_SAT: ESRI_SAT, ESRI_ATTR: ESRI_ATTR,
+    /* per la vista 3D (assets/map3d.js): stesse fonti e stesse icone */
+    OWM_TILES: OWM_TILES, OWM_NATIVE_ZOOM: OWM_NATIVE_ZOOM, RAIN_INDEX: RAIN_INDEX, RAIN_NATIVE_ZOOM: RAIN_NATIVE_ZOOM,
+    isEurope: isEurope,
+    ICONS: {layers: ICON_LAYERS, maximize: ICON_MAXIMIZE, minimize: ICON_MINIMIZE, cloud: ICON_CLOUD, rain: ICON_RAIN, save: ICON_SAVE}
   };
 })();

@@ -74,16 +74,17 @@ Norme e autorizzazioni · Domande · Chi siamo.
 ### Dopo ogni modifica: il numero di versione
 
 In `index.html` i file di `assets/`, e la mappa, sono richiamati con un numero in
-coda — oggi `?v=172`:
+coda — oggi `?v=179`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=172">
-<script src="assets/i18n.js?v=172"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=179">
+<script src="assets/i18n.js?v=179"></script>
 ```
 
-Lo stesso numero compare anche in due punti meno visibili, che vanno alzati
+Lo stesso numero compare anche in punti meno visibili, che vanno alzati
 insieme: il caricamento di `assets/mapkit.js` dentro `assets/traiettoria.js`
-e dentro `assets/spot.js` (lo caricano loro, non `index.html`), e la pagina di
+e dentro `assets/spot.js`, quello di `assets/map3d.js` dentro
+`assets/traiettoria.js` (li caricano loro, non `index.html`), e la pagina di
 prova `simulazione-diretta.html`.
 
 Serve a costringere il browser a riscaricarli. **Chi modifica un file in
