@@ -202,7 +202,11 @@ window.COMETA_MAP3D = (function(){
       cooperativeGestures:false, touchPitch:true,
       attributionControl:{compact:true}, canvasContextAttributes:{antialias:true}
     });
-    map.addControl(new ml.NavigationControl({visualizePitch:true}), "top-right");
+    /* La bussola (rimette il nord e l'inclinazione) solo da computer: da
+       telefono si ruota e si inclina con due dita, e il suo simbolo sembrava
+       una coppia di frecce per l'inclinazione. */
+    const touch = (navigator.maxTouchPoints || 0) > 0;
+    map.addControl(new ml.NavigationControl({visualizePitch:true, showCompass:!touch}), "top-right");
     map.addControl(new ml.ScaleControl({unit:"metric"}), "bottom-right");
     /* rotella: spenta finche' non si clicca sulla mappa, e di nuovo quando il mouse esce (come il 2D) */
     map.scrollZoom.disable();
