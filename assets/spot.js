@@ -194,13 +194,13 @@ window.COMETA_SPOT = (function(){
     });
     const mapkit = window.COMETA_MAPKIT ? Promise.resolve() : new Promise(function(ok, ko){
       const s = document.createElement("script");
-      s.src = "assets/mapkit.js?v=176";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
+      s.src = "assets/mapkit.js?v=177";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
       s.onload = ok; s.onerror = ko;
       document.head.appendChild(s);
     });
     const map3d = window.COMETA_MAP3D ? Promise.resolve() : new Promise(function(ok){
       const s = document.createElement("script");
-      s.src = "assets/map3d.js?v=176";
+      s.src = "assets/map3d.js?v=177";
       s.onload = ok; s.onerror = ok;     // senza, resta il 2D e basta
       document.head.appendChild(s);
     });
@@ -222,7 +222,8 @@ window.COMETA_SPOT = (function(){
         attribution:'© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'
       }).addTo(map);
       L.control.scale({imperial:false, position:"bottomright"}).addTo(map);  // sopra l'attribuzione, non accanto: da telefono l'attribuzione (lunga col satellite Esri) va su piu' righe e copriva la scala in basso a sinistra
-      window.COMETA_MAPKIT && window.COMETA_MAPKIT.enhance(map, L, elMap, street);
+      /* schermo intero sul riquadro che contiene sia il 2D sia il 3D: cambiando vista si resta a schermo intero */
+      window.COMETA_MAPKIT && window.COMETA_MAPKIT.enhance(map, L, elMap.parentNode, street);
       map.setView([FALLBACK.lat, FALLBACK.lon], FALLBACK.zoom);
       trail = L.polyline([], {color:GREEN, weight:2, opacity:.75}).addTo(map);
       ptsLayer = L.layerGroup().addTo(map);     // i punti precedenti, puntini piccoli

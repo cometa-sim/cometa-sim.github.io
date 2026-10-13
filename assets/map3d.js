@@ -50,19 +50,6 @@ window.COMETA_MAP3D = (function(){
   const ICON_TILT_UP = SVG('<path d="m6 15 6-6 6 6"/><path d="M4 20h16"/>');       /* piu' inclinata (verso l'orizzonte) */
   const ICON_TILT_DOWN = SVG('<path d="m6 9 6 6 6-6"/><path d="M4 4h16"/>');       /* piu' dall'alto */
 
-  /* Testi del gesto "ctrl + rotella" (cooperativeGestures), nelle tre lingue */
-  const GESTURES = {
-    it:{"CooperativeGesturesHandler.WindowsHelpText":"Ctrl + rotella per ingrandire la mappa",
-        "CooperativeGesturesHandler.MacHelpText":"⌘ + rotella per ingrandire la mappa",
-        "CooperativeGesturesHandler.MobileHelpText":"Usa due dita per spostare la mappa"},
-    es:{"CooperativeGesturesHandler.WindowsHelpText":"Ctrl + rueda para hacer zoom en el mapa",
-        "CooperativeGesturesHandler.MacHelpText":"⌘ + rueda para hacer zoom en el mapa",
-        "CooperativeGesturesHandler.MobileHelpText":"Usa dos dedos para mover el mapa"},
-    en:{"CooperativeGesturesHandler.WindowsHelpText":"Use Ctrl + scroll to zoom the map",
-        "CooperativeGesturesHandler.MacHelpText":"Use ⌘ + scroll to zoom the map",
-        "CooperativeGesturesHandler.MobileHelpText":"Use two fingers to move the map"}
-  };
-
   let loading = null;
   function load(){
     if(window.maplibregl) return Promise.resolve();
@@ -162,9 +149,9 @@ window.COMETA_MAP3D = (function(){
     const ml = window.maplibregl;
     const mk = window.COMETA_MAPKIT || {};
     const ICONS = mk.ICONS || {};
-    const lang = document.documentElement.lang;
-    /* Dispositivo touch (telefono, tablet): puntatore "grossolano" */
-    const touch = !!(window.matchMedia && window.matchMedia("(pointer: coarse)").matches);
+    /* Dispositivo touch (telefono, tablet): solo per mostrare i pulsanti di inclinazione */
+    const touch = (navigator.maxTouchPoints || 0) > 0 || !!(window.matchMedia && window.matchMedia("(any-pointer: coarse)").matches);
+    const fsTarget = o.fsTarget || o.container;
     const col = {up:o.color, down:o.colorDown || "#FFB84D"};
     const PITCH = 70;           /* inclinazione della vista laterale */
 
@@ -210,16 +197,21 @@ window.COMETA_MAP3D = (function(){
 
     const map = new ml.Map({
       container:o.container, style:style, center:[-56, -33], zoom:5.5, pitch:55, maxPitch:80,
-      /* Da computer: rotella solo con ctrl (la pagina scorre normalmente).
-         Da telefono niente gesti "cooperativi": un dito sposta la mappa,
-         due dita avvicinate/allontanate zoomano e ruotano, due dita
+      /* Gesti come nel 2D, su ogni dispositivo: un dito (o il mouse) sposta la
+         mappa; due dita avvicinate/allontanate zoomano e ruotano; due dita
          trascinate insieme in alto o in basso cambiano l'inclinazione
-         (touchPitch, attivo di suo in MapLibre). */
-      cooperativeGestures:!touch, touchPitch:true, locale:GESTURES[lang] || GESTURES.it,
+         (touchPitch). Niente gesti "cooperativi" (chiederebbero due dita per
+         spostare, e allora le due dita non inclinerebbero piu'): la rotella
+         del mouse, come nel 2D, si attiva solo dopo un clic sulla mappa. */
+      cooperativeGestures:false, touchPitch:true,
       attributionControl:{compact:true}, canvasContextAttributes:{antialias:true}
     });
     map.addControl(new ml.NavigationControl({visualizePitch:true}), "top-right");
     map.addControl(new ml.ScaleControl({unit:"metric"}), "bottom-right");
+    /* rotella: spenta finche' non si clicca sulla mappa, e di nuovo quando il mouse esce (come il 2D) */
+    map.scrollZoom.disable();
+    map.on("click", function(){ map.scrollZoom.enable(); });
+    o.container.addEventListener("mouseleave", function(){ map.scrollZoom.disable(); });
 
     let scene = null, launchLL = null, launchMk = null, landMk = null, burstMk = null, liveMk = null, onSat = false;
 
@@ -238,14 +230,14 @@ window.COMETA_MAP3D = (function(){
     map.addControl(viewBtn, "top-left");
 
     /* schermo intero: stessa Fullscreen API del 2D, sul contenitore della mappa */
-    if(o.container.requestFullscreen){
+    if(fsTarget.requestFullscreen){
       const fs = button(ICONS.maximize || "⛶", d.mkFullscreen || "Schermo intero", function(){
-        if(document.fullscreenElement) document.exitFullscreen(); else o.container.requestFullscreen();
+        if(document.fullscreenElement) document.exitFullscreen(); else fsTarget.requestFullscreen();
       }, "mk-fullscreen");
       map.addControl(fs, "top-left");
       document.addEventListener("fullscreenchange", function(){
-        const full = document.fullscreenElement === o.container;
-        o.container.classList.toggle("mk-is-fullscreen", full);
+        const full = document.fullscreenElement === fsTarget;
+        fsTarget.classList.toggle("mk-is-fullscreen", full);
         fs.btn.innerHTML = full ? (ICONS.minimize || "×") : (ICONS.maximize || "⛶");
         setTimeout(function(){ map.resize(); }, 60);
       });
@@ -528,13 +520,13 @@ window.COMETA_MAP3D = (function(){
         el3.setAttribute("role", "application");
         o.elMap.parentNode.insertBefore(el3, o.elMap.nextSibling);
       }
-      ready = create(Object.assign({}, o.create, {container:el3, onToggle:function(){ set(false); }}))
+      /* schermo intero sul riquadro comune a 2D e 3D: cambiando vista si resta a schermo intero */
+      ready = create(Object.assign({}, o.create, {container:el3, fsTarget:o.elMap.parentNode, onToggle:function(){ set(false); }}))
         .then(function(c){ ctl = c; return c; }, function(e){ ready = null; throw e; });
       return ready;
     }
     function set(v){
       if(!!v === on) return;
-      if(document.fullscreenElement) document.exitFullscreen();
       if(v){
         on = true;
         o.elMap.hidden = true;

@@ -709,7 +709,9 @@ td.mercedes{color:var(--mercedes)}
    piu' specifico: questa classe finisce sull'elemento mappa vero e
    proprio, quale che sia (.tw-canvas nel predittore, #spotMap nella
    Diretta). */
-.mk-is-fullscreen{height:100vh!important;width:100vw!important;border-radius:0!important}
+.mk-is-fullscreen{height:100vh!important;width:100vw!important;border-radius:0!important;margin:0!important}
+/* il riquadro a schermo intero contiene 2D e 3D: la mappa visibile lo riempie */
+.mk-is-fullscreen > .tw-canvas{height:100%!important}
 
 /* Vista 3D (assets/map3d.js, MapLibre): stesso aspetto scuro dei controlli
    Leaflet sopra. I pulsanti nativi di MapLibre hanno icone nere su fondo
