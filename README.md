@@ -74,11 +74,11 @@ Norme e autorizzazioni · Domande · Chi siamo.
 ### Dopo ogni modifica: il numero di versione
 
 In `index.html` i file di `assets/`, e la mappa, sono richiamati con un numero in
-coda — oggi `?v=180`:
+coda — oggi `?v=181`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=180">
-<script src="assets/i18n.js?v=180"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=181">
+<script src="assets/i18n.js?v=181"></script>
 ```
 
 Lo stesso numero compare anche in punti meno visibili, che vanno alzati
@@ -508,6 +508,15 @@ visitatore può aver cambiato nella pagina Traiettoria. La richiede ogni 20
 minuti, anche durante il volo, e la ridisegna solo se nel frattempo è uscita
 una nuova corsa del GFS. Non usa mai i punti GPS: non si corregge seguendo
 il pallone.
+
+**Il cerchio grigio tratteggiato** intorno all'arrivo previsto è l'errore di
+previsione, con la stessa curva dell'opzione della pagina Traiettoria
+(`convergenza_curva.json` sul branch `dati`, terzo quartile interpolato
+sull'età della corsa GFS e scalato con la durata del volo). Compare quando la
+data del lancio entra nell'orizzonte del previsore, circa una settimana
+prima, si restringe giorno per giorno a ogni nuova corsa e sparisce il
+giorno del lancio, quando vale zero per definizione. È un `L.circle`, solo
+sulla mappa 2D; il tooltip dice raggio ed età della corsa.
 
 ### Three.js
 
