@@ -65,6 +65,7 @@ Norme e autorizzazioni · Domande · Chi siamo.
 | Data del lancio (conto alla rovescia) | la costante `LAUNCH` in `assets/app.js` |
 | Fondo scala delle animazioni | la costante `SCALA_KM` in `assets/app.js` |
 | Quota di scoppio, velocità di salita/discesa e sito di lancio attesi (pagina Diretta) | `FLIGHT_BURST_KM`, `FLIGHT_ASCENT_MS`, `FLIGHT_DESCENT_V0_MS`, `FLIGHT_SITE` in `assets/app.js` |
+| Portanza al collo misurata il giorno del lancio (pagina Diretta) | `FLIGHT_NECK_LIFT_G` in `assets/app.js` |
 | Indirizzo del backend che interroga SPOT (pagina Diretta) | la costante `TRACK_URL` in `assets/app.js` |
 | Se la Diretta compare in nav (oggi no: si raggiunge solo col link `#diretta`) | `DIRETTA_PUBLIC` in `assets/app.js` |
 | Quando compare "Diretta" in nav e quando diventa rossa, se pubblica | `DIRETTA_WINDOW` e `DIRETTA_START` in `assets/app.js` |
@@ -74,11 +75,11 @@ Norme e autorizzazioni · Domande · Chi siamo.
 ### Dopo ogni modifica: il numero di versione
 
 In `index.html` i file di `assets/`, e la mappa, sono richiamati con un numero in
-coda — oggi `?v=181`:
+coda — oggi `?v=182`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=181">
-<script src="assets/i18n.js?v=181"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=182">
+<script src="assets/i18n.js?v=182"></script>
 ```
 
 Lo stesso numero compare anche in punti meno visibili, che vanno alzati
@@ -568,6 +569,17 @@ approvare la propria richiesta di modifica.
   segnale a parte — se il giorno stesso il lancio slitta rispetto all'ora
   prevista, si aggiorna `LAUNCH` all'ora vera (commit e push) e il resto
   (conto alla rovescia, quota stimata in `assets/spot.js`) segue da solo.
+
+- **La portanza al collo misurata**, il giorno del lancio:
+  `FLIGHT_NECK_LIFT_G` in `assets/app.js` (oggi `null`). Si legge in
+  grammi al collo durante il gonfiaggio e si scrive lì con un commit (serve
+  chi approva la PR quel giorno). Da quel numero la Diretta calcola la
+  velocità di salita con lo stesso modello del pallone della pagina
+  Traiettoria e corregge `FLIGHT_BURST_KM` della differenza di quota di
+  scoppio dovuta all'elio in più o in meno (in atmosfera standard). Con il
+  nominale (2794 g per Strato 2000 e 1,5 kg) ritorna 5,0 m/s e 37,9 km.
+  `FLIGHT_BALLOON_KG`, `FLIGHT_PAYLOAD_KG` e `FLIGHT_BURST_DIAM_M`, accanto,
+  vanno controllati se cambia il pallone o il carico.
 
 - **La quota di scoppio e le velocità di salita/discesa**, nella pagina
   Diretta. `FLIGHT_BURST_KM`, `FLIGHT_ASCENT_MS` e `FLIGHT_DESCENT_V0_MS`

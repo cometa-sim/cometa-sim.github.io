@@ -589,7 +589,48 @@ const FLIGHT_BURST_KM = 37.9;
 const FLIGHT_ASCENT_MS = 5;
 const FLIGHT_DESCENT_V0_MS = 4.6;
 const FLIGHT_SITE = {lat: -33.2486, lon: -58.0736};
-window.COMETA_FLIGHT = {burstKm: FLIGHT_BURST_KM, ascentMs: FLIGHT_ASCENT_MS, descentV0Ms: FLIGHT_DESCENT_V0_MS, site: FLIGHT_SITE};
+/* Portanza al collo MISURATA il giorno del lancio, in grammi (null finche'
+   non c'e'). E' la spinta netta letta al collo durante il gonfiaggio:
+   spinta di Archimede meno la massa del pallone, quindi fissa la massa di
+   elio qualunque sia la temperatura. Quando c'e', la salita non e' piu'
+   FLIGHT_ASCENT_MS ma quella che ne segue con il modello del pallone della
+   pagina Traiettoria (ascRate in assets/traiettoria.js), e la quota di
+   scoppio si corregge della differenza che quel volume d'elio da' rispetto
+   al nominale (in atmosfera standard), partendo da FLIGHT_BURST_KM.
+   Pallone, payload e diametro di scoppio sono quelli del volo. */
+const FLIGHT_NECK_LIFT_G = null;
+const FLIGHT_BALLOON_KG = 2.0, FLIGHT_PAYLOAD_KG = 1.5, FLIGHT_BURST_DIAM_M = 12.5;   /* Strato 2000 */
+window.COMETA_FLIGHT = (function(){
+  const f = {burstKm: FLIGHT_BURST_KM, ascentMs: FLIGHT_ASCENT_MS, descentV0Ms: FLIGHT_DESCENT_V0_MS, site: FLIGHT_SITE};
+  if(!(FLIGHT_NECK_LIFT_G > 0)) return f;
+  /* stesse formule di assets/traiettoria.js (ISA, Cd 0,25, aria ed elio a 15 °C) */
+  const G = 9.80665, CD = 0.25, P0 = 101325, T0 = 288.15;
+  const DRATIO = P0/(287.05*T0) - P0/(2077.1*T0);
+  const rho = function(h){
+    let T, p;
+    if(h < 11000){ T = 288.15 - 0.0065*h; p = 101325*Math.pow(T/288.15, 5.2559); }
+    else if(h < 20000){ T = 216.65; p = 22632*Math.exp(-9.80665*(h - 11000)/(287.05*T)); }
+    else if(h < 32000){ T = 216.65 + 0.001*(h - 20000); p = 5474.9*Math.pow(T/216.65, -34.1632); }
+    else { T = 228.65 + 0.0028*(h - 32000); p = 868.02*Math.pow(T/228.65, -12.2011); }
+    return p/(287.05*T);
+  };
+  const RHO0 = rho(0);
+  const bis = function(fn, a, b){ let fa = fn(a); for(let i = 0; i < 200; i++){ const m = (a + b)/2, fm = fn(m);
+    if((fa < 0) === (fm < 0)){ a = m; fa = fm; } else b = m; } return (a + b)/2; };
+  const asc = function(V){ const free = V*DRATIO - FLIGHT_BALLOON_KG - FLIGHT_PAYLOAD_KG;
+    if(free <= 0) return 0; const r = Math.cbrt(3*V/(4*Math.PI));
+    return Math.sqrt(free*G/(0.5*RHO0*CD*Math.PI*r*r)); };
+  const burst = function(V){ const rb = RHO0*V/((Math.PI/6)*Math.pow(FLIGHT_BURST_DIAM_M, 3));
+    return bis(function(h){ return rho(h) - rb; }, 0, 50000); };
+  const V = (FLIGHT_NECK_LIFT_G/1000 + FLIGHT_BALLOON_KG)/DRATIO;          /* volume a 15 °C, 1 atm */
+  const Vn = bis(function(v){ return asc(v) - FLIGHT_ASCENT_MS; }, 0.3, 60);  /* quello del nominale */
+  const a = asc(V);
+  if(!(a > 0)) return f;                                     /* portanza minore del payload: resta il nominale */
+  f.ascentMs = a;
+  f.burstKm = FLIGHT_BURST_KM + (burst(V) - burst(Vn))/1000;
+  f.neckLiftG = FLIGHT_NECK_LIFT_G;
+  return f;
+})();
 
 /* Il backend che interroga SPOT una sola volta per tutti i visitatori
    (worker/, Cloudflare Worker + Durable Object — vedi worker/README.md):
