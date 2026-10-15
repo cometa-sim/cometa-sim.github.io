@@ -199,13 +199,13 @@ window.COMETA_SPOT = (function(){
     });
     const mapkit = window.COMETA_MAPKIT ? Promise.resolve() : new Promise(function(ok, ko){
       const s = document.createElement("script");
-      s.src = "assets/mapkit.js?v=182";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
+      s.src = "assets/mapkit.js?v=183";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
       s.onload = ok; s.onerror = ko;
       document.head.appendChild(s);
     });
     const map3d = window.COMETA_MAP3D ? Promise.resolve() : new Promise(function(ok){
       const s = document.createElement("script");
-      s.src = "assets/map3d.js?v=182";
+      s.src = "assets/map3d.js?v=183";
       s.onload = ok; s.onerror = ok;     // senza, resta il 2D e basta
       document.head.appendChild(s);
     });
@@ -541,7 +541,8 @@ window.COMETA_SPOT = (function(){
       .then(function(d){
         if(!d || d.error || !d.prediction) return;      // silenzioso: fuori orizzonte, o previsore non pronto
         const run = d.request && d.request.dataset;
-        if(run && run === trajRun) return;               // stessa corsa GFS di prima: niente da ridisegnare
+        const key = run + "|" + q.toString();            // corsa GFS e parametri del volo
+        if(run && key === trajRun) return;               // stessa corsa, stessi dati: niente da ridisegnare
         const pts = [], full = [];
         d.prediction.forEach(function(stage){
           stage.trajectory.forEach(function(p){
@@ -551,7 +552,7 @@ window.COMETA_SPOT = (function(){
           });
         });
         if(pts.length < 2) return;
-        trajRun = run;
+        trajRun = key;
         trajFull = full;
         const st = d.prediction[0].trajectory, en = d.prediction[d.prediction.length - 1].trajectory;
         const durMin = (new Date(en[en.length - 1].datetime) - new Date(st[0].datetime)) / 6e4;
@@ -708,6 +709,8 @@ window.COMETA_SPOT = (function(){
 
   return {
     setActive: function(on){ if(on) start(); else stop(); },
+    /* i dati del volo sono cambiati (assets/traiettoria.js, voloDiretta) */
+    refreshTrajectory: function(){ if(trajId) pollTrajectory(); },
     setLang: function(l){ curLang = l; renderStatus(); if(fcCircle && fcLast) fcCircle.setTooltipContent(fcTip()); }
   };
 })();
