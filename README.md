@@ -65,6 +65,7 @@ Norme e autorizzazioni · Domande · Chi siamo.
 | Data del lancio (conto alla rovescia) | la costante `LAUNCH` in `assets/app.js` |
 | Fondo scala delle animazioni | la costante `SCALA_KM` in `assets/app.js` |
 | Quota di scoppio, velocità di salita/discesa e sito di lancio attesi (pagina Diretta) | `FLIGHT_BURST_KM`, `FLIGHT_ASCENT_MS`, `FLIGHT_DESCENT_V0_MS`, `FLIGHT_SITE` in `assets/app.js` |
+| Payload pesato e portanza al collo misurata (pagina Diretta) | `FLIGHT_PAYLOAD_KG`, `FLIGHT_NECK_LIFT_G` in `assets/app.js` |
 | Indirizzo del backend che interroga SPOT (pagina Diretta) | la costante `TRACK_URL` in `assets/app.js` |
 | Se la Diretta compare in nav (oggi no: si raggiunge solo col link `#diretta`) | `DIRETTA_PUBLIC` in `assets/app.js` |
 | Quando compare "Diretta" in nav e quando diventa rossa, se pubblica | `DIRETTA_WINDOW` e `DIRETTA_START` in `assets/app.js` |
@@ -74,11 +75,11 @@ Norme e autorizzazioni · Domande · Chi siamo.
 ### Dopo ogni modifica: il numero di versione
 
 In `index.html` i file di `assets/`, e la mappa, sono richiamati con un numero in
-coda — oggi `?v=180`:
+coda — oggi `?v=183`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=180">
-<script src="assets/i18n.js?v=180"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=183">
+<script src="assets/i18n.js?v=183"></script>
 ```
 
 Lo stesso numero compare anche in punti meno visibili, che vanno alzati
@@ -509,6 +510,15 @@ minuti, anche durante il volo, e la ridisegna solo se nel frattempo è uscita
 una nuova corsa del GFS. Non usa mai i punti GPS: non si corregge seguendo
 il pallone.
 
+**Il cerchio grigio tratteggiato** intorno all'arrivo previsto è l'errore di
+previsione, con la stessa curva dell'opzione della pagina Traiettoria
+(`convergenza_curva.json` sul branch `dati`, terzo quartile interpolato
+sull'età della corsa GFS e scalato con la durata del volo). Compare quando la
+data del lancio entra nell'orizzonte del previsore, circa una settimana
+prima, si restringe giorno per giorno a ogni nuova corsa e sparisce il
+giorno del lancio, quando vale zero per definizione. È un `L.circle`, solo
+sulla mappa 2D; il tooltip dice raggio ed età della corsa.
+
 ### Three.js
 
 I due modelli 3D — la sonda e la catena di volo — usano **Three.js r128**,
@@ -559,6 +569,19 @@ approvare la propria richiesta di modifica.
   segnale a parte — se il giorno stesso il lancio slitta rispetto all'ora
   prevista, si aggiorna `LAUNCH` all'ora vera (commit e push) e il resto
   (conto alla rovescia, quota stimata in `assets/spot.js`) segue da solo.
+
+- **Il payload pesato e la portanza al collo misurata**, prima e durante il
+  lancio: `FLIGHT_PAYLOAD_KG` (oggi 1,5) e `FLIGHT_NECK_LIFT_G` (oggi
+  `null`) in `assets/app.js`, con uno o più commit. Finché la portanza è
+  `null` vale la salita prevista `FLIGHT_ASCENT_MS` (5 m/s). Non c'è un
+  calcolo a parte: `voloDiretta()` in `assets/traiettoria.js` usa lo stesso
+  codice del modulo della pagina Traiettoria — volume d'elio dalla salita o
+  dalla portanza, salita, discesa al suolo con il paracadute del kit, quota
+  di scoppio con l'atmosfera prevista per il giorno e l'ora di `LAUNCH` (ISA
+  se è più in là della settimana della previsione) — e i risultati
+  sostituiscono `FLIGHT_BURST_KM` e `FLIGHT_DESCENT_V0_MS`, che restano solo
+  come riserva finché il calcolo non arriva. `assets/spot.js` richiede
+  allora di nuovo la traiettoria grigia con i numeri nuovi.
 
 - **La quota di scoppio e le velocità di salita/discesa**, nella pagina
   Diretta. `FLIGHT_BURST_KM`, `FLIGHT_ASCENT_MS` e `FLIGHT_DESCENT_V0_MS`

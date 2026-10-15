@@ -39,7 +39,12 @@
    ========================================================== */
 window.COMETA_SPOT = (function(){
   const TRAJ_URL = "https://api.v2.sondehub.org/tawhiri";   // lo stesso previsore di assets/traiettoria.js
-  const TRAJ_POLL_MS = 20 * 60000;  // il modello GFS si aggiorna ogni poche ore: ogni 20 min basta per non perdere un aggiornamento
+  const TRAJ_POLL_MS = 20 * 60000;
+  /* Curva di convergenza delle previsioni (la stessa dell'opzione «Errore
+     di previsione» di assets/traiettoria.js): di quanto si sposta ancora
+     l'atterraggio previsto fino al giorno del lancio. */
+  const CURVA = "https://raw.githubusercontent.com/cometa-sim/cometa-sim.github.io/dati/convergenza_curva.json";
+  const CURVA_NMIN = 8;  // il modello GFS si aggiorna ogni poche ore: ogni 20 min basta per non perdere un aggiornamento
   const LEAFLET = "assets/vendor/leaflet/";
   const TILES = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
   const METEO = "https://api.open-meteo.com/v1/forecast";  // stesso servizio usato dal previsore, assets/traiettoria.js
@@ -55,7 +60,7 @@ window.COMETA_SPOT = (function(){
      centrata sull'Uruguay invece che sull'oceano a (0,0). */
   const FALLBACK = {lat:-33.0, lon:-56.5, zoom:7};
 
-  let view = null, trajFull = null;   /* vista 3D (assets/map3d.js): il pulsante 2D/3D; trajFull = traiettoria prevista con le quote */
+  let view = null, trajFull = null, fcCircle = null, fcLast = null;   /* vista 3D (assets/map3d.js): il pulsante 2D/3D; trajFull = traiettoria prevista con le quote */
   let map, trail, ptsLayer, marker, markerHit, trajLine, trajRun, mapReady, pollId, tickId, trajId,
       elMap, elStatus, elAltEst, elAltGps, elRecenter,
       lastPoints, lastErr, curLang = "it", lastEstKm = null,
@@ -194,13 +199,13 @@ window.COMETA_SPOT = (function(){
     });
     const mapkit = window.COMETA_MAPKIT ? Promise.resolve() : new Promise(function(ok, ko){
       const s = document.createElement("script");
-      s.src = "assets/mapkit.js?v=180";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
+      s.src = "assets/mapkit.js?v=183";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
       s.onload = ok; s.onerror = ko;
       document.head.appendChild(s);
     });
     const map3d = window.COMETA_MAP3D ? Promise.resolve() : new Promise(function(ok){
       const s = document.createElement("script");
-      s.src = "assets/map3d.js?v=180";
+      s.src = "assets/map3d.js?v=183";
       s.onload = ok; s.onerror = ok;     // senza, resta il 2D e basta
       document.head.appendChild(s);
     });
@@ -536,7 +541,8 @@ window.COMETA_SPOT = (function(){
       .then(function(d){
         if(!d || d.error || !d.prediction) return;      // silenzioso: fuori orizzonte, o previsore non pronto
         const run = d.request && d.request.dataset;
-        if(run && run === trajRun) return;               // stessa corsa GFS di prima: niente da ridisegnare
+        const key = run + "|" + q.toString();            // corsa GFS e parametri del volo
+        if(run && key === trajRun) return;               // stessa corsa, stessi dati: niente da ridisegnare
         const pts = [], full = [];
         d.prediction.forEach(function(stage){
           stage.trajectory.forEach(function(p){
@@ -546,17 +552,72 @@ window.COMETA_SPOT = (function(){
           });
         });
         if(pts.length < 2) return;
-        trajRun = run;
+        trajRun = key;
         trajFull = full;
-        ensureMap().then(function(){
+        const st = d.prediction[0].trajectory, en = d.prediction[d.prediction.length - 1].trajectory;
+        const durMin = (new Date(en[en.length - 1].datetime) - new Date(st[0].datetime)) / 6e4;
+        Promise.all([ensureMap(), loadCurva()]).then(function(res){
           const L = window.L;
           if(!trajLine) trajLine = L.polyline(pts, {color:GREY, weight:2, opacity:.85, dashArray:"5 8", interactive:false}).addTo(map);
           else trajLine.setLatLngs(pts);
           trajLine.bringToBack();
+          drawFc(res[1], pts[pts.length - 1], run ? new Date(run) : null, L0, durMin);
           redraw3d(false);
         });
       })
       .catch(function(){ /* silenzioso: offline, CORS, o fuori dall'orizzonte del previsore */ });
+  }
+
+  /* Errore di previsione intorno all'atterraggio previsto: un cerchio
+     grigio di raggio pari al terzo quartile della curva, interpolato
+     sull'eta' della corsa GFS usata (lancio - corsa) e scalato con la
+     durata del volo; stessa logica di fcRadius() in assets/traiettoria.js.
+     Si restringe giorno per giorno; il giorno del lancio e' zero per
+     definizione e il cerchio sparisce. Solo sulla mappa 2D. */
+  let curva = null;
+  function loadCurva(){
+    if(curva) return curva;
+    curva = fetch(CURVA, {cache:"no-cache"}).then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(d){ return d && d.classi ? d : null; }, function(){ return null; })
+      .then(function(d){ if(!d) curva = null; return d; });       // un fallimento non si ricorda
+    return curva;
+  }
+  function dayUy(dt){
+    return new Intl.DateTimeFormat("en-CA", {timeZone:TZ, year:"numeric", month:"2-digit", day:"2-digit"}).format(dt);
+  }
+  function fcRadiusKm(d, run, L0, durMin){
+    if(!d || !run || dayUy(L0) <= dayUy(new Date())) return null;   // giorno del lancio: zero
+    const age = (L0 - run) / 36e5;
+    const C = d.classi.filter(function(c){ return c.n >= CURVA_NMIN; })
+      .sort(function(a, b){ return a.eta_h - b.eta_h; });
+    if(C.length < 2 || age > C[C.length - 1].eta_h + 12) return null;
+    let q = 0;
+    if(age >= C[C.length - 1].eta_h) q = C[C.length - 1].q3_km;
+    else if(age > C[0].eta_h){
+      for(let i = 0; i < C.length - 1; i++){
+        const a = C[i], b = C[i + 1];
+        if(age <= b.eta_h){ q = a.q3_km + (age - a.eta_h) / (b.eta_h - a.eta_h) * (b.q3_km - a.q3_km); break; }
+      }
+    }
+    const km = q * (d.durata_ref_min > 0 ? durMin / d.durata_ref_min : 1);
+    return km > 0 ? {km:km, age:age} : null;
+  }
+  function fcTip(){
+    return (dict().dirFcTip || "± {r} km").replace("{r}", Math.round(fcLast.km)).replace("{h}", Math.round(fcLast.age));
+  }
+  function drawFc(d, end, run, L0, durMin){
+    const L = window.L;
+    fcLast = fcRadiusKm(d, run, L0, durMin);
+    if(!fcLast){ if(fcCircle){ fcCircle.remove(); fcCircle = null; } return; }
+    /* L.circle: un arco SVG vero, liscio a ogni zoom */
+    if(!fcCircle){
+      fcCircle = L.circle(end, {radius:fcLast.km * 1000, color:GREY, weight:1.5, opacity:.9, dashArray:"5 8",
+        fillColor:GREY, fillOpacity:.12, bubblingMouseEvents:true}).addTo(map);
+      fcCircle.bindTooltip(fcTip(), {sticky:true});
+    } else {
+      fcCircle.setLatLng(end); fcCircle.setRadius(fcLast.km * 1000); fcCircle.setTooltipContent(fcTip());
+    }
+    fcCircle.bringToBack();
   }
 
   /* Le cinque icone del meteo (sole, sole e nuvola, nuvola e goccia, nuvola
@@ -648,6 +709,8 @@ window.COMETA_SPOT = (function(){
 
   return {
     setActive: function(on){ if(on) start(); else stop(); },
-    setLang: function(l){ curLang = l; renderStatus(); }
+    /* i dati del volo sono cambiati (assets/traiettoria.js, voloDiretta) */
+    refreshTrajectory: function(){ if(trajId) pollTrajectory(); },
+    setLang: function(l){ curLang = l; renderStatus(); if(fcCircle && fcLast) fcCircle.setTooltipContent(fcTip()); }
   };
 })();

@@ -582,14 +582,27 @@ window.COMETA_LAUNCH = LAUNCH;
    (SUGGERITI[0] in assets/traiettoria.js): e' una costante a parte,
    invece di leggerla dal modulo di quella pagina, apposta — cosi' non
    dipende da cosa un visitatore potrebbe aver cambiato lì per curiosita'.
-   Il giorno del lancio vanno sostituiti tutti questi valori con quelli
-   precisi di quella previsione specifica — li aggiorna chi segue il
-   lancio, qui e in nessun altro posto. */
+   Il volo vero non si scrive qui a mano: si aggiornano il payload pesato
+   e la portanza al collo misurata (FLIGHT_PAYLOAD_KG, FLIGHT_NECK_LIFT_G,
+   piu' sotto), e il resto lo calcola il codice della pagina Traiettoria. */
 const FLIGHT_BURST_KM = 37.9;
 const FLIGHT_ASCENT_MS = 5;
 const FLIGHT_DESCENT_V0_MS = 4.6;
 const FLIGHT_SITE = {lat: -33.2486, lon: -58.0736};
-window.COMETA_FLIGHT = {burstKm: FLIGHT_BURST_KM, ascentMs: FLIGHT_ASCENT_MS, descentV0Ms: FLIGHT_DESCENT_V0_MS, site: FLIGHT_SITE};
+/* I dati del volo vero, da aggiornare con un commit quando si misurano:
+   il payload si pesa prima del lancio, la portanza al collo si legge
+   durante il gonfiaggio (in grammi; null finche' non c'e', e allora vale
+   la salita prevista FLIGHT_ASCENT_MS). Da questi assets/traiettoria.js
+   (voloDiretta) calcola salita, quota di scoppio e discesa con lo stesso
+   codice del modulo della pagina Traiettoria e l'atmosfera prevista per
+   il giorno e l'ora di LAUNCH; FLIGHT_BURST_KM e FLIGHT_DESCENT_V0_MS
+   qui sopra restano solo come valori di riserva, finche' quel calcolo
+   non arriva. */
+const FLIGHT_BALLOON = "2000";       /* Strato 2000, come i preset della pagina Traiettoria */
+const FLIGHT_PAYLOAD_KG = 1.5;
+const FLIGHT_NECK_LIFT_G = null;
+window.COMETA_FLIGHT = {burstKm: FLIGHT_BURST_KM, ascentMs: FLIGHT_ASCENT_MS, descentV0Ms: FLIGHT_DESCENT_V0_MS, site: FLIGHT_SITE,
+  cfg: {bal: FLIGHT_BALLOON, pay: FLIGHT_PAYLOAD_KG, asc: FLIGHT_ASCENT_MS, neckG: FLIGHT_NECK_LIFT_G}};
 
 /* Il backend che interroga SPOT una sola volta per tutti i visitatori
    (worker/, Cloudflare Worker + Durable Object — vedi worker/README.md):

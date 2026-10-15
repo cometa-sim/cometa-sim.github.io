@@ -227,20 +227,27 @@ function quotaScoppioCol(V, d, rho){
 /* Una richiesta per luogo copre tutta la settimana della previsione */
 let atmo = {key:null, promise:null, h:null};
 function atmoKey(pl){ return pl.lat.toFixed(2) + "," + pl.lon.toFixed(2); }
-function loadAtmo(pl){
-  if(!pl) return Promise.resolve(null);
-  const k = atmoKey(pl);
-  if(atmo.key === k && atmo.promise) return atmo.promise;
+/* L'atmosfera prevista per un luogo, ora per ora per tutta la settimana della
+   previsione (null se non arriva). La usa il modulo (loadAtmo, con la cache
+   del luogo scelto) e il volo della Diretta (voloDiretta, piu' sotto). */
+function fetchHourly(pl){
   const hourly = [];
   LIVELLI.forEach(function(l){ hourly.push("temperature_" + l + "hPa", "geopotential_height_" + l + "hPa"); });
   hourly.push("temperature_2m", "surface_pressure");        /* per il gonfiaggio */
   const q = new URLSearchParams({latitude:pl.lat.toFixed(4), longitude:pl.lon.toFixed(4),
     hourly:hourly.join(","), timezone:TZ, start_date:today, end_date:lastDay});
+  return fetch(METEO + "?" + q.toString())
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(d){ return d && d.hourly ? d.hourly : null; }, function(){ return null; });
+}
+function loadAtmo(pl){
+  if(!pl) return Promise.resolve(null);
+  const k = atmoKey(pl);
+  if(atmo.key === k && atmo.promise) return atmo.promise;
   const cur = {key:k, h:null, promise:null};
   atmo = cur;
-  cur.promise = fetch(METEO + "?" + q.toString())
-    .then(function(r){ return r.ok ? r.json() : null; })
-    .then(function(d){ cur.h = d && d.hourly ? d.hourly : null; return cur.h; }, function(){ return null; })
+  cur.promise = fetchHourly(pl)
+    .then(function(h){ cur.h = h; return h; })
     .then(function(h){
       /* una risposta fallita (429, rete) non si ricorda: la prossima richiesta per questo luogo riprova */
       if(!h && atmo === cur) atmo = {key:null, promise:null, h:null};
@@ -706,13 +713,13 @@ function loadLeaflet(){
      parallelo con leaflet.js. */
   const mapkit = window.COMETA_MAPKIT ? Promise.resolve() : new Promise(function(ok, ko){
     const s = document.createElement("script");
-    s.src = "assets/mapkit.js?v=180";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
+    s.src = "assets/mapkit.js?v=183";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
     s.onload = ok; s.onerror = ko;
     document.head.appendChild(s);
   });
   const map3d = window.COMETA_MAP3D ? Promise.resolve() : new Promise(function(ok){
     const s = document.createElement("script");
-    s.src = "assets/map3d.js?v=180";
+    s.src = "assets/map3d.js?v=183";
     s.onload = ok; s.onerror = ok;       /* senza, resta il 2D e basta */
     document.head.appendChild(s);
   });
@@ -1521,5 +1528,43 @@ function relabel(){
 }
 new MutationObserver(relabel).observe(document.documentElement, {attributes:true, attributeFilter:["lang"]});
 relabel();
+
+/* ==========================================================
+   Il volo della pagina Diretta
+   ========================================================== */
+/* I dati del volo vero stanno in assets/app.js (window.COMETA_FLIGHT.cfg:
+   pallone, payload pesato, salita prevista o portanza al collo misurata,
+   partenza; ora di window.COMETA_LAUNCH). Qui si calcolano con lo stesso
+   codice del modulo: volume d'elio, salita, discesa al suolo con il
+   paracadute del kit e quota di scoppio con l'atmosfera prevista per quel
+   luogo, quel giorno e quell'ora (ISA se il giorno e' fuori dalla
+   settimana della previsione). Il risultato sostituisce i valori di
+   riserva di window.COMETA_FLIGHT, e assets/spot.js richiede di nuovo la
+   traiettoria grigia con questi numeri. */
+function voloDiretta(){
+  const F = window.COMETA_FLIGHT, L0 = window.COMETA_LAUNCH;
+  if(!F || !F.cfg || !F.site || !L0) return;
+  const c = F.cfg, pr = PRESET[c.bal] || PRESET["2000"];
+  let V, asc;
+  if(c.neckG > 0){                                   /* portanza misurata: fissa l'elio */
+    V = (c.neckG/1000 + pr.mass)/DRATIO;
+    asc = ascRate(V, pr.mass, c.pay);
+  } else {
+    V = volumePerSalita(pr.mass, c.pay, c.asc);
+    asc = c.asc;
+  }
+  if(!V || !(asc > 0)) return;                       /* dati impossibili: restano quelli di riserva */
+  const iso = isoDay(L0);
+  const hhmm = new Intl.DateTimeFormat("en-GB", {timeZone:TZ, hour:"2-digit", minute:"2-digit", hour12:false}).format(L0);
+  fetchHourly(F.site).then(function(h){
+    const col = dayColumn(h, iso, hhmm, F.site.lat);
+    F.ascentMs = asc;
+    F.burstKm = (col ? quotaScoppioCol(V, pr.diam, col) : quotaScoppio(V, pr.diam))/1000;
+    F.descentV0Ms = vAtterraggio(c.pay + PARA_M, PARA_D);
+    F.atmo = col ? "day" : "std";
+    if(window.COMETA_SPOT && window.COMETA_SPOT.refreshTrajectory) window.COMETA_SPOT.refreshTrajectory();
+  });
+}
+voloDiretta();
 
 })();
