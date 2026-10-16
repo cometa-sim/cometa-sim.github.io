@@ -713,13 +713,13 @@ function loadLeaflet(){
      parallelo con leaflet.js. */
   const mapkit = window.COMETA_MAPKIT ? Promise.resolve() : new Promise(function(ok, ko){
     const s = document.createElement("script");
-    s.src = "assets/mapkit.js?v=183";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
+    s.src = "assets/mapkit.js?v=184";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
     s.onload = ok; s.onerror = ko;
     document.head.appendChild(s);
   });
   const map3d = window.COMETA_MAP3D ? Promise.resolve() : new Promise(function(ok){
     const s = document.createElement("script");
-    s.src = "assets/map3d.js?v=183";
+    s.src = "assets/map3d.js?v=184";
     s.onload = ok; s.onerror = ok;       /* senza, resta il 2D e basta */
     document.head.appendChild(s);
   });
@@ -919,7 +919,7 @@ function legendLand(g){
   const names = g.specs.map(function(x){
     return t({B:"twLegPB", A:"twLegPA", D:"twLegPD"}[x.k]) + " (±" + num(x.s*100, (x.s*1000) % 10 ? 1 : 0) + " %)";
   });
-  if(g.fc) names.push(t("twLegFc").replace("{r}", num(g.fc.km, 0)));
+  if(g.fc) names.push(t("twLegFc").replace("{t}", fcTempo(g.fc.toLaunch)));
   const list = names.length < 2 ? names[0] : names.slice(0, -1).join(", ") + " " + t("twAnd") + " " + names[names.length - 1];
   return t("twLegend") + " " + t(g.n > 1 || g.fc ? "twLegLand" : "twLegLine") + " " + list + ". " + t("twLegWind");
 }
@@ -981,7 +981,12 @@ function fcRadius(d, r, iso){
     }
   }
   const k = d.durata_ref_min > 0 ? r.dur/d.durata_ref_min : 1;
-  return {km:q*k, age:age, q:q, k:k};
+  return {km:q*k, age:age, q:q, k:k, toLaunch:(r.pts[0].t - Date.now())/36e5};
+}
+/* Tempo al lancio: in giorni, sotto le 72 h in ore */
+function fcTempo(h){
+  if(h < 72){ const n = Math.max(1, Math.round(h)); return t(n === 1 ? "twFcHour" : "twFcHours").replace("{n}", n); }
+  const n = Math.round(h/24); return t(n === 1 ? "twFcDay" : "twFcDays").replace("{n}", n);
 }
 /* Somma di Minkowski: ogni punto dell'area (o della linea, o il solo
    atterraggio nominale) si sposta di un vettore qualunque lungo al piu'
@@ -1151,12 +1156,14 @@ function renderCard(r){
    [t("twAt"),        fmtTime(r.end.t, false)],
    [t("twBurstDist"), num(r.burstDist, 0) + " km"],
    [t("twBurstC"),    num(r.burst.alt/1000, 1) + " km"]
-  ].concat(r.spread ? [[t("twErrLand"), num(r.spread.extent, 1) + " km"]] : [])
+  /* con il solo errore di previsione l'estensione e' il diametro del
+     cerchio: non aggiunge niente al raggio */
+  ].concat(r.spread && r.spread.n ? [[t("twErrLand"), num(r.spread.extent, 1) + " km"]] : [])
    .concat(r.spread ? r.spread.specs.map(function(x){
      const k = {B:"twBurstRange", A:"twAscRange", D:"twDescRange"}[x.k], u = x.k === "B" ? " km" : " m/s", d = x.k === "B" ? 1 : 2;
      return [t(k), num(x.lov, d) + "–" + num(x.hiv, d) + u];
    }) : [])
-   .concat(r.fc && r.fc.km > 0 ? [[t("twFcRow"), "± " + num(r.fc.km, 0) + " km · " + t("twFcAge").replace("{h}", num(r.fc.age, 0))]] : [])
+   .concat(r.fc && r.fc.km > 0 ? [[t("twFcRow"), "R = " + num(r.fc.km, 0) + " km"], [t("twFcTime"), fcTempo(r.fc.toLaunch)]] : [])
    .forEach(function(row){ dl.appendChild(el("dt", null, row[0])); dl.appendChild(el("dd", null, row[1])); });
   card.appendChild(dl);
   if(r.atmo) card.appendChild(el("p", "tw-hint tw-card-note",
