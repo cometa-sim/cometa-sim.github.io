@@ -75,11 +75,11 @@ Norme e autorizzazioni · Domande · Chi siamo.
 ### Dopo ogni modifica: il numero di versione
 
 In `index.html` i file di `assets/`, e la mappa, sono richiamati con un numero in
-coda — oggi `?v=183`:
+coda — oggi `?v=185`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=183">
-<script src="assets/i18n.js?v=183"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=185">
+<script src="assets/i18n.js?v=185"></script>
 ```
 
 Lo stesso numero compare anche in punti meno visibili, che vanno alzati
@@ -338,7 +338,13 @@ chi guarda, senza server nostri:
    Sotto, «Errore di previsione»: allarga linea o area (o, da solo, fa un
    cerchio intorno all'atterraggio) di quanto la previsione può ancora
    spostarsi fino al giorno del lancio; vedi «Quanto ci si può fidare
-   della previsione a qualche giorno» più sotto.
+   della previsione a qualche giorno» più sotto. La scheda dà il raggio
+   (R = … km) e, in una riga a parte («Run GFS»), l'età della corsa GFS
+   usata rispetto al lancio (in giorni, sotto le 72 h in ore, «50 h»), e
+   la didascalia dice il tempo al lancio invece del
+   raggio, che si vede già sulla mappa: così si capisce che l'errore
+   dipende da quanto manca. Con il solo errore di previsione la scheda non
+   riporta l'estensione massima, che sarebbe solo il diametro.
 
 Sotto la mappa, il riquadro meteo (icona, temperatura, vento, nuvole,
 probabilità di pioggia) è la previsione oraria di Open-Meteo per il punto, il
