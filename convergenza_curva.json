@@ -1,12 +1,12 @@
 {
- "aggiornato": "2026-10-16T08:28:33Z",
+ "aggiornato": "2026-10-17T08:00:34Z",
  "sito": "Mercedes (Uruguay)",
- "durata_ref_min": 176.4,
+ "durata_ref_min": 176.3,
  "classi": [
   {
    "tau": 0,
-   "n": 20,
-   "eta_h": 11.0,
+   "n": 21,
+   "eta_h": 14.0,
    "q1_km": 0.0,
    "mediana_km": 0.0,
    "q3_km": 0.0,
@@ -14,66 +14,66 @@
   },
   {
    "tau": 1,
-   "n": 18,
-   "eta_h": 35.0,
-   "q1_km": 5.46,
-   "mediana_km": 6.74,
-   "q3_km": 10.51,
-   "rms_km": 9.31
+   "n": 19,
+   "eta_h": 38.0,
+   "q1_km": 4.95,
+   "mediana_km": 6.71,
+   "q3_km": 9.81,
+   "rms_km": 9.12
   },
   {
    "tau": 2,
-   "n": 17,
-   "eta_h": 56.0,
-   "q1_km": 6.4,
-   "mediana_km": 10.48,
-   "q3_km": 14.42,
-   "rms_km": 14.49
+   "n": 18,
+   "eta_h": 59.0,
+   "q1_km": 6.44,
+   "mediana_km": 10.37,
+   "q3_km": 14.26,
+   "rms_km": 14.29
   },
   {
    "tau": 3,
-   "n": 16,
+   "n": 17,
    "eta_h": 80.0,
-   "q1_km": 13.34,
-   "mediana_km": 15.04,
-   "q3_km": 20.72,
-   "rms_km": 18.66
+   "q1_km": 12.69,
+   "mediana_km": 14.32,
+   "q3_km": 19.46,
+   "rms_km": 18.15
   },
   {
    "tau": 4,
-   "n": 16,
+   "n": 17,
    "eta_h": 104.0,
-   "q1_km": 14.27,
-   "mediana_km": 18.2,
-   "q3_km": 29.84,
-   "rms_km": 23.43
+   "q1_km": 13.23,
+   "mediana_km": 16.62,
+   "q3_km": 29.46,
+   "rms_km": 22.92
   },
   {
    "tau": 5,
-   "n": 15,
+   "n": 16,
    "eta_h": 128.0,
-   "q1_km": 18.95,
-   "mediana_km": 22.45,
-   "q3_km": 34.59,
-   "rms_km": 29.42
+   "q1_km": 19.05,
+   "mediana_km": 22.02,
+   "q3_km": 32.78,
+   "rms_km": 28.99
   },
   {
    "tau": 6,
-   "n": 14,
-   "eta_h": 155.0,
-   "q1_km": 27.36,
-   "mediana_km": 35.52,
-   "q3_km": 46.58,
-   "rms_km": 46.16
+   "n": 15,
+   "eta_h": 152.0,
+   "q1_km": 28.12,
+   "mediana_km": 34.48,
+   "q3_km": 45.32,
+   "rms_km": 45.48
   },
   {
    "tau": 7,
-   "n": 13,
-   "eta_h": 176.0,
-   "q1_km": 35.88,
-   "mediana_km": 39.79,
-   "q3_km": 63.22,
-   "rms_km": 52.87
+   "n": 14,
+   "eta_h": 179.0,
+   "q1_km": 30.93,
+   "mediana_km": 39.64,
+   "q3_km": 61.89,
+   "rms_km": 51.34
   }
  ]
 }
