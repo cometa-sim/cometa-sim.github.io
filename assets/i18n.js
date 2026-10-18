@@ -271,6 +271,11 @@ it:{
   contactHead:"Seguici", contactSub:"Per vedere i nostri contenuti e scoprire le novità sulla missione.", igCta:"Seguici su Instagram",
 
   /* — Pie di pagina e altimetro — */
+  /* — Codice aperto — */
+  opKicker:"Una nota su questo progetto e sul sito",
+  opP1:"L'aspetto più bello della conoscenza è la condivisione. Senza il lavoro di altri non avremmo potuto sviluppare il nostro progetto, e speriamo che altri possano ispirarsi a quello che stiamo facendo noi. Per questo il nostro sito raccoglie tutte le informazioni — compresi gli errori — su come abbiamo pianificato e stiamo portando avanti il progetto: dalla comprensione della fisica, alle scelte fatte sulla progettazione della sonda, dallo studio dei venti e della traiettoria, fino agli aspetti legali.",
+  opP2:"Inoltre il sito è aperto e ospitato in una <a href=\"https://github.com/cometa-sim/cometa-sim.github.io\" target=\"_blank\" rel=\"noopener\">repository di GitHub</a>: tutto il materiale, inclusi gli script Python da noi sviluppati, può essere utilizzato gratuitamente, rispettando la licenza — <strong>MIT</strong> per il codice, <strong>CC BY 4.0</strong> per i testi e le immagini.",
+  opP3:"Sempre su GitHub, in <a href=\"https://github.com/cometa-sim/cometa-firmware\" target=\"_blank\" rel=\"noopener\">un'altra repository</a>, si trova il firmware — attualmente ancora in fase di sviluppo — per far funzionare i sensori.",
   footNav:"Pagine", footFollow:"Seguici", footStatus:"Stato: in corso", footRights:"Testi e immagini CC BY 4.0",
 
   /* — La fisica del volo — */
@@ -728,6 +733,11 @@ es:{
   aboutBody:"Somos estudiantes de 2EMS, IIIS, 3EMS, IVL y IVS de la Scuola Italiana di Montevideo.",
   contactHead:"Seguinos", contactSub:"Para ver nuestros contenidos y descubrir las novedades de la misión.", igCta:"Seguinos en Instagram",
 
+  /* — Código abierto — */
+  opKicker:"Una nota sobre este proyecto y sobre el sitio",
+  opP1:"Lo más lindo del conocimiento es compartirlo. Sin el trabajo de otros no habríamos podido desarrollar nuestro proyecto, y esperamos que otros puedan inspirarse en lo que estamos haciendo nosotros. Por eso nuestro sitio reúne toda la información — incluidos los errores — sobre cómo planificamos y estamos llevando adelante el proyecto: desde la comprensión de la física, a las decisiones tomadas en el diseño de la sonda, del estudio de los vientos y de la trayectoria, hasta los aspectos legales.",
+  opP2:"Además el sitio es abierto y está alojado en un <a href=\"https://github.com/cometa-sim/cometa-sim.github.io\" target=\"_blank\" rel=\"noopener\">repositorio de GitHub</a>: todo el material, incluidos los scripts de Python que desarrollamos, puede usarse gratuitamente, respetando la licencia — <strong>MIT</strong> para el código, <strong>CC BY 4.0</strong> para los textos y las imágenes.",
+  opP3:"También en GitHub, en <a href=\"https://github.com/cometa-sim/cometa-firmware\" target=\"_blank\" rel=\"noopener\">otro repositorio</a>, está el firmware — por ahora todavía en desarrollo — que hace funcionar los sensores.",
   footNav:"Páginas", footFollow:"Seguinos", footStatus:"Estado: en curso", footRights:"Textos e imágenes CC BY 4.0",
 
   /* — La física del vuelo — */
@@ -1185,6 +1195,11 @@ en:{
   aboutBody:"We are students of 2EMS, IIIS, 3EMS, IVL and IVS at the Scuola Italiana di Montevideo.",
   contactHead:"Follow us", contactSub:"To see what we are making and follow the mission news.", igCta:"Follow on Instagram",
 
+  /* — Open source — */
+  opKicker:"A note on this project and on this site",
+  opP1:"The finest thing about knowledge is sharing it. Without other people's work we could not have developed our project, and we hope others can draw inspiration from what we are doing. That is why our site gathers all the information — mistakes included — on how we planned and are carrying out the project: from understanding the physics, to the choices made in designing the probe, from the wind and trajectory study, through to the legal side.",
+  opP2:"The site is also open, and hosted in a <a href=\"https://github.com/cometa-sim/cometa-sim.github.io\" target=\"_blank\" rel=\"noopener\">GitHub repository</a>: all the material, including the Python scripts we wrote, can be used free of charge, respecting the licence — <strong>MIT</strong> for the code, <strong>CC BY 4.0</strong> for the texts and images.",
+  opP3:"Also on GitHub, in <a href=\"https://github.com/cometa-sim/cometa-firmware\" target=\"_blank\" rel=\"noopener\">another repository</a>, is the firmware — still under development — that makes the sensors work.",
   footNav:"Pages", footFollow:"Follow us", footStatus:"Status: in progress", footRights:"Text and images CC BY 4.0",
 
   /* — The physics of the flight — */

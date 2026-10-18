@@ -195,6 +195,15 @@ h3.sub-head{font-family:var(--disp);font-weight:600;font-size:clamp(19px,2.4vw,2
 .note strong{color:var(--ink);font-weight:600}
 /* Nota sulla data del lancio, in fondo alla pagina iniziale:
    piu' aria sopra dei 28px di .note, per staccarla dai teaser */
+/* Nota sul progetto aperto, nella pagina iniziale sotto ai riquadri.
+   Nome verificato: nessun altro selettore usa aperto. Un filetto a
+   sinistra la stacca dai riquadri senza farne un riquadro a sua volta. */
+.aperto{margin-top:52px;padding-left:22px;border-left:1px solid var(--line-soft);max-width:66ch}
+.aperto .kicker{margin-bottom:16px}
+.aperto .body-col p{margin-bottom:1rem}
+.aperto .body-col p:last-child{margin-bottom:0}
+@media(max-width:560px){.aperto{margin-top:38px;padding-left:16px}}
+
 .note-date{margin-top:46px;margin-bottom:10px}
 @media(max-width:560px){.note-date{margin-top:34px}}
 
