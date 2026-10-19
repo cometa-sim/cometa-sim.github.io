@@ -5,6 +5,13 @@ name = "cometa-lora"
 main = "src/index.ts"
 compatibility_date = "2025-09-01"
 
+# L'indirizzo *.workers.dev resta acceso: e' quello che usano le stazioni.
+# Gli URL di anteprima (uno per ogni versione pubblicata) invece no: ogni
+# versione vecchia resterebbe raggiungibile al suo indirizzo, anche una
+# pubblicata per sbaglio, e alle stazioni non servono.
+workers_dev = true
+preview_urls = false
+
 # I log, visibili in Logs sulla dashboard e con `npm run tail`.
 [observability.logs]
 enabled = true
@@ -42,6 +49,8 @@ bucket_name = "cometa-lora-grezzo"
 # (con una chiave diversa da quella vera).
 [env.prova]
 name = "cometa-lora-prova"
+workers_dev = true
+preview_urls = false
 
 [env.prova.vars]
 ALLOWED_ORIGINS = "https://cometa-sim.github.io,https://cometa.scuolaitaliana.edu.uy,http://localhost:8000"
