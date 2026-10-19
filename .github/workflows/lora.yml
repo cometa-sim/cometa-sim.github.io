@@ -1,0 +1,42 @@
+# COMETA — test della telemetria LoRa (lora/)
+#
+# Gira solo quando una richiesta di modifica tocca lora/: controlla i tipi
+# del Worker e fa girare i test del formato e del Worker. Non pubblica
+# niente: il deploy lo fa Cloudflare da sola, dopo l'unione in main (vedi
+# lora/README.md).
+
+name: Telemetria LoRa
+
+on:
+  pull_request:
+    paths:
+      - "lora/**"
+      - ".github/workflows/lora.yml"
+  push:
+    branches: [main]
+    paths:
+      - "lora/**"
+      - ".github/workflows/lora.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: lora/worker
+    steps:
+      - uses: actions/checkout@v4
+      # Node 22.18 o piu' recente: fa girare i test in TypeScript cosi'
+      # come sono, senza compilarli prima.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: lora/worker/package-lock.json
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test

@@ -1,0 +1,66 @@
+{
+  "_nota": "Righe d'esempio per i test di lora/formato/formato.js (formato.test.js) e del simulatore Python. 'validi': la riga, i dati che se ne devono leggere, e se va disegnata sulla mappa. 'non_validi': righe che si devono scartare, con il motivo solo come promemoria (i test controllano che vengano scartate, non il testo esatto dell'errore).",
+  "validi": [
+    {
+      "riga": "C2,412,143210,-33.245678,-58.031234,18240.0,5.20,9,3,4.98",
+      "dati": { "id": "C2", "n": 412, "utc": "143210", "lat": -33.245678, "lon": -58.031234, "alt_m": 18240, "vz_ms": 5.2, "sats": 9, "fix": 3, "v_batt": 4.98 },
+      "posizione": true
+    },
+    {
+      "riga": "C2,412,143210,-33.245678,-58.031234,18240.0,5.20,9,3,4.98\r\n",
+      "dati": { "id": "C2", "n": 412, "utc": "143210", "lat": -33.245678, "lon": -58.031234, "alt_m": 18240, "vz_ms": 5.2, "sats": 9, "fix": 3, "v_batt": 4.98 },
+      "posizione": true
+    },
+    {
+      "riga": "C2,413,,,,,,4,0,4.98",
+      "dati": { "id": "C2", "n": 413, "utc": null, "lat": null, "lon": null, "alt_m": null, "vz_ms": null, "sats": 4, "fix": 0, "v_batt": 4.98 },
+      "posizione": false
+    },
+    {
+      "riga": "C2,0,,,,,,,,5.01",
+      "dati": { "id": "C2", "n": 0, "utc": null, "lat": null, "lon": null, "alt_m": null, "vz_ms": null, "sats": null, "fix": null, "v_batt": 5.01 },
+      "posizione": false
+    },
+    {
+      "riga": "C2,2051,151502,-33.102938,-57.551200,31877.4,-87.35,11,3,4.71",
+      "dati": { "id": "C2", "n": 2051, "utc": "151502", "lat": -33.102938, "lon": -57.5512, "alt_m": 31877.4, "vz_ms": -87.35, "sats": 11, "fix": 3, "v_batt": 4.71 },
+      "posizione": true
+    },
+    {
+      "riga": "C2,3999,163000,-33.000001,-57.200000,-12.3,0.00,7,3,4.60",
+      "dati": { "id": "C2", "n": 3999, "utc": "163000", "lat": -33.000001, "lon": -57.2, "alt_m": -12.3, "vz_ms": 0, "sats": 7, "fix": 3, "v_batt": 4.6 },
+      "posizione": true
+    },
+    {
+      "riga": "C2,77,000000,-33.2,-58.0,40.0,0.00,5,0,4.90",
+      "dati": { "id": "C2", "n": 77, "utc": "000000", "lat": -33.2, "lon": -58, "alt_m": 40, "vz_ms": 0, "sats": 5, "fix": 0, "v_batt": 4.9 },
+      "posizione": false
+    }
+  ],
+  "non_validi": [
+    { "riga": "", "motivo": "riga vuota" },
+    { "riga": "\r\n", "motivo": "riga vuota" },
+    { "riga": "C2,412,143210,-33.245678,-58.031234,18240.0,5.20,9,3", "motivo": "un campo in meno" },
+    { "riga": "C2,412,143210,-33.245678,-58.031234,18240.0,5.20,9,3,4.98,1", "motivo": "un campo in piu'" },
+    { "riga": ",412,143210,-33.245678,-58.031234,18240.0,5.20,9,3,4.98", "motivo": "id vuoto" },
+    { "riga": "C2,,143210,-33.245678,-58.031234,18240.0,5.20,9,3,4.98", "motivo": "n vuoto" },
+    { "riga": "C-2,412,143210,-33.245678,-58.031234,18240.0,5.20,9,3,4.98", "motivo": "id con un trattino" },
+    { "riga": "C2,-1,143210,-33.245678,-58.031234,18240.0,5.20,9,3,4.98", "motivo": "n negativo" },
+    { "riga": "C2,41.2,143210,-33.245678,-58.031234,18240.0,5.20,9,3,4.98", "motivo": "n con decimali" },
+    { "riga": "C2,412,253210,-33.245678,-58.031234,18240.0,5.20,9,3,4.98", "motivo": "ora 25" },
+    { "riga": "C2,412,14321,-33.245678,-58.031234,18240.0,5.20,9,3,4.98", "motivo": "utc di 5 cifre" },
+    { "riga": "C2,412,143260,-33.245678,-58.031234,18240.0,5.20,9,3,4.98", "motivo": "secondi 60" },
+    { "riga": "C2,412,143210,-93.245678,-58.031234,18240.0,5.20,9,3,4.98", "motivo": "lat fuori intervallo" },
+    { "riga": "C2,412,143210,-33.245678,-198.031234,18240.0,5.20,9,3,4.98", "motivo": "lon fuori intervallo" },
+    { "riga": "C2,412,143210,-33.245678,,18240.0,5.20,9,3,4.98", "motivo": "lat senza lon" },
+    { "riga": "C2,412,143210,-33.245678,-58.031234,99999.0,5.20,9,3,4.98", "motivo": "quota assurda" },
+    { "riga": "C2,412,143210,-33.245678,-58.031234,1.8e4,5.20,9,3,4.98", "motivo": "notazione esponenziale" },
+    { "riga": "C2,412,143210,-33.245678,-58.031234,+18240.0,5.20,9,3,4.98", "motivo": "segno piu'" },
+    { "riga": "C2,412,143210,-33.245678,-58.031234,18240.0,5.20,9,3,4,98", "motivo": "virgola decimale: un campo in piu'" },
+    { "riga": "C2,412,143210,-33.245678,-58.031234, 18240.0,5.20,9,3,4.98", "motivo": "spazio in una cella" },
+    { "riga": "C2,412,143210,-33.245678,-58.031234,18240.0,5.20,nove,3,4.98", "motivo": "sats non numerico" },
+    { "riga": "C2,412,143210,-33.245678,-58.031234,18240.0,5.20,9,3,-4.98", "motivo": "v_batt negativa" },
+    { "riga": "C2,412,143210,-33.24C2,413,,,,,,4,0,4.98", "motivo": "due righe incollate" },
+    { "riga": "C2,412,143210,-33.245678,-58.031234,18240.0,5.20,9,3,4.98C2,413,,,,,,4,0,4.98C2,414,,,,,,4,0,4.98C2,415,,,,,,4,0,4.98", "motivo": "riga troppo lunga" }
+  ]
+}
