@@ -45,6 +45,7 @@ calcolo/convergenza_analisi.py      di quanto si sposta l'atterraggio previsto a
 .github/workflows/convergenza.yml   il workflow quotidiano, scrive sul branch dati
 
 worker/                             backend SPOT (Cloudflare Worker + Durable Object) — vedi worker/README.md
+lora/                               telemetria LoRa: formato della riga radio e Worker su R2 — vedi lora/README.md
 admin-diretta.html                  pagina di amministrazione della diretta (posizioni, polling, riserva) —
                                      non collegata dal sito, noindex, vedi worker/README.md
 

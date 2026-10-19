@@ -1,0 +1,62 @@
+# Worker della telemetria LoRa — vedi lora/README.md.
+# E' un Worker separato da quello dello SPOT (worker/): un errore qui non
+# deve poter fermare la diretta SPOT, e i due hanno secret e build propri.
+name = "cometa-lora"
+main = "src/index.ts"
+compatibility_date = "2025-09-01"
+
+# I log, visibili in Logs sulla dashboard e con `npm run tail`.
+[observability.logs]
+enabled = true
+head_sampling_rate = 1
+invocation_logs = true
+persist = true
+
+# Le origini da cui la pagina della stazione (servita dal sito) puo'
+# chiamare il Worker: il dominio del sito e quello tecnico di GitHub
+# Pages, utile per le prove. ID_SONDA: le righe con un altro id si
+# scartano (COMETA_RADIO_ID nel firmware).
+[vars]
+ALLOWED_ORIGINS = "https://cometa-sim.github.io,https://cometa.scuolaitaliana.edu.uy"
+ID_SONDA = "C2"
+LETTURA_DAL_WORKER = "false"
+
+# DATI e' il bucket pubblico (traccia.json, ultimo.json), servito da
+# dati.cometa.gripe; GREZZO e' quello privato delle righe grezze, senza
+# nessun dominio. I bucket vanno creati prima del primo deploy.
+[[r2_buckets]]
+binding = "DATI"
+bucket_name = "cometa-lora"
+
+[[r2_buckets]]
+binding = "GREZZO"
+bucket_name = "cometa-lora-grezzo"
+
+# L'ambiente di prova, per il simulatore: un Worker a parte
+# (cometa-lora-prova) con un bucket suo, cosi' un volo finto non finisce
+# mai sulla mappa vera. Si pubblica con `npm run deploy:prova`. Qui i
+# file si leggono dal Worker stesso (LETTURA_DAL_WORKER), quindi il
+# bucket di prova non ha bisogno di nessun dominio pubblico. In un
+# ambiente wrangler le variabili e i bucket non si ereditano: vanno
+# ripetuti tutti, e anche il secret CHIAVE_STAZIONE va impostato a parte
+# (con una chiave diversa da quella vera).
+[env.prova]
+name = "cometa-lora-prova"
+
+[env.prova.vars]
+ALLOWED_ORIGINS = "https://cometa-sim.github.io,https://cometa.scuolaitaliana.edu.uy,http://localhost:8000"
+ID_SONDA = "C2"
+LETTURA_DAL_WORKER = "true"
+
+[[env.prova.r2_buckets]]
+binding = "DATI"
+bucket_name = "cometa-lora-prova"
+
+[[env.prova.r2_buckets]]
+binding = "GREZZO"
+bucket_name = "cometa-lora-prova"
+
+# Secret, NON qui: CHIAVE_STAZIONE, la chiave che le stazioni mandano in
+# "Authorization: Bearer ...". Si imposta dalla dashboard (Settings ->
+# Variables and Secrets, tipo Secret) o con `wrangler secret put
+# CHIAVE_STAZIONE` (e `--env prova` per l'ambiente di prova).

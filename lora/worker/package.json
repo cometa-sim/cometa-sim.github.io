@@ -1,0 +1,21 @@
+{
+  "name": "cometa-lora",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Backend della telemetria LoRa di COMETA (Cloudflare Worker + R2): riceve le righe dalle stazioni di terra e pubblica traccia.json e ultimo.json.",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "deploy:prova": "wrangler deploy --env prova",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test test/*.test.ts ../formato/*.test.js",
+    "tail": "wrangler tail"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20261001.1",
+    "@types/node": "^22.20.5",
+    "typescript": "^5.6.3",
+    "wrangler": "^4.0.0"
+  }
+}
