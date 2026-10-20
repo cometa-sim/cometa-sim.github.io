@@ -10,7 +10,7 @@
      con la rete, la rende disponibile anche offline.
    - Il Worker (lora.cometa.gripe) non passa mai di qui: le richieste
      verso altri domini che non siano le mattonelle si lasciano stare. */
-const CACHE = "cometa-stazione-v1";
+const CACHE = "cometa-stazione-v2";
 const MATTONELLE = "cometa-stazione-mattonelle";
 const GUSCIO = ["./", "../../assets/vendor/leaflet/leaflet.js", "../../assets/vendor/leaflet/leaflet.css"];
 
@@ -18,8 +18,12 @@ self.addEventListener("install", function (e) {
   e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(GUSCIO); }).then(function () { return self.skipWaiting(); }));
 });
 
+/* Le copie delle versioni precedenti si buttano: non devono mai
+   ripresentarsi. */
 self.addEventListener("activate", function (e) {
-  e.waitUntil(self.clients.claim());
+  e.waitUntil(caches.keys().then(function (nomi) {
+    return Promise.all(nomi.filter(function (n) { return n !== CACHE && n !== MATTONELLE; }).map(function (n) { return caches.delete(n); }));
+  }).then(function () { return self.clients.claim(); }));
 });
 
 self.addEventListener("fetch", function (e) {
@@ -35,7 +39,11 @@ self.addEventListener("fetch", function (e) {
     return;
   }
   if (url.origin !== self.location.origin) return;
-  e.respondWith(fetch(e.request).then(function (r) {
+  /* cache: "no-cache" chiede sempre al server se la pagina e' cambiata
+     (GitHub Pages risponde 304 se no): senza, il browser puo' usare la
+     sua copia per 10 minuti, e una correzione appena pubblicata non
+     arriva. */
+  e.respondWith(fetch(e.request, { cache: "no-cache" }).then(function (r) {
     if (r.ok) { const copia = r.clone(); caches.open(CACHE).then(function (c) { c.put(e.request, copia); }); }
     return r;
   }).catch(function () {
