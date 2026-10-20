@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COMETA · Ground station</title>
+<!-- Pagina della stazione di terra della telemetria LoRa: non collegata
+     dal sito, non indicizzata. Vedi lora/README.md, "La pagina della
+     stazione". L'interfaccia e' in inglese, i commenti in italiano come
+     il resto del repository. -->
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0b1622">
+<link rel="stylesheet" href="../../assets/vendor/leaflet/leaflet.css">
+<style>
+  /* Pagina a se', senza il foglio di stile del sito: deve funzionare
+     anche se il sito cambia, e deve leggersi al sole, su un portatile
+     o su un telefono in macchina. Per questo il tema chiaro e' quello
+     predefinito, con numeri grandi; il tema scuro segue il sistema. */
+  :root{
+    --bg:#f4f6f8; --panel:#ffffff; --ink:#0b1622; --muted:#4f6275; --line:#d5dde5;
+    --accent:#0069c2; --ok:#11804a; --warn:#b26b00; --bad:#c62828; --lora:#7b2ff2;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#0b1622; --panel:#13212f; --ink:#eaf3fa; --muted:#93a8bc; --line:#26384a;
+      --accent:#5fb7ff; --ok:#4ade9b; --warn:#ffb84d; --bad:#ff7a5c; --lora:#b48cff; }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  header{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;justify-content:space-between;padding:12px 16px;
+    background:var(--panel);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:1000}
+  h1{font-size:18px;margin:0;font-weight:650}
+  h2{font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 10px;font-weight:600}
+  main{max-width:1100px;margin:0 auto;padding:16px;display:grid;gap:16px;grid-template-columns:1fr}
+  @media (min-width:900px){ main{grid-template-columns:1fr 1fr} .wide{grid-column:1 / -1} }
+  section{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;min-width:0}
+  .chips{display:flex;gap:8px;flex-wrap:wrap}
+  .chip{font-size:13px;padding:4px 10px;border-radius:999px;border:1px solid var(--line);white-space:nowrap}
+  .chip::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--muted);margin-right:6px;vertical-align:1px}
+  .chip.ok::before{background:var(--ok)} .chip.warn::before{background:var(--warn)} .chip.bad::before{background:var(--bad)}
+  .big{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
+  .big > div{border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+  .big .v{font-size:30px;font-weight:650;font-variant-numeric:tabular-nums;line-height:1.15;overflow-wrap:anywhere}
+  .big .v small{font-size:15px;font-weight:500;color:var(--muted);margin-left:3px}
+  .big .l{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+  .phase{font-size:22px;font-weight:650;margin:12px 0 0}
+  .old{color:var(--bad)}
+  label{display:block;font-size:13px;color:var(--muted);margin:10px 0 4px}
+  input{width:100%;font:inherit;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:12px}
+  button{font:inherit;font-weight:600;padding:9px 14px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer}
+  button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  button:disabled{opacity:.5;cursor:default}
+  .msg{font-size:14px;margin-top:8px;min-height:1.3em}
+  .msg.ok{color:var(--ok)} .msg.bad{color:var(--bad)} .msg.warn{color:var(--warn)}
+  #map{height:420px;border-radius:10px;border:1px solid var(--line)}
+  @media (max-width:600px){ #map{height:320px} .big .v{font-size:26px} }
+  table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
+  td{padding:4px 0;border-bottom:1px solid var(--line)} td:last-child{text-align:right;font-weight:600}
+  #rawlog{font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;max-height:260px;overflow:auto;margin:0;padding:0;list-style:none}
+  #rawlog li{padding:2px 0;border-bottom:1px solid var(--line);overflow-wrap:anywhere}
+  #rawlog li.bad{color:var(--bad)}
+  #rawlog .t{color:var(--muted);margin-right:8px}
+  .arrow{display:inline-block;width:34px;height:34px;vertical-align:middle;margin-left:6px;transition:transform .4s}
+  a{color:var(--accent)}
+  .note{font-size:13px;color:var(--muted)}
+  details summary{cursor:pointer;color:var(--muted);font-size:14px;margin-top:10px}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>COMETA ground station</h1>
+  <div class="chips">
+    <span class="chip" id="chipSerial">Receiver: not connected</span>
+    <span class="chip" id="chipLog">Log: browser only</span>
+    <span class="chip" id="chipSend">Upload: no key</span>
+  </div>
+</header>
+
+<main>
+
+  <section id="setup">
+    <h2>Setup</h2>
+    <label for="station">Station name (lowercase, e.g. <code>laptop</code>, <code>phone</code>)</label>
+    <input id="station" autocomplete="off" spellcheck="false">
+    <label for="key">Station key</label>
+    <input id="key" type="password" autocomplete="off" spellcheck="false" placeholder="paste the key here">
+    <div class="row">
+      <button id="btnKey">Check key</button>
+      <button id="btnConnect" class="primary">Connect receiver</button>
+      <button id="btnFile" hidden>Choose log file</button>
+    </div>
+    <div class="msg" id="msgSetup"></div>
+    <p class="note">The receiver works without the key and without internet: lines are always saved here,
+      and uploaded as soon as the key is checked and the network is back.</p>
+    <details>
+      <summary>Advanced</summary>
+      <p class="note">Server: <code id="workerUrl"></code><br>
+        To use another server, open this page with <code>?worker=https://…</code></p>
+    </details>
+  </section>
+
+  <section>
+    <h2>Probe</h2>
+    <div class="big">
+      <div><div class="l">Altitude</div><div class="v" id="vAlt">—</div></div>
+      <div><div class="l">Vertical speed</div><div class="v" id="vVz">—</div></div>
+      <div><div class="l">Last packet</div><div class="v" id="vAge">—</div></div>
+      <div><div class="l">GPS</div><div class="v" id="vGps">—</div></div>
+      <div><div class="l">Battery</div><div class="v" id="vBatt">—</div></div>
+      <div><div class="l">Max altitude</div><div class="v" id="vMax">—</div></div>
+    </div>
+    <div class="phase" id="vPhase">Waiting for data</div>
+    <div class="note" id="vPos"></div>
+  </section>
+
+  <section>
+    <h2>From here to the probe</h2>
+    <div class="big">
+      <div><div class="l">Distance</div><div class="v" id="vDist">—</div></div>
+      <div><div class="l">Bearing</div><div class="v"><span id="vBear">—</span><svg class="arrow" id="vArrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21V3M5 10l7-7 7 7"/></svg></div></div>
+      <div><div class="l">Elevation</div><div class="v" id="vElev">—</div></div>
+    </div>
+    <p class="note" id="vMe">Your position: waiting for the browser to allow location…</p>
+    <p class="note" id="vNav"></p>
+  </section>
+
+  <section class="wide">
+    <h2>Map</h2>
+    <div id="map"></div>
+    <div class="row"><button id="btnFit">Show everything</button><button id="btnLast">Go to last position</button></div>
+    <p class="note">Map tiles need internet. Offline the track is still drawn, on an empty background.</p>
+  </section>
+
+  <section>
+    <h2>Packets</h2>
+    <table>
+      <tr><td>Lines received</td><td id="sRx">0</td></tr>
+      <tr><td>Valid</td><td id="sValid">0</td></tr>
+      <tr><td>Discarded (broken or other probe)</td><td id="sBad">0</td></tr>
+      <tr><td>With GPS position</td><td id="sFix">0</td></tr>
+      <tr><td>Lost (gaps in the counter)</td><td id="sLost">0</td></tr>
+      <tr><td>Probe restarts seen</td><td id="sReset">0</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>Upload</h2>
+    <table>
+      <tr><td>Waiting to be sent</td><td id="uPend">0</td></tr>
+      <tr><td>Sent</td><td id="uSent">0</td></tr>
+      <tr><td>Last upload</td><td id="uLast">—</td></tr>
+    </table>
+    <div class="msg" id="msgSend"></div>
+  </section>
+
+  <section class="wide">
+    <h2>Raw log</h2>
+    <div class="row" style="margin:0 0 10px">
+      <button id="btnDownload">Download log</button>
+      <button id="btnClear">Clear stored data…</button>
+    </div>
+    <ul id="rawlog"></ul>
+  </section>
+
+</main>
+
+<script src="../../assets/vendor/leaflet/leaflet.js"></script>
+<script>
+/* ==================================================================
+   Il formato della riga radio: COPIA di lora/formato/formato.js.
+   Non modificarlo qui: si modifica formato.js e si copia con
+     node lora/formato/sincronizza.js
+   (il test lora/formato/formato.test.js controlla che le due copie
+   siano identiche). La pagina e' un file unico, per questo non lo
+   importa.
+   ================================================================== */
+// --- inizio formato ---
+
+/* I campi, nell'ordine in cui arrivano. tipo:
+   - "id": l'identificativo della sonda, lettere e cifre;
+   - "intero": cifre e basta, niente segno ne' decimali;
+   - "numero": decimale col punto, eventualmente negativo;
+   - "ora": hhmmss del GPS.
+   obbligatorio: senza quel campo la riga si scarta. Gli altri
+   possono arrivare vuoti: il firmware lascia la cella vuota quando
+   non ha il dato (REQUISITOS.md §4.2), non manda uno zero. Anche
+   fix e sats possono mancare: vengono dal ricevitore GPS, e se il
+   ricevitore non risponde non ci sono.
+
+   min e max non sono i limiti fisici del volo ma quelli oltre cui
+   un numero e' certamente spazzatura: servono a scartare una riga
+   rotta, non a giudicare il volo. vz_ms, per esempio, appena dopo
+   lo scoppio puo' superare i 100 m/s in giu', nell'aria rarefatta. */
+const CAMPI = [
+  { nome: "id",     tipo: "id",     obbligatorio: true },
+  { nome: "n",      tipo: "intero", obbligatorio: true, min: 0, max: 4294967295 },
+  { nome: "utc",    tipo: "ora" },
+  { nome: "lat",    tipo: "numero", min: -90,   max: 90 },
+  { nome: "lon",    tipo: "numero", min: -180,  max: 180 },
+  { nome: "alt_m",  tipo: "numero", min: -1000, max: 60000 },
+  { nome: "vz_ms",  tipo: "numero", min: -500,  max: 500 },
+  { nome: "sats",   tipo: "intero", min: 0,     max: 99 },
+  { nome: "fix",    tipo: "intero", min: 0,     max: 9 },
+  { nome: "v_batt", tipo: "numero", min: 0,     max: 30 }
+];
+
+/* Il firmware tiene la riga sotto gli 80 caratteri
+   (COMETA_RADIO_LARGO_MAX): una riga molto piu' lunga non e' una
+   riga della sonda, e' rumore o due righe incollate. */
+const LUNGHEZZA_MASSIMA = 120;
+
+/** I tipi, per chi legge il file con TypeScript (il Worker): sono
+   commenti, il browser li ignora. Vanno tenuti allineati con CAMPI
+   qui sopra.
+   @typedef {{ id: string, n: number, utc: string | null,
+     lat: number | null, lon: number | null, alt_m: number | null,
+     vz_ms: number | null, sats: number | null, fix: number | null,
+     v_batt: number | null }} Dati
+   @typedef {{ ok: true, dati: Dati } | { ok: false, errore: string }} Esito
+   @typedef {(number | string | null)[]} Riga */
+
+/* Le espressioni sono volutamente strette: "1e3", "+5", " 5" o
+   "5," sono numeri per parseFloat ma non escono mai dal firmware,
+   e accettarli vorrebbe dire accettare una riga arrivata storta. */
+const RE_ID = /^[A-Za-z0-9]{1,8}$/;
+const RE_INTERO = /^\d{1,10}$/;
+const RE_NUMERO = /^-?\d{1,6}(\.\d{1,8})?$/;
+const RE_ORA = /^([01]\d|2[0-3])[0-5]\d[0-5]\d$/;
+
+/** Legge una riga. Restituisce
+     { ok: true,  dati: { id, n, utc, lat, lon, alt_m, vz_ms, sats, fix, v_batt } }
+   con null nei campi vuoti, oppure
+     { ok: false, errore: "..." }
+   con il motivo, in italiano, da mostrare o da contare. Non lancia
+   eccezioni: una riga storta e' normale, non un guasto.
+   @param {unknown} testo
+   @returns {Esito} */
+function analizzaRiga(testo) {
+  if (typeof testo !== "string") return { ok: false, errore: "non e' testo" };
+  /* println() del firmware chiude con CR LF: il CR resta attaccato
+     se chi legge divide solo sul LF. Gli spazi in testa e in coda
+     invece no, il firmware non ne mette: si tolgono solo CR e LF. */
+  const riga = testo.replace(/[\r\n]+$/, "");
+  if (riga === "") return { ok: false, errore: "riga vuota" };
+  if (riga.length > LUNGHEZZA_MASSIMA) return { ok: false, errore: "riga troppo lunga" };
+  const celle = riga.split(",");
+  if (celle.length !== CAMPI.length) {
+    return { ok: false, errore: "campi: " + celle.length + " invece di " + CAMPI.length };
+  }
+  /** @type {Record<string, string | number | null>} */
+  const dati = {};
+  for (let i = 0; i < CAMPI.length; i++) {
+    const campo = CAMPI[i];
+    const cella = celle[i];
+    if (cella === "") {
+      if (campo.obbligatorio) return { ok: false, errore: campo.nome + " vuoto" };
+      dati[campo.nome] = null;
+      continue;
+    }
+    let valore;
+    if (campo.tipo === "id") {
+      if (!RE_ID.test(cella)) return { ok: false, errore: campo.nome + " non valido" };
+      valore = cella;
+    } else if (campo.tipo === "ora") {
+      if (!RE_ORA.test(cella)) return { ok: false, errore: campo.nome + " non valido" };
+      valore = cella;
+    } else {
+      const re = campo.tipo === "intero" ? RE_INTERO : RE_NUMERO;
+      if (!re.test(cella)) return { ok: false, errore: campo.nome + " non numerico" };
+      valore = Number(cella);
+      if (valore < campo.min || valore > campo.max) {
+        return { ok: false, errore: campo.nome + " fuori intervallo" };
+      }
+    }
+    dati[campo.nome] = valore;
+  }
+  /* Una sola coordinata non e' una posizione: il firmware le
+     svuota sempre insieme, quindi se ne arriva una sola la riga e'
+     rotta. */
+  if ((dati.lat === null) !== (dati.lon === null)) {
+    return { ok: false, errore: "lat e lon non vanno in coppia" };
+  }
+  return { ok: true, dati: /** @type {Dati} */ (/** @type {unknown} */ (dati)) };
+}
+
+/** Se la riga va disegnata sulla mappa. Una riga con fix=0 e'
+   valida (dice che la sonda e' viva) ma la sua posizione, se
+   c'e', non vale. Il firmware svuota gia' lat e lon quando il fix
+   non basta: il controllo su fix e' una seconda cintura, per
+   non disegnare mai un punto che il GPS stesso non garantisce.
+   @param {Dati} dati */
+function haPosizione(dati) {
+  return dati.lat !== null && dati.lon !== null && dati.fix !== null && dati.fix > 0;
+}
+
+/* Nei file JSON pubblicati (traccia.json, ultimo.json) ogni punto
+   e' un array, non un oggetto: con qualche migliaio di punti i
+   nomi ripetuti a ogni punto peserebbero piu' dei numeri.
+   L'ordine delle colonne e' questo, e il file lo riporta in
+   "colonne", cosi' chi legge non deve indovinarlo.
+
+   "t" non viene dalla sonda: e' l'ora in cui la riga e' stata
+   ricevuta a terra, in secondi unix. Serve perche' utc e' solo
+   hhmmss, senza data, e manca del tutto finche' il GPS non ha il
+   fix. L'id non c'e': un file contiene una sola sonda, e lo dice
+   una volta sola, in testa. */
+const COLONNE = ["t", "n", "utc", "lat", "lon", "alt_m", "vz_ms", "sats", "fix", "v_batt"];
+
+/** @param {Dati} dati @param {number} t @returns {Riga} */
+function inRiga(dati, t) {
+  return COLONNE.map(function (c) { return c === "t" ? t : dati[c]; });
+}
+
+/** @param {Riga} riga @returns {Dati & { t: number }} */
+function daRiga(riga) {
+  /** @type {Record<string, string | number | null>} */
+  const dati = {};
+  COLONNE.forEach(function (c, i) { const v = riga[i]; dati[c] = v === undefined ? null : v; });
+  return /** @type {Dati & { t: number }} */ (/** @type {unknown} */ (dati));
+}
+
+/** Le due stazioni ricevono gli stessi pacchetti: per riconoscere i
+   doppioni non basta n. Se la sonda si riavvia in volo, n riparte
+   da zero (REQUISITOS.md §2.2), e i pacchetti nuovi verrebbero
+   scartati come gia' visti; lo stesso succede con le prove a terra
+   fatte prima del lancio con la stessa sonda. Due stazioni che
+   ricevono lo stesso pacchetto ricevono invece gli stessi byte
+   (il modulo E220 scarta quelli con il CRC sbagliato): la chiave
+   e' quindi la riga intera. Due pacchetti diversi con tutti i
+   campi uguali, n compreso, si confondono solo dopo un riavvio e
+   senza fix: perderne uno costa poco, sono identici.
+   @param {Dati} dati */
+function chiaveDoppione(dati) {
+  return COLONNE.filter(function (c) { return c !== "t"; })
+    .map(function (c) {
+      const v = /** @type {Record<string, unknown>} */ (/** @type {unknown} */ (dati))[c];
+      return v === null || v === undefined ? "" : String(v);
+    })
+    .join(",");
+}
+
+// --- fine formato ---
+</script>
+<script>
+"use strict";
+
+/* ==================================================================
+   Impostazioni
+   ================================================================== */
+
+/* Il Worker vero. Per le prove (Worker locale o "prova") si apre la
+   pagina con ?worker=https://...: cosi' non si cambia il file. */
+const WORKER_PREDEFINITO = "https://lora.cometa.gripe";
+const WORKER = (new URLSearchParams(location.search).get("worker") || WORKER_PREDEFINITO).replace(/\/+$/, "");
+
+const BAUD = 9600;              // il modulo E220 di fabbrica (COMETA_E220_BAUD nel firmware)
+const INVIO_OGNI_MS = 5000;     // un lotto ogni 5 s: piu' o meno una riga per lotto in volo
+const INVIO_MAX_RIGHE = 5000;   // il limite del Worker per lotto
+const ATTESA_MAX_MS = 60000;    // dopo un errore si riprova sempre piu' di rado, fino a 1 min
+const VECCHIO_MS = 30000;       // senza pacchetti da 30 s (6 righe perse) l'ultimo dato si mostra in rosso
+const V_PARACADUTE_SUOLO = 4.6; // m/s, FLIGHT_DESCENT_V0_MS in assets/app.js
+const R_TERRA = 6371000;
+
+/* ==================================================================
+   Archivio nel browser (IndexedDB)
+
+   Due elenchi:
+   - "log": tutte le righe ricevute, cosi' come sono, con l'ora del
+     computer. E' il log grezzo: sopravvive a una pagina ricaricata o
+     chiusa per sbaglio, e da qui si scarica.
+   - "invio": le righe non ancora accettate dal Worker. Si cancellano
+     solo dopo la risposta positiva: se la rete cade, o la pagina si
+     chiude, al giro dopo si rimandano. Rimandare e' innocuo, il Worker
+     scarta i doppioni.
+   ================================================================== */
+const DB = (function () {
+  let db;
+  function apri() {
+    if (db) return Promise.resolve(db);
+    return new Promise(function (ok, ko) {
+      const r = indexedDB.open("cometa-stazione", 1);
+      r.onupgradeneeded = function () {
+        r.result.createObjectStore("log", { autoIncrement: true });
+        r.result.createObjectStore("invio", { autoIncrement: true });
+      };
+      r.onsuccess = function () { db = r.result; ok(db); };
+      r.onerror = function () { ko(r.error); };
+    });
+  }
+  function tx(nome, modo, fn) {
+    return apri().then(function (d) {
+      return new Promise(function (ok, ko) {
+        const t = d.transaction(nome, modo);
+        const esito = fn(t.objectStore(nome));
+        t.oncomplete = function () { ok(esito && "result" in esito ? esito.result : esito); };
+        t.onerror = function () { ko(t.error); };
+      });
+    });
+  }
+  return {
+    aggiungi: function (nome, v) { return tx(nome, "readwrite", function (s) { return s.add(v); }); },
+    tutti: function (nome) { return tx(nome, "readonly", function (s) { return s.getAll(); }); },
+    conChiavi: function (nome, max) {
+      return apri().then(function (d) {
+        return new Promise(function (ok, ko) {
+          const out = [];
+          const c = d.transaction(nome, "readonly").objectStore(nome).openCursor();
+          c.onsuccess = function () {
+            const cur = c.result;
+            if (!cur || out.length >= max) return ok(out);
+            out.push({ k: cur.key, v: cur.value });
+            cur.continue();
+          };
+          c.onerror = function () { ko(c.error); };
+        });
+      });
+    },
+    conta: function (nome) { return tx(nome, "readonly", function (s) { return s.count(); }); },
+    togli: function (nome, chiavi) {
+      return tx(nome, "readwrite", function (s) { chiavi.forEach(function (k) { s.delete(k); }); });
+    },
+    svuota: function (nome) { return tx(nome, "readwrite", function (s) { return s.clear(); }); }
+  };
+})();
+
+/* ==================================================================
+   Log su file (Chrome desktop)
+
+   Con la File System Access API si sceglie un file all'avvio e ogni
+   riga ci finisce appena arriva. Attenzione: in quella API quello che
+   si scrive diventa davvero il file solo alla chiusura (close()); fino
+   ad allora sta in una copia temporanea, che un crash della scheda
+   perde. Per questo ogni riga apre, scrive in coda e chiude: una riga
+   ogni 5 s, il costo non conta. Il log in IndexedDB c'e' comunque,
+   anche qui: il file e' una seconda copia, leggibile senza la pagina.
+   ================================================================== */
+let fileLog = null;
+let codaFile = Promise.resolve();
+function scriviSuFile(testo) {
+  if (!fileLog) return;
+  codaFile = codaFile.then(async function () {
+    const f = await fileLog.getFile();
+    const w = await fileLog.createWritable({ keepExistingData: true });
+    await w.seek(f.size);
+    await w.write(testo);
+    await w.close();
+  }).catch(function (e) {
+    fileLog = null;
+    stato("chipLog", "bad", "Log file: error, browser only");
+    console.error(e);
+  });
+}
+
+/* ==================================================================
+   Lo stato del volo, ricostruito dalle righe
+   ================================================================== */
+const volo = {
+  righe: 0, valide: 0, scartate: 0, conPos: 0,
+  sessioni: [],          // una per ogni accensione della sonda: {min, max, visti:Set}
+  ultimaRx: null,        // ms dell'ultima riga valida
+  ultimo: null,          // ultimi dati validi (anche senza fix)
+  ultimaPos: null,       // ultimi dati con posizione, e la loro ora
+  traccia: [],           // [lat, lon] dei punti con posizione
+  vzRecenti: [],         // ultime velocita' verticali, per la fase
+  quotaMax: null
+};
+
+function registra(dati, tMs) {
+  volo.valide++;
+  volo.ultimaRx = tMs;
+  volo.ultimo = dati;
+  /* Una sessione per accensione: n cresce di uno a ogni riga, e torna
+     indietro solo se la sonda si e' riavviata. I persi si contano dai
+     buchi dentro ogni sessione, non fra una e l'altra. */
+  let s = volo.sessioni[volo.sessioni.length - 1];
+  if (!s || dati.n < s.max - 5) {
+    s = { min: dati.n, max: dati.n, visti: new Set() };
+    volo.sessioni.push(s);
+  }
+  s.min = Math.min(s.min, dati.n);
+  s.max = Math.max(s.max, dati.n);
+  s.visti.add(dati.n);
+  if (dati.vz_ms !== null) {
+    volo.vzRecenti.push(dati.vz_ms);
+    if (volo.vzRecenti.length > 3) volo.vzRecenti.shift();
+  }
+  if (haPosizione(dati)) {
+    volo.conPos++;
+    volo.ultimaPos = { dati: dati, t: tMs };
+    volo.traccia.push([dati.lat, dati.lon]);
+    if (dati.alt_m !== null && (volo.quotaMax === null || dati.alt_m > volo.quotaMax)) volo.quotaMax = dati.alt_m;
+  }
+}
+
+function persi() {
+  let attesi = 0, visti = 0;
+  volo.sessioni.forEach(function (s) { attesi += s.max - s.min + 1; visti += s.visti.size; });
+  return attesi - visti;
+}
+
+/* Densita' dell'aria, atmosfera standard: la stessa formula di
+   densityISA() in assets/spot.js. */
+function densita(h) {
+  let T, p;
+  if (h < 11000) { T = 288.15 - 0.0065 * h; p = 101325 * Math.pow(T / 288.15, 5.2559); }
+  else if (h < 20000) { T = 216.65; p = 22632 * Math.exp(-9.80665 * (h - 11000) / (287.05 * T)); }
+  else if (h < 32000) { T = 216.65 + 0.001 * (h - 20000); p = 5474.9 * Math.pow(T / 216.65, -34.1632); }
+  else { T = 228.65 + 0.0028 * (h - 32000); p = 868.02 * Math.pow(T / 228.65, -12.2011); }
+  return p / (287.05 * T);
+}
+
+/* La fase si legge dalla velocita' verticale (mediana delle ultime tre,
+   per non saltare a ogni rumore del GPS). Salire e stare fermi sono
+   facili; la discesa no. Col paracadute aperto la sonda scende
+   veloce in alto, dove l'aria e' rada (decine di m/s sopra i 30 km), e
+   lenta in basso: una soglia fissa su vz scambierebbe la discesa
+   normale ad alta quota per una caduta libera. Si confronta invece vz
+   con la velocita' che il paracadute dovrebbe avere a quella quota,
+   v0 * sqrt(rho0 / rho(h)), come in assets/spot.js: se si scende molto
+   piu' veloce di cosi', il paracadute non sta frenando. */
+function fase() {
+  if (!volo.vzRecenti.length) return null;
+  const v = volo.vzRecenti.slice().sort(function (a, b) { return a - b; })[Math.floor(volo.vzRecenti.length / 2)];
+  if (v >= 1.5) return "Ascending";
+  if (v > -1.5) return "On the ground, or not moving";
+  const h = (volo.ultimaPos && volo.ultimaPos.dati.alt_m) || 0;
+  const attesa = V_PARACADUTE_SUOLO * Math.sqrt(densita(0) / densita(Math.max(h, 0)));
+  if (-v > 1.6 * attesa) return "Falling fast — burst, parachute not braking yet";
+  return "Descending under parachute";
+}
+
+/* ==================================================================
+   Distanza, direzione ed elevazione dalla posizione propria
+   ================================================================== */
+let io = null; // {lat, lon, alt, acc}
+
+function geodetica(a, b) {
+  const rad = Math.PI / 180;
+  const f1 = a.lat * rad, f2 = b.lat * rad, df = (b.lat - a.lat) * rad, dl = (b.lon - a.lon) * rad;
+  const h = Math.sin(df / 2) ** 2 + Math.cos(f1) * Math.cos(f2) * Math.sin(dl / 2) ** 2;
+  const d = 2 * R_TERRA * Math.asin(Math.min(1, Math.sqrt(h)));
+  const y = Math.sin(dl) * Math.cos(f2);
+  const x = Math.cos(f1) * Math.sin(f2) - Math.sin(f1) * Math.cos(f2) * Math.cos(dl);
+  const rotta = (Math.atan2(y, x) / rad + 360) % 360;
+  return { d: d, rotta: rotta };
+}
+
+/* L'elevazione e' l'angolo sopra l'orizzonte a cui puntare l'antenna.
+   Oltre qualche decina di km conta la curvatura della Terra: la sonda
+   "scende" sotto l'orizzonte di d^2 / 2R (circa 800 m a 100 km). */
+function elevazione(d, dh) {
+  const dhCorretto = dh - d * d / (2 * R_TERRA);
+  return Math.atan2(dhCorretto, d) * 180 / Math.PI;
+}
+
+const ROSA = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"];
+
+/* ==================================================================
+   Interfaccia
+   ================================================================== */
+const $ = function (id) { return document.getElementById(id); };
+function stato(id, livello, testo) { const e = $(id); e.className = "chip " + livello; e.textContent = testo; }
+function msg(id, livello, testo) { const e = $(id); e.className = "msg " + livello; e.textContent = testo; }
+function eta(ms) {
+  const s = Math.max(0, Math.round(ms / 1000));
+  if (s < 60) return s + " s";
+  if (s < 3600) return Math.floor(s / 60) + " min " + String(s % 60).padStart(2, "0") + " s";
+  return Math.floor(s / 3600) + " h " + String(Math.floor(s / 60) % 60).padStart(2, "0") + " min";
+}
+function ora(ms) { return new Date(ms).toLocaleTimeString([], { hour12: false }); }
+
+function aggiornaVolo() {
+  const u = volo.ultimo;
+  const p = volo.ultimaPos && volo.ultimaPos.dati;
+  $("vAlt").innerHTML = p && p.alt_m !== null ? (p.alt_m / 1000).toFixed(2) + "<small>km</small>" : "—";
+  $("vVz").innerHTML = u && u.vz_ms !== null ? (u.vz_ms > 0 ? "+" : "") + u.vz_ms.toFixed(1) + "<small>m/s</small>" : "—";
+  $("vGps").textContent = u ? (u.fix === null ? "no GPS" : (u.fix > 0 ? "fix " + u.fix : "no fix")) + (u.sats !== null ? " · " + u.sats + " sat" : "") : "—";
+  $("vBatt").innerHTML = u && u.v_batt !== null ? u.v_batt.toFixed(2) + "<small>V</small>" : "—";
+  $("vMax").innerHTML = volo.quotaMax !== null ? (volo.quotaMax / 1000).toFixed(2) + "<small>km</small>" : "—";
+  $("vPhase").textContent = fase() || "Waiting for data";
+  if (p) {
+    const vecchia = Date.now() - volo.ultimaPos.t;
+    $("vPos").textContent = "Last position " + p.lat.toFixed(6) + ", " + p.lon.toFixed(6) +
+      " at " + ora(volo.ultimaPos.t) + (p.utc ? " (GPS " + p.utc.slice(0, 2) + ":" + p.utc.slice(2, 4) + ":" + p.utc.slice(4) + " UTC)" : "") +
+      (vecchia > VECCHIO_MS ? " — " + eta(vecchia) + " ago" : "");
+    $("vNav").innerHTML = 'Navigate: <a target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=' +
+      p.lat.toFixed(6) + "," + p.lon.toFixed(6) + '">Google Maps</a> · <a target="_blank" rel="noopener" href="geo:' +
+      p.lat.toFixed(6) + "," + p.lon.toFixed(6) + '">other app</a>';
+  }
+  $("sRx").textContent = volo.righe;
+  $("sValid").textContent = volo.valide;
+  $("sBad").textContent = volo.scartate;
+  $("sFix").textContent = volo.conPos;
+  const n = persi(), tot = n + volo.valide;
+  $("sLost").textContent = n + (tot ? " (" + (100 * n / tot).toFixed(1) + " %)" : "");
+  $("sReset").textContent = Math.max(0, volo.sessioni.length - 1);
+  aggiornaDistanza();
+  aggiornaEta();
+}
+
+function aggiornaEta() {
+  if (volo.ultimaRx === null) return;
+  const e = Date.now() - volo.ultimaRx;
+  $("vAge").textContent = eta(e) + " ago";
+  $("vAge").classList.toggle("old", e > VECCHIO_MS);
+}
+
+function aggiornaDistanza() {
+  const p = volo.ultimaPos && volo.ultimaPos.dati;
+  if (!io || !p) return;
+  const g = geodetica(io, p);
+  $("vDist").innerHTML = g.d < 10000 ? Math.round(g.d) + "<small>m</small>" : (g.d / 1000).toFixed(1) + "<small>km</small>";
+  $("vBear").textContent = Math.round(g.rotta) + "° " + ROSA[Math.round(g.rotta / 22.5) % 16];
+  $("vArrow").style.transform = "rotate(" + g.rotta + "deg)";
+  if (p.alt_m !== null) $("vElev").innerHTML = elevazione(g.d, p.alt_m - (io.alt || 0)).toFixed(1) + "<small>°</small>";
+}
+
+/* Le ultime righe grezze a schermo, l'ultima in cima. textContent e mai
+   innerHTML: la riga arriva da una radio, puo' contenere qualunque
+   cosa. */
+function mostraGrezza(tMs, riga, valida) {
+  const li = document.createElement("li");
+  if (!valida) li.className = "bad";
+  const t = document.createElement("span");
+  t.className = "t";
+  t.textContent = ora(tMs);
+  li.appendChild(t);
+  li.appendChild(document.createTextNode(riga));
+  const ul = $("rawlog");
+  ul.insertBefore(li, ul.firstChild);
+  while (ul.children.length > 30) ul.removeChild(ul.lastChild);
+}
+
+/* ==================================================================
+   Mappa
+   ================================================================== */
+let mappa = null, lineaTraccia, puntoUltimo, puntoIo;
+function preparaMappa() {
+  if (!window.L) return; // Leaflet non caricato (offline alla prima apertura): il resto funziona lo stesso
+  mappa = L.map("map").setView([-33.25, -58.07], 9);
+  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 18,
+    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+  }).addTo(mappa);
+  L.control.scale({ imperial: false }).addTo(mappa);
+  const colore = getComputedStyle(document.documentElement).getPropertyValue("--lora").trim() || "#7b2ff2";
+  lineaTraccia = L.polyline([], { color: colore, weight: 3 }).addTo(mappa);
+  puntoUltimo = L.circleMarker([0, 0], { radius: 8, color: colore, fillOpacity: .9, opacity: 0, fillColor: colore });
+  puntoIo = L.circleMarker([0, 0], { radius: 7, color: "#fff", weight: 2, fillColor: "#0069c2", fillOpacity: 1 });
+}
+let primaVolta = true;
+function aggiornaMappa() {
+  if (!mappa) return;
+  lineaTraccia.setLatLngs(volo.traccia);
+  const p = volo.ultimaPos && volo.ultimaPos.dati;
+  if (p) {
+    puntoUltimo.setLatLng([p.lat, p.lon]).setStyle({ opacity: 1 }).addTo(mappa);
+    puntoUltimo.bindTooltip((p.alt_m !== null ? (p.alt_m / 1000).toFixed(2) + " km · " : "") + ora(volo.ultimaPos.t));
+    if (primaVolta) { mappa.setView([p.lat, p.lon], 11); primaVolta = false; }
+  }
+  if (io) puntoIo.setLatLng([io.lat, io.lon]).addTo(mappa);
+}
+
+/* ==================================================================
+   Ogni riga ricevuta
+   ================================================================== */
+async function rigaRicevuta(riga) {
+  const t = Date.now();
+  volo.righe++;
+  const esito = analizzaRiga(riga);
+  /* Le righe di un'altra sonda sullo stesso canale si conservano nel log,
+     ma non si mescolano alla nostra traccia. */
+  const nostra = esito.ok && esito.dati.id === ID_SONDA;
+  if (nostra) registra(esito.dati, t); else volo.scartate++;
+  mostraGrezza(t, riga, nostra);
+  aggiornaVolo();
+  aggiornaMappa();
+  const voce = { t: t, r: riga };
+  /* Prima il log locale, poi la coda d'invio: e' l'unica cosa che conta
+     davvero non perdere. Nessuna delle due aspetta la rete. */
+  scriviSuFile(new Date(t).toISOString() + "\t" + riga + "\n");
+  try {
+    await DB.aggiungi("log", voce);
+    await DB.aggiungi("invio", voce);
+  } catch (e) {
+    msg("msgSetup", "bad", "Cannot save in the browser: " + e.message + ". Choose a log file!");
+  }
+  aggiornaCoda();
+}
+
+/* La sonda che ci interessa: le righe con un altro id restano nel log
+   e vanno comunque al Worker (che le scarta allo stesso modo), ma non
+   entrano nella traccia locale. */
+const ID_SONDA = "C2";
+
+/* ==================================================================
+   Lettura della seriale
+
+   Due strade, perche' su Android Chrome non e' detto che ci sia la Web
+   Serial API:
+   - Web Serial (Chrome e Edge sul computer): il sistema operativo ha
+     gia' il driver del convertitore FT232RL, basta aprire la porta.
+   - WebUSB con il protocollo FTDI fatto a mano, se la Web Serial non
+     c'e' (Android): li' il convertitore non ha driver, e la pagina gli
+     parla direttamente. I comandi sono quelli di libftdi: reset, velocita'
+     (0x4138 = 9600 baud sul FT232R), 8N1, nessun controllo di flusso.
+     Ogni pacchetto USB che arriva comincia con due byte di stato del
+     chip, che si scartano.
+   In tutti e due i casi i byte diventano testo, e il testo righe sul \n.
+   ================================================================== */
+let lettore = null;       // la funzione che chiude la lettura in corso
+let buffer = "";
+const decoder = new TextDecoder();
+
+function byteRicevuti(bytes) {
+  buffer += decoder.decode(bytes, { stream: true });
+  let i;
+  while ((i = buffer.indexOf("\n")) >= 0) {
+    const riga = buffer.slice(0, i).replace(/\r$/, "");
+    buffer = buffer.slice(i + 1);
+    if (riga !== "") rigaRicevuta(riga);
+  }
+  /* Senza un \n per 1000 caratteri non sta arrivando una riga della
+     sonda (80 caratteri al massimo): si butta, o il buffer crescerebbe
+     senza fine con un ricevitore che manda rumore. */
+  if (buffer.length > 1000) { rigaRicevuta(buffer.slice(0, 200)); buffer = ""; }
+}
+
+async function apriSeriale(porta) {
+  await porta.open({ baudRate: BAUD });
+  stato("chipSerial", "ok", "Receiver: connected");
+  tieniSchermoAcceso();
+  let attiva = true;
+  const r = porta.readable.getReader();
+  lettore = async function () { attiva = false; try { await r.cancel(); } catch (e) {} };
+  try {
+    while (attiva) {
+      const { value, done } = await r.read();
+      if (done) break;
+      if (value) byteRicevuti(value);
+    }
+  } catch (e) {
+    console.error(e);
+  } finally {
+    try { r.releaseLock(); } catch (e) {}
+    try { await porta.close(); } catch (e) {}
+    stato("chipSerial", "bad", "Receiver: disconnected");
+  }
+}
+
+async function apriFtdi(dev) {
+  await dev.open();
+  if (dev.configuration === null) await dev.selectConfiguration(1);
+  await dev.claimInterface(0);
+  const ctrl = function (req, val, idx) {
+    return dev.controlTransferOut({ requestType: "vendor", recipient: "device", request: req, value: val, index: idx });
+  };
+  await ctrl(0, 0, 1);        // reset
+  await ctrl(3, 0x4138, 0);   // 9600 baud
+  await ctrl(4, 0x0008, 1);   // 8 bit, nessuna parita', 1 stop
+  await ctrl(2, 0, 1);        // nessun controllo di flusso
+  stato("chipSerial", "ok", "Receiver: connected (USB)");
+  tieniSchermoAcceso();
+  let attiva = true;
+  lettore = async function () { attiva = false; try { await dev.close(); } catch (e) {} };
+  try {
+    while (attiva) {
+      const r = await dev.transferIn(1, 64);
+      if (r.data && r.data.byteLength > 2) byteRicevuti(new Uint8Array(r.data.buffer, r.data.byteOffset + 2, r.data.byteLength - 2));
+    }
+  } catch (e) {
+    console.error(e);
+  } finally {
+    stato("chipSerial", "bad", "Receiver: disconnected");
+  }
+}
+
+async function collega() {
+  try {
+    if (lettore) { await lettore(); lettore = null; }
+    if ("serial" in navigator) {
+      apriSeriale(await navigator.serial.requestPort());
+    } else if ("usb" in navigator) {
+      apriFtdi(await navigator.usb.requestDevice({ filters: [{ vendorId: 0x0403 }] }));
+    } else {
+      msg("msgSetup", "bad", "This browser cannot read USB devices. Use Chrome or Edge.");
+    }
+  } catch (e) {
+    if (e.name !== "NotFoundError") msg("msgSetup", "bad", "Receiver: " + e.message);
+  }
+}
+
+/* Un cavo che si stacca in macchina e si riattacca: la porta era gia'
+   stata autorizzata, la si riapre da sola, senza toccare niente. */
+if ("serial" in navigator) {
+  navigator.serial.addEventListener("connect", function (ev) { apriSeriale(ev.target).catch(function () {}); });
+  navigator.serial.addEventListener("disconnect", function () { stato("chipSerial", "bad", "Receiver: unplugged"); });
+}
+
+/* Lo schermo che si spegne non ferma la lettura, ma su un telefono il
+   sistema puo' sospendere la scheda: si chiede di tenerlo acceso, e lo
+   si richiede quando la pagina torna in primo piano (il permesso
+   decade quando la si nasconde). */
+let wakeLock = null;
+async function tieniSchermoAcceso() {
+  try { if ("wakeLock" in navigator && !wakeLock) wakeLock = await navigator.wakeLock.request("screen"); wakeLock.onrelease = function () { wakeLock = null; }; } catch (e) {}
+}
+document.addEventListener("visibilitychange", function () { if (document.visibilityState === "visible" && lettore) tieniSchermoAcceso(); });
+
+/* ==================================================================
+   Invio al Worker
+
+   La chiave sta solo nella memoria di questa pagina: non in un file,
+   non nel localStorage. Ricaricando la pagina va reinserita, ma le
+   righe non inviate restano in IndexedDB e partono appena la chiave
+   torna.
+   ================================================================== */
+let chiave = null;
+let inviate = 0;
+let attesaMs = INVIO_OGNI_MS;
+let prossimoInvio = 0;
+let inVolo = false;
+
+function nomeStazione() { return $("station").value.trim(); }
+function nomeValido(n) { return /^[a-z0-9][a-z0-9-]{0,31}$/.test(n); }
+
+async function verificaChiave() {
+  const k = $("key").value.trim();
+  const n = nomeStazione();
+  if (!nomeValido(n)) { msg("msgSetup", "bad", "Station name: lowercase letters, digits and dashes only."); return; }
+  try { localStorage.setItem("cometa-stazione-nome", n); } catch (e) {}
+  if (!k) { msg("msgSetup", "bad", "Paste the station key first."); return; }
+  msg("msgSetup", "", "Checking…");
+  try {
+    const r = await fetch(WORKER + "/verifica", { headers: { Authorization: "Bearer " + k } });
+    if (r.status === 401) { msg("msgSetup", "bad", "Wrong key."); return; }
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    chiave = k;
+    msg("msgSetup", "ok", "Key OK. Lines will be uploaded as station “" + n + "”.");
+  } catch (e) {
+    /* Senza rete non si puo' verificare: la chiave si tiene lo stesso,
+       e il primo invio dira' se era giusta. */
+    chiave = k;
+    msg("msgSetup", "warn", "No network: key kept, it will be checked at the first upload.");
+  }
+  $("key").value = "";
+  prossimoInvio = 0;
+  aggiornaCoda();
+}
+
+async function aggiornaCoda() {
+  let n = 0;
+  try { n = await DB.conta("invio"); } catch (e) {}
+  $("uPend").textContent = n;
+  $("uSent").textContent = inviate;
+  if (!chiave) stato("chipSend", "warn", "Upload: no key" + (n ? " · " + n + " waiting" : ""));
+  else if (n > 10) stato("chipSend", "warn", "Upload: " + n + " waiting");
+  else stato("chipSend", "ok", "Upload: OK");
+}
+
+async function invia() {
+  if (inVolo || !chiave || Date.now() < prossimoInvio) return;
+  inVolo = true;
+  try {
+    const voci = await DB.conChiavi("invio", INVIO_MAX_RIGHE);
+    if (!voci.length) return;
+    const r = await fetch(WORKER + "/righe", {
+      method: "POST",
+      headers: { Authorization: "Bearer " + chiave, "Content-Type": "application/json" },
+      body: JSON.stringify({ stazione: nomeStazione(), righe: voci.map(function (x) { return x.v; }) })
+    });
+    if (r.status === 401) {
+      chiave = null;
+      msg("msgSend", "bad", "The server refused the key. Enter it again.");
+      return;
+    }
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    await DB.togli("invio", voci.map(function (x) { return x.k; }));
+    inviate += voci.length;
+    attesaMs = INVIO_OGNI_MS;
+    $("uLast").textContent = ora(Date.now());
+    msg("msgSend", "ok", "");
+  } catch (e) {
+    /* Rete assente o Worker in difficolta': si riprova, sempre piu' di
+       rado, senza mai buttare niente. */
+    attesaMs = Math.min(ATTESA_MAX_MS, attesaMs * 2);
+    prossimoInvio = Date.now() + attesaMs;
+    msg("msgSend", "warn", "Upload failed (" + e.message + "), retrying in " + Math.round(attesaMs / 1000) + " s. Lines are safe here.");
+  } finally {
+    inVolo = false;
+    aggiornaCoda();
+  }
+}
+window.addEventListener("online", function () { prossimoInvio = 0; invia(); });
+
+/* ==================================================================
+   Scaricare e svuotare
+   ================================================================== */
+async function scarica() {
+  const voci = await DB.tutti("log");
+  const testo = voci.map(function (v) { return new Date(v.t).toISOString() + "\t" + v.r + "\n"; }).join("");
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([testo], { type: "text/plain" }));
+  a.download = "cometa-lora-" + (nomeStazione() || "station") + "-" + new Date().toISOString().slice(0, 16).replace(/:/g, "") + ".txt";
+  a.click();
+  setTimeout(function () { URL.revokeObjectURL(a.href); }, 10000);
+}
+
+async function svuota() {
+  const n = await DB.conta("invio");
+  const avviso = (n ? n + " lines have NOT been uploaded yet. " : "") +
+    "This deletes the stored log and the track from this browser. Download the log first. Continue?";
+  if (!confirm(avviso)) return;
+  await DB.svuota("log");
+  await DB.svuota("invio");
+  location.reload();
+}
+
+/* ==================================================================
+   Avvio
+   ================================================================== */
+async function avvio() {
+  $("workerUrl").textContent = WORKER;
+  let nome = "";
+  try { nome = localStorage.getItem("cometa-stazione-nome") || ""; } catch (e) {}
+  $("station").value = nome || (/Android/i.test(navigator.userAgent) ? "phone" : "laptop");
+
+  preparaMappa();
+
+  /* La pagina ricaricata riparte da dove era: traccia, contatori e log
+     si ricostruiscono dalle righe salvate. */
+  try {
+    const voci = await DB.tutti("log");
+    voci.forEach(function (v) {
+      volo.righe++;
+      const e = analizzaRiga(v.r);
+      if (e.ok && e.dati.id === ID_SONDA) registra(e.dati, v.t); else volo.scartate++;
+    });
+    voci.slice(-30).forEach(function (v) { mostraGrezza(v.t, v.r, analizzaRiga(v.r).ok); });
+    if (voci.length) msg("msgSetup", "", voci.length + " lines restored from this browser.");
+  } catch (e) {
+    msg("msgSetup", "bad", "Browser storage unavailable: " + e.message);
+  }
+  aggiornaVolo();
+  aggiornaMappa();
+  aggiornaCoda();
+
+  if ("showSaveFilePicker" in window) {
+    $("btnFile").hidden = false;
+    $("btnFile").onclick = async function () {
+      try {
+        fileLog = await window.showSaveFilePicker({
+          suggestedName: "cometa-lora-" + (nomeStazione() || "station") + "-" + new Date().toISOString().slice(0, 10) + ".txt",
+          types: [{ description: "Text", accept: { "text/plain": [".txt"] } }]
+        });
+        stato("chipLog", "ok", "Log: file + browser");
+      } catch (e) { /* annullato */ }
+    };
+  }
+  $("btnConnect").onclick = collega;
+  $("btnKey").onclick = verificaChiave;
+  $("key").addEventListener("keydown", function (e) { if (e.key === "Enter") verificaChiave(); });
+  $("btnDownload").onclick = scarica;
+  $("btnClear").onclick = svuota;
+  $("btnFit").onclick = function () { if (mappa && volo.traccia.length) mappa.fitBounds(L.latLngBounds(volo.traccia.concat(io ? [[io.lat, io.lon]] : [])), { padding: [30, 30] }); };
+  $("btnLast").onclick = function () { const p = volo.ultimaPos && volo.ultimaPos.dati; if (mappa && p) mappa.setView([p.lat, p.lon], Math.max(mappa.getZoom(), 12)); };
+
+  if ("geolocation" in navigator) {
+    navigator.geolocation.watchPosition(function (pos) {
+      io = { lat: pos.coords.latitude, lon: pos.coords.longitude, alt: pos.coords.altitude, acc: pos.coords.accuracy };
+      $("vMe").textContent = "Your position: " + io.lat.toFixed(5) + ", " + io.lon.toFixed(5) + " (± " + Math.round(io.acc) + " m)" +
+        (io.alt === null ? ", altitude unknown: elevation assumes sea level" : "");
+      aggiornaDistanza();
+      aggiornaMappa();
+    }, function (e) {
+      $("vMe").textContent = "Your position: not available (" + e.message + ").";
+    }, { enableHighAccuracy: true, maximumAge: 10000 });
+  }
+
+  /* Le porte gia' autorizzate in una visita precedente si riaprono da
+     sole: dopo un crash basta ricaricare la pagina. */
+  if ("serial" in navigator) {
+    const porte = await navigator.serial.getPorts();
+    if (porte.length === 1) apriSeriale(porte[0]).catch(function () {});
+  }
+
+  setInterval(aggiornaEta, 1000);
+  setInterval(invia, 1000);
+
+  if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(function () {});
+}
+
+avvio();
+</script>
+</body>
+</html>

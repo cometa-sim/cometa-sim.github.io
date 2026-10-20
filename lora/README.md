@@ -15,10 +15,12 @@ lora/formato/casi.json      righe d'esempio, valide e non valide, per i test
 lora/formato/formato.test.js
 lora/worker/                il Worker (TypeScript): riceve le righe, scrive i file su R2
 lora/simulatore/            un volo finto, ricevuto da due stazioni finte, per provare tutto senza hardware
+lora/stazione/index.html    la pagina della stazione di terra: legge il ricevitore, salva, mostra, invia
+lora/stazione/sw.js         la fa riaprire anche senza rete
+lora/formato/sincronizza.js copia il formato dentro la pagina della stazione
 ```
 
-In arrivo, ognuno con la sua richiesta di modifica: la pagina della
-stazione di terra, l'integrazione nella mappa della Diretta.
+In arrivo: l'integrazione nella mappa della Diretta.
 
 ## La riga radio
 
@@ -286,6 +288,79 @@ Che le righe del simulatore rispettino il formato lo controlla
 `simulatore.test.js` con `formato.js` stesso, dentro `npm test`: il
 simulatore scrive le righe a mano, perché Python non può importare il file
 JavaScript, e questo test è il ponte fra i due.
+
+## La pagina della stazione
+
+**https://cometa.scuolaitaliana.edu.uy/lora/stazione/**: non è collegata dal
+sito e non è indicizzata (come `admin-diretta.html`). L'interfaccia è in
+inglese. Funziona in Chrome o Edge, sul portatile e sul telefono Android.
+
+Sta sul sito, e non in un file aperto dal computer, per tre motivi: un file
+locale manda le richieste con `Origin: null`, che il CORS del Worker rifiuta;
+su Android aprire un file HTML locale è scomodo; e le API che usa (seriale,
+file, posizione, IndexedDB) vogliono una pagina servita in HTTPS. Non contiene
+niente di segreto: la chiave si digita a mano.
+
+**Cosa fa**
+
+- Legge il ricevitore (E220 + FT232RL) a 9600 baud, una riga alla volta. Sul
+  computer usa la Web Serial API; su Android, dove la Web Serial può mancare,
+  parla direttamente al convertitore FTDI via WebUSB.
+- **Salva ogni riga, prima di tutto il resto**, con l'ora del computer: sempre
+  nel browser (IndexedDB), e su Chrome desktop anche in un file scelto con
+  «Choose log file», scritto riga per riga. «Download log» scarica quello del
+  browser. Il formato è lo stesso del grezzo su R2: ora ISO, un tab, la riga.
+- Mostra quota, velocità verticale, fase del volo, GPS, batteria, quota
+  massima; distanza, direzione ed elevazione dalla propria posizione (per
+  puntare l'antenna e per guidare); un link per navigare fino all'ultima
+  posizione; la mappa con la traccia; i pacchetti persi, contati dai buchi in
+  `n`, separati per accensione della sonda.
+- Manda le righe al Worker, un lotto ogni 5 s. Se la rete manca le tiene in
+  coda e riprova sempre più di rado (fino a un minuto); al ritorno della rete
+  parte tutto. La parte locale non aspetta mai la rete.
+- Ricaricata, o riaperta dopo un crash, ricostruisce traccia e contatori dalle
+  righe salvate nel browser, e le righe non ancora inviate ripartono.
+- Si riapre anche senza rete (`sw.js`), se è stata aperta almeno una volta con
+  la rete. Le mattonelle della mappa viste con la rete restano disponibili:
+  conviene guardare la zona del volo sulla mappa prima di partire.
+
+**La fase del volo** si legge da `vz`, ma la discesa non si può giudicare con
+una soglia fissa: col paracadute aperto, sopra i 30 km, si scende comunque a
+decine di m/s, perché l'aria è rada. La pagina confronta `vz` con la velocità
+che il paracadute dovrebbe avere a quella quota (la stessa formula della
+Diretta, `assets/spot.js`): solo se si scende molto più veloce di così dice
+che il paracadute non sta frenando.
+
+**Il giorno del lancio, su ogni stazione**
+
+1. Aprire la pagina **con la rete**, almeno una volta prima di partire.
+2. **Clear stored data…**, se ci sono righe di prove vecchie (dopo averle
+   scaricate, se servono).
+3. Nome della stazione (`laptop`, `phone`: serve solo a distinguere il grezzo
+   su R2), poi la chiave e **Check key**.
+4. Sul portatile: **Choose log file**.
+5. **Connect receiver** e scegliere il convertitore. Se il cavo si stacca e si
+   riattacca, la pagina riapre la porta da sola.
+6. Lasciare la pagina in primo piano: chiede di tenere lo schermo acceso, ma su
+   un telefono una scheda in secondo piano può essere sospesa.
+
+**Prove** con un altro Worker: `…/lora/stazione/?worker=http://localhost:8787`
+(con `npm run dev`, aggiungendo `ALLOWED_ORIGINS=http://localhost:8000` a
+`.dev.vars` e servendo il sito con `python3 -m http.server 8000` dalla radice
+del repository) o `?worker=https://cometa-lora-prova.<account>.workers.dev`.
+
+**Provata** in Chromium con un ricevitore finto che manda le righe del
+simulatore a pezzi casuali, contro il Worker locale: 400 righe, 8 rotte e
+scartate, rete tolta per 8 s a metà; il Worker ha contato tutte le 392 righe
+valide, e la pagina ricaricata ha ricostruito tutto. **Non ancora provata con
+l'hardware**: in particolare la strada WebUSB per Android va verificata con il
+telefono e il convertitore veri.
+
+**Se cambia il formato**, dopo aver modificato `formato.js`:
+
+```sh
+node lora/formato/sincronizza.js
+```
 
 ## Il giorno del lancio
 
