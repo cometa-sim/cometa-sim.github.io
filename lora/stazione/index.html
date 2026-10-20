@@ -132,6 +132,7 @@
       <div><div class="l">Max altitude</div><div class="v" id="vMax">—</div></div>
     </div>
     <div class="phase" id="vPhase">Waiting for data</div>
+    <div class="note" id="vLaunch"></div>
     <div class="note" id="vPos"></div>
   </section>
 
@@ -209,6 +210,8 @@
 <script src="assets/vendor/leaflet/leaflet.js"></script>
 <script src="assets/mapkit.js?v=stazione-2"></script>
 <script src="assets/map3d.js?v=stazione-2"></script>
+<!-- Le fasi del volo: la stessa regola della Diretta (vedi il file). -->
+<script src="lora/formato/fasi.js?v=stazione-3"></script>
 <script>
 /* ==================================================================
    Il formato della riga radio: COPIA di lora/formato/formato.js.
@@ -397,7 +400,7 @@ function chiaveDoppione(dati) {
 /* Da cambiare a ogni modifica della pagina: e' scritta in Setup, e
    dice a colpo d'occhio se il telefono sta usando la pagina nuova o una
    copia vecchia rimasta in memoria. */
-const VERSIONE = "2026-10-21b";
+const VERSIONE = "2026-10-21c";
 
 const WORKER_PREDEFINITO = "https://lora.cometa.gripe";
 const WORKER = (new URLSearchParams(location.search).get("worker") || WORKER_PREDEFINITO).replace(/\/+$/, "");
@@ -407,7 +410,6 @@ const INVIO_OGNI_MS = 5000;     // un lotto ogni 5 s: piu' o meno una riga per l
 const INVIO_MAX_RIGHE = 5000;   // il limite del Worker per lotto
 const ATTESA_MAX_MS = 60000;    // dopo un errore si riprova sempre piu' di rado, fino a 1 min
 const VECCHIO_MS = 30000;       // senza pacchetti da 30 s (6 righe perse) l'ultimo dato si mostra in rosso
-const V_PARACADUTE_SUOLO = 4.6; // m/s, FLIGHT_DESCENT_V0_MS in assets/app.js
 const R_TERRA = 6371000;
 
 /* ==================================================================
@@ -485,6 +487,10 @@ const DB = (function () {
    ================================================================== */
 let fileLog = null;
 let righeNelFile = 0;
+/* Tutte le righe del log, gia' pronte come vanno nel file, anche in
+   memoria: servono per scrivere il pregresso quando si sceglie il file
+   (vedi scegliFile). */
+const logTesto = [];
 let codaFile = Promise.resolve();
 function scriviSuFile(testo, quante) {
   if (!fileLog) return;
@@ -505,10 +511,11 @@ function scriviSuFile(testo, quante) {
 
 /* Il file si puo' scegliere anche a ricezione gia' cominciata (alla
    prima prova vera e' stato scelto alla fine, ed e' rimasto vuoto):
-   dentro si scrive subito tutto quello che il browser ha gia', e da li'
-   in poi ogni riga nuova. Una riga che arrivasse proprio nei pochi
-   millisecondi della lettura del browser potrebbe mancare nel file; nel
-   browser c'e' comunque. */
+   dentro si scrive subito tutto quello che c'e' gia', e da li' in poi
+   ogni riga nuova. Il pregresso si prende dalla memoria della pagina, e
+   il file si attiva nella stessa istruzione, senza attese in mezzo:
+   rileggendolo dal browser (un'attesa), una riga arrivata proprio in
+   quel momento restava fuori dal file — e' successo nei test. */
 async function scegliFile() {
   let h;
   try {
@@ -517,17 +524,17 @@ async function scegliFile() {
       types: [{ description: "Text", accept: { "text/plain": [".txt"] } }]
     });
   } catch (e) { return; /* annullato */ }
-  fileLog = null;
-  const voci = await DB.tutti("log");
+  const pregresso = logTesto.join("");
+  const quante = logTesto.length;
   fileLog = h;
   righeNelFile = 0;
   /* Nella stessa coda delle righe nuove, e prima di loro: una riga che
      arriva mentre si scrive il pregresso finisce in coda, dopo. */
   codaFile = codaFile.then(async function () {
     const w = await h.createWritable();   // un file scelto da capo riparte vuoto
-    await w.write(voci.map(function (v) { return new Date(v.t).toISOString() + "\t" + v.r + "\n"; }).join(""));
+    await w.write(pregresso);
     await w.close();
-    righeNelFile += voci.length;
+    righeNelFile += quante;
     stato("chipLog", "ok", "Log: file, " + righeNelFile + " lines");
   }).catch(function (e) {
     fileLog = null;
@@ -546,8 +553,6 @@ const volo = {
   ultimo: null,          // ultimi dati validi (anche senza fix)
   ultimaPos: null,       // ultimi dati con posizione, e la loro ora
   traccia: [],           // [lat, lon] dei punti con posizione
-  vzRecenti: [],         // ultime velocita' verticali, per la fase
-  quote: [],             // {t, alt} dei fix dell'ultimo minuto e mezzo, per la fase
   punti3d: [],           // {lat, lon, alt} dei punti con posizione, per il 3D
   quotaMax: null
 };
@@ -567,19 +572,15 @@ function registra(dati, tMs) {
   s.min = Math.min(s.min, dati.n);
   s.max = Math.max(s.max, dati.n);
   s.visti.add(dati.n);
-  if (dati.vz_ms !== null) {
-    volo.vzRecenti.push(dati.vz_ms);
-    if (volo.vzRecenti.length > 3) volo.vzRecenti.shift();
-  }
   if (haPosizione(dati)) {
     volo.conPos++;
     volo.ultimaPos = { dati: dati, t: tMs };
     volo.traccia.push([dati.lat, dati.lon]);
     volo.punti3d.push({ lat: dati.lat, lon: dati.lon, alt: dati.alt_m !== null ? Math.max(0, dati.alt_m) : null });
-    if (dati.alt_m !== null) {
-      volo.quote.push({ t: tMs, alt: dati.alt_m });
-      while (volo.quote.length && volo.quote[0].t < tMs - 90000) volo.quote.shift();
-    }
+    /* Qui, pagina di servizio, entrano tutti i fix, anche quelli
+       incoerenti: si deve vedere quello che succede davvero. E' la
+       Diretta che li filtra. */
+    if (fasi) COMETA_FASI.aggiungi(fasi, { t: tMs, lat: dati.lat, lon: dati.lon, alt: dati.alt_m, vz: dati.vz_ms });
     if (dati.alt_m !== null && (volo.quotaMax === null || dati.alt_m > volo.quotaMax)) volo.quotaMax = dati.alt_m;
   }
 }
@@ -590,57 +591,24 @@ function persi() {
   return attesi - visti;
 }
 
-/* Densita' dell'aria, atmosfera standard: la stessa formula di
-   densityISA() in assets/spot.js. */
-function densita(h) {
-  let T, p;
-  if (h < 11000) { T = 288.15 - 0.0065 * h; p = 101325 * Math.pow(T / 288.15, 5.2559); }
-  else if (h < 20000) { T = 216.65; p = 22632 * Math.exp(-9.80665 * (h - 11000) / (287.05 * T)); }
-  else if (h < 32000) { T = 216.65 + 0.001 * (h - 20000); p = 5474.9 * Math.pow(T / 216.65, -34.1632); }
-  else { T = 228.65 + 0.0028 * (h - 32000); p = 868.02 * Math.pow(T / 228.65, -12.2011); }
-  return p / (287.05 * T);
-}
 
-/* La fase si legge dalla velocita' verticale (mediana delle ultime tre,
-   per non saltare a ogni rumore del GPS). Salire e stare fermi sono
-   facili; la discesa no. Col paracadute aperto la sonda scende
-   veloce in alto, dove l'aria e' rada (decine di m/s sopra i 30 km), e
-   lenta in basso: una soglia fissa su vz scambierebbe la discesa
-   normale ad alta quota per una caduta libera. Si confronta invece vz
-   con la velocita' che il paracadute dovrebbe avere a quella quota,
-   v0 * sqrt(rho0 / rho(h)), come in assets/spot.js: se si scende molto
-   piu' veloce di cosi', il paracadute non sta frenando.
-   La velocita' si prende dalla quota dell'ultimo minuto, non dalla vz
-   istantanea: vedi pendenzaQuota(). */
-/* La pendenza (m/s) della quota nell'ultimo minuto, con i minimi
-   quadrati: alla prova a scuola, camminando, la vz istantanea del GPS
-   andava da -4 a +4 m/s, e la quota del primo fix era -225 m. Su un
-   minuto il rumore si media: la salita (5 m/s) e la discesa restano
-   chiarissime, il cammino a terra no. Servono almeno 4 fix che coprano
-   30 s; se no, null, e si usa la vz. */
-function pendenzaQuota() {
-  const ultimo = volo.quote.length ? volo.quote[volo.quote.length - 1].t : 0;
-  const q = volo.quote.filter(function (x) { return x.t >= ultimo - 60000; });
-  if (q.length < 4 || q[q.length - 1].t - q[0].t < 30000) return null;
-  const t0 = q[0].t;
-  let st = 0, sa = 0, stt = 0, sta = 0;
-  q.forEach(function (x) { const t = (x.t - t0) / 1000; st += t; sa += x.alt; stt += t * t; sta += t * x.alt; });
-  const n = q.length, den = n * stt - st * st;
-  return den > 0 ? (n * sta - st * sa) / den : null;
-}
-
+/* La fase del volo la decide lora/formato/fasi.js, la stessa regola
+   della Diretta: attesa fino all'ora del lancio (LAUNCH in
+   assets/app.js), poi salita, e dopo lo scoppio caduta o discesa col
+   paracadute, infine atterrata. Lo stato si crea all'avvio, appena letta
+   l'ora del lancio (vedi avvio()). */
+let fasi = null;
+let lancioMs = null;
+const NOMI_FASI = {
+  attesa: "Waiting for launch",
+  salita: "Ascending",
+  caduta: "Falling fast — burst, parachute not braking yet",
+  paracadute: "Descending under parachute",
+  atterrata: "Landed"
+};
 function fase() {
-  let v = pendenzaQuota();
-  if (v === null) {
-    if (!volo.vzRecenti.length) return null;
-    v = volo.vzRecenti.slice().sort(function (a, b) { return a - b; })[Math.floor(volo.vzRecenti.length / 2)];
-  }
-  if (v >= 1.5) return "Ascending";
-  if (v > -1.5) return "On the ground, or not moving";
-  const h = (volo.ultimaPos && volo.ultimaPos.dati.alt_m) || 0;
-  const attesa = V_PARACADUTE_SUOLO * Math.sqrt(densita(0) / densita(Math.max(h, 0)));
-  if (-v > 1.6 * attesa) return "Falling fast — burst, parachute not braking yet";
-  return "Descending under parachute";
+  if (!fasi) return null;
+  return NOMI_FASI[COMETA_FASI.fase(fasi, Date.now())];
 }
 
 /* ==================================================================
@@ -714,6 +682,7 @@ function aggiornaVolo() {
 }
 
 function aggiornaEta() {
+  $("vPhase").textContent = fase() || "Waiting for data";
   if (volo.ultimaRx === null) return;
   const e = Date.now() - volo.ultimaRx;
   $("vAge").textContent = eta(e) + " ago";
@@ -812,7 +781,9 @@ async function rigaRicevuta(riga) {
   const voce = { t: t, r: riga };
   /* Prima il log locale, poi la coda d'invio: e' l'unica cosa che conta
      davvero non perdere. Nessuna delle due aspetta la rete. */
-  scriviSuFile(new Date(t).toISOString() + "\t" + riga + "\n");
+  const testo = new Date(t).toISOString() + "\t" + riga + "\n";
+  logTesto.push(testo);
+  scriviSuFile(testo);
   try {
     await DB.aggiungi("log", voce);
     await DB.aggiungi("invio", voce);
@@ -1128,11 +1099,26 @@ async function avvio() {
 
   preparaMappa();
 
+  /* L'ora del lancio dal sito (assets/app.js, la stessa del conto alla
+     rovescia): letta qui, e non copiata, perche' se il lancio slitta e si
+     aggiorna il conto alla rovescia, la stazione la segue da sola. Senza
+     rete la da' la copia del service worker. */
+  let v0 = 4.6;
+  try {
+    const app = await (await fetch("assets/app.js", { cache: "no-cache" })).text();
+    lancioMs = COMETA_FASI.lancioDaAppJs(app);
+    v0 = COMETA_FASI.v0DaAppJs(app) || v0;
+  } catch (e) { /* resta null: si resta in attesa */ }
+  fasi = COMETA_FASI.nuovo(lancioMs, v0);
+  $("vLaunch").textContent = lancioMs === null ? "Launch time: unknown (the site could not be read)" :
+    "Launch time (from the site): " + new Date(lancioMs).toLocaleString([], { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit", hour12: false });
+
   /* La pagina ricaricata riparte da dove era: traccia, contatori e log
      si ricostruiscono dalle righe salvate. */
   try {
     const voci = await DB.tutti("log");
     voci.forEach(function (v) {
+      logTesto.push(new Date(v.t).toISOString() + "\t" + v.r + "\n");
       volo.righe++;
       const e = analizzaRiga(v.r);
       if (e.ok && e.dati.id === ID_SONDA) registra(e.dati, v.t); else volo.scartate++;
