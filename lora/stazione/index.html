@@ -10,7 +10,11 @@
      il resto del repository. -->
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#0b1622">
-<link rel="stylesheet" href="../../assets/vendor/leaflet/leaflet.css">
+<!-- Tutti gli indirizzi relativi partono dalla radice del sito: cosi'
+     assets/mapkit.js e assets/map3d.js, scritti per index.html, trovano
+     i loro file (Leaflet, MapLibre) anche da qui, senza modificarli. -->
+<base href="../../">
+<link rel="stylesheet" href="assets/vendor/leaflet/leaflet.css">
 <style>
   /* Pagina a se', senza il foglio di stile del sito: deve funzionare
      anche se il sito cambia, e deve leggersi al sole, su un portatile
@@ -52,8 +56,19 @@
   button:disabled{opacity:.5;cursor:default}
   .msg{font-size:14px;margin-top:8px;min-height:1.3em}
   .msg.ok{color:var(--ok)} .msg.bad{color:var(--bad)} .msg.warn{color:var(--warn)}
-  #map{height:420px;border-radius:10px;border:1px solid var(--line)}
-  @media (max-width:600px){ #map{height:320px} .big .v{font-size:26px} }
+  /* Il riquadro contiene la mappa 2D e, quando si preme "3D", quella 3D
+     sovrapposta (map3d.js la mette accanto, in posizione assoluta): e'
+     anche il riquadro che va a schermo intero. */
+  #mapFrame{position:relative;height:420px;border-radius:10px;border:1px solid var(--line);overflow:hidden}
+  #map{height:100%}
+  @media (max-width:600px){ #mapFrame{height:320px} .big .v{font-size:26px} }
+  /* I pulsanti di mapkit.js e map3d.js: nella Diretta li disegna
+     assets/cometa.css, che qui non si carica (cambierebbe tutta la pagina). */
+  .leaflet-bar a{display:flex;align-items:center;justify-content:center}
+  .mk-view a{width:auto!important;min-width:30px;padding:0 9px;font:600 12px/30px ui-monospace,Menlo,monospace}
+  .mk-rain.mk-active a{background:#0f3a5c!important;color:#5FE3FF!important}
+  .maplibregl-ctrl-group.mk-rain.mk-active button{background:#0f3a5c;color:#5FE3FF}
+  .mk-is-fullscreen{height:100vh!important;width:100vw!important;border-radius:0!important;margin:0!important}
   table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
   td{padding:4px 0;border-bottom:1px solid var(--line)} td:last-child{text-align:right;font-weight:600}
   #rawlog{font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;max-height:260px;overflow:auto;margin:0;padding:0;list-style:none}
@@ -92,13 +107,12 @@
       <button id="btnKey">Check key</button>
       <button id="btnConnect" class="primary">Connect receiver</button>
       <button id="btnUsb" hidden>Connect via USB (Android)</button>
-      <button id="btnFile" hidden>Choose log file</button>
+      <button id="btnFile" hidden>Keep log in a file…</button>
     </div>
     <div class="msg" id="msgSetup"></div>
     <p class="note">Upload status is shown at the top. Lines are uploaded only after the key has been checked,
-      and only while this device has a network connection. Lines not yet uploaded may be lost when the
-      page or the browser is closed (always, in a private or incognito window):
-      <strong>choose a log file</strong>, or download the log.</p>
+      and only while this device has a network connection. Since lines not yet uploaded MAY BE LOST when
+      the page or the browser is closed, keeping the log in a file is strongly suggested.</p>
     <p class="note">Page version: <code id="versione"></code></p>
     <details>
       <summary>Advanced</summary>
@@ -134,9 +148,10 @@
 
   <section class="wide">
     <h2>Map</h2>
-    <div id="map"></div>
+    <div id="mapFrame"><div id="map"></div></div>
     <div class="row"><button id="btnFit">Show everything</button><button id="btnLast">Go to last position</button></div>
-    <p class="note">Map tiles need internet. Offline the track is still drawn, on an empty background.</p>
+    <p class="note">Map tiles need internet. Offline the track is still drawn, on an empty background.
+      Satellite, clouds, full screen and 3D are the buttons on the map, as in the live page of the site.</p>
   </section>
 
   <section>
@@ -148,6 +163,7 @@
       <tr><td>With GPS position</td><td id="sFix">0</td></tr>
       <tr><td>Lost (gaps in the counter)</td><td id="sLost">0</td></tr>
       <tr><td>Probe restarts seen</td><td id="sReset">0</td></tr>
+      <tr><td>Noise bytes ignored</td><td id="sNoise">0</td></tr>
     </table>
   </section>
 
@@ -185,7 +201,14 @@
 
 </main>
 
-<script src="../../assets/vendor/leaflet/leaflet.js"></script>
+<!-- Gli stessi componenti della mappa della Diretta: i testi (i18n.js,
+     qui si usano quelli inglesi), Leaflet, satellite/nuvole/schermo
+     intero (mapkit.js) e la vista 3D (map3d.js, che scarica MapLibre
+     solo quando si preme "3D"). -->
+<script src="assets/i18n.js?v=stazione-2"></script>
+<script src="assets/vendor/leaflet/leaflet.js"></script>
+<script src="assets/mapkit.js?v=stazione-2"></script>
+<script src="assets/map3d.js?v=stazione-2"></script>
 <script>
 /* ==================================================================
    Il formato della riga radio: COPIA di lora/formato/formato.js.
@@ -374,7 +397,7 @@ function chiaveDoppione(dati) {
 /* Da cambiare a ogni modifica della pagina: e' scritta in Setup, e
    dice a colpo d'occhio se il telefono sta usando la pagina nuova o una
    copia vecchia rimasta in memoria. */
-const VERSIONE = "2026-10-21a";
+const VERSIONE = "2026-10-21b";
 
 const WORKER_PREDEFINITO = "https://lora.cometa.gripe";
 const WORKER = (new URLSearchParams(location.search).get("worker") || WORKER_PREDEFINITO).replace(/\/+$/, "");
@@ -461,8 +484,9 @@ const DB = (function () {
    anche qui: il file e' una seconda copia, leggibile senza la pagina.
    ================================================================== */
 let fileLog = null;
+let righeNelFile = 0;
 let codaFile = Promise.resolve();
-function scriviSuFile(testo) {
+function scriviSuFile(testo, quante) {
   if (!fileLog) return;
   codaFile = codaFile.then(async function () {
     const f = await fileLog.getFile();
@@ -470,6 +494,41 @@ function scriviSuFile(testo) {
     await w.seek(f.size);
     await w.write(testo);
     await w.close();
+    righeNelFile += quante || 1;
+    stato("chipLog", "ok", "Log: file, " + righeNelFile + " lines");
+  }).catch(function (e) {
+    fileLog = null;
+    stato("chipLog", "bad", "Log file: error, browser only");
+    console.error(e);
+  });
+}
+
+/* Il file si puo' scegliere anche a ricezione gia' cominciata (alla
+   prima prova vera e' stato scelto alla fine, ed e' rimasto vuoto):
+   dentro si scrive subito tutto quello che il browser ha gia', e da li'
+   in poi ogni riga nuova. Una riga che arrivasse proprio nei pochi
+   millisecondi della lettura del browser potrebbe mancare nel file; nel
+   browser c'e' comunque. */
+async function scegliFile() {
+  let h;
+  try {
+    h = await window.showSaveFilePicker({
+      suggestedName: "cometa-lora-" + (nomeStazione() || "station") + "-" + new Date().toISOString().slice(0, 10) + ".txt",
+      types: [{ description: "Text", accept: { "text/plain": [".txt"] } }]
+    });
+  } catch (e) { return; /* annullato */ }
+  fileLog = null;
+  const voci = await DB.tutti("log");
+  fileLog = h;
+  righeNelFile = 0;
+  /* Nella stessa coda delle righe nuove, e prima di loro: una riga che
+     arriva mentre si scrive il pregresso finisce in coda, dopo. */
+  codaFile = codaFile.then(async function () {
+    const w = await h.createWritable();   // un file scelto da capo riparte vuoto
+    await w.write(voci.map(function (v) { return new Date(v.t).toISOString() + "\t" + v.r + "\n"; }).join(""));
+    await w.close();
+    righeNelFile += voci.length;
+    stato("chipLog", "ok", "Log: file, " + righeNelFile + " lines");
   }).catch(function (e) {
     fileLog = null;
     stato("chipLog", "bad", "Log file: error, browser only");
@@ -488,6 +547,8 @@ const volo = {
   ultimaPos: null,       // ultimi dati con posizione, e la loro ora
   traccia: [],           // [lat, lon] dei punti con posizione
   vzRecenti: [],         // ultime velocita' verticali, per la fase
+  quote: [],             // {t, alt} dei fix dell'ultimo minuto e mezzo, per la fase
+  punti3d: [],           // {lat, lon, alt} dei punti con posizione, per il 3D
   quotaMax: null
 };
 
@@ -514,6 +575,11 @@ function registra(dati, tMs) {
     volo.conPos++;
     volo.ultimaPos = { dati: dati, t: tMs };
     volo.traccia.push([dati.lat, dati.lon]);
+    volo.punti3d.push({ lat: dati.lat, lon: dati.lon, alt: dati.alt_m !== null ? Math.max(0, dati.alt_m) : null });
+    if (dati.alt_m !== null) {
+      volo.quote.push({ t: tMs, alt: dati.alt_m });
+      while (volo.quote.length && volo.quote[0].t < tMs - 90000) volo.quote.shift();
+    }
     if (dati.alt_m !== null && (volo.quotaMax === null || dati.alt_m > volo.quotaMax)) volo.quotaMax = dati.alt_m;
   }
 }
@@ -543,10 +609,32 @@ function densita(h) {
    normale ad alta quota per una caduta libera. Si confronta invece vz
    con la velocita' che il paracadute dovrebbe avere a quella quota,
    v0 * sqrt(rho0 / rho(h)), come in assets/spot.js: se si scende molto
-   piu' veloce di cosi', il paracadute non sta frenando. */
+   piu' veloce di cosi', il paracadute non sta frenando.
+   La velocita' si prende dalla quota dell'ultimo minuto, non dalla vz
+   istantanea: vedi pendenzaQuota(). */
+/* La pendenza (m/s) della quota nell'ultimo minuto, con i minimi
+   quadrati: alla prova a scuola, camminando, la vz istantanea del GPS
+   andava da -4 a +4 m/s, e la quota del primo fix era -225 m. Su un
+   minuto il rumore si media: la salita (5 m/s) e la discesa restano
+   chiarissime, il cammino a terra no. Servono almeno 4 fix che coprano
+   30 s; se no, null, e si usa la vz. */
+function pendenzaQuota() {
+  const ultimo = volo.quote.length ? volo.quote[volo.quote.length - 1].t : 0;
+  const q = volo.quote.filter(function (x) { return x.t >= ultimo - 60000; });
+  if (q.length < 4 || q[q.length - 1].t - q[0].t < 30000) return null;
+  const t0 = q[0].t;
+  let st = 0, sa = 0, stt = 0, sta = 0;
+  q.forEach(function (x) { const t = (x.t - t0) / 1000; st += t; sa += x.alt; stt += t * t; sta += t * x.alt; });
+  const n = q.length, den = n * stt - st * st;
+  return den > 0 ? (n * sta - st * sa) / den : null;
+}
+
 function fase() {
-  if (!volo.vzRecenti.length) return null;
-  const v = volo.vzRecenti.slice().sort(function (a, b) { return a - b; })[Math.floor(volo.vzRecenti.length / 2)];
+  let v = pendenzaQuota();
+  if (v === null) {
+    if (!volo.vzRecenti.length) return null;
+    v = volo.vzRecenti.slice().sort(function (a, b) { return a - b; })[Math.floor(volo.vzRecenti.length / 2)];
+  }
   if (v >= 1.5) return "Ascending";
   if (v > -1.5) return "On the ground, or not moving";
   const h = (volo.ultimaPos && volo.ultimaPos.dati.alt_m) || 0;
@@ -620,6 +708,7 @@ function aggiornaVolo() {
   const n = persi(), tot = n + volo.valide;
   $("sLost").textContent = n + (tot ? " (" + (100 * n / tot).toFixed(1) + " %)" : "");
   $("sReset").textContent = Math.max(0, volo.sessioni.length - 1);
+  $("sNoise").textContent = rumore;
   aggiornaDistanza();
   aggiornaEta();
 }
@@ -660,16 +749,28 @@ function mostraGrezza(tMs, riga, valida) {
 /* ==================================================================
    Mappa
    ================================================================== */
-let mappa = null, lineaTraccia, puntoUltimo, puntoIo;
+let mappa = null, lineaTraccia, puntoUltimo, puntoIo, vista3d = null;
+function coloreLora() { return getComputedStyle(document.documentElement).getPropertyValue("--lora").trim() || "#7b2ff2"; }
 function preparaMappa() {
   if (!window.L) return; // Leaflet non caricato (offline alla prima apertura): il resto funziona lo stesso
   mappa = L.map("map").setView([-33.25, -58.07], 9);
-  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  const strade = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
     maxZoom: 18,
     attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
   }).addTo(mappa);
-  L.control.scale({ imperial: false }).addTo(mappa);
-  const colore = getComputedStyle(document.documentElement).getPropertyValue("--lora").trim() || "#7b2ff2";
+  L.control.scale({ imperial: false, position: "bottomright" }).addTo(mappa);
+  /* Come nella Diretta: vista satellite, nuvole/pioggia, schermo intero
+     sul riquadro (che contiene anche il 3D), e il pulsante 3D. Tutto
+     spento all'avvio: si accende dai pulsanti sulla mappa. */
+  const frame = $("mapFrame");
+  if (window.COMETA_MAPKIT) window.COMETA_MAPKIT.enhance(mappa, L, frame, strade);
+  if (window.COMETA_MAP3D) vista3d = window.COMETA_MAP3D.attach({
+    L: L, map: mappa, elMap: $("map"), el3Style: "position:absolute;inset:0",
+    create: { color: coloreLora(), colorDown: coloreLora() },
+    onEnter: function (c) { c.render(scena3d(), true); },
+    onFail: function () { msg("msgSetup", "warn", "The 3D view is not available on this device (WebGL is required)."); }
+  });
+  const colore = coloreLora();
   lineaTraccia = L.polyline([], { color: colore, weight: 3 }).addTo(mappa);
   puntoUltimo = L.circleMarker([0, 0], { radius: 8, color: colore, fillOpacity: .9, opacity: 0, fillColor: colore });
   puntoIo = L.circleMarker([0, 0], { radius: 7, color: "#fff", weight: 2, fillColor: "#0069c2", fillOpacity: 1 });
@@ -685,6 +786,13 @@ function aggiornaMappa() {
     if (primaVolta) { mappa.setView([p.lat, p.lon], 11); primaVolta = false; }
   }
   if (io) puntoIo.setLatLng([io.lat, io.lon]).addTo(mappa);
+  if (vista3d && vista3d.isOn() && vista3d.ctl()) vista3d.ctl().render(scena3d(), false);
+}
+
+/* Cosa mostra il 3D: la traccia ricevuta, ogni punto alla sua quota (lo
+   stesso formato che la Diretta passa a map3d.js). */
+function scena3d() {
+  return { runs: [], main: false, col: { up: "#8FA6BC", down: "#8FA6BC" }, live: { pts: volo.punti3d, color: coloreLora() } };
 }
 
 /* ==================================================================
@@ -739,8 +847,22 @@ let lettore = null;       // la funzione che chiude la lettura in corso
 let buffer = "";
 const decoder = new TextDecoder();
 
+/* Byte che non possono stare in una riga della sonda (testo ASCII,
+   CSV): il byte zero, gli altri caratteri di controllo tranne CR e LF,
+   e il carattere di sostituzione che TextDecoder mette al posto dei
+   byte non validi. Alla prima prova vera, aprendo la porta, ne sono
+   arrivati quasi 200 000 in pochi secondi, quasi tutti zeri: un
+   disturbo del convertitore o del modulo, non dati. Si scartano qui,
+   prima di dividere le righe, e si contano: non sono righe, e non
+   finiscono ne' nel log ne' sul server. */
+const RE_RUMORE = /[\u0000-\u0009\u000B\u000C\u000E-\u001F\u007F\uFFFD]/g;
+let rumore = 0;
+
 function byteRicevuti(bytes) {
-  buffer += decoder.decode(bytes, { stream: true });
+  const testo = decoder.decode(bytes, { stream: true });
+  const pulito = testo.replace(RE_RUMORE, "");
+  if (pulito.length !== testo.length) { rumore += testo.length - pulito.length; aggiornaVolo(); }
+  buffer += pulito;
   let i;
   while ((i = buffer.indexOf("\n")) >= 0) {
     const riga = buffer.slice(0, i).replace(/\r$/, "");
@@ -750,7 +872,7 @@ function byteRicevuti(bytes) {
   /* Senza un \n per 1000 caratteri non sta arrivando una riga della
      sonda (80 caratteri al massimo): si butta, o il buffer crescerebbe
      senza fine con un ricevitore che manda rumore. */
-  if (buffer.length > 1000) { rigaRicevuta(buffer.slice(0, 200)); buffer = ""; }
+  if (buffer.length > 1000) { rumore += buffer.length; buffer = ""; aggiornaVolo(); }
 }
 
 async function apriSeriale(porta) {
@@ -1026,15 +1148,7 @@ async function avvio() {
 
   if ("showSaveFilePicker" in window) {
     $("btnFile").hidden = false;
-    $("btnFile").onclick = async function () {
-      try {
-        fileLog = await window.showSaveFilePicker({
-          suggestedName: "cometa-lora-" + (nomeStazione() || "station") + "-" + new Date().toISOString().slice(0, 10) + ".txt",
-          types: [{ description: "Text", accept: { "text/plain": [".txt"] } }]
-        });
-        stato("chipLog", "ok", "Log: file + browser");
-      } catch (e) { /* annullato */ }
-    };
+    $("btnFile").onclick = scegliFile;
   }
   $("btnConnect").onclick = function () { collega(false); };
   if ("usb" in navigator) {
@@ -1078,7 +1192,7 @@ async function avvio() {
   setInterval(aggiornaEta, 1000);
   setInterval(invia, 1000);
 
-  if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(function () {});
+  if ("serviceWorker" in navigator) navigator.serviceWorker.register("lora/stazione/sw.js").catch(function () {});
 }
 
 avvio();

@@ -309,13 +309,26 @@ niente di segreto: la chiave si digita a mano.
   le porte seriali Bluetooth, e un convertitore USB non compare nell'elenco.
 - **Salva ogni riga, prima di tutto il resto**, con l'ora del computer: sempre
   nel browser (IndexedDB), e su Chrome desktop anche in un file scelto con
-  «Choose log file», scritto riga per riga. «Download log» scarica quello del
-  browser. Il formato è lo stesso del grezzo su R2: ora ISO, un tab, la riga.
+  «Keep log in a file…». Quel file non è un download: la pagina lo continua a
+  scrivere riga per riga mentre riceve, e ci scrive subito anche tutte le righe
+  già ricevute, così si può scegliere anche a ricezione cominciata. L'etichetta
+  in alto dice quante righe contiene. «Download log» scarica invece, in quel
+  momento, tutto quello che c'è nel browser. Il formato è lo stesso del grezzo
+  su R2: ora ISO, un tab, la riga.
+- Scarta i byte che non possono stare in una riga (lo zero, gli altri caratteri
+  di controllo): alla prima prova, aprendo la porta, ne sono arrivati quasi
+  200 000, quasi tutti zeri. Si contano in «Noise bytes ignored» e non
+  finiscono né nel log né sul server.
 - Mostra quota, velocità verticale, fase del volo, GPS, batteria, quota
   massima; distanza, direzione ed elevazione dalla propria posizione (per
   puntare l'antenna e per guidare); un link per navigare fino all'ultima
-  posizione; la mappa con la traccia; i pacchetti persi, contati dai buchi in
-  `n`, separati per accensione della sonda.
+  posizione; i pacchetti persi, contati dai buchi in `n`, separati per
+  accensione della sonda; la mappa con la traccia, con gli stessi pulsanti
+  della Diretta (vista satellite, nuvole, schermo intero, 3D con la traccia
+  alla sua quota), tutti spenti all'avvio. Satellite e 3D usano
+  `assets/mapkit.js` e `assets/map3d.js` così come sono: la pagina dichiara
+  `<base href="../../">`, la radice del sito, perché i loro percorsi relativi
+  funzionino anche da `/lora/stazione/`.
 - Manda le righe al Worker, un lotto ogni 5 s. Se la rete manca le tiene in
   coda e riprova sempre più di rado (fino a un minuto); al ritorno della rete
   parte tutto. La parte locale non aspetta mai la rete.
@@ -325,8 +338,10 @@ niente di segreto: la chiave si digita a mano.
   la rete. Le mattonelle della mappa viste con la rete restano disponibili:
   conviene guardare la zona del volo sulla mappa prima di partire.
 
-**La fase del volo** si legge da `vz`, ma la discesa non si può giudicare con
-una soglia fissa: col paracadute aperto, sopra i 30 km, si scende comunque a
+**La fase del volo** si legge dalla variazione della quota nell'ultimo minuto
+(minimi quadrati), non dalla `vz` istantanea: alla prova a scuola, camminando,
+la `vz` del GPS andava da −4 a +4 m/s, e il primo fix dava −225 m. Su un minuto
+il rumore si media. La discesa, poi, non si può giudicare con una soglia fissa: col paracadute aperto, sopra i 30 km, si scende comunque a
 decine di m/s, perché l'aria è rada. La pagina confronta `vz` con la velocità
 che il paracadute dovrebbe avere a quella quota (la stessa formula della
 Diretta, `assets/spot.js`): solo se si scende molto più veloce di così dice
