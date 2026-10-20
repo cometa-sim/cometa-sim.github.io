@@ -66,7 +66,7 @@
      assets/cometa.css, che qui non si carica (cambierebbe tutta la pagina). */
   .leaflet-bar a{display:flex;align-items:center;justify-content:center}
   .mk-view a{width:auto!important;min-width:30px;padding:0 9px;font:600 12px/30px ui-monospace,Menlo,monospace}
-  .mk-rain.mk-active a{background:#0f3a5c!important;color:#5FE3FF!important}
+  .mk-rain.mk-active a,.mk-traj.mk-active a{background:#0f3a5c!important;color:#5FE3FF!important}
   .maplibregl-ctrl-group.mk-rain.mk-active button{background:#0f3a5c;color:#5FE3FF}
   .mk-is-fullscreen{height:100vh!important;width:100vw!important;border-radius:0!important;margin:0!important}
   table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
@@ -152,7 +152,8 @@
     <div id="mapFrame"><div id="map"></div></div>
     <div class="row"><button id="btnFit">Show everything</button><button id="btnLast">Go to last position</button></div>
     <p class="note">Map tiles need internet. Offline the track is still drawn, on an empty background.
-      Satellite, clouds, full screen and 3D are the buttons on the map, as in the live page of the site.</p>
+      Satellite, clouds, full screen, 3D and the predicted trajectory (dashed grey, the same as in the live
+      page of the site) are the buttons on the map.</p>
   </section>
 
   <section>
@@ -211,7 +212,14 @@
 <script src="assets/mapkit.js?v=stazione-2"></script>
 <script src="assets/map3d.js?v=stazione-2"></script>
 <!-- Le fasi del volo: la stessa regola della Diretta (vedi il file). -->
-<script src="lora/formato/fasi.js?v=stazione-3"></script>
+<script src="lora/formato/fasi.js?v=stazione-4"></script>
+<!-- L'ora del lancio e i dati del volo, gli stessi del sito (volo.js); la
+     traiettoria prevista con lo stesso calcolo della Diretta: traiettoria.js
+     (con msis.js) ricalcola salita, scoppio e discesa col meteo del giorno,
+     volo.js fa la richiesta a Tawhiri. -->
+<script src="assets/volo.js?v=stazione-4"></script>
+<script src="assets/msis.js?v=stazione-4"></script>
+<script src="assets/traiettoria.js?v=stazione-4"></script>
 <script>
 /* ==================================================================
    Il formato della riga radio: COPIA di lora/formato/formato.js.
@@ -400,7 +408,7 @@ function chiaveDoppione(dati) {
 /* Da cambiare a ogni modifica della pagina: e' scritta in Setup, e
    dice a colpo d'occhio se il telefono sta usando la pagina nuova o una
    copia vecchia rimasta in memoria. */
-const VERSIONE = "2026-10-21c";
+const VERSIONE = "2026-10-22a";
 
 const WORKER_PREDEFINITO = "https://lora.cometa.gripe";
 const WORKER = (new URLSearchParams(location.search).get("worker") || WORKER_PREDEFINITO).replace(/\/+$/, "");
@@ -594,7 +602,7 @@ function persi() {
 
 /* La fase del volo la decide lora/formato/fasi.js, la stessa regola
    della Diretta: attesa fino all'ora del lancio (LAUNCH in
-   assets/app.js), poi salita, e dopo lo scoppio caduta o discesa col
+   assets/volo.js), poi salita, e dopo lo scoppio caduta o discesa col
    paracadute, infine atterrata. Lo stato si crea all'avvio, appena letta
    l'ora del lancio (vedi avvio()). */
 let fasi = null;
@@ -739,6 +747,23 @@ function preparaMappa() {
     onEnter: function (c) { c.render(scena3d(), true); },
     onFail: function () { msg("msgSetup", "warn", "The 3D view is not available on this device (WebGL is required)."); }
   });
+  const Traj = L.Control.extend({
+    options: { position: "topright" },
+    onAdd: function () {
+      const div = trajBtn = L.DomUtil.create("div", "leaflet-bar mk-traj");
+      const a = L.DomUtil.create("a", "", div);
+      a.href = "#";
+      a.title = "Predicted trajectory (as in the live page)";
+      a.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3 3"><path d="M3 20c4-1 6-6 9-9s6-5 9-7"/></svg>';
+      L.DomEvent.on(a, "click", L.DomEvent.stop).on(a, "click", function () {
+        trajOn = !trajOn;
+        try { localStorage.setItem("cometa-stazione-traiettoria", trajOn ? "on" : "off"); } catch (e) {}
+        mostraPrevisione();
+      });
+      return div;
+    }
+  });
+  new Traj().addTo(mappa);
   const colore = coloreLora();
   lineaTraccia = L.polyline([], { color: colore, weight: 3 }).addTo(mappa);
   puntoUltimo = L.circleMarker([0, 0], { radius: 8, color: colore, fillOpacity: .9, opacity: 0, fillColor: colore });
@@ -761,7 +786,39 @@ function aggiornaMappa() {
 /* Cosa mostra il 3D: la traccia ricevuta, ogni punto alla sua quota (lo
    stesso formato che la Diretta passa a map3d.js). */
 function scena3d() {
-  return { runs: [], main: false, col: { up: "#8FA6BC", down: "#8FA6BC" }, live: { pts: volo.punti3d, color: coloreLora() } };
+  return { runs: previsione && trajOn ? [{ pts: previsione.full }] : [], main: false, col: { up: "#8FA6BC", down: "#8FA6BC" },
+    live: { pts: volo.punti3d, color: coloreLora() } };
+}
+
+/* ==================================================================
+   La traiettoria prevista, come nella Diretta
+
+   La stessa richiesta (COMETA_PREVISIONE in assets/volo.js) con gli
+   stessi dati del volo, ricalcolati da assets/traiettoria.js col meteo
+   del giorno: la stazione e la Diretta disegnano la stessa linea. Qui e'
+   spenta all'avvio: si accende dal pulsante sulla mappa, e la scelta resta
+   nel browser. Senza rete non c'e' (Tawhiri e' un servizio esterno).
+   ================================================================== */
+let previsione = null, lineaPrevista = null, trajOn = false, trajBtn = null;
+try { trajOn = localStorage.getItem("cometa-stazione-traiettoria") === "on"; } catch (e) {}
+function chiediPrevisione() {
+  if (!window.COMETA_PREVISIONE) return;
+  window.COMETA_PREVISIONE().then(function (pr) {
+    if (!pr) return;
+    previsione = pr;
+    if (lineaPrevista) lineaPrevista.setLatLngs(pr.pts);
+    mostraPrevisione();
+  });
+}
+function mostraPrevisione() {
+  if (!mappa) return;
+  if (!lineaPrevista && previsione) lineaPrevista = L.polyline(previsione.pts, { color: "#6f8296", weight: 2, opacity: .9, dashArray: "5 8", interactive: false });
+  if (lineaPrevista) {
+    if (trajOn && !mappa.hasLayer(lineaPrevista)) lineaPrevista.addTo(mappa).bringToBack();
+    if (!trajOn && mappa.hasLayer(lineaPrevista)) mappa.removeLayer(lineaPrevista);
+  }
+  if (trajBtn) trajBtn.classList.toggle("mk-active", trajOn);
+  if (vista3d && vista3d.isOn() && vista3d.ctl()) vista3d.ctl().render(scena3d(), false);
 }
 
 /* ==================================================================
@@ -1099,16 +1156,11 @@ async function avvio() {
 
   preparaMappa();
 
-  /* L'ora del lancio dal sito (assets/app.js, la stessa del conto alla
-     rovescia): letta qui, e non copiata, perche' se il lancio slitta e si
-     aggiorna il conto alla rovescia, la stazione la segue da sola. Senza
-     rete la da' la copia del service worker. */
-  let v0 = 4.6;
-  try {
-    const app = await (await fetch("assets/app.js", { cache: "no-cache" })).text();
-    lancioMs = COMETA_FASI.lancioDaAppJs(app);
-    v0 = COMETA_FASI.v0DaAppJs(app) || v0;
-  } catch (e) { /* resta null: si resta in attesa */ }
+  /* L'ora del lancio dal sito (assets/volo.js, la stessa del conto alla
+     rovescia): se il lancio slitta e si aggiorna quella, la stazione la
+     segue da sola. Senza rete la da' la copia del service worker. */
+  lancioMs = window.COMETA_LAUNCH ? window.COMETA_LAUNCH.getTime() : null;
+  const v0 = (window.COMETA_FLIGHT && window.COMETA_FLIGHT.descentV0Ms) || 4.6;
   fasi = COMETA_FASI.nuovo(lancioMs, v0);
   $("vLaunch").textContent = lancioMs === null ? "Launch time: unknown (the site could not be read)" :
     "Launch time (from the site): " + new Date(lancioMs).toLocaleString([], { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit", hour12: false });
@@ -1174,6 +1226,10 @@ async function avvio() {
     const porte = await navigator.serial.getPorts();
     if (porte.length === 1) apriSeriale(porte[0]).catch(function () {});
   }
+
+  chiediPrevisione();
+  window.addEventListener("cometa-volo", chiediPrevisione);
+  setInterval(chiediPrevisione, 20 * 60000);   // il GFS si aggiorna ogni poche ore, come nella Diretta
 
   setInterval(aggiornaEta, 1000);
   setInterval(invia, 1000);

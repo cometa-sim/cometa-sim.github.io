@@ -21,7 +21,9 @@ lora/formato/sincronizza.js copia il formato dentro la pagina della stazione
 lora/formato/fasi.js        le fasi del volo, una regola sola per stazione e Diretta
 ```
 
-In arrivo: l'integrazione nella mappa della Diretta.
+Nel sito, la Diretta legge i dati LoRa con `assets/lora.js` e li disegna con
+`assets/spot.js` e `assets/profilo.js` (vedi il README del sito, «La pagina
+Diretta»).
 
 ## La riga radio
 
@@ -330,6 +332,11 @@ niente di segreto: la chiave si digita a mano.
   `assets/mapkit.js` e `assets/map3d.js` così come sono: la pagina dichiara
   `<base href="../../">`, la radice del sito, perché i loro percorsi relativi
   funzionino anche da `/lora/stazione/`.
+- La traiettoria prevista, spenta all'avvio, si accende dal pulsante sulla
+  mappa: è la stessa della Diretta, con la stessa richiesta
+  (`COMETA_PREVISIONE` in `assets/volo.js`) e gli stessi dati del volo,
+  ricalcolati col meteo del giorno da `assets/traiettoria.js`, che la pagina
+  carica insieme a `assets/msis.js`.
 - Manda le righe al Worker, un lotto ogni 5 s. Se la rete manca le tiene in
   coda e riprova sempre più di rado (fino a un minuto); al ritorno della rete
   parte tutto. La parte locale non aspetta mai la rete.
@@ -342,9 +349,10 @@ niente di segreto: la chiave si digita a mano.
 **La fase del volo** la decide `lora/formato/fasi.js`, la stessa regola che
 userà la Diretta. Le fasi vanno solo avanti:
 
-- **Waiting for launch** fino all'ora del lancio, `LAUNCH` in `assets/app.js`
-  (la stessa del conto alla rovescia, letta da lì: se il lancio slitta, basta
-  aggiornare quella). Qualunque cosa faccia il GPS prima, resta così.
+- **Waiting for launch** fino all'ora del lancio, `LAUNCH` in `assets/volo.js`
+  (la stessa del conto alla rovescia: se il lancio slitta, basta aggiornare
+  quella; la pagina della stazione carica `volo.js`, non `app.js`, che fuori dal
+  sito si fermerebbe). Qualunque cosa faccia il GPS prima, resta così.
 - **Ascending** dall'ora del lancio.
 - Dopo lo **scoppio**, riconosciuto da due fix di fila con `vz` sotto −10 m/s
   (camminando, alla prova del 20 ottobre, non è mai scesa sotto −3,7):
