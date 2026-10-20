@@ -385,7 +385,7 @@ window.COMETA_SPOT = (function(){
     if(!elStatus) return;
     const d = dict();
     /* dati non arrivati (rete, CORS, risposta del backend): "Network error", uguale in ogni lingua */
-    if(lastErr){ elStatus.textContent = lastErr === "3d" ? (d.mk3dFail || "3D") : "Network error"; return; }
+    if(lastErr === "3d"){ elStatus.textContent = d.mk3dFail || "3D"; return; }
     /* Se il LoRa ha un punto buono piu' recente dello SPOT, la riga parla
        di quello (la posizione piu' fresca); se lo SPOT tace sopra i 18 km
        ma il LoRa trasmette, non c'e' nessun "segnale perso" da dire. */
@@ -400,6 +400,8 @@ window.COMETA_SPOT = (function(){
         : lp.lat.toFixed(4) + ", " + lp.lon.toFixed(4) + " · " + ago;
       return;
     }
+    /* L'errore di rete dello SPOT conta solo se il LoRa non ha niente da dire. */
+    if(lastErr){ elStatus.textContent = "Network error"; return; }
     if(!lastPoints || !lastPoints.length){ elStatus.textContent = d.dirSpotWaiting || "waiting…"; return; }
     if(isLanded(lastPoints)){ elStatus.textContent = d.dirSpotLanded || "probe landed"; return; }
     const last = lastPoints[lastPoints.length - 1];
