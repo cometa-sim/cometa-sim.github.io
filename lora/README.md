@@ -304,8 +304,9 @@ niente di segreto: la chiave si digita a mano.
 **Cosa fa**
 
 - Legge il ricevitore (E220 + FT232RL) a 9600 baud, una riga alla volta. Sul
-  computer usa la Web Serial API; su Android, dove la Web Serial può mancare,
-  parla direttamente al convertitore FTDI via WebUSB.
+  computer usa la Web Serial API. Su Android parla direttamente al
+  convertitore FTDI via WebUSB: lì Chrome ha anche la Web Serial, ma solo per
+  le porte seriali Bluetooth, e un convertitore USB non compare nell'elenco.
 - **Salva ogni riga, prima di tutto il resto**, con l'ora del computer: sempre
   nel browser (IndexedDB), e su Chrome desktop anche in un file scelto con
   «Choose log file», scritto riga per riga. «Download log» scarica quello del
