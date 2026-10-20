@@ -4,6 +4,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import vm from "node:vm";
 import { analizzaRiga, haPosizione } from "./formato.js";
 import "./fasi.js";
 
@@ -74,11 +75,61 @@ test("dopo lo scoppio, la caduta libera si distingue dalla discesa col paracadut
   assert.equal(F.fase(s, T0 + 16000), "paracadute");
 });
 
-test("l'ora del lancio e la discesa si leggono da assets/app.js", () => {
-  const app = readFileSync(new URL("../../assets/app.js", import.meta.url), "utf8");
-  const t = F.lancioDaAppJs(app);
-  assert.ok(Number.isFinite(t), "LAUNCH non trovato in assets/app.js: e' cambiato il modo in cui e' scritto?");
-  assert.ok(F.v0DaAppJs(app) > 0, "FLIGHT_DESCENT_V0_MS non trovato in assets/app.js");
-  assert.equal(F.lancioDaAppJs('const LAUNCH = new Date("2026-10-28T11:00:00-03:00");'), Date.parse("2026-10-28T14:00:00Z"));
-  assert.equal(F.lancioDaAppJs("niente"), null);
+test("assets/volo.js da' l'ora del lancio e i dati del volo, anche fuori dal sito", () => {
+  /* La pagina della stazione lo carica da solo, senza app.js: deve
+     bastare a se stesso. */
+  const codice = readFileSync(new URL("../../assets/volo.js", import.meta.url), "utf8");
+  const finestra = {};
+  vm.runInNewContext(codice, { window: finestra, URLSearchParams, fetch: () => Promise.reject(new Error("no")) });
+  /* instanceof Date non vale fra due contesti vm diversi: si guarda getTime. */
+  assert.ok(finestra.COMETA_LAUNCH && Number.isFinite(finestra.COMETA_LAUNCH.getTime()), "COMETA_LAUNCH mancante");
+  assert.ok(finestra.COMETA_FLIGHT.descentV0Ms > 0 && finestra.COMETA_FLIGHT.site, "COMETA_FLIGHT incompleto");
+  assert.equal(typeof finestra.COMETA_PREVISIONE, "function");
+  assert.match(finestra.COMETA_LORA_DATI, /^https:\/\//);
+});
+
+test("filtro della Diretta: fix scarsi e quote impossibili non passano", () => {
+  const f = F.nuovoFiltro();
+  const p = (t, extra) => Object.assign({ t: T0 + t * 1000, lat: -33.2, lon: -58.0, alt: 50, vz: 0, sats: 9, fix: 3 }, extra);
+  assert.equal(F.filtra(f, p(0, { fix: 0 })).length, 0);
+  assert.equal(F.filtra(f, p(5, { sats: 4 })).length, 0);
+  assert.equal(F.filtra(f, p(10, { alt: -225 })).length, 0);         // come alla prova a scuola
+  assert.equal(F.statoFiltro(f, T0 + 10000), "attesa");
+  assert.equal(F.filtra(f, p(15)).length, 1);
+  assert.equal(F.statoFiltro(f, T0 + 20000), "ok");
+});
+
+test("filtro della Diretta: un salto isolato si ignora, tre punti concordi si accettano", () => {
+  const f = F.nuovoFiltro();
+  const p = (t, lat, alt) => ({ t: T0 + t * 1000, lat: lat, lon: -58.0, alt: alt, vz: 5, sats: 9, fix: 3 });
+  F.filtra(f, p(0, -33.20, 1000));
+  F.filtra(f, p(5, -33.2001, 1025));
+  assert.equal(F.filtra(f, p(10, -32.0, 1050)).length, 0);           // 130 km in 5 s: impossibile
+  assert.equal(F.filtra(f, p(15, -33.2002, 1075)).length, 1);        // si riprende dal buono
+  /* Un buono che era sbagliato: tre punti concordi lo scavalcano. */
+  const g = F.nuovoFiltro();
+  F.filtra(g, p(0, -31.0, 1000));                                     // il primo era sbagliato
+  assert.equal(F.filtra(g, p(5, -33.20, 1025)).length, 0);
+  assert.equal(F.filtra(g, p(10, -33.2001, 1050)).length, 0);
+  assert.equal(F.filtra(g, p(15, -33.2002, 1075)).length, 3);
+});
+
+test("filtro della Diretta: senza punti buoni da un minuto, segnale perso", () => {
+  const f = F.nuovoFiltro();
+  F.filtra(f, { t: T0, lat: -33.2, lon: -58, alt: 100, vz: 5, sats: 9, fix: 3 });
+  for (let i = 1; i <= 15; i++) F.filtra(f, { t: T0 + 5000 * i, lat: null, lon: null, alt: null, vz: null, sats: 3, fix: 0 });
+  assert.equal(F.statoFiltro(f, T0 + 59000), "ok");
+  assert.equal(F.statoFiltro(f, T0 + 75000), "perso");
+});
+
+test("un volo intero del simulatore passa il filtro quasi tutto", () => {
+  const righe = voloSimulato();
+  const f = F.nuovoFiltro();
+  let con = 0, presi = 0;
+  for (const { t, d } of righe) {
+    if (!haPosizione(d)) continue;
+    con++;
+    presi += F.filtra(f, { t, lat: d.lat, lon: d.lon, alt: d.alt_m, vz: d.vz_ms, sats: d.sats, fix: d.fix }).length;
+  }
+  assert.ok(presi / con > 0.98, presi + " su " + con);
 });

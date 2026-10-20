@@ -8,7 +8,7 @@
 
    Le fasi vanno solo avanti, in quest'ordine:
 
-     attesa      prima dell'ora del lancio (LAUNCH in assets/app.js,
+     attesa      prima dell'ora del lancio (LAUNCH in assets/volo.js,
                  la stessa del conto alla rovescia): la sonda parte a
                  quell'ora, e qualunque cosa faccia il GPS prima — prove
                  a terra, un GPS che "scivola" vicino a un edificio — resta
@@ -65,7 +65,7 @@
 
   /* Uno stato nuovo. lancioMs: l'ora del lancio (ms), o null se non si
      conosce (allora si resta in attesa). v0: la velocita' del paracadute
-     al suolo, m/s (FLIGHT_DESCENT_V0_MS in assets/app.js). */
+     al suolo, m/s (FLIGHT_DESCENT_V0_MS in assets/volo.js). */
   function nuovo(lancioMs, v0) {
     return { lancioMs: lancioMs, v0: v0 || 4.6, recenti: [], scoppio: null, atterrata: null, quotaMax: null, ultimo: null };
   }
@@ -111,25 +111,65 @@
     return "attesa";
   }
 
-  /* L'ora del lancio letta dal testo di assets/app.js, dalla riga
-       const LAUNCH = new Date("2026-10-28T11:00:00-03:00");
-     cosi' la pagina della stazione segue da sola un rinvio del lancio,
-     senza una seconda copia da aggiornare. null se la riga non c'e' o
-     non e' una data. */
-  function lancioDaAppJs(testo) {
-    const m = /const\s+LAUNCH\s*=\s*new Date\(\s*"([^"]+)"\s*\)/.exec(testo || "");
-    if (!m) return null;
-    const t = Date.parse(m[1]);
-    return isNaN(t) ? null : t;
+  /* ----------------------------------------------------------
+     Il filtro della Diretta
+
+     La pagina della stazione mostra tutto, anche i dati incoerenti:
+     e' di servizio, deve far vedere quello che succede davvero. La
+     Diretta no: un punto incoerente si ignora, e resta mostrato
+     l'ultimo buono; se da un minuto non arriva nessun punto buono,
+     "segnale perso". Incoerente vuol dire:
+     - senza fix, o con meno di 6 satelliti (il fix non e' affidabile);
+     - una quota impossibile: sotto i -100 m (in Uruguay il terreno sta
+       fra 0 e 500 m; alla prova del 20 ottobre, vicino a un edificio,
+       il GPS e' scivolato fino a -225 m con 10-14 satelliti) o sopra i
+       45 km;
+     - un salto dall'ultimo punto buono che la sonda non puo' fare: piu'
+       di 150 m/s in orizzontale (la corrente a getto arriva a 60-70) o
+       di 200 m/s in verticale.
+     Se pero' 3 punti di fila sono coerenti fra loro ma non con
+     l'ultimo buono, era quello a essere sbagliato: si accettano, cosi'
+     un solo punto sbagliato preso per buono non blocca la mappa.
+     ---------------------------------------------------------- */
+  const COERENZA = { satsMin: 6, quotaMin: -100, quotaMax: 45000, vOrizMax: 150, vVertMax: 200, conferme: 3, persoMs: 60000 };
+
+  function compatibili(a, b) {
+    const dt = Math.max((b.t - a.t) / 1000, 1);
+    if (distanzaM(a, b) / dt > COERENZA.vOrizMax) return false;
+    if (a.alt !== null && b.alt !== null && Math.abs(b.alt - a.alt) / dt > COERENZA.vVertMax) return false;
+    return true;
   }
 
-  /* La velocita' del paracadute al suolo, dalla stessa riga di app.js
-     (FLIGHT_DESCENT_V0_MS). */
-  function v0DaAppJs(testo) {
-    const m = /const\s+FLIGHT_DESCENT_V0_MS\s*=\s*([0-9.]+)/.exec(testo || "");
-    return m ? Number(m[1]) : null;
+  function nuovoFiltro() { return { buoni: [], sospesi: [] }; }
+
+  /* p: {t (ms), lat, lon, alt, vz, sats, fix}. Restituisce i punti
+     accettati con questo (di solito [p], a volte i 3 sospesi, o
+     nessuno). */
+  function filtra(f, p) {
+    if (p.lat === null || p.lon === null || !(p.fix > 0)) return [];
+    if (p.sats !== null && p.sats < COERENZA.satsMin) return [];
+    if (p.alt !== null && (p.alt < COERENZA.quotaMin || p.alt > COERENZA.quotaMax)) return [];
+    const prec = f.buoni[f.buoni.length - 1];
+    if (!prec || compatibili(prec, p)) { f.buoni.push(p); f.sospesi = []; return [p]; }
+    const s = f.sospesi;
+    if (s.length && !compatibili(s[s.length - 1], p)) f.sospesi = [];
+    f.sospesi.push(p);
+    if (f.sospesi.length >= COERENZA.conferme) {
+      const presi = f.sospesi;
+      f.buoni = f.buoni.concat(presi);
+      f.sospesi = [];
+      return presi;
+    }
+    return [];
+  }
+
+  /* "attesa" (nessun punto buono, ancora), "ok", o "perso". */
+  function statoFiltro(f, adessoMs) {
+    const u = f.buoni[f.buoni.length - 1];
+    if (!u) return "attesa";
+    return adessoMs - u.t > COERENZA.persoMs ? "perso" : "ok";
   }
 
   g.COMETA_FASI = { SOGLIE: SOGLIE, nuovo: nuovo, aggiungi: aggiungi, fase: fase, vParacadute: vParacadute,
-    lancioDaAppJs: lancioDaAppJs, v0DaAppJs: v0DaAppJs };
+    COERENZA: COERENZA, nuovoFiltro: nuovoFiltro, filtra: filtra, statoFiltro: statoFiltro };
 })(typeof window !== "undefined" ? window : globalThis);

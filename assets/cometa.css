@@ -1123,6 +1123,34 @@ nav a.ig:hover svg{transform:translateY(-1px)}
    Il punto GPS e' verde come il pallino sulla mappa (stesso --green);
    la stimata, che e' un calcolo e non un dato misurato, resta in
    grigio, come la traiettoria prevista sulla mappa (stesso --muted). */
+/* ---------- Diretta: telemetria LoRa (assets/lora.js, assets/profilo.js) ----------
+   La legenda sulla mappa: testo nei colori del testo, il colore della
+   fonte solo nel segno accanto. La traiettoria prevista, spenta, resta
+   in legenda attenuata. */
+.spot-legenda{display:flex;flex-wrap:wrap;gap:4px 18px;padding:10px 15px;
+  font-family:var(--mono);font-size:10.5px;line-height:1.6;color:var(--muted)}
+.spot-legenda:empty{display:none}
+.spot-legenda b{color:var(--ink);font-weight:500}
+.spot-legenda .leg-row{white-space:nowrap}
+.spot-legenda .leg-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:-1px}
+.spot-legenda .leg-dash{display:inline-block;width:16px;margin-right:6px;vertical-align:3px;border-top:2px dashed #8FA6BC}
+.spot-legenda .leg-perso{color:#FF7A5C}
+.spot-traj.mk-active a{background:#0f3a5c!important;color:#5FE3FF!important}
+/* Il profilo di quota: griglia e assi recessivi, la linea e' l'unica cosa
+   in primo piano. */
+.prof{position:relative;margin-top:14px;border:1px solid var(--line-soft);border-radius:14px;background:var(--panel);
+  padding:10px 8px 4px;min-height:214px}
+.prof .prof-svg{display:block;width:100%;height:auto;max-width:none;touch-action:pan-y}
+.prof .prof-griglia{stroke:rgba(255,255,255,.07);stroke-width:1}
+.prof .prof-tacca{stroke:rgba(255,255,255,.25);stroke-width:1}
+.prof .prof-asse{fill:var(--faint);font-family:var(--mono);font-size:10px}
+.prof .prof-vuoto{fill:var(--faint);font-family:var(--mono);font-size:11px}
+.prof .prof-etichetta{fill:var(--ink);font-family:var(--mono);font-size:10.5px}
+.prof .prof-anello{stroke:#06101c;stroke-width:2}
+.prof .prof-mirino{stroke:rgba(255,255,255,.35);stroke-width:1;stroke-dasharray:3 3}
+.prof .prof-tip{position:absolute;top:6px;transform:translateX(-50%);background:#0b1726;color:var(--ink);
+  border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:4px 9px;font-family:var(--mono);font-size:11px;
+  white-space:nowrap;pointer-events:none}
 .alt-pair{display:flex;gap:14px;margin-top:14px}
 .alt-tile{flex:1;min-width:0;border:1px solid var(--line-soft);border-radius:14px;
   background:var(--panel);padding:15px 16px;text-align:center}
@@ -1131,12 +1159,15 @@ nav a.ig:hover svg{transform:translateY(-1px)}
 .alt-n small{font-size:.42em;font-weight:400;margin-left:3px;opacity:.65}
 #altEstRow .alt-n{color:var(--muted)}
 #altGpsRow .alt-n{color:var(--green)}
+#altGpsRow.da-lora .alt-n{color:#9B72F5}   /* la quota piu' recente viene dal LoRa (assets/spot.js) */
 .alt-l{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-top:7px}
 /* Lampeggia una volta, in arancio, quando arriva un punto nuovo dal
    tracciatore — cosi' si vede che il dato si e' davvero aggiornato,
    non solo che il numero e' cambiato (a volte non cambia). */
 #altGpsRow.flash .alt-n{animation:altFlash 2.6s ease-out}
 @keyframes altFlash{0%,30%{color:var(--beacon)}100%{color:var(--green)}}
+#altGpsRow.da-lora.flash .alt-n{animation-name:altFlashLora}
+@keyframes altFlashLora{0%,30%{color:var(--beacon)}100%{color:#9B72F5}}
 @media(prefers-reduced-motion:reduce){#altGpsRow.flash .alt-n{animation:none}}
 
 .q-tight p + p{margin-top:0}

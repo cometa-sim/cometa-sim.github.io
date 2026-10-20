@@ -23,10 +23,13 @@ assets/cometa.css                   colori, caratteri, impaginazione
 assets/i18n.js                      i testi in italiano, spagnolo e inglese
 assets/sonda.js                     i 26 componenti + il modello 3D (Three.js)
 assets/catena.js                    la catena di volo in 3D, nella pagina Missione
+assets/volo.js                      ora del lancio (LAUNCH) e dati del volo (FLIGHT_*), la richiesta della traiettoria prevista
 assets/app.js                       lingua, navigazione, salita, fisica, conto alla rovescia
 assets/traiettoria.js               prevedere il volo: pallone, partenza, Tawhiri
 assets/msis.js                      NRLMSIS 2.1 tabulato, generato da calcolo/genera_msis.py
-assets/spot.js                      pagina Diretta: mappa GPS e quota stimata in volo
+assets/spot.js                      pagina Diretta: mappa (SPOT e LoRa), legenda, quota stimata in volo
+assets/lora.js                      pagina Diretta: i dati LoRa da dati.cometa.gripe, filtrati
+assets/profilo.js                   pagina Diretta: il grafico della quota dai dati LoRa
 assets/mapkit.js                    controlli comuni alle due mappe: satellite, nuvole/pioggia,
                                      schermo intero, salva — vedi «I livelli della mappa»
 assets/vendor/three.min.js          Three.js r128, copia locale (vedi sotto)
@@ -64,10 +67,10 @@ Norme e autorizzazioni · Domande · Chi siamo.
 | Misure, peso o nota di un componente | l'elenco `PARTS` in `assets/sonda.js` |
 | Nomi delle cinque parti della catena di volo | la chiave `chain` in `assets/i18n.js` |
 | Colori e caratteri di tutto il sito | il blocco `:root` in `assets/cometa.css` |
-| Data del lancio (conto alla rovescia) | la costante `LAUNCH` in `assets/app.js` |
+| Data del lancio (conto alla rovescia, Diretta, stazione LoRa) | la costante `LAUNCH` in `assets/volo.js` |
 | Fondo scala delle animazioni | la costante `SCALA_KM` in `assets/app.js` |
-| Quota di scoppio, velocità di salita/discesa e sito di lancio attesi (pagina Diretta) | `FLIGHT_BURST_KM`, `FLIGHT_ASCENT_MS`, `FLIGHT_DESCENT_V0_MS`, `FLIGHT_SITE` in `assets/app.js` |
-| Payload pesato e portanza al collo misurata (pagina Diretta) | `FLIGHT_PAYLOAD_KG`, `FLIGHT_NECK_LIFT_G` in `assets/app.js` |
+| Quota di scoppio, velocità di salita/discesa e sito di lancio attesi (pagina Diretta) | `FLIGHT_BURST_KM`, `FLIGHT_ASCENT_MS`, `FLIGHT_DESCENT_V0_MS`, `FLIGHT_SITE` in `assets/volo.js` |
+| Payload pesato e portanza al collo misurata (pagina Diretta) | `FLIGHT_PAYLOAD_KG`, `FLIGHT_NECK_LIFT_G` in `assets/volo.js` |
 | Indirizzo del backend che interroga SPOT (pagina Diretta) | la costante `TRACK_URL` in `assets/app.js` |
 | Se la Diretta compare in nav (oggi no: si raggiunge solo col link `#diretta`) | `DIRETTA_PUBLIC` in `assets/app.js` |
 | Quando compare "Diretta" in nav e quando diventa rossa, se pubblica | `DIRETTA_WINDOW` e `DIRETTA_START` in `assets/app.js` |
@@ -77,11 +80,11 @@ Norme e autorizzazioni · Domande · Chi siamo.
 ### Dopo ogni modifica: il numero di versione
 
 In `index.html` i file di `assets/`, e la mappa, sono richiamati con un numero in
-coda — oggi `?v=190`:
+coda — oggi `?v=191`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=190">
-<script src="assets/i18n.js?v=190"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=191">
+<script src="assets/i18n.js?v=191"></script>
 ```
 
 Lo stesso numero compare anche in punti meno visibili, che vanno alzati
@@ -352,7 +355,7 @@ Sotto la mappa, il riquadro meteo (icona, temperatura, vento, nuvole,
 probabilità di pioggia) è la previsione oraria di Open-Meteo per il punto, il
 giorno e l'ora della partenza scelti, e si aggiorna quando cambiano.
 
-Il giorno proposto è la data di `LAUNCH` in `assets/app.js`, quando cade
+Il giorno proposto è la data di `LAUNCH` in `assets/volo.js`, quando cade
 nella settimana della previsione, altrimenti domani. L'area di esclusione
 e il contorno dell'Uruguay sono ripetuti in cima a `assets/traiettoria.js`
 e sono gli stessi di `cometa_venti.py`: se cambiano, vanno cambiati nei
@@ -510,13 +513,37 @@ dal 10 ottobre 2026: provato con il tracker e la pagina admin chiusa, il
 punto è arrivato al Worker pochi secondi dopo il messaggio. Tutti i
 dettagli sono in `worker/README.md`.
 
-**La linea grigia tratteggiata** è la traiettoria prevista: `assets/spot.js`
-la chiede a Tawhiri con i parametri fissi di `FLIGHT_*` in `assets/app.js`
-(partenza da `FLIGHT_SITE`, all'ora di `LAUNCH`) — non quelli che un
-visitatore può aver cambiato nella pagina Traiettoria. La richiede ogni 20
-minuti, anche durante il volo, e la ridisegna solo se nel frattempo è uscita
-una nuova corsa del GFS. Non usa mai i punti GPS: non si corregge seguendo
-il pallone.
+**La telemetria LoRa** (viola) arriva dalla radio della sonda, una riga ogni
+5 s per tutto il volo, attraverso le stazioni di terra e il Worker
+`cometa-lora` (tutto in `lora/README.md`). `assets/lora.js` legge
+`traccia.json` una volta e `ultimo.json` ogni 20 s da `dati.cometa.gripe`,
+attraverso la cache di Cloudflare: il browser non chiama mai il Worker. La
+Diretta non mostra i dati incoerenti (senza fix, meno di 6 satelliti, quote
+sotto −100 m o sopra 45 km, salti impossibili): un punto così si ignora e
+resta l'ultimo buono; se da un minuto non ne arriva nessuno buono, la legenda
+dice «segnale perso». La regola, e le fasi del volo che compaiono in legenda
+(in attesa, in salita, in caduta, col paracadute, atterrata: l'attesa finisce
+all'ora di `LAUNCH`), stanno in `lora/formato/fasi.js`, la stessa della
+pagina della stazione, che però mostra tutto.
+
+La **legenda**, sotto la mappa, dà per LoRa e SPOT da quanto è arrivato l'ultimo
+dato: una posizione vecchia non deve sembrare attuale. La mappa segue l'ultimo
+dato solo se è il più recente fra le due fonti, e solo quando ne arriva uno
+nuovo. «Ultimo punto GPS» è la quota più recente fra le due, viola se viene dal
+LoRa; la stessa riancora la quota stimata. Nel 3D la traccia è quella LoRa
+quando c'è (ha la quota a ogni punto), se no quella dello SPOT. Sotto la quota,
+il **grafico** della quota nel tempo dai dati LoRa (`assets/profilo.js`).
+
+**La linea grigia tratteggiata** è la traiettoria prevista: la richiesta a
+Tawhiri è `COMETA_PREVISIONE` in `assets/volo.js`, con i parametri fissi di
+`FLIGHT_*` (partenza da `FLIGHT_SITE`, all'ora di `LAUNCH`) — non quelli che
+un visitatore può aver cambiato nella pagina Traiettoria. La stessa richiesta
+la fa la pagina della stazione LoRa, che quindi disegna la stessa linea.
+`assets/spot.js` la richiede ogni 20 minuti, anche durante il volo, e la
+ridisegna solo se nel frattempo è uscita una nuova corsa del GFS. Non usa mai
+i punti GPS: non si corregge seguendo il pallone. Si accende e si spegne con il
+pulsante sulla mappa (accesa all'inizio; la scelta resta nel browser di chi
+guarda), insieme al cerchio dell'errore di previsione.
 
 **Il cerchio grigio tratteggiato** intorno all'arrivo previsto è l'errore di
 previsione, con la stessa curva dell'opzione della pagina Traiettoria
@@ -571,16 +598,17 @@ approvare la propria richiesta di modifica.
   resta, e magari la pagina usa la curva solo per partenze in Uruguay.
 
 - **La data definitiva del lancio**, quando la DINACIA autorizza. Oggi la
-  costante `LAUNCH` in `assets/app.js` vale `2026-10-28T11:00:00-03:00`: è
+  costante `LAUNCH` in `assets/volo.js` vale `2026-10-28T11:00:00-03:00`: è
   provvisoria, e il conto alla rovescia la mostra come se fosse certa.
   È anche il via vero: il lancio **è** la scadenza di `LAUNCH`, non un
   segnale a parte — se il giorno stesso il lancio slitta rispetto all'ora
   prevista, si aggiorna `LAUNCH` all'ora vera (commit e push) e il resto
-  (conto alla rovescia, quota stimata in `assets/spot.js`) segue da solo.
+  (conto alla rovescia, quota stimata in `assets/spot.js`, fasi del volo
+  nella Diretta e nella pagina della stazione LoRa) segue da solo.
 
 - **Il payload pesato e la portanza al collo misurata**, prima e durante il
   lancio: `FLIGHT_PAYLOAD_KG` (oggi 1,5) e `FLIGHT_NECK_LIFT_G` (oggi
-  `null`) in `assets/app.js`, con uno o più commit. Finché la portanza è
+  `null`) in `assets/volo.js`, con uno o più commit. Finché la portanza è
   `null` vale la salita prevista `FLIGHT_ASCENT_MS` (5 m/s). Non c'è un
   calcolo a parte: `voloDiretta()` in `assets/traiettoria.js` usa lo stesso
   codice del modulo della pagina Traiettoria — volume d'elio dalla salita o
@@ -593,7 +621,7 @@ approvare la propria richiesta di modifica.
 
 - **La quota di scoppio e le velocità di salita/discesa**, nella pagina
   Diretta. `FLIGHT_BURST_KM`, `FLIGHT_ASCENT_MS` e `FLIGHT_DESCENT_V0_MS`
-  in `assets/app.js` oggi hanno i numeri generici già scritti su Missione
+  in `assets/volo.js` oggi hanno i numeri generici già scritti su Missione
   (37,9 km, 5 m/s di salita, 4,6 m/s di velocità terminale al suolo):
   il giorno del lancio vanno sostituiti con la previsione precisa di quel
   volo, altrimenti la quota stimata in volo (`assets/spot.js`) scoppia e
