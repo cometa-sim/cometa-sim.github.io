@@ -64,6 +64,9 @@
   a{color:var(--accent)}
   .note{font-size:13px;color:var(--muted)}
   details summary{cursor:pointer;color:var(--muted);font-size:14px;margin-top:10px}
+  #pericolo{border-color:var(--bad)}
+  #pericolo summary{color:var(--bad);font-size:13px;letter-spacing:.06em;text-transform:uppercase;font-weight:600;margin:0}
+  button.danger{border-color:var(--bad);color:var(--bad)}
 </style>
 </head>
 <body>
@@ -165,6 +168,19 @@
       <button id="btnClear">Clear stored data…</button>
     </div>
     <ul id="rawlog"></ul>
+  </section>
+
+  <section class="wide" id="pericolo">
+    <details>
+      <summary>Danger zone</summary>
+      <p class="note">Clears the <strong>public track on the server</strong>: the map on the site starts empty.
+        Use it after the tests, before the launch, never during the flight.
+        The log in this browser and the raw copy on the server are kept. Needs the key.</p>
+      <label for="confermaReset">Type <code>reset</code> to enable the button</label>
+      <input id="confermaReset" autocomplete="off" spellcheck="false" autocapitalize="off">
+      <div class="row"><button id="btnReset" class="danger" disabled>Clear public track on server</button></div>
+      <div class="msg" id="msgReset"></div>
+    </details>
   </section>
 
 </main>
@@ -358,7 +374,7 @@ function chiaveDoppione(dati) {
 /* Da cambiare a ogni modifica della pagina: e' scritta in Setup, e
    dice a colpo d'occhio se il telefono sta usando la pagina nuova o una
    copia vecchia rimasta in memoria. */
-const VERSIONE = "2026-10-20b";
+const VERSIONE = "2026-10-21a";
 
 const WORKER_PREDEFINITO = "https://lora.cometa.gripe";
 const WORKER = (new URLSearchParams(location.search).get("worker") || WORKER_PREDEFINITO).replace(/\/+$/, "");
@@ -928,6 +944,35 @@ async function invia() {
 window.addEventListener("online", function () { prossimoInvio = 0; invia(); });
 
 /* ==================================================================
+   Azzerare la traccia pubblica sul server (Danger zone)
+
+   Svuota traccia.json e ultimo.json (POST /azzera), come il curl del
+   README, e nient'altro: il log di questo browser e il grezzo sul server
+   restano. Sta in fondo, chiusa, e il pulsante si attiva solo scrivendo
+   "reset" a mano: premuto per sbaglio durante il volo svuoterebbe la
+   mappa pubblica.
+   ================================================================== */
+async function azzeraServer() {
+  if ($("confermaReset").value.trim() !== "reset") return;
+  if (!chiave) { msg("msgReset", "bad", "Check the key first (Setup, at the top)."); return; }
+  $("btnReset").disabled = true;
+  try {
+    const r = await fetch(WORKER + "/azzera", {
+      method: "POST",
+      headers: { Authorization: "Bearer " + chiave, "Content-Type": "application/json" },
+      body: JSON.stringify({ conferma: "azzera" })
+    });
+    const j = await r.json().catch(function () { return {}; });
+    if (!r.ok || !j.ok) throw new Error(j.errore || "HTTP " + r.status);
+    msg("msgReset", "ok", "Public track cleared at " + ora(Date.now()) + " (revision " + j.revisione + ").");
+    $("confermaReset").value = "";
+  } catch (e) {
+    msg("msgReset", "bad", "Not cleared: " + e.message);
+    $("btnReset").disabled = false;
+  }
+}
+
+/* ==================================================================
    Scaricare e svuotare
    ================================================================== */
 async function scarica() {
@@ -1001,6 +1046,10 @@ async function avvio() {
   $("key").addEventListener("keydown", function (e) { if (e.key === "Enter") verificaChiave(); });
   $("btnDownload").onclick = scarica;
   $("btnClear").onclick = svuota;
+  $("confermaReset").addEventListener("input", function () {
+    $("btnReset").disabled = $("confermaReset").value.trim() !== "reset";
+  });
+  $("btnReset").onclick = azzeraServer;
   $("btnFit").onclick = function () { if (mappa && volo.traccia.length) mappa.fitBounds(L.latLngBounds(volo.traccia.concat(io ? [[io.lat, io.lon]] : [])), { padding: [30, 30] }); };
   $("btnLast").onclick = function () { const p = volo.ultimaPos && volo.ultimaPos.dati; if (mappa && p) mappa.setView([p.lat, p.lon], Math.max(mappa.getZoom(), 12)); };
 

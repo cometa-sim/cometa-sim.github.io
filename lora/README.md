@@ -365,7 +365,11 @@ node lora/formato/sincronizza.js
 
 ## Il giorno del lancio
 
-Dopo le prove a terra, prima del decollo:
+Dopo le prove a terra, prima del decollo, si svuota la traccia pubblica sul
+server. Dalla pagina della stazione: in fondo, **Danger zone**, con la chiave
+verificata, scrivendo `reset` a mano. Svuota solo il server: il log nel browser
+della stazione resta (quello si svuota con *Clear stored data…*). Oppure dal
+terminale:
 
 ```sh
 curl -X POST https://<indirizzo-del-worker>/azzera \
