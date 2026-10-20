@@ -88,6 +88,7 @@
     <div class="row">
       <button id="btnKey">Check key</button>
       <button id="btnConnect" class="primary">Connect receiver</button>
+      <button id="btnUsb" hidden>Connect via USB (Android)</button>
       <button id="btnFile" hidden>Choose log file</button>
     </div>
     <div class="msg" id="msgSetup"></div>
@@ -95,6 +96,7 @@
       and only while this device has a network connection. Lines not yet uploaded may be lost when the
       page or the browser is closed (always, in a private or incognito window):
       <strong>choose a log file</strong>, or download the log.</p>
+    <p class="note">Page version: <code id="versione"></code></p>
     <details>
       <summary>Advanced</summary>
       <p class="note">Server: <code id="workerUrl"></code><br>
@@ -353,6 +355,11 @@ function chiaveDoppione(dati) {
 
 /* Il Worker vero. Per le prove (Worker locale o "prova") si apre la
    pagina con ?worker=https://...: cosi' non si cambia il file. */
+/* Da cambiare a ogni modifica della pagina: e' scritta in Setup, e
+   dice a colpo d'occhio se il telefono sta usando la pagina nuova o una
+   copia vecchia rimasta in memoria. */
+const VERSIONE = "2026-10-20b";
+
 const WORKER_PREDEFINITO = "https://lora.cometa.gripe";
 const WORKER = (new URLSearchParams(location.search).get("worker") || WORKER_PREDEFINITO).replace(/\/+$/, "");
 
@@ -781,14 +788,23 @@ async function apriFtdi(dev) {
 
 /* 0x0403 e' FTDI: lo usano anche i convertitori FT232RL non originali. */
 const FILTRO_FTDI = [{ vendorId: 0x0403 }];
+/* Android si riconosce dallo user agent; ma con «sito desktop» attivo
+   Chrome si presenta come un computer, e la pagina sceglierebbe la Web
+   Serial, che li' non vede il convertitore. Per questo, dove c'e'
+   WebUSB, c'e' anche il pulsante "Connect via USB": scavalca la scelta
+   automatica. */
+function eAndroid() {
+  return /Android/i.test(navigator.userAgent) ||
+    !!(navigator.userAgentData && /Android/i.test(navigator.userAgentData.platform || ""));
+}
 function usaUsb() {
-  return "usb" in navigator && (/Android/i.test(navigator.userAgent) || !("serial" in navigator));
+  return "usb" in navigator && (eAndroid() || !("serial" in navigator));
 }
 
-async function collega() {
+async function collega(forzaUsb) {
   try {
     if (lettore) { await lettore(); lettore = null; }
-    if (usaUsb()) {
+    if (forzaUsb === true || usaUsb()) {
       apriFtdi(await navigator.usb.requestDevice({ filters: FILTRO_FTDI }));
     } else if ("serial" in navigator) {
       apriSeriale(await navigator.serial.requestPort());
@@ -796,7 +812,12 @@ async function collega() {
       msg("msgSetup", "bad", "This browser cannot read USB devices. Use Chrome or Edge.");
     }
   } catch (e) {
-    if (e.name !== "NotFoundError") msg("msgSetup", "bad", "Receiver: " + e.message);
+    if (e.name === "NotFoundError") return; // finestra chiusa senza scegliere
+    /* Su Android un'altra app (per esempio un terminale seriale) puo'
+       tenersi il convertitore: finche' non lo lascia, Chrome non lo
+       puo' aprire. */
+    msg("msgSetup", "bad", "Receiver: " + e.message +
+      (e.name === "NetworkError" || e.name === "SecurityError" ? " — close any other app using the USB adapter, unplug and plug it again." : ""));
   }
 }
 
@@ -970,7 +991,12 @@ async function avvio() {
       } catch (e) { /* annullato */ }
     };
   }
-  $("btnConnect").onclick = collega;
+  $("btnConnect").onclick = function () { collega(false); };
+  if ("usb" in navigator) {
+    $("btnUsb").hidden = false;
+    $("btnUsb").onclick = function () { collega(true); };
+  }
+  $("versione").textContent = VERSIONE;
   $("btnKey").onclick = verificaChiave;
   $("key").addEventListener("keydown", function (e) { if (e.key === "Enter") verificaChiave(); });
   $("btnDownload").onclick = scarica;
