@@ -9,7 +9,7 @@
     "deploy": "wrangler deploy",
     "deploy:prova": "wrangler deploy --env prova",
     "typecheck": "tsc --noEmit",
-    "test": "node --test test/*.test.ts ../formato/*.test.js",
+    "test": "node --test test/*.test.ts ../formato/*.test.js ../simulatore/*.test.js",
     "tail": "wrangler tail"
   },
   "devDependencies": {

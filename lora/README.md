@@ -14,11 +14,11 @@ lora/formato/formato.js     il formato della riga: campi, lettura, controlli —
 lora/formato/casi.json      righe d'esempio, valide e non valide, per i test
 lora/formato/formato.test.js
 lora/worker/                il Worker (TypeScript): riceve le righe, scrive i file su R2
+lora/simulatore/            un volo finto, ricevuto da due stazioni finte, per provare tutto senza hardware
 ```
 
-In arrivo, ognuno con la sua richiesta di modifica: il simulatore
-(`lora/simulatore/`), la pagina della stazione di terra, l'integrazione
-nella mappa della Diretta.
+In arrivo, ognuno con la sua richiesta di modifica: la pagina della
+stazione di terra, l'integrazione nella mappa della Diretta.
 
 ## La riga radio
 
@@ -168,13 +168,27 @@ Il simulatore non deve mai scrivere sulla mappa vera. Per questo c'è un
 secondo Worker, `cometa-lora-prova`, con il suo bucket (`cometa-lora-prova`,
 anche per il grezzo) e la sua chiave. Serve i file da sé
 (`LETTURA_DAL_WORKER`), quindi il bucket non ha bisogno di nessun dominio.
-Si pubblica da terminale:
+
+Si crea dalla dashboard come quello vero, con tre differenze:
+
+| Campo | Valore |
+|---|---|
+| Project name | `cometa-lora-prova` |
+| Root directory | `lora/worker` |
+| Deploy command | `npx wrangler deploy --env prova` |
+| Build watch paths | `lora/worker/*` e `lora/formato/*` |
+
+Poi, sul Worker `cometa-lora-prova`: il secret `CHIAVE_STAZIONE`, con una
+chiave **diversa** da quella vera, e in *Domains* lo stesso schema
+dell'altro (*Production* acceso, *Preview* spento).
+
+In alternativa, da terminale:
 
 ```sh
 cd lora/worker
 npm install
 npx wrangler login
-npx wrangler secret put CHIAVE_STAZIONE --env prova   # una chiave diversa da quella vera
+npx wrangler secret put CHIAVE_STAZIONE --env prova
 npm run deploy:prova
 ```
 
@@ -183,7 +197,7 @@ npm run deploy:prova
 ```sh
 cd lora/worker
 npm install
-npm test            # formato, traccia, scritture concorrenti (con un R2 finto)
+npm test            # formato, traccia, scritture concorrenti (con un R2 finto), simulatore
 npm run typecheck
 npm run dev         # il Worker su http://localhost:8787, con R2 simulato
 ```
@@ -207,13 +221,71 @@ curl http://localhost:8787/ultimo.json
 I test con il R2 finto provano la logica; che R2 vero rispetti le
 scritture condizionali si è verificato con `npm run dev` (due stazioni, 40
 lotti in parallelo, nessun punto perso; sei stazioni che creano il file
-nello stesso istante) e va riverificato una volta sull'ambiente di prova
-con il simulatore.
+nello stesso istante) e con il simulatore. Sul Cloudflare vero si
+riverifica con il simulatore sull'ambiente di prova.
 
 Un volo di quattro ore sono circa 2900 righe e 150 kB di `traccia.json`: ogni
 lotto costa al Worker 3-4 ms di CPU, sotto i 10 ms del piano gratuito. Il
 test «unire tremila righe resta veloce» se ne accorge, se un giorno non è
 più così.
+
+## Il simulatore
+
+`lora/simulatore/simulatore.py` inventa un volo completo — tre minuti a
+terra, salita a 5 m/s, scoppio a 37,9 km, discesa col paracadute,
+atterraggio, dieci minuti a terra — e lo fa ricevere da due stazioni
+finte, `portatile` e `telefono`, che mandano le righe al Worker come farà
+la pagina vera: a lotti, ognuna per conto suo. Ci mette dentro quello che
+può andare storto il giorno del volo:
+
+- pacchetti persi, diversi per le due stazioni (8 % ciascuna);
+- doppioni: quasi tutti i pacchetti li ricevono tutte e due, e ogni tanto
+  una stazione rimanda un lotto intero;
+- il telefono senza rete per un po', a metà volo: poi manda tutto insieme;
+- il GPS senza fix nel primo minuto e, ogni tanto, per qualche pacchetto;
+- qualche riga rotta, che il Worker deve scartare;
+- a richiesta (`--riavvio-min 40`), la sonda che si riavvia e ricomincia
+  a contare da zero.
+
+Alla fine legge `ultimo.json` e confronta: le righe distinte ricevute da
+almeno una stazione devono essere esattamente quelle che il Worker ha
+contato.
+
+```
+[portatile] ricevute 2099, inviate 2099, invii falliti 0
+[telefono] ricevute 2117, inviate 2117, invii falliti 0
+righe distinte ricevute da almeno una stazione: 2276 (piu' 7 rotte)
+il Worker ne ha contate 2276 nuove (totale 2276, revisione 139)
+OK: nessuna riga persa, nessun doppione
+```
+
+Serve solo Python 3, senza niente da installare. La chiave si legge dalla
+variabile `CHIAVE_STAZIONE`, o la chiede all'avvio: non va mai scritta sulla
+riga di comando, dove resterebbe nella cronologia del terminale.
+
+```sh
+cd lora/simulatore
+
+# solo le righe, a schermo (per vedere come sono)
+python3 simulatore.py --solo-righe | head
+
+# contro il Worker locale (npm run dev in lora/worker), velocissimo
+python3 simulatore.py --url http://localhost:8787 --azzera --velocita 150
+
+# contro il Worker di prova su Cloudflare: un volo di tre ore in dieci minuti
+python3 simulatore.py --url https://cometa-lora-prova.<account>.workers.dev --azzera --velocita 20
+```
+
+Si rifiuta di scrivere su un indirizzo che non sia `localhost` o non abbia
+`prova` nel nome: il Worker vero non lo tocca mai, a meno di aggiungere
+`--produzione` apposta. `python3 simulatore.py --help` elenca tutte le
+opzioni (quota di scoppio, perdite, durata della mancanza di rete…); con
+`--seme 3` si ripete esattamente lo stesso volo.
+
+Che le righe del simulatore rispettino il formato lo controlla
+`simulatore.test.js` con `formato.js` stesso, dentro `npm test`: il
+simulatore scrive le righe a mano, perché Python non può importare il file
+JavaScript, e questo test è il ponte fra i due.
 
 ## Il giorno del lancio
 
