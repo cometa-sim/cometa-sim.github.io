@@ -699,13 +699,14 @@ const ID_SONDA = "C2";
 /* ==================================================================
    Lettura della seriale
 
-   Due strade, perche' su Android Chrome non e' detto che ci sia la Web
-   Serial API:
+   Due strade:
    - Web Serial (Chrome e Edge sul computer): il sistema operativo ha
      gia' il driver del convertitore FT232RL, basta aprire la porta.
-   - WebUSB con il protocollo FTDI fatto a mano, se la Web Serial non
-     c'e' (Android): li' il convertitore non ha driver, e la pagina gli
-     parla direttamente. I comandi sono quelli di libftdi: reset, velocita'
+   - WebUSB con il protocollo FTDI fatto a mano, su Android. Li' Chrome
+     ha anche la Web Serial, ma solo per le porte seriali Bluetooth: un
+     convertitore USB non compare nell'elenco ("nessun dispositivo
+     compatibile", visto sul telefono vero). Android non ha il driver
+     del convertitore, e la pagina gli parla direttamente. I comandi sono quelli di libftdi: reset, velocita'
      (0x4138 = 9600 baud sul FT232R), 8N1, nessun controllo di flusso.
      Ogni pacchetto USB che arriva comincia con due byte di stato del
      chip, che si scartano.
@@ -778,13 +779,19 @@ async function apriFtdi(dev) {
   }
 }
 
+/* 0x0403 e' FTDI: lo usano anche i convertitori FT232RL non originali. */
+const FILTRO_FTDI = [{ vendorId: 0x0403 }];
+function usaUsb() {
+  return "usb" in navigator && (/Android/i.test(navigator.userAgent) || !("serial" in navigator));
+}
+
 async function collega() {
   try {
     if (lettore) { await lettore(); lettore = null; }
-    if ("serial" in navigator) {
+    if (usaUsb()) {
+      apriFtdi(await navigator.usb.requestDevice({ filters: FILTRO_FTDI }));
+    } else if ("serial" in navigator) {
       apriSeriale(await navigator.serial.requestPort());
-    } else if ("usb" in navigator) {
-      apriFtdi(await navigator.usb.requestDevice({ filters: [{ vendorId: 0x0403 }] }));
     } else {
       msg("msgSetup", "bad", "This browser cannot read USB devices. Use Chrome or Edge.");
     }
@@ -795,7 +802,10 @@ async function collega() {
 
 /* Un cavo che si stacca in macchina e si riattacca: la porta era gia'
    stata autorizzata, la si riapre da sola, senza toccare niente. */
-if ("serial" in navigator) {
+if (usaUsb()) {
+  navigator.usb.addEventListener("connect", function (ev) { if (ev.device.vendorId === 0x0403) apriFtdi(ev.device).catch(function () {}); });
+  navigator.usb.addEventListener("disconnect", function () { stato("chipSerial", "bad", "Receiver: unplugged"); });
+} else if ("serial" in navigator) {
   navigator.serial.addEventListener("connect", function (ev) { apriSeriale(ev.target).catch(function () {}); });
   navigator.serial.addEventListener("disconnect", function () { stato("chipSerial", "bad", "Receiver: unplugged"); });
 }
@@ -982,7 +992,10 @@ async function avvio() {
 
   /* Le porte gia' autorizzate in una visita precedente si riaprono da
      sole: dopo un crash basta ricaricare la pagina. */
-  if ("serial" in navigator) {
+  if (usaUsb()) {
+    const disp = (await navigator.usb.getDevices()).filter(function (d) { return d.vendorId === 0x0403; });
+    if (disp.length === 1) apriFtdi(disp[0]).catch(function () {});
+  } else if ("serial" in navigator) {
     const porte = await navigator.serial.getPorts();
     if (porte.length === 1) apriSeriale(porte[0]).catch(function () {});
   }
