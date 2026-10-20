@@ -1,0 +1,44 @@
+/* Service worker della pagina della stazione: la fa riaprire anche
+   senza rete. Al sito di lancio o in macchina internet puo' mancare, e
+   una pagina ricaricata per sbaglio non deve diventare una pagina
+   bianca proprio allora.
+
+   - La pagina e Leaflet: prima la rete (cosi' una versione nuova arriva
+     appena c'e' connessione), e se la rete non c'e' la copia salvata.
+   - Le mattonelle della mappa: prima la copia salvata, e intanto si
+     salvano quelle nuove. Guardare la zona del volo sulla mappa a casa,
+     con la rete, la rende disponibile anche offline.
+   - Il Worker (lora.cometa.gripe) non passa mai di qui: le richieste
+     verso altri domini che non siano le mattonelle si lasciano stare. */
+const CACHE = "cometa-stazione-v1";
+const MATTONELLE = "cometa-stazione-mattonelle";
+const GUSCIO = ["./", "../../assets/vendor/leaflet/leaflet.js", "../../assets/vendor/leaflet/leaflet.css"];
+
+self.addEventListener("install", function (e) {
+  e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(GUSCIO); }).then(function () { return self.skipWaiting(); }));
+});
+
+self.addEventListener("activate", function (e) {
+  e.waitUntil(self.clients.claim());
+});
+
+self.addEventListener("fetch", function (e) {
+  const url = new URL(e.request.url);
+  if (e.request.method !== "GET") return;
+  if (url.hostname === "tile.openstreetmap.org") {
+    e.respondWith(caches.open(MATTONELLE).then(function (c) {
+      return c.match(e.request).then(function (salvata) {
+        const rete = fetch(e.request).then(function (r) { if (r.ok) c.put(e.request, r.clone()); return r; });
+        return salvata || rete;
+      });
+    }));
+    return;
+  }
+  if (url.origin !== self.location.origin) return;
+  e.respondWith(fetch(e.request).then(function (r) {
+    if (r.ok) { const copia = r.clone(); caches.open(CACHE).then(function (c) { c.put(e.request, copia); }); }
+    return r;
+  }).catch(function () {
+    return caches.match(e.request, { ignoreSearch: true });
+  }));
+});

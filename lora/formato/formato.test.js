@@ -65,3 +65,10 @@ test("fra i marcatori non ci sono import ne' export", () => {
   const blocco = sorgente.slice(inizio, fine);
   assert.doesNotMatch(blocco, /^\s*(import|export)\b/m);
 });
+
+test("la pagina della stazione ha il formato aggiornato", async () => {
+  /* Se fallisce: node lora/formato/sincronizza.js */
+  const { blocco, PAGINA, FORMATO } = await import("./sincronizza.js");
+  assert.equal(blocco(readFileSync(PAGINA, "utf8")), blocco(readFileSync(FORMATO, "utf8")),
+    "la copia del formato in lora/stazione/index.html e' vecchia: node lora/formato/sincronizza.js");
+});
