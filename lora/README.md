@@ -18,6 +18,7 @@ lora/simulatore/            un volo finto, ricevuto da due stazioni finte, per p
 lora/stazione/index.html    la pagina della stazione di terra: legge il ricevitore, salva, mostra, invia
 lora/stazione/sw.js         la fa riaprire anche senza rete
 lora/formato/sincronizza.js copia il formato dentro la pagina della stazione
+lora/formato/fasi.js        le fasi del volo, una regola sola per stazione e Diretta
 ```
 
 In arrivo: l'integrazione nella mappa della Diretta.
@@ -199,7 +200,7 @@ npm run deploy:prova
 ```sh
 cd lora/worker
 npm install
-npm test            # formato, traccia, scritture concorrenti (con un R2 finto), simulatore
+npm test            # formato, fasi, traccia, scritture concorrenti (R2 finto), simulatore, sintassi della stazione
 npm run typecheck
 npm run dev         # il Worker su http://localhost:8787, con R2 simulato
 ```
@@ -309,13 +310,26 @@ niente di segreto: la chiave si digita a mano.
   le porte seriali Bluetooth, e un convertitore USB non compare nell'elenco.
 - **Salva ogni riga, prima di tutto il resto**, con l'ora del computer: sempre
   nel browser (IndexedDB), e su Chrome desktop anche in un file scelto con
-  «Choose log file», scritto riga per riga. «Download log» scarica quello del
-  browser. Il formato è lo stesso del grezzo su R2: ora ISO, un tab, la riga.
+  «Keep log in a file…». Quel file non è un download: la pagina lo continua a
+  scrivere riga per riga mentre riceve, e ci scrive subito anche tutte le righe
+  già ricevute, così si può scegliere anche a ricezione cominciata. L'etichetta
+  in alto dice quante righe contiene. «Download log» scarica invece, in quel
+  momento, tutto quello che c'è nel browser. Il formato è lo stesso del grezzo
+  su R2: ora ISO, un tab, la riga.
+- Scarta i byte che non possono stare in una riga (lo zero, gli altri caratteri
+  di controllo): alla prima prova, aprendo la porta, ne sono arrivati quasi
+  200 000, quasi tutti zeri. Si contano in «Noise bytes ignored» e non
+  finiscono né nel log né sul server.
 - Mostra quota, velocità verticale, fase del volo, GPS, batteria, quota
   massima; distanza, direzione ed elevazione dalla propria posizione (per
   puntare l'antenna e per guidare); un link per navigare fino all'ultima
-  posizione; la mappa con la traccia; i pacchetti persi, contati dai buchi in
-  `n`, separati per accensione della sonda.
+  posizione; i pacchetti persi, contati dai buchi in `n`, separati per
+  accensione della sonda; la mappa con la traccia, con gli stessi pulsanti
+  della Diretta (vista satellite, nuvole, schermo intero, 3D con la traccia
+  alla sua quota), tutti spenti all'avvio. Satellite e 3D usano
+  `assets/mapkit.js` e `assets/map3d.js` così come sono: la pagina dichiara
+  `<base href="../../">`, la radice del sito, perché i loro percorsi relativi
+  funzionino anche da `/lora/stazione/`.
 - Manda le righe al Worker, un lotto ogni 5 s. Se la rete manca le tiene in
   coda e riprova sempre più di rado (fino a un minuto); al ritorno della rete
   parte tutto. La parte locale non aspetta mai la rete.
@@ -325,12 +339,26 @@ niente di segreto: la chiave si digita a mano.
   la rete. Le mattonelle della mappa viste con la rete restano disponibili:
   conviene guardare la zona del volo sulla mappa prima di partire.
 
-**La fase del volo** si legge da `vz`, ma la discesa non si può giudicare con
-una soglia fissa: col paracadute aperto, sopra i 30 km, si scende comunque a
-decine di m/s, perché l'aria è rada. La pagina confronta `vz` con la velocità
-che il paracadute dovrebbe avere a quella quota (la stessa formula della
-Diretta, `assets/spot.js`): solo se si scende molto più veloce di così dice
-che il paracadute non sta frenando.
+**La fase del volo** la decide `lora/formato/fasi.js`, la stessa regola che
+userà la Diretta. Le fasi vanno solo avanti:
+
+- **Waiting for launch** fino all'ora del lancio, `LAUNCH` in `assets/app.js`
+  (la stessa del conto alla rovescia, letta da lì: se il lancio slitta, basta
+  aggiornare quella). Qualunque cosa faccia il GPS prima, resta così.
+- **Ascending** dall'ora del lancio.
+- Dopo lo **scoppio**, riconosciuto da due fix di fila con `vz` sotto −10 m/s
+  (camminando, alla prova del 20 ottobre, non è mai scesa sotto −3,7):
+  **Falling fast** se si scende molto più veloce di quanto il paracadute
+  permetterebbe a quella quota, altrimenti **Descending under parachute**. Il
+  confronto serve perché sopra i 30 km anche col paracadute aperto si scende
+  a decine di m/s.
+- **Landed**: dopo lo scoppio, `vz` quasi zero e posizione ferma entro 30 m per
+  30 s.
+
+Questa è la pagina di servizio: mostra tutti i dati, anche quelli incoerenti
+(alla prova a scuola, vicino a un edificio, il GPS è «scivolato» fino a −225 m
+con 10-14 satelliti), per vedere quello che succede davvero. La Diretta invece
+li filtrerà.
 
 **Il giorno del lancio, su ogni stazione**
 
@@ -365,7 +393,11 @@ node lora/formato/sincronizza.js
 
 ## Il giorno del lancio
 
-Dopo le prove a terra, prima del decollo:
+Dopo le prove a terra, prima del decollo, si svuota la traccia pubblica sul
+server. Dalla pagina della stazione: in fondo, **Danger zone**, con la chiave
+verificata, scrivendo `reset` a mano. Svuota solo il server: il log nel browser
+della stazione resta (quello si svuota con *Clear stored data…*). Oppure dal
+terminale:
 
 ```sh
 curl -X POST https://<indirizzo-del-worker>/azzera \

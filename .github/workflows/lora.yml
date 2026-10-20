@@ -11,11 +11,13 @@ on:
   pull_request:
     paths:
       - "lora/**"
+      - "assets/app.js"   # le fasi leggono LAUNCH da li' (vedi lora/formato/fasi.test.js)
       - ".github/workflows/lora.yml"
   push:
     branches: [main]
     paths:
       - "lora/**"
+      - "assets/app.js"   # le fasi leggono LAUNCH da li' (vedi lora/formato/fasi.test.js)
       - ".github/workflows/lora.yml"
 
 permissions:
