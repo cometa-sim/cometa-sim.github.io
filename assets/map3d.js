@@ -121,18 +121,29 @@ window.COMETA_MAP3D = (function(){
       return box(p.lat, p.lon, hw, Math.max(0, p.alt - ext), p.alt + ext, {m:m, c:p.up ? cUp : cDown});
     });
   }
-  function buildTubes(sc, col){
+  /* Lo spessore del tubo e dei cubetti dipende anche dallo zoom: mpp sono
+     i metri per pixel al centro della vista. Senza, lo spessore era solo
+     in metri (almeno 110 m, i cubetti dei fix almeno 290 m): giusto
+     guardando un volo intero, enorme zoomando su un tratto corto — alla
+     prima prova della telemetria LoRa, un giro a piedi intorno alla
+     scuola, ogni cubetto era piu' grande di tutto il percorso. Ora lo
+     spessore e' quello di prima, ma mai piu' di qualche pixel: da
+     lontano non cambia niente, da vicino il tubo si assottiglia.
+     Si ricalcola a ogni zoom (vedi "zoomend" in build()). */
+  const PX_TUBO = 3, PX_FIX = 4, MIN_M = 2;
+  function buildTubes(sc, col, mpp){
     const runs = sc.runs || [], live = sc.live && sc.live.pts && sc.live.pts.length ? sc.live.pts : null;
     const lists = runs.map(function(r){ return r.pts; }).concat(live ? [live] : []);
     if(!lists.length) return empty();
     const diag = diagonal(lists);
-    const hwMain = Math.max(110, diag/260), hwThin = Math.max(80, diag/480);
+    const tetto = function(m, px){ return mpp ? Math.min(m, Math.max(MIN_M, mpp*px)) : m; };
+    const hwMain = tetto(Math.max(110, diag/260), PX_TUBO), hwThin = tetto(Math.max(80, diag/480), PX_TUBO);
     let feats = [];
     runs.forEach(function(r){
       feats = feats.concat(tubeFeats(r.pts, sc.main ? hwMain : hwThin, sc.main ? 0 : 1, col.up, col.down));
     });
     if(live){      /* un cubetto per ogni fix GPS con la quota: nessuna linea fra un fix e l'altro */
-      const c = sc.live.color || "#4ADE9B", hp = hwMain*1.3;
+      const c = sc.live.color || "#4ADE9B", hp = tetto(Math.max(110, diag/260)*1.3, PX_FIX);
       live.forEach(function(p, k){
         if(p.alt == null) return;
         const s = k === live.length - 1 ? hp*1.8 : hp;
@@ -209,6 +220,10 @@ window.COMETA_MAP3D = (function(){
     map.on("click", function(){ map.scrollZoom.enable(); });
     o.container.addEventListener("mouseleave", function(){ map.scrollZoom.disable(); });
 
+    /* metri per pixel al centro della vista: MapLibre usa mattonelle da 512 px */
+    function mpp(){
+      return 40075016.686*Math.cos(map.getCenter().lat*RAD)/(512*Math.pow(2, map.getZoom()));
+    }
     let scene = null, launchLL = null, launchMk = null, landMk = null, burstMk = null, liveMk = null, onSat = false;
 
     /* ----- pulsanti ----- */
@@ -431,7 +446,7 @@ window.COMETA_MAP3D = (function(){
         });
       });
       map.getSource("shadow").setData({type:"FeatureCollection", features:gl});
-      map.getSource("tube").setData(sc ? buildTubes(sc, sc.col || col) : empty());
+      map.getSource("tube").setData(sc ? buildTubes(sc, sc.col || col, mpp()) : empty());
       const first = runs[0];
       landMk = pin(landMk, "#FFB84D", first && sc.main ? [first.end.lon, first.end.lat] : null, sc && sc.labels && sc.labels.land);
       burstMk = pin(burstMk, "#ffffff", first && sc.main ? [first.burst.lon, first.burst.lat] : null, sc && sc.labels && sc.labels.burst);
@@ -439,6 +454,11 @@ window.COMETA_MAP3D = (function(){
       liveMk = pin(liveMk, (sc && sc.live && sc.live.color) || "#4ADE9B", lp ? [lp.lon, lp.lat] : null, sc && sc.live && sc.live.label);
       if(doFit) fit();
     }
+
+    /* lo spessore del tubo segue lo zoom (vedi buildTubes) */
+    map.on("zoomend", function(){
+      if(scene && map.getSource("tube")) map.getSource("tube").setData(buildTubes(scene, scene.col || col, mpp()));
+    });
 
     map.on("click", function(e){
       if(e.originalEvent && e.originalEvent.target.closest && e.originalEvent.target.closest(".maplibregl-marker")) return;
