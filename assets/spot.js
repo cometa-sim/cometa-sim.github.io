@@ -54,24 +54,33 @@ window.COMETA_SPOT = (function(){
   const LOST_MS = 3 * 60000;  // SPOT manda un punto ogni ~2,5 min: 3 min e' un margine ragionevole
   const HIGH_KM = 18;         // sopra qui il GPS smette di trasmettere per natura sua, non per un guasto
   const LANDED_TOL_DEG = 0.0003;  // ~30 m: fix fermi allo stesso punto, segno che la sonda e' a terra
-  const GREEN = "#4ADE9B", ORANGE = "#FFB84D", GREY = "#8FA6BC";   // punto reale, lampeggio, traiettoria prevista
+  const GREEN = "#4ADE9B", ORANGE = "#FFB84D", GREY = "#8FA6BC";   // punto reale, lampeggio e atterraggio previsto, traiettoria prevista il giorno del lancio
   /* La telemetria LoRa (assets/lora.js): viola, ben distinto dal verde
      dello SPOT anche per chi non distingue i colori (controllato con il
      validatore di palette: ΔE 27 sul fondo scuro, la soglia e' 8). */
   const VIOLET = "#9B72F5";
+  /* La traiettoria prevista cambia aspetto il giorno del lancio (vedi
+     stileTraj): prima e' una previsione, azzurra come nel predittore,
+     con l'atterraggio arancione; dal giorno del lancio e' grigia, per non
+     confondersi con le tracce vere. */
+  const CYAN = "#5FE3FF", GREY_CHIARO = "#D3DDE6";
   const SEGUI_ZOOM = 10;
   /* Finche' la sonda non ha ancora mandato nessun punto, la mappa si apre
      centrata sull'Uruguay invece che sull'oceano a (0,0). */
   const FALLBACK = {lat:-33.0, lon:-56.5, zoom:7};
 
-  let view = null, trajFull = null, fcCircle = null, fcLast = null;   /* vista 3D (assets/map3d.js): il pulsante 2D/3D; trajFull = traiettoria prevista con le quote */
+  /* view: la vista 3D (assets/map3d.js), il pulsante 2D/3D. trajPr: l'ultima
+     traiettoria prevista (window.COMETA_PREVISIONE), con le quote; trajGroup:
+     come e' disegnata in 2D; trajModo: per quale giorno (vedi stileTraj).
+     fcLast: l'errore di previsione, {km, age} o null. */
+  let view = null, trajPr = null, trajGroup = null, trajModo = null, fcLast = null;
   /* LoRa: la traccia viola, l'ultimo punto, la legenda, il profilo di quota.
      trajOn: la traiettoria prevista si accende e si spegne (pulsante sulla
      mappa); la scelta resta nel browser di chi guarda. */
   let loraTrail = null, loraMarker = null, loraHit = null, loraUltimaT = null, legenda = null, profilo = null,
       trajBtn = null, trajOn = true, spotAltPt = null;
   try { trajOn = localStorage.getItem("cometa-traiettoria") !== "off"; } catch(e){}
-  let map, trail, ptsLayer, marker, markerHit, trajLine, trajRun, mapReady, pollId, tickId, trajId,
+  let map, trail, ptsLayer, marker, markerHit, trajRun, mapReady, pollId, tickId, trajId,
       elMap, elStatus, elAltEst, elAltGps, elRecenter,
       lastPoints, lastErr, curLang = "it", lastEstKm = null,
       /* L'ancora: "al tempo reale anchorT (ms) il modello e' al proprio
@@ -209,13 +218,13 @@ window.COMETA_SPOT = (function(){
     });
     const mapkit = window.COMETA_MAPKIT ? Promise.resolve() : new Promise(function(ok, ko){
       const s = document.createElement("script");
-      s.src = "assets/mapkit.js?v=197";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
+      s.src = "assets/mapkit.js?v=198";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
       s.onload = ok; s.onerror = ko;
       document.head.appendChild(s);
     });
     const map3d = window.COMETA_MAP3D ? Promise.resolve() : new Promise(function(ok){
       const s = document.createElement("script");
-      s.src = "assets/map3d.js?v=197";
+      s.src = "assets/map3d.js?v=198";
       s.onload = ok; s.onerror = ok;     // senza, resta il 2D e basta
       document.head.appendChild(s);
     });
@@ -240,6 +249,10 @@ window.COMETA_SPOT = (function(){
       /* schermo intero sul riquadro che contiene sia il 2D sia il 3D: cambiando vista si resta a schermo intero */
       window.COMETA_MAPKIT && window.COMETA_MAPKIT.enhance(map, L, elMap.parentNode, street);
       map.setView([FALLBACK.lat, FALLBACK.lon], FALLBACK.zoom);
+      /* La traiettoria prevista sta sotto le tracce vere, in un piano suo:
+         area di atterraggio, linee e punti restano nell'ordine in cui si
+         aggiungono (vedi disegnaTraiettoria). */
+      map.createPane("previsione").style.zIndex = 350;
       trail = L.polyline([], {color:GREEN, weight:2, opacity:.75}).addTo(map);
       ptsLayer = L.layerGroup().addTo(map);     // i punti precedenti, puntini piccoli
       /* Nascosto del tutto finche' non arriva un punto vero: opacity e
@@ -319,8 +332,7 @@ window.COMETA_SPOT = (function(){
         '<span class="leg-row leg-traj"><i class="leg-dash"></i><span class="leg-traj-t"></span></span>';
       mostraTraiettoria();
       /* 2D / 3D: nel 3D si segue il volo con la quota vera. La traiettoria
-         prevista e' tutta grigia (in 3D salita e discesa si distinguono da
-         sole, e i colori non si confondono con la traccia vera, verde). */
+         prevista ha i colori del 2D (stileTraj). */
       if(window.COMETA_MAP3D) view = window.COMETA_MAP3D.attach({
         L:L, map:map, elMap:elMap, el3Style:"position:absolute;inset:0",
         create:{color:GREEN, colorDown:GREEN},
@@ -337,9 +349,11 @@ window.COMETA_SPOT = (function(){
     return mapReady;
   }
 
-  /* Cio' che il 3D deve mostrare: i fix GPS veri (verdi, uno per uno, alla
-     loro quota; un fix arrivato senza quota resta solo come punto a terra)
-     e la traiettoria prevista (grigia, piu' sottile e trasparente). */
+  /* Cio' che il 3D deve mostrare: i fix GPS veri (uno per uno, alla loro
+     quota; un fix arrivato senza quota resta solo come punto a terra) e la
+     traiettoria prevista (sottile e trasparente), con i colori del 2D:
+     tubo, proiezione a terra, scoppio, atterraggio e, prima del giorno del
+     lancio, l'area di atterraggio. */
   function scene3d(){
     const live = (lastPoints || []).map(function(p){
       return {lat:p.lat, lon:p.lon, alt:p.alt != null ? Math.max(0, p.alt) : null};
@@ -350,10 +364,26 @@ window.COMETA_SPOT = (function(){
     const lora = window.COMETA_LORA ? window.COMETA_LORA.punti() : [];
     const vivo = lora.length ? {pts:lora.map(function(p){ return {lat:p.lat, lon:p.lon, alt:p.alt != null ? Math.max(0, p.alt) : null}; }), color:VIOLET}
       : {pts:live, color:GREEN};
-    return {
-      runs:trajFull && trajOn ? [{pts:trajFull}] : [], main:false, col:{up:GREY, down:GREY},
-      live:vivo
-    };
+    const sc = {runs:[], main:false, live:vivo};
+    if(trajPr && trajOn){
+      const st = stileTraj(), d = dict();
+      sc.runs = [{pts:trajPr.full, burst:trajPr.burst, end:trajPr.end}];
+      sc.col = {up:st.linea, down:st.linea};
+      sc.ombra = st.ombra;
+      sc.pin = {land:st.arrivo, burst:st.scoppioFill};
+      sc.labels = {burst:testoScoppio(d), land:testoArrivo(d)};
+      if(fcLast && !st.giorno) sc.fills = [{ring:cerchio(trajPr.end, fcLast.km), color:ORANGE, opacity:.35}];
+    }
+    return sc;
+  }
+  /* Un cerchio di raggio km intorno a p, come anello [lon, lat] per map3d.js. */
+  function cerchio(p, km){
+    const k = Math.cos(p.lat * Math.PI / 180), out = [];
+    for(let i = 0; i < 96; i++){
+      const u = 2 * Math.PI * i / 96;
+      out.push([p.lon + km * Math.cos(u) / (111.32 * k), p.lat + km * Math.sin(u) / 110.57]);
+    }
+    return out;
   }
   function redraw3d(fit){
     if(view && view.isOn() && view.ctl()) view.ctl().render(scene3d(), !!fit);
@@ -474,6 +504,7 @@ window.COMETA_SPOT = (function(){
        arriva un dato. */
     renderStatus();
     renderLegenda();
+    aggiornaGiorno();
   }
 
   let lastRealTime = null, lastAltKey = null;
@@ -667,13 +698,13 @@ window.COMETA_SPOT = (function(){
       .catch(function(err){ lastErr = err.message; renderStatus(); });
   }
 
-  /* La traiettoria grigia: lo stesso previsore (Tawhiri/SondeHub) e i
-     parametri di default della pagina Traiettoria (aerodromo di Mercedes,
-     quota di scoppio e velocita' del volo vero), girato silenziosamente
-     in background, senza toccare la vista della mappa (quella segue solo
-     i punti GPS veri). Se la data di lancio e' fuori dall'orizzonte del
-     previsore (troppo lontana, o il modello non e' ancora pronto) la
-     richiesta fallisce e non si fa nulla: si riprova al giro dopo. */
+  /* La traiettoria prevista: lo stesso previsore (Tawhiri/SondeHub) e i
+     dati del volo di assets/volo.js (partenza, quota di scoppio e velocita'
+     del volo vero), girato silenziosamente in background, senza toccare la
+     vista della mappa (quella segue solo i punti GPS veri). Se la data di
+     lancio e' fuori dall'orizzonte del previsore (troppo lontana, o il
+     modello non e' ancora pronto) la richiesta fallisce e non si fa nulla:
+     si riprova al giro dopo. */
   function pollTrajectory(){
     const L0 = window.COMETA_LAUNCH;
     if(!window.COMETA_PREVISIONE) return;
@@ -683,39 +714,114 @@ window.COMETA_SPOT = (function(){
       if(!pr) return;                                  // silenzioso: fuori orizzonte, previsore non pronto, offline
       if(pr.run && pr.key === trajRun) return;         // stessa corsa, stessi dati: niente da ridisegnare
       trajRun = pr.key;
-      trajFull = pr.full;
       Promise.all([ensureMap(), loadCurva()]).then(function(res){
-        const L = window.L;
-        if(!trajLine) trajLine = L.polyline(pr.pts, {color:GREY, weight:2, opacity:.85, dashArray:"5 8", interactive:false});
-        else trajLine.setLatLngs(pr.pts);
-        drawFc(res[1], pr.pts[pr.pts.length - 1], pr.run, L0, pr.durMin);
-        mostraTraiettoria();
+        trajPr = pr;
+        fcLast = fcRadiusKm(res[1], pr.run, L0, pr.durMin);
+        disegnaTraiettoria();
+        renderScheda();
       });
     });
   }
 
-  /* Accende o spegne la traiettoria prevista (e il cerchio dell'errore
-     di previsione) sulla mappa 2D e nel 3D. */
+  /* Il giorno del lancio (ora di Montevideo) e dopo: la traiettoria e'
+     grigia, piena fino allo scoppio e tratteggiata dopo, con scoppio e
+     atterraggio grigi, e senza l'area dell'errore di previsione (il
+     giorno del lancio l'anticipo e' zero). Prima: azzurra come nel
+     predittore (assets/traiettoria.js, draw), atterraggio arancione e
+     intorno l'area di atterraggio, arancione. */
+  const FMT_GIORNO = new Intl.DateTimeFormat("en-CA", {timeZone:TZ, year:"numeric", month:"2-digit", day:"2-digit"});
+  function dayUy(dt){ return FMT_GIORNO.format(dt); }
+  function giornoLancio(){
+    const L0 = window.COMETA_LAUNCH;
+    return !!L0 && dayUy(L0) <= dayUy(new Date());
+  }
+  function stileTraj(){
+    return giornoLancio()
+      ? {giorno:true, linea:GREY, scoppio:GREY, scoppioFill:GREY_CHIARO, arrivo:GREY, ombra:GREY}
+      : {giorno:false, linea:CYAN, scoppio:CYAN, scoppioFill:"#fff", arrivo:ORANGE, ombra:"#ffffff"};
+  }
+  function numero(x, dec){
+    return new Intl.NumberFormat(dict().code || "it", {minimumFractionDigits:dec, maximumFractionDigits:dec}).format(x);
+  }
+  function testoScoppio(d){ return (d.twBurstC || "Burst altitude") + " " + numero(trajPr.burst.alt / 1000, 1) + " km"; }
+  function testoArrivo(d){
+    return (d.twLand || "Landing") + " " + new Intl.DateTimeFormat("en-GB", {timeZone:TZ, hour:"2-digit", minute:"2-digit", hourCycle:"h23"}).format(trajPr.end.t);
+  }
+
+  /* Ridisegna da capo la traiettoria in 2D (succede solo con una corsa
+     GFS nuova, al cambio di lingua e a mezzanotte del giorno del lancio):
+     prima l'area di atterraggio, sopra le linee, sopra ancora i punti. */
+  function disegnaTraiettoria(){
+    const L = window.L, pr = trajPr;
+    if(!pr || !map) return;
+    const st = stileTraj(), d = dict(), P = "previsione";
+    trajModo = st.giorno;
+    if(trajGroup) map.removeLayer(trajGroup);
+    trajGroup = L.featureGroup();
+    const ll = function(p){ return [p.lat, p.lon]; };
+    const su = pr.full.filter(function(p){ return p.up; }).map(ll);
+    const giu = pr.full.filter(function(p){ return !p.up; }).map(ll);
+    if(giu.length) giu.unshift(ll(pr.burst));
+    if(fcLast && !st.giorno){
+      /* L.circle: un arco SVG vero, liscio a ogni zoom */
+      L.circle(ll(pr.end), {pane:P, radius:fcLast.km * 1000, color:ORANGE, weight:3, opacity:1,
+        fillColor:ORANGE, fillOpacity:.35, bubblingMouseEvents:true}).bindTooltip(fcTip(), {sticky:true}).addTo(trajGroup);
+    }
+    L.polyline(su, {pane:P, color:st.linea, weight:3, opacity:.95, interactive:false}).addTo(trajGroup);
+    L.polyline(giu, {pane:P, color:st.linea, weight:2.5, opacity:.95, dashArray:"6 7", interactive:false}).addTo(trajGroup);
+    L.circleMarker(ll(pr.burst), {pane:P, radius:5, color:st.scoppio, weight:2, fillColor:st.scoppioFill, fillOpacity:1, bubblingMouseEvents:false})
+      .bindTooltip(testoScoppio(d)).addTo(trajGroup);
+    L.circleMarker(ll(pr.end), {pane:P, radius:8, color:"#02060f", weight:2, fillColor:st.arrivo, fillOpacity:1, bubblingMouseEvents:false})
+      .bindTooltip(testoArrivo(d)).addTo(trajGroup);
+    mostraTraiettoria();
+  }
+
+  /* Accende o spegne la traiettoria prevista (con scoppio, atterraggio e
+     area di atterraggio) sulla mappa 2D e nel 3D. */
   function mostraTraiettoria(){
-    [trajLine, fcCircle].forEach(function(l){
-      if(!l) return;
-      if(trajOn){ if(!map.hasLayer(l)) l.addTo(map); l.bringToBack(); }
-      else if(map.hasLayer(l)) map.removeLayer(l);
-    });
+    if(trajGroup){
+      if(trajOn && !map.hasLayer(trajGroup)) trajGroup.addTo(map);
+      else if(!trajOn && map.hasLayer(trajGroup)) map.removeLayer(trajGroup);
+    }
     if(trajBtn){
       trajBtn.classList.toggle("mk-active", trajOn);
       trajBtn.firstChild.title = dict().dirTrajToggle || "Predicted trajectory";
     }
-    if(legenda && legenda.querySelector(".leg-traj")) legenda.querySelector(".leg-traj").style.opacity = trajOn ? 1 : .45;
+    const lt = legenda && legenda.querySelector(".leg-traj");
+    if(lt){
+      lt.style.opacity = trajOn ? 1 : .45;
+      lt.querySelector(".leg-dash").style.borderTopColor = stileTraj().linea;
+    }
     redraw3d(false);
   }
 
+  /* La scheda della previsione sotto il meteo, uguale a quella del
+     predittore (assets/traiettoria.js la disegna): partenza, atterraggio,
+     deriva, tempi e quote del volo previsto. */
+  function renderScheda(){
+    const el = document.getElementById("dirScheda");
+    if(!el || !window.COMETA_TRAIETTORIA) return;
+    el.hidden = !trajPr;
+    if(trajPr) window.COMETA_TRAIETTORIA.scheda(el, trajPr.raw, {atmo:flightCfg().atmo, fc:fcLast});
+  }
+
+  /* Quota e quota nel tempo compaiono solo dal giorno del lancio; e a
+     mezzanotte di quel giorno la traiettoria cambia colori. */
+  function aggiornaGiorno(){
+    const g = giornoLancio(), q = document.getElementById("dirQuote");
+    if(q && q.hidden === g) q.hidden = !g;
+    if(trajPr && trajModo !== g){
+      if(g) fcLast = null;
+      disegnaTraiettoria(); renderScheda();
+    }
+  }
+
   /* Errore di previsione intorno all'atterraggio previsto: un cerchio
-     grigio di raggio pari al terzo quartile della curva, interpolato
+     di raggio pari al terzo quartile della curva, interpolato
      sull'eta' della corsa GFS usata (lancio - corsa) e scalato con la
      durata del volo; stessa logica di fcRadius() in assets/traiettoria.js.
      Si restringe giorno per giorno; il giorno del lancio e' zero per
-     definizione e il cerchio sparisce. Solo sulla mappa 2D. */
+     definizione e il cerchio sparisce. */
   let curva = null;
   function loadCurva(){
     if(curva) return curva;
@@ -723,9 +829,6 @@ window.COMETA_SPOT = (function(){
       .then(function(d){ return d && d.classi ? d : null; }, function(){ return null; })
       .then(function(d){ if(!d) curva = null; return d; });       // un fallimento non si ricorda
     return curva;
-  }
-  function dayUy(dt){
-    return new Intl.DateTimeFormat("en-CA", {timeZone:TZ, year:"numeric", month:"2-digit", day:"2-digit"}).format(dt);
   }
   function fcRadiusKm(d, run, L0, durMin){
     if(!d || !run || dayUy(L0) <= dayUy(new Date())) return null;   // giorno del lancio: zero
@@ -746,21 +849,6 @@ window.COMETA_SPOT = (function(){
   }
   function fcTip(){
     return (dict().dirFcTip || "R = {r} km").replace("{r}", Math.round(fcLast.km)).replace("{h}", Math.round(fcLast.age));
-  }
-  function drawFc(d, end, run, L0, durMin){
-    const L = window.L;
-    fcLast = fcRadiusKm(d, run, L0, durMin);
-    if(!fcLast){ if(fcCircle){ fcCircle.remove(); fcCircle = null; } return; }
-    /* L.circle: un arco SVG vero, liscio a ogni zoom */
-    if(!fcCircle){
-      fcCircle = L.circle(end, {radius:fcLast.km * 1000, color:GREY, weight:1.5, opacity:.9, dashArray:"5 8",
-        fillColor:GREY, fillOpacity:.12, bubblingMouseEvents:true});
-      if(trajOn) fcCircle.addTo(map);
-      fcCircle.bindTooltip(fcTip(), {sticky:true});
-    } else {
-      fcCircle.setLatLng(end); fcCircle.setRadius(fcLast.km * 1000); fcCircle.setTooltipContent(fcTip());
-    }
-    fcCircle.bringToBack();
   }
 
   /* Le cinque icone del meteo (sole, sole e nuvola, nuvola e goccia, nuvola
@@ -836,6 +924,7 @@ window.COMETA_SPOT = (function(){
   let loraIscritto = false;
   function start(){
     renderStatus(); // "in attesa del segnale" subito, non vuoto finche' arriva la prima risposta
+    aggiornaGiorno();
     ensureMap().then(function(){
       if(window.COMETA_LORA){
         if(!loraIscritto){ window.COMETA_LORA.onUpdate(renderLora); loraIscritto = true; }
@@ -863,8 +952,9 @@ window.COMETA_SPOT = (function(){
     /* i dati del volo sono cambiati (assets/traiettoria.js, voloDiretta) */
     refreshTrajectory: function(){ if(trajId) pollTrajectory(); },
     setLang: function(l){
-      curLang = l; renderStatus(); renderLegenda(); mostraTraiettoria();
-      if(fcCircle && fcLast) fcCircle.setTooltipContent(fcTip());
+      curLang = l; renderStatus(); renderLegenda();
+      if(trajPr) disegnaTraiettoria(); else mostraTraiettoria();
+      renderScheda();
       if(profilo) profilo.aggiorna(window.COMETA_LORA ? window.COMETA_LORA.punti() : [], testiProfilo());
     }
   };

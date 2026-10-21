@@ -185,8 +185,8 @@ window.COMETA_MAP3D = (function(){
         {id:"fills-line", type:"line", source:"fills", paint:{"line-color":["get","c"], "line-width":2.5}},
         {id:"lines", type:"line", source:"lines", layout:{"line-cap":"round", "line-join":"round"}, paint:{"line-color":["get","c"], "line-width":["get","w"]}},
         /* proiezione a terra: piena in salita, tratteggiata in discesa, come nel 2D */
-        {id:"shadow", type:"line", source:"shadow", filter:["==",["get","d"],0], paint:{"line-color":"#ffffff", "line-width":1.8, "line-opacity":.85}},
-        {id:"shadowd", type:"line", source:"shadow", filter:["==",["get","d"],1], paint:{"line-color":"#ffffff", "line-width":1.8, "line-opacity":.85, "line-dasharray":[3,3]}},
+        {id:"shadow", type:"line", source:"shadow", filter:["==",["get","d"],0], paint:{"line-color":["get","c"], "line-width":1.8, "line-opacity":.85}},
+        {id:"shadowd", type:"line", source:"shadow", filter:["==",["get","d"],1], paint:{"line-color":["get","c"], "line-width":1.8, "line-opacity":.85, "line-dasharray":[3,3]}},
         /* Diretta: proiezione a terra di ogni fix GPS */
         {id:"livepts", type:"circle", source:"livepts", paint:{"circle-radius":3.5, "circle-color":["get","c"],
           "circle-stroke-color":"#02060f", "circle-stroke-width":1, "circle-pitch-alignment":"map"}},
@@ -381,7 +381,7 @@ window.COMETA_MAP3D = (function(){
     function pin(m, color, ll, text){
       if(!ll){ if(m){ m.remove(); } return null; }
       if(!m) m = new ml.Marker({element:dot(color), opacityWhenCovered:"1"}).setLngLat(ll).addTo(map);
-      else m.setLngLat(ll);
+      else { m.setLngLat(ll); m.getElement().style.background = color; }
       m.setPopup(text ? new ml.Popup({offset:12, closeButton:false}).setText(text) : null);
       return m;
     }
@@ -437,19 +437,24 @@ window.COMETA_MAP3D = (function(){
       map.getSource("livepts").setData({type:"FeatureCollection", features:(sc && sc.live && sc.live.pts || []).map(function(p){
         return {type:"Feature", properties:{c:lc}, geometry:{type:"Point", coordinates:[p.lon, p.lat]}};
       })});
-      const gl = [];
+      /* la proiezione a terra e' bianca, salvo sc.ombra (la Diretta il
+         giorno del lancio: grigia, come in 2D) */
+      const gl = [], oc = sc && sc.ombra || "#ffffff";
       ground.forEach(function(L){
         const up = L.filter(function(p){ return p.up !== false; }), down = L.filter(function(p){ return p.up === false; });
         if(down.length && up.length) down.unshift(up[up.length - 1]);        /* la discesa parte dallo scoppio */
         [[up, 0], [down, 1]].forEach(function(a){
-          if(a[0].length > 1) gl.push({type:"Feature", properties:{d:a[1]}, geometry:{type:"LineString", coordinates:a[0].map(function(p){ return [p.lon, p.lat]; })}});
+          if(a[0].length > 1) gl.push({type:"Feature", properties:{d:a[1], c:oc}, geometry:{type:"LineString", coordinates:a[0].map(function(p){ return [p.lon, p.lat]; })}});
         });
       });
       map.getSource("shadow").setData({type:"FeatureCollection", features:gl});
       map.getSource("tube").setData(sc ? buildTubes(sc, sc.col || col, mpp()) : empty());
       const first = runs[0];
-      landMk = pin(landMk, "#FFB84D", first && sc.main ? [first.end.lon, first.end.lat] : null, sc && sc.labels && sc.labels.land);
-      burstMk = pin(burstMk, "#ffffff", first && sc.main ? [first.burst.lon, first.burst.lat] : null, sc && sc.labels && sc.labels.burst);
+      /* scoppio e atterraggio: per la traiettoria principale, o se la
+         scena li chiede (sc.pin: {land, burst}, i colori; la Diretta) */
+      const pc = sc && sc.pin, conPin = first && (sc.main || pc);
+      landMk = pin(landMk, pc && pc.land || "#FFB84D", conPin ? [first.end.lon, first.end.lat] : null, sc && sc.labels && sc.labels.land);
+      burstMk = pin(burstMk, pc && pc.burst || "#ffffff", conPin ? [first.burst.lon, first.burst.lat] : null, sc && sc.labels && sc.labels.burst);
       const lp = sc && sc.live && sc.live.pts && sc.live.pts[sc.live.pts.length - 1];
       liveMk = pin(liveMk, (sc && sc.live && sc.live.color) || "#4ADE9B", lp ? [lp.lon, lp.lat] : null, sc && sc.live && sc.live.label);
       if(doFit) fit();
