@@ -531,6 +531,8 @@ input[type=range]{accent-color:var(--cyan);width:160px}
   display:flex;align-items:center;justify-content:center;font-weight:600;color:#02060f}
 #detail .ttl{font-family:var(--disp);font-size:16px;font-weight:700;line-height:1.2;margin:0}
 #detail .dims{font-family:var(--mono);font-size:11px;color:var(--cyan);margin-top:9px;letter-spacing:.02em}
+/* Riga che dice dove sta il pezzo: piu' spenta del resto delle misure. */
+#detail .dims.dove{color:var(--muted);margin-top:8px}
 #detail p{font-size:13px;color:var(--muted);line-height:1.5;margin:10px 0 0}
 #detail .empty{font-size:13px;color:var(--faint);margin:0}
 
