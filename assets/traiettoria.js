@@ -713,13 +713,13 @@ function loadLeaflet(){
      parallelo con leaflet.js. */
   const mapkit = window.COMETA_MAPKIT ? Promise.resolve() : new Promise(function(ok, ko){
     const s = document.createElement("script");
-    s.src = "assets/mapkit.js?v=185";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
+    s.src = "assets/mapkit.js?v=195";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
     s.onload = ok; s.onerror = ko;
     document.head.appendChild(s);
   });
   const map3d = window.COMETA_MAP3D ? Promise.resolve() : new Promise(function(ok){
     const s = document.createElement("script");
-    s.src = "assets/map3d.js?v=185";
+    s.src = "assets/map3d.js?v=195";
     s.onload = ok; s.onerror = ok;       /* senza, resta il 2D e basta */
     document.head.appendChild(s);
   });
@@ -1539,7 +1539,7 @@ relabel();
 /* ==========================================================
    Il volo della pagina Diretta
    ========================================================== */
-/* I dati del volo vero stanno in assets/app.js (window.COMETA_FLIGHT.cfg:
+/* I dati del volo vero stanno in assets/volo.js (window.COMETA_FLIGHT.cfg:
    pallone, payload pesato, salita prevista o portanza al collo misurata,
    partenza; ora di window.COMETA_LAUNCH). Qui si calcolano con lo stesso
    codice del modulo: volume d'elio, salita, discesa al suolo con il
@@ -1570,6 +1570,9 @@ function voloDiretta(){
     F.descentV0Ms = vAtterraggio(c.pay + PARA_M, PARA_D);
     F.atmo = col ? "day" : "std";
     if(window.COMETA_SPOT && window.COMETA_SPOT.refreshTrajectory) window.COMETA_SPOT.refreshTrajectory();
+    /* lo stesso avviso per chi non e' la Diretta: la pagina della stazione
+       LoRa (lora/stazione/) ridisegna la sua traiettoria prevista */
+    window.dispatchEvent(new Event("cometa-volo"));
   });
 }
 voloDiretta();

@@ -38,7 +38,6 @@
      e quando arriva la riallinea con dolcezza.
    ========================================================== */
 window.COMETA_SPOT = (function(){
-  const TRAJ_URL = "https://api.v2.sondehub.org/tawhiri";   // lo stesso previsore di assets/traiettoria.js
   const TRAJ_POLL_MS = 20 * 60000;
   /* Curva di convergenza delle previsioni (la stessa dell'opzione «Errore
      di previsione» di assets/traiettoria.js): di quanto si sposta ancora
@@ -56,11 +55,22 @@ window.COMETA_SPOT = (function(){
   const HIGH_KM = 18;         // sopra qui il GPS smette di trasmettere per natura sua, non per un guasto
   const LANDED_TOL_DEG = 0.0003;  // ~30 m: fix fermi allo stesso punto, segno che la sonda e' a terra
   const GREEN = "#4ADE9B", ORANGE = "#FFB84D", GREY = "#8FA6BC";   // punto reale, lampeggio, traiettoria prevista
+  /* La telemetria LoRa (assets/lora.js): viola, ben distinto dal verde
+     dello SPOT anche per chi non distingue i colori (controllato con il
+     validatore di palette: ΔE 27 sul fondo scuro, la soglia e' 8). */
+  const VIOLET = "#9B72F5";
+  const SEGUI_ZOOM = 10;
   /* Finche' la sonda non ha ancora mandato nessun punto, la mappa si apre
      centrata sull'Uruguay invece che sull'oceano a (0,0). */
   const FALLBACK = {lat:-33.0, lon:-56.5, zoom:7};
 
   let view = null, trajFull = null, fcCircle = null, fcLast = null;   /* vista 3D (assets/map3d.js): il pulsante 2D/3D; trajFull = traiettoria prevista con le quote */
+  /* LoRa: la traccia viola, l'ultimo punto, la legenda, il profilo di quota.
+     trajOn: la traiettoria prevista si accende e si spegne (pulsante sulla
+     mappa); la scelta resta nel browser di chi guarda. */
+  let loraTrail = null, loraMarker = null, loraHit = null, loraUltimaT = null, legenda = null, profilo = null,
+      trajBtn = null, trajOn = true, spotAltPt = null;
+  try { trajOn = localStorage.getItem("cometa-traiettoria") !== "off"; } catch(e){}
   let map, trail, ptsLayer, marker, markerHit, trajLine, trajRun, mapReady, pollId, tickId, trajId,
       elMap, elStatus, elAltEst, elAltGps, elRecenter,
       lastPoints, lastErr, curLang = "it", lastEstKm = null,
@@ -71,7 +81,7 @@ window.COMETA_SPOT = (function(){
          riancoraggio produce, da riassorbire con un decadimento breve. */
       anchorT = null, anchorTau = 0, jumpOffsetKm = 0, jumpAtMs = null;
 
-  /* I numeri del volo stanno in assets/app.js — window.COMETA_FLIGHT —
+  /* I numeri del volo stanno in assets/volo.js — window.COMETA_FLIGHT —
      cosi' c'e' un solo posto dove aggiornarli il giorno del lancio.
      descentV0Ms e' la velocita' del paracadute AL SUOLO: piu' in alto
      scende molto piu' veloce (vedi densityISA sotto). site e' il punto di
@@ -199,13 +209,13 @@ window.COMETA_SPOT = (function(){
     });
     const mapkit = window.COMETA_MAPKIT ? Promise.resolve() : new Promise(function(ok, ko){
       const s = document.createElement("script");
-      s.src = "assets/mapkit.js?v=185";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
+      s.src = "assets/mapkit.js?v=195";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
       s.onload = ok; s.onerror = ko;
       document.head.appendChild(s);
     });
     const map3d = window.COMETA_MAP3D ? Promise.resolve() : new Promise(function(ok){
       const s = document.createElement("script");
-      s.src = "assets/map3d.js?v=185";
+      s.src = "assets/map3d.js?v=195";
       s.onload = ok; s.onerror = ok;     // senza, resta il 2D e basta
       document.head.appendChild(s);
     });
@@ -268,6 +278,46 @@ window.COMETA_SPOT = (function(){
         }
       });
       new Recenter().addTo(map);
+
+      /* La traccia LoRa, sopra quella dello SPOT: e' piu' fitta e arriva
+         ogni 5 s. Come per lo SPOT, il pallino visibile non risponde al
+         tocco: lo fa un cerchio piu' grande e invisibile. */
+      loraTrail = L.polyline([], {color:VIOLET, weight:2.5, opacity:.9, interactive:false}).addTo(map);
+      loraMarker = L.circleMarker([FALLBACK.lat, FALLBACK.lon], {
+        radius:7, color:VIOLET, weight:2, fillColor:VIOLET, fillOpacity:0, opacity:0, interactive:false
+      }).addTo(map);
+      loraHit = L.circleMarker([FALLBACK.lat, FALLBACK.lon], {radius:16, weight:0, fillOpacity:0, opacity:0}).addTo(map);
+
+      /* Il pulsante per accendere e spegnere la traiettoria prevista,
+         nello stesso stile degli altri (mapkit.js). */
+      const Traj = L.Control.extend({
+        options:{position:"topright"},
+        onAdd:function(){
+          const div = trajBtn = L.DomUtil.create("div", "leaflet-bar spot-traj");
+          const a = L.DomUtil.create("a", "", div);
+          a.href = "#";
+          a.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3 3"><path d="M3 20c4-1 6-6 9-9s6-5 9-7"/></svg>';
+          L.DomEvent.on(a, "click", L.DomEvent.stop).on(a, "click", function(){
+            trajOn = !trajOn;
+            try { localStorage.setItem("cometa-traiettoria", trajOn ? "on" : "off"); } catch(e){}
+            mostraTraiettoria();
+          });
+          return div;
+        }
+      });
+      new Traj().addTo(map);
+
+      /* La legenda, sotto la mappa e non sopra (da telefono copriva i
+         pulsanti): le due fonti, ognuna con l'eta' del suo ultimo dato
+         (una posizione vecchia non deve sembrare attuale), e la
+         traiettoria prevista. Il testo e' nei colori del testo, il
+         colore lo porta solo il segno accanto. */
+      legenda = document.getElementById("spotLegenda");
+      if(legenda) legenda.innerHTML =
+        '<span class="leg-row"><i class="leg-dot" style="background:' + VIOLET + '"></i><b>LoRa</b> <span class="leg-lora"></span></span>' +
+        '<span class="leg-row"><i class="leg-dot" style="background:' + GREEN + '"></i><b>SPOT</b> <span class="leg-spot"></span></span>' +
+        '<span class="leg-row leg-traj"><i class="leg-dash"></i><span class="leg-traj-t"></span></span>';
+      mostraTraiettoria();
       /* 2D / 3D: nel 3D si segue il volo con la quota vera. La traiettoria
          prevista e' tutta grigia (in 3D salita e discesa si distinguono da
          sole, e i colori non si confondono con la traccia vera, verde). */
@@ -294,9 +344,15 @@ window.COMETA_SPOT = (function(){
     const live = (lastPoints || []).map(function(p){
       return {lat:p.lat, lon:p.lon, alt:p.alt != null ? Math.max(0, p.alt) : null};
     });
+    /* map3d.js disegna una sola traccia "live": quella LoRa quando c'e',
+       perche' ha la quota a ogni punto ed e' molto piu' fitta; quella
+       dello SPOT altrimenti. */
+    const lora = window.COMETA_LORA ? window.COMETA_LORA.punti() : [];
+    const vivo = lora.length ? {pts:lora.map(function(p){ return {lat:p.lat, lon:p.lon, alt:p.alt != null ? Math.max(0, p.alt) : null}; }), color:VIOLET}
+      : {pts:live, color:GREEN};
     return {
-      runs:trajFull ? [{pts:trajFull}] : [], main:false, col:{up:GREY, down:GREY},
-      live:{pts:live, color:GREEN}
+      runs:trajFull && trajOn ? [{pts:trajFull}] : [], main:false, col:{up:GREY, down:GREY},
+      live:vivo
     };
   }
   function redraw3d(fit){
@@ -309,6 +365,7 @@ window.COMETA_SPOT = (function(){
   function formatAgo(ms){
     const s = Math.max(0, Math.round(ms / 1000));
     if(s < 60) return s + "s";
+    if(s >= 3600) return Math.floor(s / 3600) + "h " + String(Math.floor(s / 60) % 60).padStart(2, "0") + "min";
     const m = Math.floor(s / 60), r = s % 60;
     return m + "min " + String(r).padStart(2, "0") + "s";
   }
@@ -328,7 +385,23 @@ window.COMETA_SPOT = (function(){
     if(!elStatus) return;
     const d = dict();
     /* dati non arrivati (rete, CORS, risposta del backend): "Network error", uguale in ogni lingua */
-    if(lastErr){ elStatus.textContent = lastErr === "3d" ? (d.mk3dFail || "3D") : "Network error"; return; }
+    if(lastErr === "3d"){ elStatus.textContent = d.mk3dFail || "3D"; return; }
+    /* Se il LoRa ha un punto buono piu' recente dello SPOT, la riga parla
+       di quello (la posizione piu' fresca); se lo SPOT tace sopra i 18 km
+       ma il LoRa trasmette, non c'e' nessun "segnale perso" da dire. */
+    const lora = window.COMETA_LORA ? window.COMETA_LORA.punti() : [];
+    const lp = lora[lora.length - 1];
+    const spotT = lastPoints && lastPoints.length ? new Date(lastPoints[lastPoints.length - 1].time).getTime() : -Infinity;
+    if(lp && lp.t >= spotT){
+      const sl = window.COMETA_LORA.stato(Date.now());
+      const ago = (d.dirSpotAgo || "{t} ago").replace("{t}", formatAgo(Date.now() - lp.t));
+      if(sl.fase === "atterrata"){ elStatus.textContent = (d.dirSpotLanded || "probe landed") + " · " + lp.lat.toFixed(4) + ", " + lp.lon.toFixed(4); return; }
+      elStatus.textContent = sl.stato === "perso" ? (d.dirLegLost || "signal lost") + " · " + ago
+        : lp.lat.toFixed(4) + ", " + lp.lon.toFixed(4) + " · " + ago;
+      return;
+    }
+    /* L'errore di rete dello SPOT conta solo se il LoRa non ha niente da dire. */
+    if(lastErr){ elStatus.textContent = "Network error"; return; }
     if(!lastPoints || !lastPoints.length){ elStatus.textContent = d.dirSpotWaiting || "waiting…"; return; }
     if(isLanded(lastPoints)){ elStatus.textContent = d.dirSpotLanded || "probe landed"; return; }
     const last = lastPoints[lastPoints.length - 1];
@@ -400,6 +473,7 @@ window.COMETA_SPOT = (function(){
        cosi' si vede che la pagina non e' bloccata, non solo quando
        arriva un dato. */
     renderStatus();
+    renderLegenda();
   }
 
   let lastRealTime = null, lastAltKey = null;
@@ -461,25 +535,101 @@ window.COMETA_SPOT = (function(){
       marker.setStyle({opacity:1, fillOpacity:.9});
       markerHit.setLatLng([last.lat, last.lon]);
       if(markerHit.getPopup()) markerHit.setPopupContent(popupHtml(last)); else markerHit.bindPopup(popupHtml(last));
-      if(!(view && view.isOn())) map.setView([last.lat, last.lon], Math.max(map.getZoom(), 10));   // il 2D nascosto non ha misura
+      if(lastRealTime == null || String(last.time) !== String(lastRealTime)) segui(last.lat, last.lon, last.time);
       /* Il Data Push porta la posizione pochi secondi dopo il messaggio ma
          senza quota; la quota dello stesso messaggio arriva poco dopo, con
          la lettura del feed (vedi worker/README.md). Nel frattempo la quota
          GPS resta l'ultima misurata invece di passare a "—": il puntino si
          sposta e lampeggia subito, la tessera della quota quando arriva
          una quota nuova. */
-      let altPt = null;
-      for(let i = points.length - 1; i >= 0; i--){ if(points[i].alt != null){ altPt = points[i]; break; } }
-      setAltText(elAltGps, altPt ? altPt.alt / 1000 : null);
+      spotAltPt = null;
+      for(let i = points.length - 1; i >= 0; i--){ if(points[i].alt != null){ spotAltPt = points[i]; break; } }
       if(lastRealTime != null && String(last.time) !== String(lastRealTime)) flashMapMarker();
-      const altKey = altPt ? altPt.time + "|" + altPt.alt : null;
-      if(lastAltKey != null && altKey !== lastAltKey) flashGps();
       lastRealTime = last.time;
-      lastAltKey = altKey;
-      if(altPt) onNewRealPoint(altPt);
+      aggiornaQuotaGps();
     }
     redraw3d(false);
     renderStatus();
+  }
+
+  /* La mappa segue l'ultimo dato, ma solo se e' davvero il piu' recente
+     fra SPOT e LoRa: altrimenti ogni 30 s lo SPOT, con un punto di due
+     minuti prima, la riporterebbe indietro. E solo quando arriva un dato
+     nuovo, non a ogni lettura: chi ha spostato la mappa da solo non
+     viene riportato al centro di continuo. */
+  let seguiT = -Infinity;
+  function segui(lat, lon, t){
+    if(t < seguiT) return;
+    seguiT = t;
+    if(!(view && view.isOn())) map.setView([lat, lon], Math.max(map.getZoom(), SEGUI_ZOOM));   // il 2D nascosto non ha misura
+  }
+
+  /* "Ultimo punto GPS": la quota piu' recente fra le due fonti (sono
+     due GPS, quello dello SPOT e quello della sonda). La stessa ancora
+     la quota stimata (onNewRealPoint). */
+  function aggiornaQuotaGps(){
+    const lora = window.COMETA_LORA ? window.COMETA_LORA.punti() : [];
+    let lp = null;
+    for(let i = lora.length - 1; i >= 0; i--){ if(lora[i].alt != null){ lp = lora[i]; break; } }
+    let pt = spotAltPt, daLora = false;
+    if(lp && (!pt || lp.t > pt.time)){ pt = {lat:lp.lat, lon:lp.lon, alt:lp.alt, time:lp.t}; daLora = true; }
+    setAltText(elAltGps, pt ? pt.alt / 1000 : null);
+    /* il colore del numero dice da quale fonte viene, come sulla mappa */
+    const row = document.getElementById("altGpsRow");
+    if(row) row.classList.toggle("da-lora", daLora);
+    const altKey = pt ? pt.time + "|" + pt.alt : null;
+    if(lastAltKey != null && altKey !== lastAltKey) flashGps();
+    lastAltKey = altKey;
+    if(pt) onNewRealPoint(pt);
+  }
+
+  /* I punti LoRa buoni (assets/lora.js li ha gia' filtrati). */
+  function renderLora(){
+    if(!loraTrail) return;
+    const pts = window.COMETA_LORA.punti();
+    loraTrail.setLatLngs(pts.map(function(p){ return [p.lat, p.lon]; }));
+    const last = pts[pts.length - 1];
+    if(last){
+      loraMarker.setLatLng([last.lat, last.lon]).setStyle({opacity:1, fillOpacity:.9});
+      loraHit.setLatLng([last.lat, last.lon]);
+      const html = popupHtml({lat:last.lat, lon:last.lon, alt:last.alt, time:last.t});
+      if(loraHit.getPopup()) loraHit.setPopupContent(html); else loraHit.bindPopup(html);
+      if(last.t !== loraUltimaT){ loraUltimaT = last.t; segui(last.lat, last.lon, last.t); }
+    }
+    aggiornaQuotaGps();
+    if(profilo) profilo.aggiorna(pts, testiProfilo());
+    redraw3d(false);
+    renderLegenda();
+  }
+
+  function testiProfilo(){
+    const d = dict();
+    return {vuoto:d.dirProfEmpty || "Waiting for LoRa data", km:"km"};
+  }
+
+  /* La legenda: LoRa con la fase del volo e l'eta' dell'ultimo dato
+     buono, o "segnale perso"; SPOT con l'eta' del suo ultimo punto. */
+  function renderLegenda(){
+    if(!legenda || !legenda.querySelector(".leg-lora")) return;    // la pagina non ha la legenda (o la mappa non e' ancora pronta)
+    const d = dict(), now = Date.now();
+    const sl = window.COMETA_LORA ? window.COMETA_LORA.stato(now) : {stato:"attesa"};
+    const lp = window.COMETA_LORA ? window.COMETA_LORA.punti() : [];
+    let tl;
+    if(sl.stato === "attesa") tl = d.dirLegWait || "waiting";
+    else {
+      const ago = (d.dirSpotAgo || "{t} ago").replace("{t}", formatAgo(now - lp[lp.length - 1].t));
+      tl = sl.stato === "perso" ? (d.dirLegLost || "signal lost") + " · " + ago
+        : ((sl.fase && d["dirFase_" + sl.fase]) ? d["dirFase_" + sl.fase] + " · " : "") + ago;
+    }
+    legenda.querySelector(".leg-lora").textContent = "· " + tl;
+    legenda.querySelector(".leg-lora").classList.toggle("leg-perso", sl.stato === "perso");
+    let ts = d.dirLegWait || "waiting";
+    if(lastPoints && lastPoints.length){
+      const t = new Date(lastPoints[lastPoints.length - 1].time).getTime();
+      if(!isNaN(t)) ts = (d.dirSpotAgo || "{t} ago").replace("{t}", formatAgo(now - t));
+    }
+    legenda.querySelector(".leg-spot").textContent = "· " + ts;
+    legenda.querySelector(".leg-traj-t").textContent = d.dirLegTraj || "Predicted trajectory";
   }
 
   /* La risposta del backend (worker/, GET /track.json) e' gia' pulita e
@@ -525,47 +675,39 @@ window.COMETA_SPOT = (function(){
      previsore (troppo lontana, o il modello non e' ancora pronto) la
      richiesta fallisce e non si fa nulla: si riprova al giro dopo. */
   function pollTrajectory(){
-    const flight = flightCfg(), L0 = window.COMETA_LAUNCH;
-    if(!flight.site || !L0) return;
-    const q = new URLSearchParams({
-      profile: "standard_profile",
-      launch_latitude: flight.site.lat.toFixed(5),
-      launch_longitude: (((flight.site.lon % 360) + 360) % 360).toFixed(5),
-      launch_datetime: L0.toISOString().replace(/\.\d+Z$/, "Z"),
-      ascent_rate: flight.ascentMs.toFixed(2),
-      burst_altitude: Math.round(flight.burstKm * 1000),
-      descent_rate: flight.descentV0Ms.toFixed(2)
+    const L0 = window.COMETA_LAUNCH;
+    if(!window.COMETA_PREVISIONE) return;
+    /* La richiesta e' in assets/volo.js, la stessa della pagina della
+       stazione LoRa, cosi' le due pagine disegnano la stessa linea. */
+    window.COMETA_PREVISIONE().then(function(pr){
+      if(!pr) return;                                  // silenzioso: fuori orizzonte, previsore non pronto, offline
+      if(pr.run && pr.key === trajRun) return;         // stessa corsa, stessi dati: niente da ridisegnare
+      trajRun = pr.key;
+      trajFull = pr.full;
+      Promise.all([ensureMap(), loadCurva()]).then(function(res){
+        const L = window.L;
+        if(!trajLine) trajLine = L.polyline(pr.pts, {color:GREY, weight:2, opacity:.85, dashArray:"5 8", interactive:false});
+        else trajLine.setLatLngs(pr.pts);
+        drawFc(res[1], pr.pts[pr.pts.length - 1], pr.run, L0, pr.durMin);
+        mostraTraiettoria();
+      });
     });
-    fetch(TRAJ_URL + "?" + q.toString())
-      .then(function(r){ return r.json(); })
-      .then(function(d){
-        if(!d || d.error || !d.prediction) return;      // silenzioso: fuori orizzonte, o previsore non pronto
-        const run = d.request && d.request.dataset;
-        const key = run + "|" + q.toString();            // corsa GFS e parametri del volo
-        if(run && key === trajRun) return;               // stessa corsa, stessi dati: niente da ridisegnare
-        const pts = [], full = [];
-        d.prediction.forEach(function(stage){
-          stage.trajectory.forEach(function(p){
-            const lon = p.longitude >= 180 ? p.longitude - 360 : p.longitude;
-            pts.push([p.latitude, lon]);
-            full.push({lat:p.latitude, lon:lon, alt:p.altitude, up:stage.stage === "ascent"});
-          });
-        });
-        if(pts.length < 2) return;
-        trajRun = key;
-        trajFull = full;
-        const st = d.prediction[0].trajectory, en = d.prediction[d.prediction.length - 1].trajectory;
-        const durMin = (new Date(en[en.length - 1].datetime) - new Date(st[0].datetime)) / 6e4;
-        Promise.all([ensureMap(), loadCurva()]).then(function(res){
-          const L = window.L;
-          if(!trajLine) trajLine = L.polyline(pts, {color:GREY, weight:2, opacity:.85, dashArray:"5 8", interactive:false}).addTo(map);
-          else trajLine.setLatLngs(pts);
-          trajLine.bringToBack();
-          drawFc(res[1], pts[pts.length - 1], run ? new Date(run) : null, L0, durMin);
-          redraw3d(false);
-        });
-      })
-      .catch(function(){ /* silenzioso: offline, CORS, o fuori dall'orizzonte del previsore */ });
+  }
+
+  /* Accende o spegne la traiettoria prevista (e il cerchio dell'errore
+     di previsione) sulla mappa 2D e nel 3D. */
+  function mostraTraiettoria(){
+    [trajLine, fcCircle].forEach(function(l){
+      if(!l) return;
+      if(trajOn){ if(!map.hasLayer(l)) l.addTo(map); l.bringToBack(); }
+      else if(map.hasLayer(l)) map.removeLayer(l);
+    });
+    if(trajBtn){
+      trajBtn.classList.toggle("mk-active", trajOn);
+      trajBtn.firstChild.title = dict().dirTrajToggle || "Predicted trajectory";
+    }
+    if(legenda && legenda.querySelector(".leg-traj")) legenda.querySelector(".leg-traj").style.opacity = trajOn ? 1 : .45;
+    redraw3d(false);
   }
 
   /* Errore di previsione intorno all'atterraggio previsto: un cerchio
@@ -612,7 +754,8 @@ window.COMETA_SPOT = (function(){
     /* L.circle: un arco SVG vero, liscio a ogni zoom */
     if(!fcCircle){
       fcCircle = L.circle(end, {radius:fcLast.km * 1000, color:GREY, weight:1.5, opacity:.9, dashArray:"5 8",
-        fillColor:GREY, fillOpacity:.12, bubblingMouseEvents:true}).addTo(map);
+        fillColor:GREY, fillOpacity:.12, bubblingMouseEvents:true});
+      if(trajOn) fcCircle.addTo(map);
       fcCircle.bindTooltip(fcTip(), {sticky:true});
     } else {
       fcCircle.setLatLng(end); fcCircle.setRadius(fcLast.km * 1000); fcCircle.setTooltipContent(fcTip());
@@ -645,7 +788,7 @@ window.COMETA_SPOT = (function(){
   }
 
   /* Meteo previsto sul punto di lancio al giorno e all'ora del lancio
-     (window.COMETA_LAUNCH, assets/app.js) — previsione oraria di
+     (window.COMETA_LAUNCH, assets/volo.js) — previsione oraria di
      Open-Meteo, come il riquadro del predittore (assets/traiettoria.js).
      Il punto e' sempre quello fisso del lancio (window.COMETA_FLIGHT.site),
      non scelto da chi guarda. La previsione arriva a 16 giorni: prima di
@@ -690,9 +833,16 @@ window.COMETA_SPOT = (function(){
       .catch(function(){ el.hidden = true; });
   }
 
+  let loraIscritto = false;
   function start(){
     renderStatus(); // "in attesa del segnale" subito, non vuoto finche' arriva la prima risposta
     ensureMap().then(function(){
+      if(window.COMETA_LORA){
+        if(!loraIscritto){ window.COMETA_LORA.onUpdate(renderLora); loraIscritto = true; }
+        const el = document.getElementById("loraProfilo");
+        if(el && !profilo && window.COMETA_PROFILO){ profilo = window.COMETA_PROFILO.crea(el, VIOLET); profilo.aggiorna([], testiProfilo()); }
+        window.COMETA_LORA.start();
+      }
       poll();
       pollTrajectory();
       loadWeather();
@@ -705,12 +855,17 @@ window.COMETA_SPOT = (function(){
     if(pollId){ clearInterval(pollId); pollId = null; }
     if(tickId){ clearInterval(tickId); tickId = null; }
     if(trajId){ clearInterval(trajId); trajId = null; }
+    if(window.COMETA_LORA) window.COMETA_LORA.stop();
   }
 
   return {
     setActive: function(on){ if(on) start(); else stop(); },
     /* i dati del volo sono cambiati (assets/traiettoria.js, voloDiretta) */
     refreshTrajectory: function(){ if(trajId) pollTrajectory(); },
-    setLang: function(l){ curLang = l; renderStatus(); if(fcCircle && fcLast) fcCircle.setTooltipContent(fcTip()); }
+    setLang: function(l){
+      curLang = l; renderStatus(); renderLegenda(); mostraTraiettoria();
+      if(fcCircle && fcLast) fcCircle.setTooltipContent(fcTip());
+      if(profilo) profilo.aggiorna(window.COMETA_LORA ? window.COMETA_LORA.punti() : [], testiProfilo());
+    }
   };
 })();
