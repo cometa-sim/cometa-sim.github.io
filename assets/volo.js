@@ -33,7 +33,7 @@ window.COMETA_LAUNCH = LAUNCH;
    piu' in alto, dove l'aria e' rada, la stessa sonda scende molto piu'
    veloce, e rallenta scendendo — lo stesso motivo per cui qui e' "al
    suolo" e non "di discesa" e basta. FLIGHT_SITE e' il punto di partenza
-   usato per la traiettoria grigia disegnata in diretta — lo stesso
+   usato per la traiettoria prevista disegnata in diretta — lo stesso
    aerodromo di Mercedes che la pagina Traiettoria propone di default
    (SUGGERITI[0] in assets/traiettoria.js): e' una costante a parte,
    invece di leggerla dal modulo di quella pagina, apposta — cosi' non
@@ -44,7 +44,13 @@ window.COMETA_LAUNCH = LAUNCH;
 const FLIGHT_BURST_KM = 37.9;
 const FLIGHT_ASCENT_MS = 5;
 const FLIGHT_DESCENT_V0_MS = 4.6;
-const FLIGHT_SITE = {lat: -33.2486, lon: -58.0736};
+/* Il punto di partenza. Per ora e' il centro dell'aerodromo di Mercedes
+   (il punto di riferimento di SUME); il giorno del lancio si sostituisce
+   con la posizione esatta presa sul posto, con un commit: la traiettoria
+   prevista della Diretta e della stazione si ricalcola da sola, al
+   caricamento e ogni 20 minuti. Il nome compare in testa alla scheda
+   della previsione, sotto il meteo della Diretta. */
+const FLIGHT_SITE = {name: "Mercedes · aeródromo", lat: -33.2486, lon: -58.0736};
 /* I dati del volo vero, da aggiornare con un commit quando si misurano:
    il payload si pesa prima del lancio, la portanza al collo si legge
    durante il gonfiaggio (in grammi; null finche' non c'e', e allora vale
@@ -73,8 +79,10 @@ window.COMETA_LORA_DATI = LORA_DATI;
    LAUNCH, con salita, quota di scoppio e discesa di window.COMETA_FLIGHT
    (che assets/traiettoria.js, voloDiretta, ricalcola con l'atmosfera
    prevista per quel giorno). Risolve con
-     {pts: [[lat, lon], ...], full: [{lat, lon, alt, up}, ...],
-      run: corsa GFS (Date o null), key, durMin}
+     {pts: [[lat, lon], ...], full: [{t, lat, lon, alt, up}, ...] (t in ms),
+      burst, end: lo scoppio e l'atterraggio (due punti di full),
+      run: corsa GFS (Date o null), key, durMin,
+      raw: la risposta di Tawhiri, per la scheda (assets/traiettoria.js)}
    oppure null se il previsore non ha una risposta (data fuori
    dall'orizzonte del GFS, previsore non pronto, rete assente). */
 window.COMETA_PREVISIONE = function(){
@@ -100,13 +108,15 @@ window.COMETA_PREVISIONE = function(){
         stage.trajectory.forEach(function(p){
           const lon = p.longitude >= 180 ? p.longitude - 360 : p.longitude;
           pts.push([p.latitude, lon]);
-          full.push({lat:p.latitude, lon:lon, alt:p.altitude, up:stage.stage === "ascent"});
+          full.push({t:new Date(p.datetime).getTime(), lat:p.latitude, lon:lon, alt:p.altitude, up:stage.stage === "ascent"});
         });
       });
       if(pts.length < 2) return null;
       const st = d.prediction[0].trajectory, en = d.prediction[d.prediction.length - 1].trajectory;
-      return {pts:pts, full:full, run:run ? new Date(run) : null, key:run + "|" + q.toString(),
-        durMin:(new Date(en[en.length - 1].datetime) - new Date(st[0].datetime)) / 6e4};
+      const su = full.filter(function(p){ return p.up; });
+      return {pts:pts, full:full, burst:su.length ? su[su.length - 1] : full[0], end:full[full.length - 1],
+        run:run ? new Date(run) : null, key:run + "|" + q.toString(),
+        durMin:(new Date(en[en.length - 1].datetime) - new Date(st[0].datetime)) / 6e4, raw:d};
     })
     .catch(function(){ return null; });
 };

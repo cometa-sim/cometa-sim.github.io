@@ -720,13 +720,13 @@ function loadLeaflet(){
      parallelo con leaflet.js. */
   const mapkit = window.COMETA_MAPKIT ? Promise.resolve() : new Promise(function(ok, ko){
     const s = document.createElement("script");
-    s.src = "assets/mapkit.js?v=197";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
+    s.src = "assets/mapkit.js?v=198";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
     s.onload = ok; s.onerror = ko;
     document.head.appendChild(s);
   });
   const map3d = window.COMETA_MAP3D ? Promise.resolve() : new Promise(function(ok){
     const s = document.createElement("script");
-    s.src = "assets/map3d.js?v=197";
+    s.src = "assets/map3d.js?v=198";
     s.onload = ok; s.onerror = ok;       /* senza, resta il 2D e basta */
     document.head.appendChild(s);
   });
@@ -850,7 +850,7 @@ function scene3d(x){
   if(!x.ok) return null;
   const sc = {
     runs:[x], main:true, fills:[], lines:[],
-    labels:{burst:t("twBurstDist") + " " + num(x.burst.alt/1000, 1) + " km", land:t("twLand") + " " + fmtTime(x.end.t, false)}
+    labels:{burst:t("twBurstC") + " " + num(x.burst.alt/1000, 1) + " km", land:t("twLand") + " " + fmtTime(x.end.t, false)}
   };
   if(x.spread){
     const g = x.spread, VI = "#A98CFF";
@@ -884,7 +884,7 @@ function draw(r, noFit){
   L.polyline(up, {color:COL, weight:3, opacity:.95, interactive:false}).addTo(layer);
   L.polyline(down, {color:COL, weight:2.5, opacity:.95, dashArray:"6 7", interactive:false}).addTo(layer);
   L.circleMarker([r.burst.lat, r.burst.lon], {radius:5, color:COL, weight:2, fillColor:"#fff", fillOpacity:1, bubblingMouseEvents:false})
-    .bindTooltip(t("twBurstDist") + " " + num(r.burst.alt/1000, 1) + " km").addTo(layer);
+    .bindTooltip(t("twBurstC") + " " + num(r.burst.alt/1000, 1) + " km").addTo(layer);
   L.circleMarker([r.end.lat, r.end.lon], {radius:8, color:"#02060f", weight:2, fillColor:"#FFB84D", fillOpacity:1, bubblingMouseEvents:false})
     .bindTooltip(t("twLand") + " " + fmtTime(r.end.t, false)).addTo(layer);
   const bb = L.latLngBounds(up.concat(down));
@@ -1142,14 +1142,17 @@ function show(x, noFit){
 }
 
 /* ---------- Risultati ---------- */
-function renderCard(r){
-  elRes.innerHTML = "";
+/* dest: dove disegnarla (di solito elRes; la Diretta ne ha una sua, vedi
+   COMETA_TRAIETTORIA in fondo) */
+function renderCard(r, dest){
+  dest = dest || elRes;
+  dest.innerHTML = "";
   if(!r) return;
   const card = el("div", "tw-card");
   card.appendChild(el("h4", null, r.from.name));
   if(!r.ok){
     card.appendChild(el("p", "tw-err", t("twErr").replace("{msg}", r.err)));
-    elRes.appendChild(card); return;
+    dest.appendChild(card); return;
   }
   if(r.stato) card.appendChild(el("span", "tw-badge " + r.stato,
     t({ok:"twOk", escl:"twEscl", fuori:"twFuori"}[r.stato])));
@@ -1179,7 +1182,7 @@ function renderCard(r){
   a.href = "https://www.google.com/maps/search/?api=1&query=" + r.end.lat.toFixed(5) + "," + r.end.lon.toFixed(5);
   a.target = "_blank"; a.rel = "noopener";
   card.appendChild(a);
-  elRes.appendChild(card);
+  dest.appendChild(card);
 }
 function setStatus(txt, isErr){
   elStatus.textContent = txt || "";
@@ -1583,5 +1586,21 @@ function voloDiretta(){
   });
 }
 voloDiretta();
+
+/* La scheda della previsione nella Diretta (assets/spot.js), uguale a
+   quella di questa pagina: dalla risposta di Tawhiri che chiede
+   window.COMETA_PREVISIONE (assets/volo.js), con la partenza e i dati del
+   volo di assets/volo.js. o: {atmo, fc: {km, age} o null}. */
+window.COMETA_TRAIETTORIA = {
+  scheda:function(dest, raw, o){
+    const F = window.COMETA_FLIGHT;
+    if(!dest || !raw || !F || !F.site) return;
+    let r;
+    try { r = parse(F.site, raw); } catch(e){ dest.innerHTML = ""; return; }
+    r.atmo = o && o.atmo;
+    r.fc = o && o.fc;
+    renderCard(r, dest);
+  }
+};
 
 })();

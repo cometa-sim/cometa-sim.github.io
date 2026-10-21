@@ -80,11 +80,11 @@ Norme e autorizzazioni · Domande · Chi siamo.
 ### Dopo ogni modifica: il numero di versione
 
 In `index.html` i file di `assets/`, e la mappa, sono richiamati con un numero in
-coda — oggi `?v=197`:
+coda — oggi `?v=198`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=197">
-<script src="assets/i18n.js?v=197"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=198">
+<script src="assets/i18n.js?v=198"></script>
 ```
 
 Lo stesso numero compare anche in punti meno visibili, che vanno alzati
@@ -533,8 +533,20 @@ nuovo. «Ultimo punto GPS» è la quota più recente fra le due, viola se viene 
 LoRa; la stessa riancora la quota stimata. Nel 3D la traccia è quella LoRa
 quando c'è (ha la quota a ogni punto), se no quella dello SPOT. Sotto la quota,
 il **grafico** della quota nel tempo dai dati LoRa (`assets/profilo.js`).
+Quota e grafico compaiono solo dal giorno del lancio (ora di Montevideo).
 
-**La linea grigia tratteggiata** è la traiettoria prevista: la richiesta a
+**La traiettoria prevista** cambia aspetto il giorno del lancio, nel 2D e
+nel 3D. Nei giorni prima è una previsione, e si disegna come nel predittore:
+azzurra, piena fino allo scoppio e tratteggiata dopo, scoppio bianco,
+atterraggio arancione e intorno l'area di atterraggio (sotto). Dal giorno del
+lancio è grigia, per non confondersi con le tracce vere: stesse linee e
+stessi punti, tutti grigi, e niente area (l'anticipo è zero). Lo stesso vale
+per la proiezione a terra e i punti del 3D (`ombra` e `pin` nella scena di
+`assets/map3d.js`). Sotto il meteo, la **scheda** della previsione, la
+stessa del predittore (`COMETA_TRAIETTORIA.scheda` in
+`assets/traiettoria.js`): partenza, atterraggio, deriva, tempi e quote.
+
+La richiesta a
 Tawhiri è `COMETA_PREVISIONE` in `assets/volo.js`, con i parametri fissi di
 `FLIGHT_*` (partenza da `FLIGHT_SITE`, all'ora di `LAUNCH`) — non quelli che
 un visitatore può aver cambiato nella pagina Traiettoria. La stessa richiesta
@@ -543,16 +555,17 @@ la fa la pagina della stazione LoRa, che quindi disegna la stessa linea.
 ridisegna solo se nel frattempo è uscita una nuova corsa del GFS. Non usa mai
 i punti GPS: non si corregge seguendo il pallone. Si accende e si spegne con il
 pulsante sulla mappa (accesa all'inizio; la scelta resta nel browser di chi
-guarda), insieme al cerchio dell'errore di previsione.
+guarda), insieme all'area di atterraggio.
 
-**Il cerchio grigio tratteggiato** intorno all'arrivo previsto è l'errore di
+**L'area di atterraggio**, arancione intorno all'arrivo previsto, è l'errore di
 previsione, con la stessa curva dell'opzione della pagina Traiettoria
 (`convergenza_curva.json` sul branch `dati`, terzo quartile interpolato
 sull'età della corsa GFS e scalato con la durata del volo). Compare quando la
 data del lancio entra nell'orizzonte del previsore, circa una settimana
 prima, si restringe giorno per giorno a ogni nuova corsa e sparisce il
-giorno del lancio, quando vale zero per definizione. È un `L.circle`, solo
-sulla mappa 2D; il tooltip dice raggio ed età della corsa.
+giorno del lancio, quando vale zero per definizione. In 2D è un `L.circle`
+(il tooltip dice raggio ed età della corsa), in 3D un cerchio steso sul
+terreno.
 
 ### Three.js
 
@@ -617,7 +630,7 @@ approvare la propria richiesta di modifica.
   se è più in là della settimana della previsione) — e i risultati
   sostituiscono `FLIGHT_BURST_KM` e `FLIGHT_DESCENT_V0_MS`, che restano solo
   come riserva finché il calcolo non arriva. `assets/spot.js` richiede
-  allora di nuovo la traiettoria grigia con i numeri nuovi.
+  allora di nuovo la traiettoria prevista con i numeri nuovi.
 
 - **La quota di scoppio e le velocità di salita/discesa**, nella pagina
   Diretta. `FLIGHT_BURST_KM`, `FLIGHT_ASCENT_MS` e `FLIGHT_DESCENT_V0_MS`
@@ -650,11 +663,13 @@ approvare la propria richiesta di modifica.
   proprio quello che il riancoraggio risolve appena arriva il punto
   giusto.
 
-  `FLIGHT_SITE` (sempre in `assets/app.js`) è il punto di partenza usato
-  per la linea grigia tratteggiata della traiettoria prevista, disegnata
-  sulla mappa della pagina Diretta accanto ai punti GPS veri (verdi):
-  oggi è l'aerodromo di Mercedes, lo stesso sito proposto di default
-  nella pagina Traiettoria. `assets/spot.js` interroga Tawhiri (lo stesso
+  `FLIGHT_SITE` (sempre in `assets/volo.js`, con il nome che compare in
+  testa alla scheda) è il punto di partenza della traiettoria prevista,
+  disegnata sulla mappa della pagina Diretta accanto alle tracce vere:
+  oggi è il centro dell'aerodromo di Mercedes, lo stesso sito proposto di
+  default nella pagina Traiettoria. **Il giorno del lancio** va sostituito
+  con la posizione esatta presa sul posto (un commit): la traiettoria si
+  ricalcola da sola, al caricamento e ogni 20 minuti. `assets/spot.js` interroga Tawhiri (lo stesso
   previsore usato lì) in background, in silenzio, con questi parametri —
   non quelli che un visitatore potrebbe aver cambiato giocando col modulo
   della pagina Traiettoria — e ridisegna la linea ogni volta che la
