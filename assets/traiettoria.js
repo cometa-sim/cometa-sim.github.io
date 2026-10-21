@@ -30,7 +30,14 @@ const GEO = "https://geocoding-api.open-meteo.com/v1/search";
 const METEO = "https://api.open-meteo.com/v1/forecast";
 const TZ = "America/Montevideo";
 const TZ_OFF = "-03:00";            /* l'Uruguay non ha ora legale dal 2015 */
-const GIORNI_MAX = 7;               /* orizzonte della corsa GFS di Tawhiri */
+/* Fin dove si possono scegliere le date: oggi piu' GIORNI_MAX giorni.
+   Il GFS che usa Tawhiri arriva a 192 ore (8 giorni) dall'ultima corsa, e
+   la corsa piu' recente ha di solito qualche ora: con 7 il giorno del
+   lancio non era ancora selezionabile qui mentre la Diretta, che chiede
+   direttamente a Tawhiri, la traiettoria la mostrava gia'. Con 8, l'ultimo
+   giorno puo' non essere coperto per intero: nelle ore oltre la fine della
+   corsa Tawhiri risponde con un errore, e lo si mostra (twErr). */
+const GIORNI_MAX = 8;
 const LEAFLET = "assets/vendor/leaflet/";
 const COL = "#5FE3FF";              /* --cyan */
 const TILES = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
@@ -713,13 +720,13 @@ function loadLeaflet(){
      parallelo con leaflet.js. */
   const mapkit = window.COMETA_MAPKIT ? Promise.resolve() : new Promise(function(ok, ko){
     const s = document.createElement("script");
-    s.src = "assets/mapkit.js?v=195";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
+    s.src = "assets/mapkit.js?v=196";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
     s.onload = ok; s.onerror = ko;
     document.head.appendChild(s);
   });
   const map3d = window.COMETA_MAP3D ? Promise.resolve() : new Promise(function(ok){
     const s = document.createElement("script");
-    s.src = "assets/map3d.js?v=195";
+    s.src = "assets/map3d.js?v=196";
     s.onload = ok; s.onerror = ok;       /* senza, resta il 2D e basta */
     document.head.appendChild(s);
   });
