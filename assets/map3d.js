@@ -199,7 +199,34 @@ window.COMETA_MAP3D = (function(){
          paint:{"fill-extrusion-color":["get","c"], "fill-extrusion-height":["get","h"], "fill-extrusion-base":["get","b"], "fill-extrusion-opacity":.96}}
       ],
       terrain:{source:"dem", exaggeration:1.5},
-      sky:{"sky-color":"#0e2a4a", "horizon-color":"#6f93b8", "fog-color":"#a9c2dc", "sky-horizon-blend":.5, "horizon-fog-blend":.6, "fog-ground-blend":.8}
+      /* ---------- Terra tonda, e il cielo che ci si appoggia ----------
+         Con la proiezione piana il cielo e' un velo dipinto davanti alla
+         scena, con il suo orizzonte calcolato SENZA il rilievo: inclinando
+         molto la vista quel velo finisce un po' piu' in alto di dove
+         arriva il terreno, e in mezzo si vedeva una riga scura (lo sfondo
+         dello stile). Sul globo l'orizzonte non e' piu' disegnato ma e'
+         geometria vera — il bordo del pianeta — e la cucitura sparisce,
+         oltre a far vedere la curvatura, che a queste distanze e' quella
+         giusta, non gonfiata.
+
+         Da vicino la curvatura non esiste piu' (su dieci chilometri il
+         pianeta e' piatto) e MapLibre torna da solo alla proiezione
+         piana. Il passaggio fra le due e' l'unico momento brutto, perche'
+         i due cieli si sovrappongono: lo si tiene stretto (0,8 livelli di
+         zoom invece dei 2 di serie) e spostato piu' in la', 11,4 -> 12,2,
+         dove non lascia nessuna riga a nessuna inclinazione — provate
+         tutte e tre le finestre, quelle a 10,4 e a 12,4 ne lasciavano
+         ancora qualcuna.
+
+         atmosphere-blend: sul globo il cielo non e' piu' un gradiente ma
+         un'atmosfera calcolata, che pero' si stende anche DAVANTI alla
+         mappa. A piena forza la sbianca e il tema scuro sparisce: a 0,2
+         resta il filo luminoso sull'orizzonte e la mappa resta scura. Le
+         tre tinte qui sotto continuano a servire da vicino, dove il cielo
+         torna a essere un gradiente. */
+      projection:{type:["interpolate", ["linear"], ["zoom"], 11.4, "vertical-perspective", 12.2, "mercator"]},
+      sky:{"sky-color":"#0e2a4a", "horizon-color":"#6f93b8", "fog-color":"#a9c2dc", "sky-horizon-blend":.5,
+           "horizon-fog-blend":.6, "fog-ground-blend":.8, "atmosphere-blend":.2}
     };
 
     const map = new ml.Map({
@@ -334,8 +361,12 @@ window.COMETA_MAP3D = (function(){
         const out = document.createElement("canvas");
         out.width = W; out.height = H + FOOT;
         const g = out.getContext("2d");
+        /* Fondo pieno prima di copiare: sul globo la parte di cielo fuori
+           dall'atmosfera resta TRASPARENTE nel canvas WebGL (a schermo si
+           vede il fondo del contenitore, .tw-canvas in cometa.css). Senza
+           questo, nel PNG salvato il cielo verrebbe fuori bianco. */
+        g.fillStyle = "#02060f"; g.fillRect(0, 0, W, H + FOOT);
         g.drawImage(cv, 0, 0);
-        g.fillStyle = "#02060f"; g.fillRect(0, H, W, FOOT);
         g.fillStyle = "#EAF3FA"; g.textBaseline = "alphabetic";
         g.font = "600 " + 15*u + "px 'Space Grotesk', Inter, system-ui, sans-serif";
         g.fillText(info.title || "COMETA", 16*u, H + 26*u);
