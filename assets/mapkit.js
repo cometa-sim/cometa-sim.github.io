@@ -173,7 +173,9 @@ window.COMETA_MAPKIT = (function(){
        avanza di uno e dopo l'ultimo livello spegne. In Europa i livelli
        sono pioggia (RainViewer) e nuvole (OpenWeatherMap); altrove
        solo nuvole. */
-    let modes = null, layers = {}, step = 0, wrap = null, btn = null, loading = false, cancelled = false;
+    /* urls/specs: come ridisegnare lo stesso livello fuori da Leaflet
+       (l'esportazione in PNG del predittore ridisegna tutto a mano) */
+    let modes = null, layers = {}, specs = {}, step = 0, wrap = null, btn = null, loading = false, cancelled = false;
     function setButton(kind){
       if(!btn) return;
       const d = dict();
@@ -181,14 +183,26 @@ window.COMETA_MAPKIT = (function(){
       btn.title = kind === "rain" ? (d.mkRainOnly || "Pioggia (radar)") : (d.mkRain || "Nuvole (foto satellitare)");
     }
     function owmLayer(){
+      /* mask: la mattonella e' bianca su trasparente, e' la trasparenza a
+         portare il dato (piu' nuvole = piu' opaca). Chi la ridisegna su
+         uno sfondo chiaro deve ricolorarla, o sparisce. Il radar invece
+         ha colori propri, che sono una scala di intensita'. */
+      specs.clouds = {kind:"clouds", url:OWM_TILES, opacity:.75, maxNativeZoom:OWM_NATIVE_ZOOM, credit:"OpenWeatherMap", mask:true};
       return L.tileLayer(OWM_TILES, {
         pane: "mkRain", opacity: .75, maxZoom: 18, maxNativeZoom: OWM_NATIVE_ZOOM,
+        /* come le mattonelle stradali del predittore: servono anche
+           all'esportazione in PNG, che le ridisegna su un canvas. Senza
+           crossOrigin il browser potrebbe riusare per il canvas una copia
+           presa dalla cache senza permesso CORS, e il canvas diventerebbe
+           "sporco" — l'immagine non si salverebbe piu'. */
+        crossOrigin: true,
         attribution: 'Nuvole: <a href="https://openweathermap.org/" target="_blank" rel="noopener">OpenWeatherMap</a>'
       });
     }
     function rainViewerLayer(host, path){
+      specs.rain = {kind:"rain", url:host + path + "/256/{z}/{x}/{y}/2/1_1.png", opacity:.55, maxNativeZoom:RAIN_NATIVE_ZOOM, credit:"RainViewer"};
       return L.tileLayer(host + path + "/256/{z}/{x}/{y}/2/1_1.png", {
-        pane: "mkRain", opacity: .55, maxZoom: 18, maxNativeZoom: RAIN_NATIVE_ZOOM,
+        pane: "mkRain", opacity: .55, maxZoom: 18, maxNativeZoom: RAIN_NATIVE_ZOOM, crossOrigin: true,
         attribution: 'Pioggia: <a href="https://www.rainviewer.com" target="_blank" rel="noopener">RainViewer</a>'
       });
     }
@@ -236,6 +250,106 @@ window.COMETA_MAPKIT = (function(){
       }
     });
     new Rain().addTo(map);
+    /* Che livello c'e' sopra la mappa in questo momento, e come
+       ridisegnarlo: null se e' spento. */
+    return {overlay: function(){ return step ? specs[modes[step - 1]] || null : null; }};
+  }
+
+  /* ---------- Lo specchietto del meteo dentro un'immagine salvata ----------
+     Le stesse celle del riquadro .mk-weather che si vede sotto la mappa,
+     ridisegnate su un canvas. I valori si LEGGONO dal riquadro, non si
+     ricalcolano: l'immagine salvata dice esattamente quello che diceva la
+     pagina, senza una seconda chiamata al servizio meteo che potrebbe
+     rispondere altro.
+
+     Torna una promessa perche' l'icona e' un SVG, che va prima
+     rasterizzato: si passa per un data: URL (niente rete, e un data: URL
+     non rende il canvas "sporco", quindi toBlob continua a funzionare).
+     Se l'icona non si carica si salta la sua cella e il resto si disegna
+     comunque.
+
+     o: {x, y, u, head, align, paper, ink, muted, accent}. x,y e'
+     l'angolo in alto a sinistra, o in alto a destra con align:"right".
+     Risolve con {w, h} del riquadro disegnato, o null se non c'era
+     niente da disegnare. */
+  function drawWeather(g, box, o){
+    if(!box || box.hidden) return Promise.resolve(null);
+    const u = o.u || 1;
+    const paper = o.paper || "rgba(255,255,255,.93)", ink = o.ink || "#0E1620";
+    const muted = o.muted || "#4A5B6C", accent = o.accent || "#0B6FA4";
+    const FV = "600 " + 17*u + "px 'Space Grotesk', Inter, system-ui, sans-serif";
+    const FU = 9*u + "px Inter, system-ui, sans-serif";
+    const FL = 8.5*u + "px 'JetBrains Mono', ui-monospace, monospace";
+    const FH = 10*u + "px Inter, system-ui, sans-serif";
+    /* Celle lette dal riquadro: quella dell'icona contiene un <svg>, le
+       altre un valore (col pezzetto di unita' in <small>) e un'etichetta. */
+    const cells = [];
+    Array.prototype.forEach.call(box.querySelectorAll(".mk-wtile"), function(tile){
+      const v = tile.querySelector(".mk-wv"), l = tile.querySelector(".mk-wl");
+      if(!v) return;
+      const svg = v.querySelector("svg");
+      if(svg){ cells.push({svg: svg}); return; }
+      const small = v.querySelector("small");
+      cells.push({v: (small ? v.textContent.replace(small.textContent, "") : v.textContent).trim(),
+                  unit: small ? small.textContent : "", l: l ? l.textContent.trim() : ""});
+    });
+    if(!cells.length) return Promise.resolve(null);
+    /* misure: ogni cella larga quanto il suo contenuto, con un minimo */
+    g.save();
+    const widths = cells.map(function(c){
+      if(c.svg) return 34*u;
+      g.font = FV; let w = g.measureText(c.v).width;
+      if(c.unit){ g.font = FU; w += g.measureText(c.unit).width + 2*u; }
+      g.font = FL; w = Math.max(w, g.measureText(c.l).width);
+      return Math.max(46*u, w + 16*u);
+    });
+    const PAD = 11*u, HEAD = o.head ? 15*u : 0;
+    let W = widths.reduce(function(a, b){ return a + b; }, 0) + 2*PAD;
+    if(o.head){ g.font = FH; W = Math.max(W, g.measureText(o.head).width + 2*PAD); }
+    const H = PAD + HEAD + 20*u + 13*u + PAD;
+    const x0 = o.align === "right" ? o.x - W : o.x, y0 = o.y;
+    /* sfondo chiaro con un filo di bordo: lo stesso trattamento della scala */
+    g.fillStyle = paper; g.fillRect(x0, y0, W, H);
+    g.globalAlpha = .18; g.strokeStyle = ink; g.lineWidth = 1*u;
+    g.strokeRect(x0 + .5*u, y0 + .5*u, W - u, H - u); g.globalAlpha = 1;
+    if(o.head){
+      g.font = FH; g.fillStyle = muted; g.textAlign = "left"; g.textBaseline = "alphabetic";
+      g.fillText(o.head, x0 + PAD, y0 + PAD + 10*u);
+    }
+    const yV = y0 + PAD + HEAD + 17*u, yL = yV + 13*u;
+    let cx = x0 + PAD, icon = null;
+    g.textBaseline = "alphabetic";
+    cells.forEach(function(c, i){
+      const w = widths[i], mid = cx + w/2;
+      if(i){   /* filo di separazione fra una cella e l'altra */
+        g.globalAlpha = .12; g.strokeStyle = ink; g.lineWidth = 1*u;
+        g.beginPath(); g.moveTo(cx, y0 + PAD + HEAD); g.lineTo(cx, y0 + H - PAD*.6); g.stroke(); g.globalAlpha = 1;
+      }
+      if(c.svg){ icon = {svg: c.svg, x: mid, y: (yV + yL)/2 - 11*u}; cx += w; return; }
+      g.textAlign = "center"; g.fillStyle = ink; g.font = FV;
+      if(c.unit){
+        /* valore e unita' affiancati, come il <small> nella pagina */
+        const wv = g.measureText(c.v).width;
+        g.font = FU; const wu = g.measureText(c.unit).width;
+        const left = mid - (wv + 2*u + wu)/2;
+        g.textAlign = "left"; g.font = FV; g.fillText(c.v, left, yV);
+        g.font = FU; g.globalAlpha = .7; g.fillText(c.unit, left + wv + 2*u, yV); g.globalAlpha = 1;
+        g.textAlign = "center";
+      } else g.fillText(c.v, mid, yV);
+      g.fillStyle = muted; g.font = FL; g.letterSpacing = "1px";
+      g.fillText(c.l.toUpperCase(), mid, yL);
+      g.letterSpacing = "0px";
+      cx += w;
+    });
+    g.restore();
+    if(!icon) return Promise.resolve({w: W, h: H});
+    return new Promise(function(ok){
+      const im = new Image();
+      im.onload = function(){ try { g.drawImage(im, icon.x - 11*u, icon.y, 22*u, 22*u); } catch(e){} ok({w: W, h: H}); };
+      im.onerror = function(){ ok({w: W, h: H}); };
+      im.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(
+        icon.svg.outerHTML.replace(/currentColor/g, accent).replace("<svg", '<svg xmlns="http://www.w3.org/2000/svg"'));
+    });
   }
 
   /* Salva l'immagine: solo dove chi chiama passa onSave (solo il
@@ -264,15 +378,15 @@ window.COMETA_MAPKIT = (function(){
   function enhance(map, L, container, streetLayer, opts){
     opts = opts || {};
     const base = addBaseToggle(map, L, streetLayer);
-    addRainLayer(map, L);
+    const rain = addRainLayer(map, L);
     addFullscreenControl(map, L, container);
     if(opts.onSave) addSaveControl(map, L, opts.onSave);
-    return {isSatellite: base.isSatellite};
+    return {isSatellite: base.isSatellite, overlay: rain.overlay};
   }
 
   return {
     addBaseToggle: addBaseToggle, addFullscreenControl: addFullscreenControl, addRainLayer: addRainLayer,
-    addSaveControl: addSaveControl, enhance: enhance, ESRI_SAT: ESRI_SAT, ESRI_ATTR: ESRI_ATTR,
+    addSaveControl: addSaveControl, enhance: enhance, drawWeather: drawWeather, ESRI_SAT: ESRI_SAT, ESRI_ATTR: ESRI_ATTR,
     /* per la vista 3D (assets/map3d.js): stesse fonti e stesse icone */
     OWM_TILES: OWM_TILES, OWM_NATIVE_ZOOM: OWM_NATIVE_ZOOM, RAIN_INDEX: RAIN_INDEX, RAIN_NATIVE_ZOOM: RAIN_NATIVE_ZOOM,
     isEurope: isEurope,

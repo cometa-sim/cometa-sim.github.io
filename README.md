@@ -80,11 +80,11 @@ Norme e autorizzazioni · Domande · Chi siamo.
 ### Dopo ogni modifica: il numero di versione
 
 In `index.html` i file di `assets/`, e la mappa, sono richiamati con un numero in
-coda — oggi `?v=199`:
+coda — oggi `?v=200`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=199">
-<script src="assets/i18n.js?v=199"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=200">
+<script src="assets/i18n.js?v=200"></script>
 ```
 
 Lo stesso numero compare anche in punti meno visibili, che vanno alzati
@@ -375,6 +375,28 @@ colori da fondo chiaro, più scala, titolo (luogo, data, corsa GFS),
 legenda e attribuzione. Per questo il livello delle mattonelle è caricato
 con `crossOrigin`: senza, il canvas non si potrebbe salvare.
 
+Con il livello **nuvole/radar acceso** l'immagine porta via anche il meteo,
+e la regola è una sola: le mattonelle sono lo stato di adesso, lo
+specchietto è una previsione.
+
+- lo **specchietto delle condizioni** (le stesse celle che si vedono sotto
+  la mappa, in alto a destra nell'immagine, con sopra il giorno e l'ora)
+  c'è sempre: è la previsione per il momento della partenza scelto, e i
+  valori si leggono dal riquadro della pagina, non si richiedono di nuovo;
+- le **mattonelle di nuvole e radar** finiscono nell'immagine solo
+  salvando il giorno stesso della partenza. Su una mappa intitolata a un
+  giorno futuro sarebbero una bugia: mostrerebbero il cielo di oggi.
+
+Le mattonelle delle nuvole sono bianche su trasparente, ed è la
+trasparenza a portare il dato: qui lo sfondo è chiaro, quindi si
+ricolorano di ardesia tenendo la stessa trasparenza — più nuvole, più
+scuro. Il radar no: i suoi colori sono la scala dell'intensità di
+pioggia. Le fonti in più (OpenWeatherMap, Open-Meteo) si aggiungono
+all'attribuzione solo quando sono davvero nell'immagine.
+
+L'immagine 3D è invece una fotografia della vista, quindi le nuvole, se
+accese, ci sono già; lo specchietto si aggiunge allo stesso modo.
+
 Leaflet (`assets/vendor/leaflet/`) si scarica solo quando la mappa entra
 nello schermo.
 
@@ -461,7 +483,9 @@ hanno gli stessi controlli, scritti una volta sola in `assets/mapkit.js`:
   pioggia di **RainViewer** (lì la rete di radar a terra è fitta; mostra solo
   dove piove, e per questo il pulsante prende l'icona della pioggia).
   Altrove è la copertura nuvolosa di **OpenWeatherMap**. È lo stato attuale
-  delle nuvole, non quello previsto per il giorno del lancio.
+  delle nuvole, non quello previsto per il giorno del lancio — per questo
+  nell'immagine salvata entrano solo se si salva il giorno stesso della
+  partenza (vedi sopra).
 - **Schermo intero**, e solo nella Traiettoria **salva l'immagine**.
 
 La chiave di OpenWeatherMap non sta nel sito: OpenWeatherMap non permette

@@ -319,7 +319,12 @@ window.COMETA_MAP3D = (function(){
     /* Salva l'immagine: lo schermo della mappa cosi' com'e' (vista, inclinazione,
        livelli) con una striscia sotto che dice cos'e' e di chi sono i dati.
        Il canvas WebGL si puo' copiare solo subito dopo un disegno: si chiede
-       un ridisegno e si copia nello stesso istante. */
+       un ridisegno e si copia nello stesso istante.
+
+       Le nuvole e il radar, se accesi, sono dentro il canvas e finiscono
+       nell'immagine da soli: qui e' una fotografia della vista, non un
+       disegno rifatto come nel 2D. Con quel livello acceso si aggiunge
+       pero' lo stesso specchietto del meteo del 2D (o.weather). */
     let saveCtl = null;
     function save(){
       const info = o.onSave ? o.onSave() : {};
@@ -339,14 +344,20 @@ window.COMETA_MAP3D = (function(){
         g.fillStyle = "#5F7690"; g.font = 10.5*u + "px Inter, system-ui, sans-serif";
         g.fillText((onSat ? "Tiles © Esri — Source: Esri, Maxar, Earthstar Geographics, GIS User Community" : "© OpenStreetMap contributors")
           + " · Mapzen/AWS Terrain Tiles · cometa.scuolaitaliana.edu.uy", 16*u, H + FOOT - 10*u);
-        out.toBlob(function(blob){
-          if(!blob){ if(o.onSaveError) o.onSaveError(); return; }
-          const a = document.createElement("a");
-          a.download = (info.filename || "cometa-3d") + ".png";
-          a.href = URL.createObjectURL(blob);
-          document.body.appendChild(a); a.click(); a.remove();
-          setTimeout(function(){ URL.revokeObjectURL(a.href); }, 4000);
-        }, "image/png");
+        const wbox = step && o.weather && mk.drawWeather
+          ? mk.drawWeather(g, document.querySelector(o.weather),
+              {x: W - 16*u, y: 16*u, u: u, align:"right", head: info.weatherHead})
+          : Promise.resolve(null);
+        wbox.then(function(){
+          out.toBlob(function(blob){
+            if(!blob){ if(o.onSaveError) o.onSaveError(); return; }
+            const a = document.createElement("a");
+            a.download = (info.filename || "cometa-3d") + ".png";
+            a.href = URL.createObjectURL(blob);
+            document.body.appendChild(a); a.click(); a.remove();
+            setTimeout(function(){ URL.revokeObjectURL(a.href); }, 4000);
+          }, "image/png");
+        });
       });
       map.triggerRepaint();
     }
