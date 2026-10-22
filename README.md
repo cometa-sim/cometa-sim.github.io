@@ -80,11 +80,11 @@ Norme e autorizzazioni · Domande · Chi siamo.
 ### Dopo ogni modifica: il numero di versione
 
 In `index.html` i file di `assets/`, e la mappa, sono richiamati con un numero in
-coda — oggi `?v=200`:
+coda — oggi `?v=201`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=200">
-<script src="assets/i18n.js?v=200"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=201">
+<script src="assets/i18n.js?v=201"></script>
 ```
 
 Lo stesso numero compare anche in punti meno visibili, che vanno alzati
@@ -487,6 +487,37 @@ hanno gli stessi controlli, scritti una volta sola in `assets/mapkit.js`:
   nell'immagine salvata entrano solo se si salva il giorno stesso della
   partenza (vedi sopra).
 - **Schermo intero**, e solo nella Traiettoria **salva l'immagine**.
+
+#### La vista 3D: terra tonda, e il cielo che ci si appoggia
+
+La mappa 3D della Traiettoria (`assets/map3d.js`, MapLibre) disegna il
+pianeta **tondo**, con la curvatura vera: non è un effetto, è la proiezione
+`vertical-perspective` al posto di Mercatore.
+
+Il motivo non è solo estetico. Con la proiezione piana il cielo è un velo
+dipinto davanti alla scena, e il suo orizzonte è calcolato **senza** il
+rilievo: inclinando molto la vista quel velo finisce un po' più in alto di
+dove arriva il terreno, e fra i due si vedeva una riga — a volte una fascia
+— del colore di sfondo. Sul globo l'orizzonte non è più disegnato ma è
+geometria: il bordo del pianeta. La cucitura non può esistere.
+
+Da vicino la curvatura non c'è più (su dieci chilometri il pianeta è
+piatto) e MapLibre torna da solo alla proiezione piana. Il passaggio fra le
+due è l'unico momento in cui i due cieli si sovrappongono, ed è lì che
+ricompariva una riga: la finestra è tenuta stretta e spostata dove non ne
+lascia nessuna, **11,4 → 12,2** invece dei due livelli di zoom di serie.
+
+Sul globo il cielo non è più un gradiente ma un'atmosfera calcolata, che
+però si stende anche **davanti** alla mappa: a piena forza la sbianca e il
+tema scuro sparisce. `atmosphere-blend` sta a **0,2**, che lascia il filo
+luminoso sull'orizzonte e la mappa scura; alzarlo schiarisce il cielo e
+insieme la mappa. Le tre tinte dello `sky` continuano a servire da vicino,
+dove il cielo torna a essere un gradiente.
+
+Una conseguenza da ricordare: fuori dall'atmosfera il canvas WebGL resta
+**trasparente** (a schermo si vede il fondo di `.tw-canvas`). Per questo
+l'immagine salvata riempie il fondo prima di copiare il canvas, altrimenti
+il cielo verrebbe fuori bianco.
 
 La chiave di OpenWeatherMap non sta nel sito: OpenWeatherMap non permette
 di limitarla a un dominio, quindi chiunque la vedesse nel codice potrebbe
