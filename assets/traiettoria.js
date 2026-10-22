@@ -730,13 +730,13 @@ function loadLeaflet(){
      parallelo con leaflet.js. */
   const mapkit = window.COMETA_MAPKIT ? Promise.resolve() : new Promise(function(ok, ko){
     const s = document.createElement("script");
-    s.src = "assets/mapkit.js?v=199";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
+    s.src = "assets/mapkit.js?v=200";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
     s.onload = ok; s.onerror = ko;
     document.head.appendChild(s);
   });
   const map3d = window.COMETA_MAP3D ? Promise.resolve() : new Promise(function(ok){
     const s = document.createElement("script");
-    s.src = "assets/map3d.js?v=199";
+    s.src = "assets/map3d.js?v=200";
     s.onload = ok; s.onerror = ok;       /* senza, resta il 2D e basta */
     document.head.appendChild(s);
   });
@@ -802,7 +802,8 @@ function ensureMap(){
         color:COL, colorDown:COL, excl:MOSTRA_EXCL ? EXCL : null,     /* tutta la traiettoria azzurra, anche la discesa */
         onPick:function(lat, lon){ setLaunch({lat:lat, lon:lon}); },
         onDrag:function(lat, lon){ setLaunch({lat:lat, lon:lon}); },
-        onSave:info3d, onSaveError:function(){ setStatus(t("twPngErr"), true); }
+        onSave:info3d, onSaveError:function(){ setStatus(t("twPngErr"), true); },
+        weather:"#twWeather"      /* lo specchietto del meteo da copiare nell'immagine salvata */
       },
       onEnter:function(c){
         c.setLaunch(launch, false);
@@ -837,6 +838,7 @@ function info3d(){
     lines.push(t("twLand") + " " + num(x.end.lat, 4) + ", " + num(x.end.lon, 4) + " · Tawhiri (SondeHub) · NOAA GFS");
   }
   return {title:title, lines:lines,
+    weatherHead:fmtTime(launchAt(elDate.value, elTime.value || "11:00"), true),
     filename:"cometa-traiettoria-3d-" + (name || "mappa").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") + "-" + day};
 }
 /* I risultati di show() come li vuole map3d.js: [lon, lat] ovunque */
@@ -1385,10 +1387,14 @@ elWeekBtn.addEventListener("click", function(){
    canvas con le mattonelle OSM a uno o due livelli di zoom in piu' (piu'
    dettaglio, nessun filtro scuro) e i tracciati con colori da fondo
    chiaro, piu' una riga con luogo, data, legenda, scala e attribuzione.
-   Le mattonelle sono al massimo MAX_TILES, per rispetto del server OSM. */
+   Le mattonelle sono al massimo MAX_TILES, per rispetto del server OSM.
+
+   Con il livello nuvole/radar accesso finisce nell'immagine anche il
+   meteo (vedi ov/ovTiles dentro exportPng). */
 const MAX_TILES = 200, OUT_W = 3200;
 const LIGHT = {track:"#0B6FA4", band:"#0B6FA4", land:"#E08E0B", asc:"#6C4FD1",
-               excl:"#C0392B", ink:"#0E1620", muted:"#4A5B6C", paper:"#FFFFFF"};
+               excl:"#C0392B", ink:"#0E1620", muted:"#4A5B6C", paper:"#FFFFFF",
+               cloud:"#41505E"};   /* nuvole: ardesia, vedi tinta() */
 function loadTile(url){
   return new Promise(function(ok){
     const im = new Image();
@@ -1405,6 +1411,14 @@ function exportPng(){
      {z}/{x}/{y}) o satellite (Esri, ordine {z}/{y}/{x} — diverso!). */
   const sat = !!(mapkit && mapkit.isSatellite && mapkit.isSatellite());
   const tileUrl = sat ? window.COMETA_MAPKIT.ESRI_SAT : TILES;
+  /* Livello nuvole/radar: se e' accesso l'immagine porta via anche il
+     meteo. Le sue mattonelle sono pero' la situazione di ADESSO, non una
+     previsione, quindi si disegnano solo salvando il giorno stesso della
+     partenza — su una mappa intitolata a un giorno futuro sarebbero una
+     bugia. Lo specchietto del meteo e' invece una previsione per il
+     giorno e l'ora scelti, e vale sempre. */
+  const ov = mapkit && mapkit.overlay ? mapkit.overlay() : null;
+  const ovTiles = !!(ov && elDate.value === isoDay(new Date()));
   const size = map.getSize(), z0 = map.getZoom();
   /* Immagine sempre larga almeno OUT_W pixel (fattore S rispetto allo
      schermo). Le mattonelle salgono di zoom quanto basta, ma senza
@@ -1433,23 +1447,58 @@ function exportPng(){
   const g = cv.getContext("2d");
   g.fillStyle = "#E8EEF2"; g.fillRect(0, 0, W, H);
   g.imageSmoothingQuality = "high";
-  /* mattonelle */
-  const n = Math.pow(2, z), jobs = [];
-  for(let ty = Math.floor(origin.y/256); ty <= Math.floor((origin.y + H/k)/256); ty++){
-    if(ty < 0 || ty >= n) continue;
-    for(let tx = Math.floor(origin.x/256); tx <= Math.floor((origin.x + W/k)/256); tx++){
-      const wx = ((tx % n) + n) % n;
-      const url = sat ? tileUrl.replace("{z}", z).replace("{y}", ty).replace("{x}", wx)
-                      : tileUrl.replace("{z}", z).replace("{x}", wx).replace("{y}", ty);
-      jobs.push(loadTile(url).then(function(im){
-        /* +0,5 px per non lasciare fessure fra una mattonella e l'altra quando k non e' intero */
-        if(im) g.drawImage(im, (tx*256 - origin.x)*k, (ty*256 - origin.y)*k, 256*k + .5, 256*k + .5);
-        return !!im;
-      }));
-    }
+  /* Mattonelle, uno strato per volta: si caricano in parallelo ma si
+     disegnano tutte insieme alla fine, altrimenti una mattonella delle
+     nuvole arrivata in fretta finirebbe SOTTO una mattonella di sfondo
+     arrivata dopo. zt puo' essere piu' basso di z: le nuvole e il radar
+     non servono mattonelle oltre un certo zoom (maxNativeZoom), e da li'
+     in su si ingrandiscono, come fa Leaflet a schermo. */
+  const n = Math.pow(2, z);
+  /* Ricolora una mattonella tenendone la trasparenza: "source-in" riempie
+     solo dove c'e' gia' qualcosa e conserva l'alfa del disegno sotto. */
+  let tintCv = null;
+  function tinta(im, colore){
+    if(!tintCv) tintCv = document.createElement("canvas");
+    tintCv.width = im.width; tintCv.height = im.height;      /* azzera anche il contenuto */
+    const x = tintCv.getContext("2d");
+    x.drawImage(im, 0, 0);
+    x.globalCompositeOperation = "source-in";
+    x.fillStyle = colore; x.fillRect(0, 0, im.width, im.height);
+    return tintCv;
   }
-  Promise.all(jobs).then(function(res){
-    const missing = res.filter(function(x){ return !x; }).length;
+  function tileLayer(url, yxOrder, zt, alpha, tint){
+    const f = Math.pow(2, z - zt), ox = origin.x/f, oy = origin.y/f, kk = k*f, nn = Math.pow(2, zt);
+    const jobs = [];
+    for(let ty = Math.floor(oy/256); ty <= Math.floor((oy + H/kk)/256); ty++){
+      if(ty < 0 || ty >= nn) continue;
+      for(let tx = Math.floor(ox/256); tx <= Math.floor((ox + W/kk)/256); tx++){
+        const wx = ((tx % nn) + nn) % nn;
+        const u2 = yxOrder ? url.replace("{z}", zt).replace("{y}", ty).replace("{x}", wx)
+                           : url.replace("{z}", zt).replace("{x}", wx).replace("{y}", ty);
+        const dx = (tx*256 - ox)*kk, dy = (ty*256 - oy)*kk;
+        jobs.push(loadTile(u2).then(function(im){ return im ? {im:im, x:dx, y:dy} : null; }));
+      }
+    }
+    return Promise.all(jobs).then(function(got){
+      g.globalAlpha = alpha;
+      /* +0,5 px per non lasciare fessure fra una mattonella e l'altra quando kk non e' intero */
+      got.forEach(function(q){ if(q) g.drawImage(tint ? tinta(q.im, tint) : q.im, q.x, q.y, 256*kk + .5, 256*kk + .5); });
+      g.globalAlpha = 1;
+      return got.filter(function(q){ return !q; }).length;
+    });
+  }
+  tileLayer(tileUrl, sat, z, 1).then(function(missing){
+    /* Nuvole/radar sopra lo sfondo; quelle che non arrivano non rendono
+       l'immagine incompleta. Le nuvole sono bianche su trasparente (vedi
+       "mask" in mapkit.js): qui lo sfondo e' chiaro, quindi si
+       ricolorano di ardesia tenendo la trasparenza — piu' nuvole, piu'
+       scuro. L'opacita' sale perche' la mattonella non supera meta'
+       opacita' nemmeno a cielo coperto. Il radar invece passa com'e': i
+       suoi colori sono la scala dell'intensita' di pioggia. */
+    if(!ovTiles) return missing;
+    return tileLayer(ov.url, false, Math.min(z, ov.maxNativeZoom),
+                     ov.mask ? .95 : ov.opacity, ov.mask ? LIGHT.cloud : null).then(function(){ return missing; });
+  }).then(function(missing){
     const path = function(pts, close){
       g.beginPath();
       pts.forEach(function(q, i){ const p = P(q[0], q[1]); if(i) g.lineTo(p[0], p[1]); else g.moveTo(p[0], p[1]); });
@@ -1530,19 +1579,33 @@ function exportPng(){
     g.fillStyle = LIGHT.muted; g.font = 12.5*u + "px Inter, system-ui, sans-serif";
     lines.forEach(function(l, i){ g.fillText(l, 18*u, H + (53 + 19*i)*u); });
     g.font = 11*u + "px Inter, system-ui, sans-serif"; g.fillStyle = "#7A8A99";
-    g.fillText((sat ? "Tiles © Esri — Source: Esri, Maxar, Earthstar Geographics, GIS User Community" : "© OpenStreetMap contributors")
-      + " · Tawhiri (SondeHub) · NOAA GFS · cometa.scuolaitaliana.edu.uy", 18*u, H + FOOT - 14*u);
-    try {
-      cv.toBlob(function(blob){
-        if(!blob){ setStatus(t("twPngErr"), true); return; }
-        const a = document.createElement("a"), day = x && x.ok ? isoDay(x.pts[0].t) : elDate.value;
-        a.download = "cometa-traiettoria-" + (launch ? launch.name : "mappa").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") + "-" + day + ".png";
-        a.href = URL.createObjectURL(blob);
-        document.body.appendChild(a); a.click(); a.remove();
-        setTimeout(function(){ URL.revokeObjectURL(a.href); }, 4000);
-        setStatus(missing ? t("twPngPart") : "");
-      }, "image/png");
-    } catch(e){ setStatus(t("twPngErr"), true); }
+    const cred = [sat ? "Tiles © Esri — Source: Esri, Maxar, Earthstar Geographics, GIS User Community" : "© OpenStreetMap contributors"];
+    if(ovTiles) cred.push(ov.credit);
+    cred.push("Tawhiri (SondeHub)", "NOAA GFS");
+    if(ov) cred.push("Open-Meteo");
+    cred.push("cometa.scuolaitaliana.edu.uy");
+    g.fillText(cred.join(" · "), 18*u, H + FOOT - 14*u);
+    /* specchietto del meteo, in alto a destra: le stesse celle che si
+       vedono sotto la mappa, con sopra il giorno e l'ora a cui si
+       riferiscono. I valori si leggono dal riquadro della pagina. */
+    const wbox = ov && window.COMETA_MAPKIT ? window.COMETA_MAPKIT.drawWeather(g, document.getElementById("twWeather"), {
+      x: W - 18*u, y: 18*u, u: u, align: "right",
+      head: fmtTime(launchAt(elDate.value, elTime.value || "11:00"), true),
+      ink: LIGHT.ink, muted: LIGHT.muted, accent: LIGHT.track
+    }) : Promise.resolve(null);
+    wbox.then(function(){
+      try {
+        cv.toBlob(function(blob){
+          if(!blob){ setStatus(t("twPngErr"), true); return; }
+          const a = document.createElement("a"), day = x && x.ok ? isoDay(x.pts[0].t) : elDate.value;
+          a.download = "cometa-traiettoria-" + (launch ? launch.name : "mappa").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") + "-" + day + ".png";
+          a.href = URL.createObjectURL(blob);
+          document.body.appendChild(a); a.click(); a.remove();
+          setTimeout(function(){ URL.revokeObjectURL(a.href); }, 4000);
+          setStatus(missing ? t("twPngPart") : "");
+        }, "image/png");
+      } catch(e){ setStatus(t("twPngErr"), true); }
+    });
   });
 }
 
