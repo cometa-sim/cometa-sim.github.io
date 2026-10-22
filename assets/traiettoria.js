@@ -62,6 +62,16 @@ const SUGGERITI = [
 ];
 const PREDEFINITO = SUGGERITI[0];
 /* [lon, lat], gli stessi poligoni di cometa_venti.py */
+/* ---------- Area di esclusione ----------
+   Il poligono della DINACIA e il giudizio che ne discende restano scritti
+   ma spenti: torneranno come impostazione avanzata. Rimettere a true per
+   riaccendere tutto in una volta — disegno sulla mappa 2D, mappa 3D,
+   immagine PNG, colonna dello stato ed etichette della legenda. */
+const MOSTRA_EXCL = false;
+/* Le legende e l'esito "ok" hanno due versioni: con e senza il poligono. */
+function kExcl(k){ return MOSTRA_EXCL ? k + "Excl" : k; }
+function kOk(){ return MOSTRA_EXCL ? "twOk" : "twInUru"; }
+
 const EXCL = [[-56.78,-34.55],[-56.75,-34.20],[-56.20,-34.12],[-55.74,-34.18],
   [-55.10,-34.15],[-54.60,-34.35],[-54.30,-34.62],[-54.63,-34.84],
   [-54.95,-34.97],[-55.30,-34.90],[-55.85,-34.80],[-56.20,-34.90],[-56.50,-34.78]];
@@ -404,7 +414,7 @@ function clearResults(){
   if(layer) layer.clearLayers();
   shown = null;
   if(c3()) c3().render(null, false);
-  if(elLegend){ elLegend.setAttribute("data-i18n", "twLegend"); elLegend.textContent = t("twLegend"); }
+  if(elLegend){ elLegend.setAttribute("data-i18n", kExcl("twLegend")); elLegend.textContent = t(kExcl("twLegend")); }
 }
 function saveLaunch(){
   try { localStorage.setItem(KEY, JSON.stringify(launch)); } catch(e){ /* navigazione privata */ }
@@ -649,7 +659,7 @@ function bearing(la1, lo1, la2, lo2){
 function stato(lat, lon, from){
   if(!from || !inPoly(from.lon, from.lat, URU)) return null;
   if(!inPoly(lon, lat, URU)) return "fuori";
-  if(inPoly(lon, lat, EXCL)) return "escl";
+  if(MOSTRA_EXCL && inPoly(lon, lat, EXCL)) return "escl";
   return "ok";
 }
 
@@ -764,7 +774,7 @@ function ensureMap(){
     /* schermo intero sul riquadro che contiene sia il 2D sia il 3D (elMap.parentNode):
        cambiando vista si resta a schermo intero */
     mapkit = window.COMETA_MAPKIT && window.COMETA_MAPKIT.enhance(map, L, elMap.parentNode, street, {onSave: exportPng});
-    L.polygon(EXCL.map(function(p){ return [p[1], p[0]]; }),
+    if(MOSTRA_EXCL) L.polygon(EXCL.map(function(p){ return [p[1], p[0]]; }),
               {color:"#FF7A5C", weight:1.5, fillColor:"#FF7A5C", fillOpacity:.16, interactive:false}).addTo(map);
     /* Fascia di piu' partenze: i poligoni si disegnano opachi in un pannello
        reso trasparente per intero, cosi' le sovrapposizioni non si sommano. */
@@ -789,7 +799,7 @@ function ensureMap(){
     if(window.COMETA_MAP3D) view = window.COMETA_MAP3D.attach({
       L:L, map:map, elMap:elMap, el3Class:"tw-canvas",
       create:{
-        color:COL, colorDown:COL, excl:EXCL,     /* tutta la traiettoria azzurra, anche la discesa */
+        color:COL, colorDown:COL, excl:MOSTRA_EXCL ? EXCL : null,     /* tutta la traiettoria azzurra, anche la discesa */
         onPick:function(lat, lon){ setLaunch({lat:lat, lon:lon}); },
         onDrag:function(lat, lon){ setLaunch({lat:lat, lon:lon}); },
         onSave:info3d, onSaveError:function(){ setStatus(t("twPngErr"), true); }
@@ -1100,7 +1110,7 @@ function renderBand(x){
   ok.forEach(function(r){ if(r.stato) cnt[r.stato]++; });
   const worst = cnt.fuori ? "fuori" : (cnt.escl ? "escl" : "ok");
   const ofN = function(k){ return t("twOfN").replace("{k}", k).replace("{n}", n); };
-  if(ok[0].stato) card.appendChild(el("span", "tw-badge " + worst, worst === "ok" ? t("twOk") :
+  if(ok[0].stato) card.appendChild(el("span", "tw-badge " + worst, worst === "ok" ? t(kOk()) :
     t(worst === "escl" ? "twEscl" : "twFuori") + " · " + ofN(cnt[worst])));
   const mLat = ok.reduce(function(s, r){ return s + r.end.lat; }, 0)/n;
   const mLon = ok.reduce(function(s, r){ return s + r.end.lon; }, 0)/n;
@@ -1130,7 +1140,7 @@ function renderBand(x){
 /* Mostra un risultato, singolo o fascia; noFit: non cambiare l'inquadratura */
 function show(x, noFit){
   const band = !!(x && x.band);
-  if(elLegend){ elLegend.setAttribute("data-i18n", band ? "twLegendBand" : "twLegend"); elLegend.textContent = t(band ? "twLegendBand" : "twLegend"); }
+  if(elLegend){ const k = kExcl(band ? "twLegendBand" : "twLegend"); elLegend.setAttribute("data-i18n", k); elLegend.textContent = t(k); }
   shown = x || null;
   if(band){ renderBand(x); statusDone(x.list); if(map) drawBand(x, noFit || !!(view && view.isOn())); }
   else {
@@ -1155,7 +1165,7 @@ function renderCard(r, dest){
     dest.appendChild(card); return;
   }
   if(r.stato) card.appendChild(el("span", "tw-badge " + r.stato,
-    t({ok:"twOk", escl:"twEscl", fuori:"twFuori"}[r.stato])));
+    t({ok:kOk(), escl:"twEscl", fuori:"twFuori"}[r.stato])));
   const dl = el("dl");
   [[t("twStart"),     t("twGround").replace("{m}", num(r.ground, 0))],
    [t("twLand"),      num(r.end.lat, 4) + ", " + num(r.end.lon, 4)],
@@ -1324,7 +1334,7 @@ function renderWeek(){
       tr.appendChild(el("td", null, num(r.bear, 0) + "°"));
       tr.appendChild(el("td", null, num(r.dur, 0) + " min"));
       tr.appendChild(el("td", null, num(r.burst.alt/1000, 1) + " km"));
-      tr.appendChild(r.stato ? el("td", "tw-w-" + r.stato, t({ok:"twOk", escl:"twEscl", fuori:"twFuori"}[r.stato])) : el("td", null, "—"));
+      tr.appendChild(r.stato ? el("td", "tw-w-" + r.stato, t({ok:kOk(), escl:"twEscl", fuori:"twFuori"}[r.stato])) : el("td", null, "—"));
     }
     const pick = function(){
       if(!r || !r.ok) return;
@@ -1451,9 +1461,11 @@ function exportPng(){
     };
     g.lineJoin = "round"; g.lineCap = "round";
     /* area di esclusione */
-    path(EXCL.map(function(q){ return [q[1], q[0]]; }), true);
-    g.globalAlpha = .12; g.fillStyle = LIGHT.excl; g.fill(); g.globalAlpha = .8;
-    g.lineWidth = 1.5*u; g.strokeStyle = LIGHT.excl; g.stroke(); g.globalAlpha = 1;
+    if(MOSTRA_EXCL){
+      path(EXCL.map(function(q){ return [q[1], q[0]]; }), true);
+      g.globalAlpha = .12; g.fillStyle = LIGHT.excl; g.fill(); g.globalAlpha = .8;
+      g.lineWidth = 1.5*u; g.strokeStyle = LIGHT.excl; g.stroke(); g.globalAlpha = 1;
+    }
     const x = last;
     if(x && x.band){
       /* fascia: disegnata opaca su un foglio a parte e posata trasparente, come a schermo */
