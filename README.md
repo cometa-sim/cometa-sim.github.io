@@ -80,11 +80,11 @@ Norme e autorizzazioni · Domande · Chi siamo.
 ### Dopo ogni modifica: il numero di versione
 
 In `index.html` i file di `assets/`, e la mappa, sono richiamati con un numero in
-coda — oggi `?v=202`:
+coda — oggi `?v=203`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=202">
-<script src="assets/i18n.js?v=202"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=203">
+<script src="assets/i18n.js?v=203"></script>
 ```
 
 Lo stesso numero compare anche in punti meno visibili, che vanno alzati
@@ -312,12 +312,19 @@ chi guarda, senza server nostri:
    impongono quota di scoppio e discesa: vuoti, valgono quelli del
    modello e quelli calcolati.
 2. **La partenza.** Si scrive una località (suggerimenti mentre si
-   scrive: prima l'aerodromo di Mercedes, poi i due siti dello studio,
-   Mercedes e Durazno, poi il geocoder di Open-Meteo),
+   scrive: prima l'aerodromo di Mercedes e La Calera (Minas), poi i due
+   siti dello studio, Mercedes e Durazno, poi il geocoder di Open-Meteo),
    oppure le coordinate, oppure si tocca la mappa o si usa la posizione
    del telefono. La stella sulla mappa si può trascinare. Chi arriva
    trova l'aerodromo di Mercedes (SUME, dove c'è la stazione INUMET); l'ultimo luogo scelto dal visitatore resta nel
    `localStorage` del dispositivo (chiave `cometa-partenza-v2`).
+   **Giorno e ora sono quelli del luogo di partenza**, non del browser:
+   le 11 a Mercedes sono le 11 di Mercedes per chiunque guardi. Il fuso
+   lo dà Open-Meteo (`timezone=auto`) con l'atmosfera del luogo, e
+   l'etichetta dell'ora dice lo scarto da UTC («ora locale, UTC−3»);
+   finché non arriva vale Montevideo. Anche gli orari dei risultati
+   (tocca terra alle, corsa GFS, tabella dei giorni) sono nell'ora del
+   luogo. La Diretta resta in ora di Montevideo, come `LAUNCH`.
 3. **La traiettoria.** La chiede a **Tawhiri**, il predittore di
    [SondeHub](https://sondehub.org/), sui venti dell'ultima corsa del
    modello **GFS** della NOAA. La quota di partenza non la passiamo:

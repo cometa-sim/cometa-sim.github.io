@@ -28,6 +28,12 @@
 const API = "https://api.v2.sondehub.org/tawhiri";
 const GEO = "https://geocoding-api.open-meteo.com/v1/search";
 const METEO = "https://api.open-meteo.com/v1/forecast";
+/* Giorno e ora di lancio sono quelli del luogo di partenza: le 11 a
+   Mercedes sono le 11 di Mercedes, per chiunque guardi e da dovunque.
+   Il fuso del luogo lo dice Open-Meteo (timezone=auto, nella stessa
+   richiesta dell'atmosfera: vedi fetchHourly e fusoDi); finche' non e'
+   arrivato, e per la Diretta (LAUNCH e' l'ora di Montevideo), vale TZ.
+   TZ_OFF serve solo per contare i giorni (addDays). */
 const TZ = "America/Montevideo";
 const TZ_OFF = "-03:00";            /* l'Uruguay non ha ora legale dal 2015 */
 /* Fin dove si possono scegliere le date: oggi piu' GIORNI_MAX giorni.
@@ -105,14 +111,16 @@ function t(k){
   const d = window.I18N[lang()] || window.I18N.it;
   return d[k] !== undefined ? d[k] : window.I18N.it[k];
 }
-function fmtTime(d, withDay){
-  const o = {timeZone:TZ, hour:"2-digit", minute:"2-digit", hour12:false};
+/* z: il fuso (IANA); se manca, quello della partenza scelta */
+function fmtTime(d, withDay, z){
+  const o = {timeZone:z || fuso(), hour:"2-digit", minute:"2-digit", hour12:false};
   if(withDay){ o.weekday = "short"; o.day = "numeric"; o.month = "short"; }
   return new Intl.DateTimeFormat(lang(), o).format(d);
 }
 function fmtDay(iso){
-  return new Intl.DateTimeFormat(lang(), {timeZone:TZ, weekday:"short", day:"numeric", month:"short"})
-    .format(new Date(iso + "T12:00:00" + TZ_OFF));
+  const z = fuso();
+  return new Intl.DateTimeFormat(lang(), {timeZone:z, weekday:"short", day:"numeric", month:"short"})
+    .format(inFuso(iso, "12:00", z));
 }
 function num(x, dec){
   return new Intl.NumberFormat(lang(), {minimumFractionDigits:dec, maximumFractionDigits:dec}).format(x);
@@ -249,16 +257,61 @@ let atmo = {key:null, promise:null, h:null};
 function atmoKey(pl){ return pl.lat.toFixed(2) + "," + pl.lon.toFixed(2); }
 /* L'atmosfera prevista per un luogo, ora per ora per tutta la settimana della
    previsione (null se non arriva). La usa il modulo (loadAtmo, con la cache
-   del luogo scelto) e il volo della Diretta (voloDiretta, piu' sotto). */
-function fetchHourly(pl){
+   del luogo scelto) e il volo della Diretta (voloDiretta, piu' sotto).
+   z: il fuso delle ore della risposta; "auto" (il modulo) e' quello del
+   luogo, e Open-Meteo lo restituisce in h.fuso. */
+function fetchHourly(pl, z){
   const hourly = [];
   LIVELLI.forEach(function(l){ hourly.push("temperature_" + l + "hPa", "geopotential_height_" + l + "hPa"); });
   hourly.push("temperature_2m", "surface_pressure");        /* per il gonfiaggio */
   const q = new URLSearchParams({latitude:pl.lat.toFixed(4), longitude:pl.lon.toFixed(4),
-    hourly:hourly.join(","), timezone:TZ, start_date:today, end_date:lastDay});
+    hourly:hourly.join(","), timezone:z || "auto", start_date:today, end_date:lastDay});
   return fetch(METEO + "?" + q.toString())
     .then(function(r){ return r.ok ? r.json() : null; })
-    .then(function(d){ return d && d.hourly ? d.hourly : null; }, function(){ return null; });
+    .then(function(d){
+      if(!d || !d.hourly) return null;
+      d.hourly.fuso = d.timezone && fusoValido(d.timezone) ? d.timezone : null;
+      return d.hourly;
+    }, function(){ return null; });
+}
+function fusoValido(z){
+  try { new Intl.DateTimeFormat("en", {timeZone:z}); return true; } catch(e){ return false; }
+}
+/* Il fuso di un luogo di partenza: quello che ha detto Open-Meteo con
+   l'atmosfera, se e' arrivata, altrimenti Montevideo. fuso(): quello della
+   partenza scelta. */
+function fusoDi(pl){
+  return pl && atmo.key === atmoKey(pl) && atmo.h && atmo.h.fuso || TZ;
+}
+function fuso(){ return fusoDi(launch); }
+/* Quanti ms il fuso z e' avanti rispetto a UTC all'istante t */
+function scartoFuso(t, z){
+  const p = {};
+  new Intl.DateTimeFormat("en-US", {timeZone:z, hourCycle:"h23", year:"numeric", month:"2-digit", day:"2-digit",
+    hour:"2-digit", minute:"2-digit", second:"2-digit"}).formatToParts(t).forEach(function(x){ p[x.type] = x.value; });
+  return Date.UTC(+p.year, +p.month - 1, +p.day, +p.hour, +p.minute, +p.second) - (t - t % 1000);
+}
+/* L'istante in cui nel fuso z sono le hhmm del giorno iso (con l'ora legale,
+   dove c'e': lo scarto si ricalcola sull'istante trovato) */
+function inFuso(iso, hhmm, z){
+  const w = Date.UTC(+iso.slice(0, 4), +iso.slice(5, 7) - 1, +iso.slice(8, 10), +hhmm.slice(0, 2), +hhmm.slice(3, 5));
+  let t = w - scartoFuso(w, z);
+  t = w - scartoFuso(t, z);
+  return new Date(t);
+}
+/* "UTC−3", "UTC+5:30", "UTC" */
+function etichettaUtc(t, z){
+  const m = Math.round(scartoFuso(t.getTime(), z)/60000);
+  if(!m) return "UTC";
+  const a = Math.abs(m);
+  return "UTC" + (m < 0 ? "−" : "+") + Math.floor(a/60) + (a % 60 ? ":" + String(a % 60).padStart(2, "0") : "");
+}
+/* L'etichetta dell'ora: dice in che fuso si sta scrivendo */
+function etichettaOra(){
+  const e = $("#twTimeL");
+  if(!e) return;
+  const z = fuso(), quando = launchAt(elDate.value || today, elTime.value || "11:00");
+  e.textContent = t("twTime").replace("{utc}", etichettaUtc(quando, z));
 }
 function loadAtmo(pl){
   if(!pl) return Promise.resolve(null);
@@ -385,6 +438,8 @@ function fcWarn(r){
   const na = r && r.fc && r.fc.na;
   if(zero || na) elWarn.appendChild(el("li", "tw-fc", t(zero ? "twFcZero" : "twFcNa")));
 }
+/* lo scarto da UTC puo' cambiare col giorno, dove c'e' l'ora legale */
+[elDate, elTime].forEach(function(e){ e.addEventListener("input", etichettaOra); });
 [elBal, elDiam, elMass, elPay, elAsc, elCyl, elPCyl, elTGonf, elChute, elBurst, elDesc, elDate, elTime, elFcOn].forEach(function(e){
   if(e) e.addEventListener("input", renderBalloon);
 });
@@ -437,7 +492,8 @@ function setLaunch(pl, keepText, noSave){
   if(!noSave) saveLaunch();            /* si ricorda solo cio' che ha scelto il visitatore */
   closeSugg();
   if(map) placeLaunchMarker(true);
-  loadAtmo(launch).then(renderBalloon);
+  etichettaOra();
+  loadAtmo(launch).then(function(){ etichettaOra(); renderBalloon(); });
   loadWeather(launch);
 }
 
@@ -493,7 +549,7 @@ function loadWeather(pl){
   const q = new URLSearchParams({
     latitude: pl.lat.toFixed(4), longitude: pl.lon.toFixed(4),
     hourly: "temperature_2m,cloud_cover,cloud_cover_low,cloud_cover_mid,cloud_cover_high,wind_speed_10m,wind_gusts_10m,precipitation_probability",
-    start_date: iso, end_date: iso, timezone: TZ
+    start_date: iso, end_date: iso, timezone: "auto"      /* ore del luogo, come giorno e ora scelti */
   });
   fetch(METEO + "?" + q.toString())
     .then(function(r){ return r.ok ? r.json() : null; })
@@ -609,8 +665,8 @@ elGeo.addEventListener("click", function(){
 });
 
 /* ---------- Date: il calendario e' quello di Montevideo ---------- */
-function isoDay(d){
-  return new Intl.DateTimeFormat("en-CA", {timeZone:TZ, year:"numeric", month:"2-digit", day:"2-digit"}).format(d);
+function isoDay(d, z){
+  return new Intl.DateTimeFormat("en-CA", {timeZone:z || TZ, year:"numeric", month:"2-digit", day:"2-digit"}).format(d);
 }
 function addDays(iso, n){
   const d = new Date(iso + "T12:00:00" + TZ_OFF);
@@ -687,7 +743,9 @@ function predict(pl, whenUTC, p){
       if(!r.ok || d.error){
         throw new Error((d.error && d.error.description) || ("HTTP " + r.status));
       }
-      return parse(pl, d);
+      const res = parse(pl, d);
+      res.tz = fusoDi(pl);
+      return res;
     });
   }, function(){ throw new Error(t("twNoNet")); });
 }
@@ -733,13 +791,13 @@ function loadLeaflet(){
      parallelo con leaflet.js. */
   const mapkit = window.COMETA_MAPKIT ? Promise.resolve() : new Promise(function(ok, ko){
     const s = document.createElement("script");
-    s.src = "assets/mapkit.js?v=202";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
+    s.src = "assets/mapkit.js?v=203";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
     s.onload = ok; s.onerror = ko;
     document.head.appendChild(s);
   });
   const map3d = window.COMETA_MAP3D ? Promise.resolve() : new Promise(function(ok){
     const s = document.createElement("script");
-    s.src = "assets/map3d.js?v=202";
+    s.src = "assets/map3d.js?v=203";
     s.onload = ok; s.onerror = ok;       /* senza, resta il 2D e basta */
     document.head.appendChild(s);
   });
@@ -834,8 +892,8 @@ function info3d(){
     const ok = x.list.filter(function(r){ return r.ok; });
     title += " · " + t("twNFlights").toLowerCase() + " " + ok.length;
   } else if(x && x.ok){
-    title += " · " + fmtTime(x.pts[0].t, true) + (x.run ? " · GFS " + fmtTime(x.run, true) : "");
-    day = isoDay(x.pts[0].t);
+    title += " · " + fmtTime(x.pts[0].t, true, x.tz) + (x.run ? " · GFS " + fmtTime(x.run, true, x.tz) : "");
+    day = isoDay(x.pts[0].t, x.tz);
     lines.push(t("twDrift") + " " + num(x.drift, 0) + " km · " + t("twBear") + " " + num(x.bear, 0) + "° · " +
       t("twBurstC") + " " + num(x.burst.alt/1000, 1) + " km · " + t("twDur") + " " + num(x.dur, 0) + " min");
     lines.push(t("twLand") + " " + num(x.end.lat, 4) + ", " + num(x.end.lon, 4) + " · Tawhiri (SondeHub) · NOAA GFS");
@@ -865,7 +923,7 @@ function scene3d(x){
   if(!x.ok) return null;
   const sc = {
     runs:[x], main:true, fills:[], lines:[],
-    labels:{burst:t("twBurstC") + " " + num(x.burst.alt/1000, 1) + " km", land:t("twLand") + " " + fmtTime(x.end.t, false)}
+    labels:{burst:t("twBurstC") + " " + num(x.burst.alt/1000, 1) + " km", land:t("twLand") + " " + fmtTime(x.end.t, false, x.tz)}
   };
   if(x.spread){
     const g = x.spread, VI = "#A98CFF";
@@ -901,7 +959,7 @@ function draw(r, noFit){
   L.circleMarker([r.burst.lat, r.burst.lon], {radius:5, color:COL, weight:2, fillColor:"#fff", fillOpacity:1, bubblingMouseEvents:false})
     .bindTooltip(t("twBurstC") + " " + num(r.burst.alt/1000, 1) + " km").addTo(layer);
   L.circleMarker([r.end.lat, r.end.lon], {radius:8, color:"#02060f", weight:2, fillColor:"#FFB84D", fillOpacity:1, bubblingMouseEvents:false})
-    .bindTooltip(t("twLand") + " " + fmtTime(r.end.t, false)).addTo(layer);
+    .bindTooltip(t("twLand") + " " + fmtTime(r.end.t, false, r.tz)).addTo(layer);
   const bb = L.latLngBounds(up.concat(down));
   bb.extend([r.from.lat, r.from.lon]);
   if(r.spread){       /* area (o linea) di atterraggio: un solo colore */
@@ -1178,7 +1236,7 @@ function renderCard(r, dest){
    [t("twBear"),      num(r.bear, 0) + "°"],
    [t("twTBurst"),    num(r.tBurst, 0) + " min"],
    [t("twDur"),       num(r.dur, 0) + " min"],
-   [t("twAt"),        fmtTime(r.end.t, false)],
+   [t("twAt"),        fmtTime(r.end.t, false, r.tz)],
    [t("twBurstDist"), num(r.burstDist, 0) + " km"],
    [t("twBurstC"),    num(r.burst.alt/1000, 1) + " km"]
   /* con il solo errore di previsione l'estensione e' il diametro del
@@ -1205,9 +1263,10 @@ function setStatus(txt, isErr){
 }
 function statusDone(results){
   const ok = results.filter(function(r){ return r && r.ok && r.run; });
-  setStatus(ok.length ? t("twDone").replace("{run}", fmtTime(ok[0].run, true)) : "");
+  setStatus(ok.length ? t("twDone").replace("{run}", fmtTime(ok[0].run, true, ok[0].tz)) : "");
 }
-function launchAt(iso, hhmm){ return new Date(iso + "T" + hhmm + ":00" + TZ_OFF); }
+/* pl: il luogo di partenza (di solito quello scelto), per il suo fuso */
+function launchAt(iso, hhmm, pl){ return inFuso(iso, hhmm, fusoDi(pl || launch)); }
 const MAX_VOLI = 48;
 function aMin(s){ return parseInt(s.slice(0, 2), 10)*60 + parseInt(s.slice(3, 5), 10); }
 function aHhmm(m){ return String(Math.floor(m/60)).padStart(2, "0") + ":" + String(m % 60).padStart(2, "0"); }
@@ -1263,10 +1322,10 @@ form.addEventListener("submit", function(e){
   const LL = launchList();
   if(LL.err){ setStatus(t(LL.err).replace("{n}", LL.n).replace("{m}", MAX_VOLI), true); return; }
   if(LL.list.length > 1){ runBand(launch, LL.list); return; }
-  const pl = launch, iso = elDate.value, hhmm = elTime.value, when = launchAt(iso, hhmm);
+  const pl = launch, iso = elDate.value, hhmm = elTime.value;
   setStatus(t("twLoading"));
   Promise.all([ensureMap(), loadAtmo(pl).then(function(){
-    const p = flightParams(iso, hhmm);
+    const p = flightParams(iso, hhmm), when = launchAt(iso, hhmm, pl);     /* il fuso del luogo arriva con l'atmosfera */
     /* Area di atterraggio: la stessa partenza con il diametro di scoppio a
        d(1±sB), la velocita' di salita a v(1±sA) e quella di discesa a
        v(1±sD), tutte le combinazioni degli estremi; fino a nove voli. */
@@ -1310,7 +1369,7 @@ function runBand(pl, list){
   function next(){
     if(i >= list.length) return Promise.resolve();
     const j = list[i++], p = flightParams(j.iso, j.hhmm);
-    return predict(pl, launchAt(j.iso, j.hhmm), p)
+    return predict(pl, launchAt(j.iso, j.hhmm, pl), p)
       .then(function(r){ r.atmo = p.atmo; return r; }, function(e){ return {ok:false, from:pl, err:e.message}; })
       .then(function(r){ out.push(r); prog(); return next(); });
   }
@@ -1360,7 +1419,7 @@ elWeekBtn.addEventListener("click", function(){
   const days = [];
   for(let k = 0; k <= GIORNI_MAX; k++){
     const iso = addDays(today, k);
-    if(launchAt(iso, hhmm) < new Date()) continue;          /* gia' passato */
+    if(launchAt(iso, hhmm, pl) < new Date()) continue;      /* gia' passato */
     week[iso] = null; days.push(iso);
   }
   elWeekBox.hidden = false; renderWeek();
@@ -1372,7 +1431,7 @@ elWeekBtn.addEventListener("click", function(){
     if(i >= days.length) return Promise.resolve();
     const iso = days[i++];
     const p = flightParams(iso, hhmm);                     /* ogni giorno la sua atmosfera */
-    return predict(pl, launchAt(iso, hhmm), p)
+    return predict(pl, launchAt(iso, hhmm, pl), p)
       .then(function(r){ r.atmo = p.atmo; return r; })
       .catch(function(e){ return {ok:false, from:pl, err:e.message}; })
       .then(function(r){ week[iso] = r; renderWeek(); return next(); });
@@ -1421,7 +1480,7 @@ function exportPng(){
      bugia. Lo specchietto del meteo e' invece una previsione per il
      giorno e l'ora scelti, e vale sempre. */
   const ov = mapkit && mapkit.overlay ? mapkit.overlay() : null;
-  const ovTiles = !!(ov && elDate.value === isoDay(new Date()));
+  const ovTiles = !!(ov && elDate.value === isoDay(new Date(), fuso()));
   const size = map.getSize(), z0 = map.getZoom();
   /* Immagine sempre larga almeno OUT_W pixel (fattore S rispetto allo
      schermo). Le mattonelle salgono di zoom quanto basta, ma senza
@@ -1577,7 +1636,7 @@ function exportPng(){
     g.fillStyle = LIGHT.ink; g.textBaseline = "alphabetic"; g.font = "600 " + 17*u + "px 'Space Grotesk', Inter, system-ui, sans-serif";
     let title = "COMETA · " + (launch ? launch.name : "");
     if(x && x.band) title += " · " + t("twNFlights").toLowerCase() + " " + x.list.filter(function(r){ return r.ok; }).length;
-    else if(x && x.ok) title += " · " + fmtTime(x.pts[0].t, true) + (x.run ? " · GFS " + fmtTime(x.run, true) : "");
+    else if(x && x.ok) title += " · " + fmtTime(x.pts[0].t, true, x.tz) + (x.run ? " · GFS " + fmtTime(x.run, true, x.tz) : "");
     g.fillText(title, 18*u, H + 30*u);
     g.fillStyle = LIGHT.muted; g.font = 12.5*u + "px Inter, system-ui, sans-serif";
     lines.forEach(function(l, i){ g.fillText(l, 18*u, H + (53 + 19*i)*u); });
@@ -1600,7 +1659,7 @@ function exportPng(){
       try {
         cv.toBlob(function(blob){
           if(!blob){ setStatus(t("twPngErr"), true); return; }
-          const a = document.createElement("a"), day = x && x.ok ? isoDay(x.pts[0].t) : elDate.value;
+          const a = document.createElement("a"), day = x && x.ok ? isoDay(x.pts[0].t, x.tz) : elDate.value;
           a.download = "cometa-traiettoria-" + (launch ? launch.name : "mappa").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") + "-" + day + ".png";
           a.href = URL.createObjectURL(blob);
           document.body.appendChild(a); a.click(); a.remove();
@@ -1615,6 +1674,7 @@ function exportPng(){
 /* ---------- Cambio di lingua: si riscrive quello che e' gia' a schermo ---------- */
 function relabel(){
   elWhere.placeholder = t("twWherePh");
+  etichettaOra();
   renderBalloon();
   if(view) view.relabel();
   updateMulti();
@@ -1651,7 +1711,7 @@ function voloDiretta(){
   if(!V || !(asc > 0)) return;                       /* dati impossibili: restano quelli di riserva */
   const iso = isoDay(L0);
   const hhmm = new Intl.DateTimeFormat("en-GB", {timeZone:TZ, hour:"2-digit", minute:"2-digit", hour12:false}).format(L0);
-  fetchHourly(F.site).then(function(h){
+  fetchHourly(F.site, TZ).then(function(h){
     const col = dayColumn(h, iso, hhmm, F.site.lat);
     F.ascentMs = asc;
     F.burstKm = (col ? quotaScoppioCol(V, pr.diam, col) : quotaScoppio(V, pr.diam))/1000;
@@ -1677,6 +1737,7 @@ window.COMETA_TRAIETTORIA = {
     try { r = parse(F.site, raw); } catch(e){ dest.innerHTML = ""; return; }
     r.atmo = o && o.atmo;
     r.fc = o && o.fc;
+    r.tz = TZ;                          /* LAUNCH e' l'ora di Montevideo */
     renderCard(r, dest);
   }
 };
