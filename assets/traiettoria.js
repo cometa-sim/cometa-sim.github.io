@@ -57,15 +57,14 @@ const CURVA_NMIN = 8;               /* classi con meno campioni non si usano */
    come se l'avesse scelta il visitatore; con una chiave nuova si riparte */
 const KEY = "cometa-partenza-v2";
 
-/* I due siti dello studio: proposti per primi fra i suggerimenti */
-/* La partenza proposta e' l'aerodromo di Mercedes (SUME, Ricardo
-   Detomasi), dove c'e' la stazione di INUMET: punto di riferimento
-   dell'aerodromo, 33°14'55"S 58°04'25"W, 21 m. La Calera, vicino a
-   Minas, e' la partenza che propone DINACIA: e' fra i suggerimenti,
-   cosi' si trova scrivendo "Minas" o "Calera". */
+/* La partenza proposta e' La Calera, vicino a Minas, dove la DINACIA ci
+   chiede di lanciare (lo stesso FLIGHT_SITE di assets/volo.js). Poi
+   l'aerodromo di Mercedes (SUME, Ricardo Detomasi), dove c'e' la stazione
+   di INUMET: punto di riferimento dell'aerodromo, 33°14'55"S 58°04'25"W,
+   21 m; e i due siti dello studio. */
 const SUGGERITI = [
+  {name:"La Calera · Minas",    lat:-34.2919, lon:-55.3531, note:"twDinacia"},
   {name:"Mercedes · aeródromo", lat:-33.2486, lon:-58.0736, note:"twInumet"},
-  {name:"La Calera · Minas",    lat:-34.2919, lon:-55.3531},
   {name:"Mercedes (Soriano)",   lat:-33.249,  lon:-58.030,  studied:true},
   {name:"Durazno",              lat:-33.380,  lon:-56.520,  studied:true}
 ];
@@ -689,7 +688,7 @@ if(elToDay){ elToDay.min = today; elToDay.max = lastDay; }
     elDate.value = addDays(today, 1);
   }
   /* Si parte dall'ultimo luogo scelto su questo dispositivo, altrimenti
-     dall'aerodromo di Mercedes: con i valori proposti il calcolo
+     da La Calera (Minas): con i valori proposti il calcolo
      funziona subito, e il luogo si cambia scrivendo sopra. */
   const saved = loadLaunch();
   if(saved) setLaunch(saved); else setLaunch(PREDEFINITO, false, true);
@@ -793,13 +792,13 @@ function loadLeaflet(){
      parallelo con leaflet.js. */
   const mapkit = window.COMETA_MAPKIT ? Promise.resolve() : new Promise(function(ok, ko){
     const s = document.createElement("script");
-    s.src = "assets/mapkit.js?v=204";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
+    s.src = "assets/mapkit.js?v=205";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
     s.onload = ok; s.onerror = ko;
     document.head.appendChild(s);
   });
   const map3d = window.COMETA_MAP3D ? Promise.resolve() : new Promise(function(ok){
     const s = document.createElement("script");
-    s.src = "assets/map3d.js?v=204";
+    s.src = "assets/map3d.js?v=205";
     s.onload = ok; s.onerror = ok;       /* senza, resta il 2D e basta */
     document.head.appendChild(s);
   });

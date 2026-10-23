@@ -17,7 +17,7 @@
    ========================================================== */
 /* Ora locale di Montevideo (UTC-3). Scritta cosi', il conto alla rovescia
    e' identico per un visitatore di Montevideo, di Roma o di Malargue. */
-const LAUNCH = new Date("2026-10-28T11:00:00-03:00");
+const LAUNCH = new Date("2026-10-29T09:00:00-03:00");
 /* La previsione del giorno (assets/traiettoria.js) propone questo giorno
    e quest'ora, quando cadono dentro la settimana coperta dal GFS. */
 window.COMETA_LAUNCH = LAUNCH;
@@ -34,7 +34,7 @@ window.COMETA_LAUNCH = LAUNCH;
    veloce, e rallenta scendendo — lo stesso motivo per cui qui e' "al
    suolo" e non "di discesa" e basta. FLIGHT_SITE e' il punto di partenza
    usato per la traiettoria prevista disegnata in diretta — lo stesso
-   aerodromo di Mercedes che la pagina Traiettoria propone di default
+   luogo (La Calera, Minas) che la pagina Traiettoria propone di default
    (SUGGERITI[0] in assets/traiettoria.js): e' una costante a parte,
    invece di leggerla dal modulo di quella pagina, apposta — cosi' non
    dipende da cosa un visitatore potrebbe aver cambiato lì per curiosita'.
@@ -44,13 +44,14 @@ window.COMETA_LAUNCH = LAUNCH;
 const FLIGHT_BURST_KM = 37.9;
 const FLIGHT_ASCENT_MS = 5;
 const FLIGHT_DESCENT_V0_MS = 4.6;
-/* Il punto di partenza. Per ora e' il centro dell'aerodromo di Mercedes
-   (il punto di riferimento di SUME); il giorno del lancio si sostituisce
+/* Il punto di partenza: La Calera, vicino a Minas, dove la DINACIA ci
+   chiede di lanciare (prima era l'aerodromo di Mercedes, -33.2486,
+   -58.0736). Il giorno del lancio si sostituisce
    con la posizione esatta presa sul posto, con un commit: la traiettoria
    prevista della Diretta e della stazione si ricalcola da sola, al
    caricamento e ogni 20 minuti. Il nome compare in testa alla scheda
    della previsione, sotto il meteo della Diretta. */
-const FLIGHT_SITE = {name: "Mercedes · aeródromo", lat: -33.2486, lon: -58.0736};
+const FLIGHT_SITE = {name: "La Calera · Minas", lat: -34.2919, lon: -55.3531};
 /* I dati del volo vero, da aggiornare con un commit quando si misurano:
    il payload si pesa prima del lancio, la portanza al collo si legge
    durante il gonfiaggio (in grammi; null finche' non c'e', e allora vale

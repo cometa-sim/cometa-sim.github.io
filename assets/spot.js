@@ -94,11 +94,11 @@ window.COMETA_SPOT = (function(){
      cosi' c'e' un solo posto dove aggiornarli il giorno del lancio.
      descentV0Ms e' la velocita' del paracadute AL SUOLO: piu' in alto
      scende molto piu' veloce (vedi densityISA sotto). site e' il punto di
-     partenza previsto per la traiettoria grigia: lo stesso di default
-     della pagina Traiettoria (aerodromo di Mercedes), non quello che un
+     partenza previsto per la traiettoria prevista: lo stesso di default
+     della pagina Traiettoria (La Calera, Minas), non quello che un
      visitatore potrebbe aver cambiato giocando col modulo di quella pagina. */
   function flightCfg(){
-    return window.COMETA_FLIGHT || {burstKm:37.9, ascentMs:5, descentV0Ms:4.6, site:{lat:-33.2486, lon:-58.0736}};
+    return window.COMETA_FLIGHT || {burstKm:37.9, ascentMs:5, descentV0Ms:4.6, site:{name:"La Calera · Minas", lat:-34.2919, lon:-55.3531}};
   }
 
   /* Atmosfera standard (ISA) — stessa formula di densitaISA() in
@@ -218,13 +218,13 @@ window.COMETA_SPOT = (function(){
     });
     const mapkit = window.COMETA_MAPKIT ? Promise.resolve() : new Promise(function(ok, ko){
       const s = document.createElement("script");
-      s.src = "assets/mapkit.js?v=204";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
+      s.src = "assets/mapkit.js?v=205";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
       s.onload = ok; s.onerror = ko;
       document.head.appendChild(s);
     });
     const map3d = window.COMETA_MAP3D ? Promise.resolve() : new Promise(function(ok){
       const s = document.createElement("script");
-      s.src = "assets/map3d.js?v=204";
+      s.src = "assets/map3d.js?v=205";
       s.onload = ok; s.onerror = ok;     // senza, resta il 2D e basta
       document.head.appendChild(s);
     });
