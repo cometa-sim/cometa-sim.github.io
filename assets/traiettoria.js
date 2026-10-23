@@ -484,6 +484,8 @@ function loadLaunch(){
   } catch(e){ /* niente di salvato */ }
   return null;
 }
+/* Le coordinate sempre col punto, in ogni lingua: con la virgola decimale
+   "-33,2906, -56,1416" si legge male, e cosi' si incollano in una mappa o in un GPS */
 function coordLabel(lat, lon){ return lat.toFixed(4) + ", " + lon.toFixed(4); }
 function setLaunch(pl, keepText, noSave){
   if(last && (last.from.lat !== pl.lat || last.from.lon !== pl.lon)) clearResults();
@@ -791,13 +793,13 @@ function loadLeaflet(){
      parallelo con leaflet.js. */
   const mapkit = window.COMETA_MAPKIT ? Promise.resolve() : new Promise(function(ok, ko){
     const s = document.createElement("script");
-    s.src = "assets/mapkit.js?v=203";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
+    s.src = "assets/mapkit.js?v=204";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
     s.onload = ok; s.onerror = ko;
     document.head.appendChild(s);
   });
   const map3d = window.COMETA_MAP3D ? Promise.resolve() : new Promise(function(ok){
     const s = document.createElement("script");
-    s.src = "assets/map3d.js?v=203";
+    s.src = "assets/map3d.js?v=204";
     s.onload = ok; s.onerror = ok;       /* senza, resta il 2D e basta */
     document.head.appendChild(s);
   });
@@ -896,7 +898,7 @@ function info3d(){
     day = isoDay(x.pts[0].t, x.tz);
     lines.push(t("twDrift") + " " + num(x.drift, 0) + " km · " + t("twBear") + " " + num(x.bear, 0) + "° · " +
       t("twBurstC") + " " + num(x.burst.alt/1000, 1) + " km · " + t("twDur") + " " + num(x.dur, 0) + " min");
-    lines.push(t("twLand") + " " + num(x.end.lat, 4) + ", " + num(x.end.lon, 4) + " · Tawhiri (SondeHub) · NOAA GFS");
+    lines.push(t("twLand") + " " + coordLabel(x.end.lat, x.end.lon) + " · Tawhiri (SondeHub) · NOAA GFS");
   }
   return {title:title, lines:lines,
     weatherHead:fmtTime(launchAt(elDate.value, elTime.value || "11:00"), true),
@@ -1231,7 +1233,7 @@ function renderCard(r, dest){
     t({ok:kOk(), escl:"twEscl", fuori:"twFuori"}[r.stato])));
   const dl = el("dl");
   [[t("twStart"),     t("twGround").replace("{m}", num(r.ground, 0))],
-   [t("twLand"),      num(r.end.lat, 4) + ", " + num(r.end.lon, 4)],
+   [t("twLand"),      coordLabel(r.end.lat, r.end.lon)],
    [t("twDrift"),     num(r.drift, 0) + " km"],
    [t("twBear"),      num(r.bear, 0) + "°"],
    [t("twTBurst"),    num(r.tBurst, 0) + " min"],
