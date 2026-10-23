@@ -54,9 +54,12 @@ const KEY = "cometa-partenza-v2";
 /* I due siti dello studio: proposti per primi fra i suggerimenti */
 /* La partenza proposta e' l'aerodromo di Mercedes (SUME, Ricardo
    Detomasi), dove c'e' la stazione di INUMET: punto di riferimento
-   dell'aerodromo, 33°14'55"S 58°04'25"W, 21 m. */
+   dell'aerodromo, 33°14'55"S 58°04'25"W, 21 m. La Calera, vicino a
+   Minas, e' la partenza che propone DINACIA: e' fra i suggerimenti,
+   cosi' si trova scrivendo "Minas" o "Calera". */
 const SUGGERITI = [
   {name:"Mercedes · aeródromo", lat:-33.2486, lon:-58.0736, note:"twInumet"},
+  {name:"La Calera · Minas",    lat:-34.2919, lon:-55.3531},
   {name:"Mercedes (Soriano)",   lat:-33.249,  lon:-58.030,  studied:true},
   {name:"Durazno",              lat:-33.380,  lon:-56.520,  studied:true}
 ];
@@ -730,13 +733,13 @@ function loadLeaflet(){
      parallelo con leaflet.js. */
   const mapkit = window.COMETA_MAPKIT ? Promise.resolve() : new Promise(function(ok, ko){
     const s = document.createElement("script");
-    s.src = "assets/mapkit.js?v=201";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
+    s.src = "assets/mapkit.js?v=202";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
     s.onload = ok; s.onerror = ko;
     document.head.appendChild(s);
   });
   const map3d = window.COMETA_MAP3D ? Promise.resolve() : new Promise(function(ok){
     const s = document.createElement("script");
-    s.src = "assets/map3d.js?v=201";
+    s.src = "assets/map3d.js?v=202";
     s.onload = ok; s.onerror = ok;       /* senza, resta il 2D e basta */
     document.head.appendChild(s);
   });
