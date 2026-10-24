@@ -944,15 +944,23 @@ footer{border-top:1px solid var(--line-soft);padding:56px 0 66px;background:rgba
    orizzontale, non impilati. Le altezze sono diverse di proposito
    — lo stemma è alto e stretto, il logo COMETA largo e con molto
    spazio interno: pareggiate otticamente, non in pixel. */
-.crest-pair{display:flex;align-items:center;gap:22px;flex-wrap:wrap}
-.crest-pair .crest{height:46px;width:auto}
-.crest-pair .crest-cometa{height:62px;width:auto;opacity:.9;
-  mix-blend-mode:screen;filter:none}
+/* Fondo pagina: i due marchi incolonnati, COMETA sopra e i 140 anni della
+   Scuola sotto, allineati a sinistra. Alla stessa larghezza il marchio
+   della Scuola pesava troppo — e' lungo e fitto, e reggeva il confronto
+   invece di stare un passo indietro: sta al 79 % (150 px contro 190), che
+   lascia la precedenza a COMETA e tiene ancora leggibili le tre righe di
+   testo. Piu' giu' non si puo' scendere senza perderle.
+   Niente ombra portata: quel testo e' bianco e sottile, e l'ombra lo
+   impasta. */
+.crest-pair{display:flex;flex-direction:column;align-items:flex-start;gap:14px}
+.crest-pair .crest{height:auto;display:block;filter:none}
+.crest-pair .crest-cometa{width:190px;opacity:1;mix-blend-mode:screen}   /* screen: il marchio porta un campo di stelle scuro, che cosi sparisce nel fondo */
+.crest-pair .crest-sim{width:150px}
 
 @media(max-width:520px){
-  .crest-pair{gap:16px}
-  .crest-pair .crest{height:40px}
-  .crest-pair .crest-cometa{height:54px}
+  .crest-pair{gap:12px}
+  .crest-pair .crest-cometa{width:162px}
+  .crest-pair .crest-sim{width:128px}
 }
 
 /* Figure con didascalia (mappa della zona di esclusione) */

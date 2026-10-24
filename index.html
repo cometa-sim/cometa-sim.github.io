@@ -23,7 +23,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@200;300;400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/cometa.css?v=206">
+<link rel="stylesheet" href="assets/cometa.css?v=209">
 </head>
 <body>
 
@@ -149,7 +149,6 @@
             <rect x="107" y="371" width="26" height="4.5" rx="2" fill="#E7EDF2"/>
             <circle cx="120" cy="384" r="3.4" fill="#0D1319"/>
             <circle cx="120" cy="384" r="1.3" fill="#2C3A47"/>
-            <line x1="131" y1="371" x2="137" y2="361" stroke="#8a97a6" stroke-width="1"/>
           </g>
         </svg>
       </div>
@@ -410,6 +409,7 @@
         <p data-i18n-html="msE0b"></p>
         <p data-i18n-html="msE3"></p>
         <p data-i18n-html="msE5"></p>
+        <p data-i18n-html="msE6"></p>
         <p data-i18n-html="msNot1"></p>
       </div>
     </div>
@@ -472,14 +472,14 @@
            Il pallone qui sopra li conta da solo: non c'e' nessun numero da aggiornare a mano. -->
       <ol class="prog reveal d1">
         <li class="pg-done"><span class="pg-state" data-i18n="pgDone">Fatto</span><h3 data-i18n="pg1t"></h3><p data-i18n="pg1"></p></li>
+        <li class="pg-done"><span class="pg-state" data-i18n="pgDone">Fatto</span><h3 data-i18n="pg2t"></h3><p data-i18n="pg2"></p></li>
         <li class="pg-done"><span class="pg-state" data-i18n="pgDone">Fatto</span><h3 data-i18n="pg3t"></h3><p data-i18n="pg3"></p></li>
         <li class="pg-done"><span class="pg-state" data-i18n="pgDone">Fatto</span><h3 data-i18n="pg4t"></h3><p data-i18n="pg4"></p></li>
         <li class="pg-done"><span class="pg-state" data-i18n="pgDone">Fatto</span><h3 data-i18n="pg6t"></h3><p data-i18n="pg6"></p></li>
-        <li class="pg-wip"><span class="pg-state" data-i18n="pgWip">In corso</span><h3 data-i18n="pg2t"></h3><p data-i18n="pg2"></p></li>
+        <li class="pg-done"><span class="pg-state" data-i18n="pgDone">Fatto</span><h3 data-i18n="pg7t"></h3><p data-i18n="pg7"></p></li>
         <li class="pg-wip"><span class="pg-state" data-i18n="pgWip">In corso</span><h3 data-i18n="pg5t"></h3><p data-i18n="pg5"></p></li>
         <li class="pg-wip"><span class="pg-state" data-i18n="pgWip">In corso</span><h3 data-i18n="pg9t"></h3><p data-i18n="pg9"></p></li>
         <li class="pg-wip"><span class="pg-state" data-i18n="pgWip">In corso</span><h3 data-i18n="pg10t"></h3><p data-i18n="pg10"></p></li>
-        <li class="pg-wip"><span class="pg-state" data-i18n="pgWip">In corso</span><h3 data-i18n="pg7t"></h3><p data-i18n="pg7"></p></li>
         <li class="pg-wip"><span class="pg-state" data-i18n="pgWip">In corso</span><h3 data-i18n="pg8t"></h3><p data-i18n="pg8"></p></li>
         <li class="pg-todo"><span class="pg-state" data-i18n="pgTodo">Da fare</span><h3 data-i18n="pg11t"></h3><p data-i18n="pg11"></p></li>
         <li class="pg-todo"><span class="pg-state" data-i18n="pgTodo">Da fare</span><h3 data-i18n="pg12t"></h3><p data-i18n="pg12"></p></li>
@@ -623,7 +623,7 @@
   <section class="section" style="padding-top:24px">
     <div class="wrap">
       <div class="sonda-top">
-        <p style="font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint)">KLO-01 · 165 × 165 × 140 mm · 29 <span data-i18n="uParts">pezzi</span></p>
+        <p style="font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint)">KLO-01 · 165 × 165 × 140 mm · 25 <span data-i18n="uParts">pezzi</span></p>
         <div class="seg" role="group" aria-label="Banco / Volo">
           <button id="mBanco" class="on" aria-pressed="true" type="button" data-i18n="modeBench">Banco</button>
           <button id="mVolo" aria-pressed="false" type="button" data-i18n="modeFlight">Volo</button>
@@ -653,7 +653,7 @@
             <button class="tog on" id="togPins" aria-pressed="true" type="button" data-i18n="ctlPins">Numeri</button>
             <button class="tog on" id="togWad" aria-pressed="true" type="button" data-i18n="ctlWad">Ovatta</button>
           </div>
-          <p id="ctlVolo" style="display:none;margin-top:14px;color:var(--muted);font-size:15px" data-i18n="flightNote">Sonda chiusa, con ali di stabilizzazione, braccetto esterno e tubo di confronto.</p>
+          <p id="ctlVolo" style="display:none;margin-top:14px;color:var(--muted);font-size:15px" data-i18n="flightNote">Sonda chiusa, con le alette di stabilizzazione: in cima all'ala +Y il PT1000 esterno, in cima all'ala −Y il sensore di umidità.</p>
         </div>
 
         <div>
@@ -672,7 +672,7 @@
 <section class="page" id="page-venti">
   <div class="wrap page-hero">
     <div class="kicker reveal" data-i18n="wKicker">Fase 1 · Studio preliminare</div>
-    <h1 class="ttl reveal d1" data-i18n="windsTitle">Dove va a finire la sonda</h1>
+    <h1 class="ttl reveal d1" data-i18n="windsTitle">Come capire dove va la sonda</h1>
     <p class="psub reveal d2" data-i18n="windsSub">600 traiettorie simulate per scegliere da dove partire.</p>
   </div>
 
@@ -871,7 +871,7 @@
       </div>
 
       <div class="map-frame reveal d1">
-        <iframe id="mapFrame" src="mappe/uru2000_footprint.html?v=206"
+        <iframe id="mapFrame" src="mappe/uru2000_footprint.html?v=209"
                 title="Mappa interattiva dei 600 punti di atterraggio simulati con le ellissi di dispersione"
                 loading="lazy"></iframe>
       </div>
@@ -1068,7 +1068,7 @@
         <img src="assets/img/zona-exclusion-dinacia.jpg" alt="" data-i18n-alt="lZoneAlt" loading="lazy" style="width:100%;height:auto;display:block;border-radius:10px">
         <figcaption data-i18n-html="lZoneCap"></figcaption>
       </figure>
-      <div class="body-col reveal d2"><p data-i18n-html="lZone2"></p></div>
+      <div class="body-col reveal d2"><p data-i18n-html="lZone2"></p><p data-i18n-html="lZone3"></p></div>
     </div>
   </section>
 
@@ -1200,8 +1200,8 @@
       <div class="foot-school">Scuola Italiana di Montevideo</div>
       <div class="foot-motto">#CarichiamoLaPalla</div>
       <div class="crest-pair" style="margin-top:18px">
-        <img class="crest" src="assets/img/sim-logo.png" alt="Scuola Italiana di Montevideo" width="52" height="74" loading="lazy">
-        <img class="crest crest-cometa" src="assets/img/cometa-logo.png" alt="Progetto COMETA" width="132" height="64" loading="lazy">
+        <img class="crest crest-cometa" src="assets/img/cometa-logo.png" alt="Progetto COMETA" width="968" height="470" loading="lazy">
+        <img class="crest crest-sim" src="assets/img/sim-140-logo.png" alt="Scuola Italiana di Montevideo · 140 anni" width="760" height="231" loading="lazy">
       </div>
     </div>
     <div class="foot-col">
@@ -1230,16 +1230,16 @@
 
 </div>
 
-<script src="assets/i18n.js?v=206"></script>
-<script src="assets/volo.js?v=206"></script>
-<script src="assets/sonda.js?v=206"></script>
-<script src="assets/catena.js?v=206"></script>
-<script src="lora/formato/fasi.js?v=206"></script>
-<script src="assets/lora.js?v=206"></script>
-<script src="assets/profilo.js?v=206"></script>
-<script src="assets/spot.js?v=206"></script>
-<script src="assets/app.js?v=206"></script>
-<script src="assets/msis.js?v=206"></script>
-<script src="assets/traiettoria.js?v=206"></script>
+<script src="assets/i18n.js?v=209"></script>
+<script src="assets/volo.js?v=209"></script>
+<script src="assets/sonda.js?v=209"></script>
+<script src="assets/catena.js?v=209"></script>
+<script src="lora/formato/fasi.js?v=209"></script>
+<script src="assets/lora.js?v=209"></script>
+<script src="assets/profilo.js?v=209"></script>
+<script src="assets/spot.js?v=209"></script>
+<script src="assets/app.js?v=209"></script>
+<script src="assets/msis.js?v=209"></script>
+<script src="assets/traiettoria.js?v=209"></script>
 </body>
 </html>
