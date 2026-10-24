@@ -87,11 +87,11 @@ Norme e autorizzazioni · Domande · Chi siamo.
 ### Dopo ogni modifica: il numero di versione
 
 In `index.html` i file di `assets/`, e la mappa, sono richiamati con un numero in
-coda — oggi `?v=213`:
+coda — oggi `?v=214`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=213">
-<script src="assets/i18n.js?v=213"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=214">
+<script src="assets/i18n.js?v=214"></script>
 ```
 
 Lo stesso numero compare anche in punti meno visibili, che vanno alzati
@@ -468,9 +468,14 @@ vento trasla tutti i voli dell'area: gli spigoli dell'area diventano archi
 di cerchio (contorno a 180 punti per vertice, disegnato senza
 semplificazione e senza arrotondare i vertici al pixel, con lo stesso
 `smoothPolygon` usato prima per l'ellisse: altrimenti i punti, più fitti di
-un pixel, fanno un bordo a scalini). Il giorno stesso del lancio vale zero per definizione:
-con la casella attiva e il giorno di oggi, l'avviso compare subito, fra
-quelli del pallone sotto le tessere. Le classi con meno di 8 campioni non
+un pixel, fanno un bordo a scalini). Vale zero per definizione solo con
+l'ultima corsa GFS che arriva prima del lancio: le corse sono ogni 6 h
+(00, 06, 12, 18 UTC) e arrivano in Tawhiri circa 5 h dopo l'ora nominale,
+quindi lo zero scatta quando la corsa successiva a quella usata arriverebbe
+dopo il lancio (`ultimaCorsa()` in `assets/traiettoria.js`; il giorno del
+lancio, la mattina, può ancora arrivarne una più recente). Con la casella
+attiva l'avviso compare subito, prima del calcolo (con la corsa stimata
+dall'orologio), fra quelli del pallone sotto le tessere. Le classi con meno di 8 campioni non
 si usano. Se il file non si carica, lo dice un avviso nello stesso posto e
 l'area resta quella del pallone. Accanto alla casella la pagina scrive solo
 «Terzo quartile. Per ora affidabile solo in Uruguay» (`twFcHint` in
@@ -648,8 +653,9 @@ previsione, con la stessa curva dell'opzione della pagina Traiettoria
 (`convergenza_curva.json` sul branch `dati`, terzo quartile interpolato
 sull'età della corsa GFS e scalato con la durata del volo). Compare quando la
 data del lancio entra nell'orizzonte del previsore, circa una settimana
-prima, si restringe giorno per giorno a ogni nuova corsa e sparisce il
-giorno del lancio, quando vale zero per definizione. In 2D è un `L.circle`
+prima, si restringe a ogni nuova corsa e sparisce con l'ultima corsa GFS
+che arriva prima del lancio, quando vale zero per definizione (stessa regola
+della pagina Traiettoria). In 2D è un `L.circle`
 (il tooltip dice raggio ed età della corsa), in 3D un cerchio steso sul
 terreno.
 

@@ -53,6 +53,18 @@ const TILES = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
    previsto rispetto alla previsione del giorno stesso, a Mercedes. */
 const CURVA = "https://raw.githubusercontent.com/cometa-sim/cometa-sim.github.io/dati/convergenza_curva.json";
 const CURVA_NMIN = 8;               /* classi con meno campioni non si usano */
+/* Il GFS esce ogni 6 h (00, 06, 12, 18 UTC) e arriva in Tawhiri circa 5 h
+   dopo l'ora nominale. L'errore di previsione e' zero solo con l'ultima
+   corsa che arriva prima del lancio: se la successiva arriva dopo. */
+const GFS_PASSO_H = 6, GFS_RITARDO_H = 5;
+function ultimaCorsa(run, lancio){
+  return run.getTime() + (GFS_PASSO_H + GFS_RITARDO_H)*36e5 > lancio.getTime();
+}
+/* la corsa che Tawhiri ha adesso, stimata dall'orologio (prima del calcolo) */
+function corsaStimata(){
+  const p = GFS_PASSO_H*36e5;
+  return new Date(Math.floor((Date.now() - GFS_RITARDO_H*36e5)/p)*p);
+}
 /* v2: la prima versione salvava anche la partenza predefinita (Durazno)
    come se l'avesse scelta il visitatore; con una chiave nuova si riparte */
 const KEY = "cometa-partenza-v2";
@@ -433,7 +445,8 @@ function fcWarn(r){
   const old = elWarn.querySelector(".tw-fc");
   if(old) old.remove();
   if(!elFcOn || !elFcOn.checked) return;
-  const zero = r && r.fc ? r.fc.zero : elDate.value && elDate.value <= today;
+  const zero = r && r.fc ? r.fc.zero
+    : !!(elDate.value && elTime.value) && ultimaCorsa(corsaStimata(), launchAt(elDate.value, elTime.value));
   const na = r && r.fc && r.fc.na;
   if(zero || na) elWarn.appendChild(el("li", "tw-fc", t(zero ? "twFcZero" : "twFcNa")));
 }
@@ -792,13 +805,13 @@ function loadLeaflet(){
      parallelo con leaflet.js. */
   const mapkit = window.COMETA_MAPKIT ? Promise.resolve() : new Promise(function(ok, ko){
     const s = document.createElement("script");
-    s.src = "assets/mapkit.js?v=213";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
+    s.src = "assets/mapkit.js?v=214";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
     s.onload = ok; s.onerror = ko;
     document.head.appendChild(s);
   });
   const map3d = window.COMETA_MAP3D ? Promise.resolve() : new Promise(function(ok){
     const s = document.createElement("script");
-    s.src = "assets/map3d.js?v=213";
+    s.src = "assets/map3d.js?v=214";
     s.onload = ok; s.onerror = ok;       /* senza, resta il 2D e basta */
     document.head.appendChild(s);
   });
@@ -1047,7 +1060,7 @@ function loadCurva(){
   return curva;
 }
 function fcRadius(d, r, iso){
-  if(iso <= today) return {km:0, zero:true};
+  if(r.run && ultimaCorsa(r.run, r.pts[0].t)) return {km:0, zero:true};
   if(!d || !r.run) return {km:0, na:true};
   const age = (r.pts[0].t - r.run)/36e5;                       /* eta' della corsa al lancio, h */
   const C = d.classi.filter(function(c){ return c.n >= CURVA_NMIN; })
