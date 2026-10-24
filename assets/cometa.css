@@ -1141,8 +1141,8 @@ nav a.ig:hover svg{transform:translateY(-1px)}
   #page-diretta .mk-wv{font-size:18px}
   #page-diretta .mk-wl{margin-top:3px}
 }
-/* le righe sotto video e mappa: luogo e stato */
-.dir-video-info{font-family:var(--mono);font-size:10.5px;color:var(--faint);padding:10px 15px;border-top:1px solid var(--line-soft)}
+/* le righe sotto video e mappa: luogo e stato, senza linee di separazione */
+.dir-video-info{font-family:var(--mono);font-size:10.5px;color:var(--faint);padding:0 15px 12px}
 .dir-video-dot{background:var(--cyan)}
 .dir-video-dot.is-live{background:var(--live);animation:navPulse 1.8s infinite}
 .embeds2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:12px}
