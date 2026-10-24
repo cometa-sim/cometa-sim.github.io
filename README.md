@@ -448,8 +448,12 @@ GFS — 00, 06, 12 e 18 UTC, cioè 21, 03, 09 e 15 in Uruguay, disponibili in
 Tawhiri qualche ora dopo — e l'analisi raggruppa l'anticipo a passo di 6 h
 (`--passo 6`): la curva si misura corsa per corsa invece che interpolata
 fra un giorno e l'altro. Il riferimento di ogni bersaglio è la corsa più
-recente prima del lancio. Le coordinate (−34,2905, −55,3552) vanno
-confermate con l'AIP della DINACIA.
+recente prima del lancio. Il punto (−34,2919, −55,3531) è quello di lancio
+sul prato, lo stesso di `FLIGHT_SITE` in `assets/volo.js` e della pagina
+Traiettoria; il punto di riferimento ufficiale dell'aerodromo (AIP DINACIA,
+−34,2905, −55,3552, il centro delle piste) è a circa 250 m, una differenza
+irrilevante per la statistica. Se il punto di lancio cambia, va cambiato nei
+tre posti.
 
 La pagina usa la curva di La Calera a passo di 6 h appena ha almeno tre
 classi con 8 campioni (circa una settimana di raccolta), fino ad allora
