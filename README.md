@@ -21,7 +21,7 @@ simulazione-diretta.html            prova la pagina Diretta con un orologio acce
 
 assets/cometa.css                   colori, caratteri, impaginazione
 assets/i18n.js                      i testi in italiano, spagnolo e inglese
-assets/sonda.js                     i 26 componenti + il modello 3D (Three.js)
+assets/sonda.js                     i 25 componenti + il modello 3D (Three.js)
 assets/catena.js                    la catena di volo in 3D, nella pagina Missione
 assets/volo.js                      ora del lancio (LAUNCH) e dati del volo (FLIGHT_*), la richiesta della traiettoria prevista
 assets/app.js                       lingua, navigazione, salita, fisica, conto alla rovescia
@@ -80,11 +80,11 @@ Norme e autorizzazioni · Domande · Chi siamo.
 ### Dopo ogni modifica: il numero di versione
 
 In `index.html` i file di `assets/`, e la mappa, sono richiamati con un numero in
-coda — oggi `?v=201`:
+coda — oggi `?v=202`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=201">
-<script src="assets/i18n.js?v=201"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=202">
+<script src="assets/i18n.js?v=202"></script>
 ```
 
 Lo stesso numero compare anche in punti meno visibili, che vanno alzati

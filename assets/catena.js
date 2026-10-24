@@ -200,8 +200,8 @@ function build(){
   swivel.position.y = JOIN_Y - 0.055; root.add(swivel); reg("antitorsione", swivel, [swMat]);
 
   /* ---------- 5 · Payload: la sonda ----------
-     Scatola esterna 220 × 220 × 190 mm, con le due alette
-     di stabilizzazione e il braccetto dei sensori esterni. */
+     Scatola esterna 220 × 220 × 190 mm, con le due alette di
+     stabilizzazione e, in cima a ciascuna, un sensore esterno. */
   const pay = new THREE.Group();
   const BOX_Y = JOIN_Y - 0.26 - 0.182;
   pay.position.y = BOX_Y;
@@ -231,17 +231,17 @@ function build(){
   });
   reg("payload", null, [finMat]);
 
-  /* Braccetto esterno con il sensore in punta */
-  const armMat = new THREE.MeshStandardMaterial({color:C(COL.metal), roughness:0.5, metalness:0.55});
-  const arm = new THREE.Mesh(new THREE.CylinderGeometry(0.010, 0.010, 0.29, 12), armMat);
-  arm.rotation.z = Math.PI/2; arm.position.set(-0.355, 0.028, 0);
-  pay.add(arm); reg("payload", arm, [armMat]);
-  const tipMat = new THREE.MeshStandardMaterial({color:C(0xF7FAFC), roughness:0.9});
-  const tipS = new THREE.Mesh(new THREE.BoxGeometry(0.030, 0.022, 0.022), tipMat);
-  tipS.position.set(-0.500, 0.028, 0); pay.add(tipS); reg("payload", tipS, [tipMat]);
-  const shieldM = new THREE.MeshStandardMaterial({color:C(0xF7FAFC), roughness:0.88, side:THREE.DoubleSide});
-  const shield = new THREE.Mesh(new THREE.BoxGeometry(0.062, 0.005, 0.050), shieldM);
-  shield.position.set(-0.478, 0.062, 0); pay.add(shield); reg("payload", shield, [shieldM]);
+  /* I due sensori esterni, in cima alle alette: il PT1000 sporge oltre la
+     punta di un'aletta, il sensore di umidita' sta sotto il suo tettuccio
+     bianco sull'altra (componenti 24 e 21 di assets/sonda.js). */
+  const sensMat = new THREE.MeshStandardMaterial({color:C(0xF7FAFC), roughness:0.9});
+  const pt = new THREE.Mesh(new THREE.BoxGeometry(0.013, 0.013, 0.057), sensMat);
+  pt.position.set(0, 0.193, 0.706); pay.add(pt); reg("payload", pt, [sensMat]);
+  const sht = new THREE.Mesh(new THREE.BoxGeometry(0.010, 0.034, 0.050), sensMat);
+  sht.position.set(0.015, 0.172, -0.645); pay.add(sht); reg("payload", sht, []);
+  const hoodM = new THREE.MeshStandardMaterial({color:C(0xF7FAFC), roughness:0.88, side:THREE.DoubleSide});
+  const hood = new THREE.Mesh(new THREE.BoxGeometry(0.030, 0.005, 0.061), hoodM);
+  hood.position.set(0.015, 0.198, -0.645); pay.add(hood); reg("payload", hood, [hoodM]);
 
   /* Obiettivo della camera, a filo di parete */
   const lensMat = new THREE.MeshStandardMaterial({color:C(COL.glass), roughness:0.16, metalness:0.65});

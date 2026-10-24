@@ -34,7 +34,7 @@ const TEX = {
 /* Fondale della modalità Volo: una foto vera scattata in quota. */
 const SKYIMG = ""; // es. "assets/img/stratosfera.jpg"
 
-/* ---------- I 29 componenti ---------- */
+/* ---------- I 25 componenti ---------- */
 const PARTS = [
 {id:1, deck:1, cat:"rad", x:35, y:113, z:0, w:125, d:32, h:20, g:40,
  n:{it:"GGreg20_V3 + tubo J305", es:"GGreg20_V3 + tubo J305", en:"GGreg20_V3 + J305 tube"},
@@ -51,27 +51,27 @@ const PARTS = [
 {id:3, deck:1, cat:"atmo", x:-30, y:57, z:0, w:38, d:50, h:21, g:41,
  n:{it:"PMS5003 particolato", es:"PMS5003 material particulado", en:"PMS5003 particulate"},
  note:{
-  it:"INCASSATO NELLA PARETE −X, la stessa della staffa ma a quota diversa: la staffa esce a z≈80, il PMS sta sul ripiano 1 (z 0-21). Faccia a filo esterno, perimetro sigillato con silicone NEUTRO, bocche sulla faccia stretta 50 × 21 inclinate in basso con visiera anti-ghiaccio. Ruotato 90°. Le pareti ±Y restano libere per le alette centrate, la +X per la camera. Sporge 8 mm all'interno, da fasciare con un collare di XPS. Ponte termico ~0,3 W.",
-  es:"EMPOTRADO EN LA PARED −X, la misma que la ménsula pero a otra altura: la ménsula sale a z≈80, el PMS va en el estante 1 (z 0-21). Cara a ras del exterior, perímetro sellado con silicona NEUTRA, bocas en la cara angosta de 50 × 21 inclinadas hacia abajo con visera antihielo. Rotado 90°. Las paredes ±Y quedan libres para las aletas centradas, y la +X para la cámara. Sobresale 8 mm hacia adentro: envolverlo con un collar de XPS. Puente térmico ~0,3 W.",
-  en:"RECESSED INTO THE −X WALL, the same one as the bracket but at a different height: the bracket exits at z≈80, the PMS sits on deck 1 (z 0-21). Face flush with the outside, perimeter sealed with NEUTRAL silicone, inlets on the narrow 50 × 21 face angled downwards with an anti-icing visor. Rotated 90°. The ±Y walls stay free for the centred fins, and +X for the camera. It protrudes 8 mm inwards and must be wrapped in an XPS collar. Thermal bridge ~0.3 W."}},
-{id:4, deck:1, cat:"alim", x:98, y:18, z:0, w:60, d:48, h:18, g:90,
+  it:"INCASSATO NELLA PARETE −X, sul ripiano 1 (z 0-21). Faccia a filo esterno, perimetro sigillato con silicone NEUTRO, bocche sulla faccia stretta 50 × 21 inclinate in basso con visiera anti-ghiaccio. Ruotato 90°. Le pareti ±Y restano libere per le alette centrate, la +X per la camera. Sporge 8 mm all'interno, da fasciare con un collare di XPS. Ponte termico ~0,3 W.",
+  es:"EMPOTRADO EN LA PARED −X, en el estante 1 (z 0-21). Cara a ras del exterior, perímetro sellado con silicona NEUTRA, bocas en la cara angosta de 50 × 21 inclinadas hacia abajo con visera antihielo. Rotado 90°. Las paredes ±Y quedan libres para las aletas centradas, y la +X para la cámara. Sobresale 8 mm hacia adentro: envolverlo con un collar de XPS. Puente térmico ~0,3 W.",
+  en:"RECESSED INTO THE −X WALL, on deck 1 (z 0-21). Face flush with the outside, perimeter sealed with NEUTRAL silicone, inlets on the narrow 50 × 21 face angled downwards with an anti-icing visor. Rotated 90°. The ±Y walls stay free for the centred fins, and +X for the camera. It protrudes 8 mm inwards and must be wrapped in an XPS collar. Thermal bridge ~0.3 W."}},
+{id:4, deck:1, cat:"alim", x:38, y:18, z:0, w:60, d:48, h:18, g:90,
  n:{it:"Pacco 6 × AA litio L91", es:"Pack 6 × AA litio L91", en:"6 × AA lithium pack L91"},
  note:{
-  it:"Massa pesante in basso. Fili saldati ai contatti e pile compresse con nastro: un micro-spostamento all'impatto riavvia il sistema. Le L91 funzionano fino a −40 °C: basta lo strato di ovatta sul fondo, senza fasciarle a parte. Il DS18B20 n. 28 e la prova in congelatore con il LoRa che trasmette dicono se serve altro.",
-  es:"Masa pesada abajo. Cables soldados a los contactos y pilas comprimidas con cinta: un micro-desplazamiento en el impacto reinicia el sistema. Las L91 funcionan hasta −40 °C: alcanza con la capa de guata en el fondo, sin envolverlas aparte. El DS18B20 n.º 28 y la prueba en el congelador con el LoRa transmitiendo dicen si hace falta algo más.",
-  en:"Heavy mass low down. Wires soldered to the contacts and cells compressed with tape: a tiny shift on impact restarts the system. The L91 cells work down to −40 °C: the layer of wadding on the floor is enough, without wrapping them separately. The DS18B20 no. 28 and the freezer test with the LoRa transmitting will say whether anything more is needed."}},
+  it:"SPOSTATO VERSO −X, al posto dei due MAX31865: bilancia la Space Cam incassata nella parete +X. Massa pesante in basso. Fili saldati ai contatti e pile compresse con nastro: un micro-spostamento all'impatto riavvia il sistema. Le L91 funzionano fino a −40 °C: basta lo strato di ovatta sul fondo, senza fasciarle a parte. Il PT1000 interno (25) gli sta accanto, sulla parete −Y: è la zona più fredda della scatola.",
+  es:"CORRIDO HACIA −X, en el lugar de los dos MAX31865: equilibra la Space Cam empotrada en la pared +X. Masa pesada abajo. Cables soldados a los contactos y pilas comprimidas con cinta: un micro-desplazamiento en el impacto reinicia el sistema. Las L91 funcionan hasta −40 °C: alcanza con la capa de guata en el fondo, sin envolverlas aparte. El PT1000 interno (25) está al lado, sobre la pared −Y: es la zona más fría de la caja.",
+  en:"MOVED TOWARDS −X, into the place of the two MAX31865 boards: it balances the Space Cam recessed in the +X wall. Heavy mass low down. Wires soldered to the contacts and cells compressed with tape: a tiny shift on impact restarts the system. The L91 cells work down to −40 °C: the layer of wadding on the floor is enough, without wrapping them separately. The inner PT1000 (25) sits beside it, on the −Y wall: the coldest part of the box."}},
 {id:5, deck:2, cat:"alim", x:19, y:20, z:40, w:55, d:32, h:18, g:45,
  n:{it:"Pacco 3 × AA (livello 2)", es:"Pack 3 × AA (nivel 2)", en:"3 × AA pack (level 2)"},
  note:{
   it:"Alimenta SOLO l'Adalogger. Nessun contatto elettrico con il pacco principale: è ciò che rende indipendente il livello 2. È il pacco da sorvegliare al freddo: tre celle sotto carico scendono verso 3,6 V e i picchi di trasmissione del LoRa possono provocare reset. Registrarne la tensione nella prova in congelatore.",
   es:"Alimenta SOLO al Adalogger. Ningún contacto eléctrico con el paquete principal: es lo que hace independiente al nivel 2. Es el paquete a vigilar en el frío: tres celdas bajo carga bajan hacia 3,6 V y los picos de transmisión del LoRa pueden provocar reinicios. Registrar su tensión en la prueba del congelador.",
   en:"Powers ONLY the Adalogger. No electrical contact with the main pack: that is what makes level 2 independent. This is the pack to watch in the cold: three cells under load drop towards 3.6 V and the LoRa transmission peaks can cause resets. Record its voltage during the freezer test."}},
-{id:6, deck:1, cat:"atmo", x:39, y:39, z:0, w:51, d:25, h:14, g:9,
+{id:6, deck:2, cat:"atmo", x:82, y:90, z:40, w:51, d:25, h:14, g:9,
  n:{it:"SCD30 CO₂", es:"SCD30 CO₂", en:"SCD30 CO₂"},
  note:{
-  it:"L'aria interna si rinnova dalle sole fughe naturali della scatola: il profilo di CO₂ risulta 'spalmato' su qualche centinaio di metri, limite dichiarato. Tenerlo FUORI dal flusso della ventola del PMS5003 e lontano dalle fonti di calore. Il DS18B20 n. 30 gli sta a contatto: offset di autoriscaldamento e temperatura del gas per la correzione di densità dell'NDIR.",
-  es:"El aire interior se renueva solo por las fugas naturales de la caja: el perfil de CO₂ queda 'untado' sobre algunos cientos de metros, límite declarado. Mantenerlo FUERA del flujo del ventilador del PMS5003 y lejos de las fuentes de calor. El DS18B20 n.º 30 está en contacto con él: offset de autocalentamiento y temperatura del gas para la corrección de densidad del NDIR.",
-  en:"The inside air is renewed only through the box's natural leaks: the CO₂ profile comes out smeared over a few hundred metres, a declared limit. Keep it OUT of the PMS5003 fan flow and away from heat sources. The DS18B20 no. 30 is in contact with it: self-heating offset and gas temperature for the NDIR density correction."}},
+  it:"SPOSTATO SUL RIPIANO 2, al centro, vicino alla catena Qwiic e lontano dalla ventola del PMS5003. L'aria interna si rinnova dalle sole fughe naturali della scatola: il profilo di CO₂ risulta «spalmato» su qualche centinaio di metri, limite dichiarato. Per la correzione di densità dell'NDIR usa il proprio sensore di temperatura interno e la pressione dell'MS8607.",
+  es:"MOVIDO AL ESTANTE 2, al centro, cerca de la cadena Qwiic y lejos del ventilador del PMS5003. El aire interior se renueva solo por las fugas naturales de la caja: el perfil de CO₂ queda «untado» sobre algunos cientos de metros, límite declarado. Para la corrección de densidad del NDIR usa su propio sensor de temperatura interno y la presión del MS8607.",
+  en:"MOVED TO DECK 2, in the centre, close to the Qwiic chain and away from the PMS5003 fan. The inside air is renewed only through the box's natural leaks: the CO₂ profile comes out smeared over a few hundred metres, a declared limit. For the NDIR density correction it uses its own internal temperature sensor and the pressure from the MS8607."}},
 {id:8, deck:2, cat:"kit", x:164, y:53, z:35, w:31, d:60, h:41, g:66,
  n:{it:"Space Cam", es:"Space Cam", en:"Space Cam"},
  note:{
@@ -90,12 +90,12 @@ const PARTS = [
   it:"LIVELLO 2. Pile, microSD e GPS propri. Registra quota e traiettoria anche se il Teensy si blocca del tutto.",
   es:"NIVEL 2. Pilas, microSD y GPS propios. Registra altura y trayectoria incluso si el Teensy se cuelga por completo.",
   en:"LEVEL 2. Its own cells, microSD and GPS. Records altitude and trajectory even if the Teensy locks up completely."}},
-{id:11, deck:2, cat:"atmo", x:14, y:114.5, z:40, w:28, d:25, h:12, g:5,
- n:{it:"MAX31865 + PT1000", es:"MAX31865 + PT1000", en:"MAX31865 + PT1000"},
+{id:11, deck:1, cat:"atmo", x:101, y:32, z:0, w:28, d:25, h:12, g:5,
+ n:{it:"MAX31865 — PT1000 esterno", es:"MAX31865 — PT1000 exterior", en:"MAX31865 — outer PT1000"},
  note:{
-  it:"SPI, non I²C: sta fuori dalla catena Qwiic ed è per questo l'unico pezzo da saldare. Spostato di 7,5 mm verso −Y per il ripiano accorciato. L'elemento sensibile è sul braccetto esterno.",
-  es:"SPI, no I²C: queda fuera de la cadena Qwiic y por eso es la única pieza a soldar. Corrido 7,5 mm hacia −Y por el estante acortado. El elemento sensible está en el brazo exterior.",
-  en:"SPI, not I²C: it sits outside the Qwiic chain and is therefore the only piece to be soldered. Moved 7.5 mm towards −Y because of the cut-back deck. The sensing element is on the external arm."}},
+  it:"SPOSTATO SUL RIPIANO 1, dove prima c'era il pacco pile, accanto all'altro MAX31865. SPI, non I²C: sta fuori dalla catena Qwiic ed è per questo uno dei pochi pezzi da saldare. Legge il PT1000 in cima all'ala +Y: il cavo corre lungo l'aletta ed entra dal foro sotto il coperchio, poi scende nella fascia +Y.",
+  es:"MOVIDO AL ESTANTE 1, donde antes iba el paquete de pilas, junto al otro MAX31865. SPI, no I²C: queda fuera de la cadena Qwiic y por eso es una de las pocas piezas a soldar. Lee el PT1000 que va en la punta de la aleta +Y: el cable corre a lo largo de la aleta y entra por el orificio bajo la tapa, y después baja por la franja +Y.",
+  en:"MOVED TO DECK 1, where the battery pack used to be, next to the other MAX31865. SPI, not I²C: it sits outside the Qwiic chain and is therefore one of the few pieces to be soldered. It reads the PT1000 at the top of fin +Y: the cable runs along the fin and enters through the hole under the lid, then drops down the +Y channel."}},
 {id:12, deck:2, cat:"alim", x:77, y:19, z:40, w:82, d:51, h:14, g:16,
  n:{it:"Perfboard: optoacc. + polyfuse + MOSFET", es:"Perfboard: optoacop. + polyfuse + MOSFET", en:"Perfboard: optocoupler + polyfuse + MOSFET"},
  note:{
@@ -144,54 +144,36 @@ const PARTS = [
   it:"Da 9-10,8 V a 5 V. Senza questo il Teensy, che accetta al massimo 5,5 V, si distrugge.",
   es:"De 9-10,8 V a 5 V. Sin esto el Teensy, que acepta 5,5 V como máximo, se destruye.",
   en:"From 9-10.8 V down to 5 V. Without it the Teensy, which takes 5.5 V maximum, is destroyed."}},
-{id:21, deck:3, cat:"atmo", x:-159, y:96, z:54, w:26, d:18, h:5, g:2,
- n:{it:"SHT45 + PTFE (braccetto esterno)", es:"SHT45 + PTFE (brazo exterior)", en:"SHT45 + PTFE (external arm)"},
+{id:21, deck:3, cat:"atmo", x:94.5, y:-270, z:148, w:5, d:26, h:18, g:2,
+ n:{it:"SHT45 umidità (ala −Y)", es:"SHT45 humedad (aleta −Y)", en:"SHT45 humidity (fin −Y)"},
  note:{
-  it:"FUORI DALLA SONDA, accanto al PT1000: va l'INTERA scheda sul braccetto, e l'I²C corre senza problemi nei 15 cm di cavo. La membrana in PTFE protegge da polvere e condensa. Serve anche a marcare i minuti in cui si attraversa una nube.",
-  es:"FUERA DE LA SONDA, junto al PT1000: va la placa ENTERA en el brazo, y el I²C corre sin problemas en los 15 cm de cable. La membrana de PTFE protege del polvo y la condensación. Sirve también para marcar los minutos en que se atraviesa una nube.",
-  en:"OUTSIDE THE PROBE, next to the PT1000: the WHOLE board goes on the arm, and I²C runs without trouble over the 15 cm of cable. The PTFE membrane protects it from dust and condensation. It also marks the minutes spent crossing a cloud."}},
+  it:"IN CIMA ALL'ALA −Y, alla stessa quota del PT1000 esterno sull'altra ala. Scheda distanziata 8 mm dalla faccia dell'aletta, chip rivolto in basso o di lato, tettuccio bianco sopra contro sole e pioggia; il filtro in PTFE sul chip non va coperto. Dall'umidità e dalla temperatura del chip si ricava il punto di rugiada; con la temperatura del PT1000 esterno si ricalcola l'umidità relativa dell'aria. Valida fino a circa 11 km.",
+  es:"EN LA PUNTA DE LA ALETA −Y, a la misma altura que el PT1000 exterior de la otra aleta. Placa separada 8 mm de la cara de la aleta, chip mirando hacia abajo o de costado, techito blanco arriba contra el sol y la lluvia; el filtro de PTFE sobre el chip no se tapa. De la humedad y la temperatura del chip sale el punto de rocío; con la temperatura del PT1000 exterior se recalcula la humedad relativa del aire. Válida hasta unos 11 km.",
+  en:"AT THE TOP OF FIN −Y, at the same height as the outer PT1000 on the other fin. The board stands 8 mm off the face of the fin, chip facing down or sideways, with a white roof above it against sun and rain; the PTFE filter on the chip must stay uncovered. Dew point comes from the chip's humidity and temperature; with the outer PT1000's temperature the relative humidity of the air is recomputed. Valid up to about 11 km."}},
+{id:25, deck:1, cat:"atmo", x:52, y:1, z:5, w:30, d:6, h:6, g:19,
+ n:{it:"PT1000 interno (parete −Y)", es:"PT1000 interior (pared −Y)", en:"Inner PT1000 (−Y wall)"},
+ note:{
+  it:"Incollato o nastrato alla faccia interna della parete −Y, in basso, accanto al pacco pile principale: misura la cassa nella zona più fredda della scatola. Coperto dai ciuffi di ovatta, così segue la parete e non l'aria che gli passa davanti. Con il PT1000 esterno dà il salto di temperatura attraverso il polistirolo; con l'MS8607, che sta in alto, la differenza fra alto e basso della scatola.",
+  es:"Pegado o encintado a la cara interna de la pared −Y, abajo, junto al paquete de pilas principal: mide la caja en la zona más fría. Cubierto por los mechones de guata, así sigue a la pared y no al aire que le pasa por delante. Con el PT1000 exterior da el salto de temperatura a través del poliestireno; con el MS8607, que está arriba, la diferencia entre la parte alta y la baja de la caja.",
+  en:"Glued or taped to the inner face of the −Y wall, low down, beside the main battery pack: it measures the shell in the coldest part of the box. Covered by the wadding tufts, so it follows the wall and not the air passing in front of it. With the outer PT1000 it gives the temperature drop across the polystyrene; with the MS8607, which sits high up, the difference between the top and the bottom of the box."}},
 {id:31, deck:1, cat:"pos", x:8, y:101, z:6, w:21, d:36, h:5, g:8,
  n:{it:"LoRa E220-900T22D", es:"LoRa E220-900T22D", en:"LoRa E220-900T22D"},
  note:{
   it:"SPOSTATO SUL RIPIANO 1, vicino alla parete −X, su uno spessore di balsa da 6 mm: serve ad alzare lo stilo quanto basta per passare sopra lo spigolo del Geiger. Connettore SMA rivolto verso +Y, a y ≈ 145 mm. Collegato in UART all'Adalogger (livello 2) sul ripiano 2: alimentazione, GND, TX e RX salgono nella fascia +Y insieme agli altri cavi. M0 e M1 a massa in modo permanente.",
   es:"MOVIDO AL ESTANTE 1, junto a la pared −X, sobre un espesor de balsa de 6 mm: sirve para levantar el látigo lo justo para pasar por encima de la arista del Geiger. Conector SMA hacia +Y, en y ≈ 145 mm. Conectado por UART al Adalogger (nivel 2) en el estante 2: alimentación, GND, TX y RX suben por la franja +Y junto con los demás cables. M0 y M1 a masa de forma permanente.",
   en:"MOVED TO DECK 1, close to the −X wall, on a 6 mm balsa spacer: it raises the whip just enough to clear the Geiger's edge. SMA connector facing +Y, at y ≈ 145 mm. Connected over UART to the Adalogger (level 2) on deck 2: power, GND, TX and RX climb through the +Y channel along with the other wiring. M0 and M1 permanently tied to ground."}},
-{id:23, deck:2, cat:"atmo", x:133, y:74, z:40, w:28, d:25, h:12, g:5,
- n:{it:"2° MAX31865 (PT1000 nel tubo)", es:"2.º MAX31865 (PT1000 en el tubo)", en:"2nd MAX31865 (PT1000 in the tube)"},
+{id:23, deck:1, cat:"atmo", x:129.5, y:32, z:0, w:28, d:25, h:12, g:5,
+ n:{it:"MAX31865 — PT1000 interno", es:"MAX31865 — PT1000 interior", en:"MAX31865 — inner PT1000"},
  note:{
-  it:"ESPERIMENTO DI CONFRONTO: legge il secondo PT1000, alloggiato nel tubo esterno con curva a 90°, in parallelo a quello nudo sul braccetto. Le due curve misurano il bias solare e l'effetto della schermatura.",
-  es:"EXPERIMENTO DE COMPARACIÓN: lee el segundo PT1000, alojado en el tubo exterior con curva de 90°, en paralelo con el que va desnudo en el brazo. Las dos curvas miden el sesgo solar y el efecto del blindaje.",
-  en:"COMPARISON EXPERIMENT: it reads the second PT1000, housed in the external tube with its 90° bend, in parallel with the bare one on the arm. The two curves measure the solar bias and the effect of the shielding."}},
-{id:24, deck:3, cat:"atmo", x:-175, y:97, z:52, w:6, d:10, h:8, g:19,
- n:{it:"Sonda PT1000 (braccetto esterno)", es:"Sonda PT1000 (brazo exterior)", en:"PT1000 probe (external arm)"},
+  it:"SPOSTATO SUL RIPIANO 1, accanto al primo. Legge il PT1000 incollato in basso alla parete −Y: cavo di pochi centimetri, perché il sensore è a due passi.",
+  es:"MOVIDO AL ESTANTE 1, junto al primero. Lee el PT1000 pegado abajo en la pared −Y: cable de pocos centímetros, porque el sensor está a dos pasos.",
+  en:"MOVED TO DECK 1, next to the first one. It reads the PT1000 glued low on the −Y wall: a few centimetres of cable, because the sensor is right there."}},
+{id:24, deck:3, cat:"atmo", x:79.5, y:435, z:170, w:6, d:30, h:6, g:19,
+ n:{it:"PT1000 esterno (ala +Y)", es:"PT1000 exterior (aleta +Y)", en:"Outer PT1000 (fin +Y)"},
  note:{
-  it:"In punta al braccetto, in aria libera e senza schermatura completa: è il TERMINE DI PARAGONE del tubo aspirato. Da verniciare di BIANCO OPACO. Il piattino ripara solo dall'alto: il bias residuo si dichiara e il tubo dice quanto vale.",
-  es:"En la punta del brazo, en aire libre y sin blindaje completo: es el TÉRMINO DE COMPARACIÓN del tubo. Pintarlo de BLANCO MATE. El platillo protege solo desde arriba: el sesgo residual se declara y el tubo dice cuánto vale.",
-  en:"At the tip of the arm, in free air and without full shielding: it is the REFERENCE against which the tube is judged. Paint it MATT WHITE. The small plate shields only from above: the residual bias is declared, and the tube tells you how large it is."}},
-{id:26, deck:3, cat:"atmo", x:-88, y:53, z:23, w:10, d:8, h:8, g:19,
- n:{it:"PT1000 nel tubo (confronto)", es:"PT1000 en el tubo (comparación)", en:"PT1000 in the tube (comparison)"},
- note:{
-  it:"Condotto INTERAMENTE ESTERNO con CURVA A 90°: presa rivolta in alto, gomito in basso con foro di scarico da 2 mm, sensore nel tratto orizzontale a valle del gomito. In salita le goccioline sopraffuse non svoltano, impattano e drenano. In discesa la separazione non opera: dato dichiarato non protetto. Solo i fili entrano nella sonda, da un foro da 3 mm sigillato.",
-  es:"Conducto ÍNTEGRAMENTE EXTERIOR con CURVA DE 90°: toma hacia arriba, codo abajo con orificio de drenaje de 2 mm, sensor en el tramo horizontal aguas abajo del codo. En el ascenso las gotitas sobreenfriadas no doblan, impactan y drenan. En el descenso la separación no opera: dato declarado como no protegido. Solo los cables entran en la sonda, por un orificio de 3 mm sellado.",
-  en:"Duct ENTIRELY EXTERNAL with a 90° BEND: inlet pointing up, elbow below with a 2 mm drain hole, sensor in the horizontal run downstream of the elbow. On the way up supercooled droplets do not turn, they impact and drain. On the way down the separation does not work: the data is declared unprotected. Only the wires enter the probe, through a sealed 3 mm hole."}},
-{id:27, deck:2, cat:"atmo", x:6, y:56, z:53, w:10, d:4, h:6, g:0,
- n:{it:"DS18B20 — cassa", es:"DS18B20 — caja", en:"DS18B20 — shell"},
- note:{
-  it:"Incollato alla faccia interna della parete: misura la temperatura della cassa. Lasciarlo scoperto, senza ovatta. I quattro DS18B20 condividono un solo pin (bus 1-Wire, pull-up 4,7 kΩ verso 3,3 V).",
-  es:"Pegado a la cara interna de la pared: mide la temperatura de la caja. Dejarlo descubierto, sin guata. Los cuatro DS18B20 comparten un solo pin (bus 1-Wire, pull-up de 4,7 kΩ a 3,3 V).",
-  en:"Glued to the inner face of the wall: it measures the temperature of the shell. Leave it uncovered, without wadding. The four DS18B20 share a single pin (1-Wire bus, 4.7 kΩ pull-up to 3.3 V)."}},
-{id:28, deck:1, cat:"atmo", x:118, y:34, z:18, w:10, d:4, h:6, g:0,
- n:{it:"DS18B20 — pacco pile", es:"DS18B20 — paquete de pilas", en:"DS18B20 — battery pack"},
- note:{
-  it:"Sul pacco principale: la capacità delle L91 dipende dalla temperatura, ed è questo dato — con la prova in congelatore — a decidere se il pad riscaldante andrà reintegrato.",
-  es:"Sobre el paquete principal: la capacidad de las L91 depende de la temperatura, y es este dato — junto con la prueba del congelador — el que decide si el pad calefactor habrá que reincorporarlo.",
-  en:"On the main pack: the capacity of the L91 cells depends on temperature, and it is this measurement — together with the freezer test — that decides whether the heating pad has to be brought back."}},
-{id:29, deck:2, cat:"atmo", x:85, y:74, z:57, w:10, d:4, h:6, g:0,
- n:{it:"DS18B20 — centro del volume", es:"DS18B20 — centro del volumen", en:"DS18B20 — centre of the volume"},
- note:{
-  it:"Sospeso a metà altezza, lontano da ogni componente e dall'ovatta: misura l'ARIA interna, non una scheda. Il profilo termico interno è fra le misure più interessanti del volo.",
-  es:"Suspendido a media altura, lejos de todo componente y de la guata: mide el AIRE interior, no una placa. El perfil térmico interno está entre las medidas más interesantes del vuelo.",
-  en:"Suspended at mid-height, away from every component and from the wadding: it measures the internal AIR, not a board. The internal thermal profile is among the most interesting measurements of the flight."}},
+  it:"IN CIMA ALL'ALA +Y, all'estremità esterna: appoggiato sul bordo superiore e sporgente di 20 mm oltre la punta, in aria libera. In salita l'aria arriva dall'alto e lo raggiunge prima di aver toccato la scatola. Sonda verniciata di BIANCO OPACO: il bias solare resta e va dichiarato, come l'esposizione a goccioline e ghiaccio nelle nubi. All'atterraggio la punta dell'ala è la parte più esposta: i dati sono già registrati, ma va fissato bene.",
+  es:"EN LA PUNTA DE LA ALETA +Y, en el extremo exterior: apoyado sobre el borde superior y sobresaliendo 20 mm más allá de la punta, en aire libre. En el ascenso el aire llega desde arriba y lo alcanza antes de haber tocado la caja. Sonda pintada de BLANCO MATE: el sesgo solar queda y hay que declararlo, igual que la exposición a gotitas y hielo dentro de las nubes. En el aterrizaje la punta de la aleta es la parte más expuesta: los datos ya están grabados, pero hay que fijarlo bien.",
+  en:"AT THE TOP OF FIN +Y, at its outer end: resting on the upper edge and projecting 20 mm beyond the tip, in free air. On the way up the air comes from above and reaches it before it has touched the box. The probe is painted MATT WHITE: the solar bias remains and must be declared, as must the exposure to droplets and ice inside clouds. On landing the fin tip is the most exposed part: the data is already recorded, but it must be fixed securely."}},
 {id:32, deck:3, cat:"kit", x:47, y:76, z:80, w:75, d:45, h:21, g:78,
  n:{it:"STRATOfinder (rintracciamento cellulare)", es:"STRATOfinder (rastreo celular)", en:"STRATOfinder (cellular tracking)"},
  note:{
@@ -203,13 +185,7 @@ const PARTS = [
  note:{
   it:"Stilo da 170 mm avvitato direttamente al modulo, senza prolunga. Snodo piegato a 90° e ruotato verso +X: lo stilo sta nel piano verticale y = 145 mm, a 8 mm dalle colonne d'angolo, e sale a 41° dalla base (18, 145, 11) fino alla punta (147, 145, 122), sotto l'ovatta del coperchio. Non attraversa nessun ripiano: passa nella fascia liberata accorciando i ripiani 2 e 3 sul lato +Y. Verso l'orizzonte la componente verticale vale sin 41°: la perdita è di 3,7 dB costanti, in qualunque azimut. Distanze: SAM-M8Q principale 43 mm, SAM-M8Q livello 2 69 mm, SPOT 71 mm, STRATOfinder 24 mm. Si avvita per ultimo, a ripiani montati, e si svita prima di smontarli. I margini sul Geiger (1-2 mm) e sull'IMU vanno verificati a secco.",
   es:"Látigo de 170 mm atornillado directamente al módulo, sin prolongación. Codo doblado a 90° y girado hacia +X: el látigo queda en el plano vertical y = 145 mm, a 8 mm de las columnas de esquina, y sube a 41° desde la base (18, 145, 11) hasta la punta (147, 145, 122), bajo la guata de la tapa. No atraviesa ningún estante: pasa por la franja liberada al acortar los estantes 2 y 3 del lado +Y. Hacia el horizonte la componente vertical vale sen 41°: la pérdida es de 3,7 dB constantes, en cualquier azimut. Distancias: SAM-M8Q principal 43 mm, SAM-M8Q nivel 2 69 mm, SPOT 71 mm, STRATOfinder 24 mm. Se atornilla al final, con los estantes montados, y se desatornilla antes de desmontarlos. Los márgenes sobre el Geiger (1-2 mm) y sobre la IMU hay que verificarlos en seco.",
-  en:"A 170 mm whip screwed straight onto the module, with no extension lead. The joint is bent 90° and turned towards +X: the whip lies in the vertical plane y = 145 mm, 8 mm from the corner columns, and rises at 41° from its base (18, 145, 11) to its tip (147, 145, 122), under the lid's wadding. It crosses no deck: it runs through the channel freed by cutting decks 2 and 3 back on the +Y side. Towards the horizon the vertical component is sin 41°: a constant 3.7 dB loss, at any azimuth. Distances: main SAM-M8Q 43 mm, level-2 SAM-M8Q 69 mm, SPOT 71 mm, STRATOfinder 24 mm. It is screwed on last, with the decks assembled, and unscrewed before taking them apart. The clearances over the Geiger (1-2 mm) and the IMU must be checked in a dry fit."}},
-{id:30, deck:1, cat:"atmo", x:59, y:49, z:14, w:10, d:4, h:6, g:0,
- n:{it:"DS18B20 — SCD30", es:"DS18B20 — SCD30", en:"DS18B20 — SCD30"},
- note:{
-  it:"A contatto con l'SCD30: fornisce l'offset di autoriscaldamento e la temperatura del gas per la correzione di densità dell'NDIR.",
-  es:"En contacto con el SCD30: aporta el offset de autocalentamiento y la temperatura del gas para la corrección de densidad del NDIR.",
-  en:"In contact with the SCD30: it supplies the self-heating offset and the gas temperature for the NDIR density correction."}}
+  en:"A 170 mm whip screwed straight onto the module, with no extension lead. The joint is bent 90° and turned towards +X: the whip lies in the vertical plane y = 145 mm, 8 mm from the corner columns, and rises at 41° from its base (18, 145, 11) to its tip (147, 145, 122), under the lid's wadding. It crosses no deck: it runs through the channel freed by cutting decks 2 and 3 back on the +Y side. Towards the horizon the vertical component is sin 41°: a constant 3.7 dB loss, at any azimuth. Distances: main SAM-M8Q 43 mm, level-2 SAM-M8Q 69 mm, SPOT 71 mm, STRATOfinder 24 mm. It is screwed on last, with the decks assembled, and unscrewed before taking them apart. The clearances over the Geiger (1-2 mm) and the IMU must be checked in a dry fit."}}
 ];
 
 const DECKS = [{n:1, key:"deck1", z:0,  plate:null},
@@ -217,10 +193,10 @@ const DECKS = [{n:1, key:"deck1", z:0,  plate:null},
                {n:3, key:"deck3", z:80, plate:77}];
 const CATS  = [["atmo","catAtmo"],["pos","catPos"],["rad","catRad"],["alim","catAlim"],["kit","catKit"]];
 const FLOOR = (INT.w * INT.d) / 100;      /* cm² utili di un ripiano */
-const EXT_IDS = [21,24,26];               /* componenti fuori dalla scatola */
+const EXT_IDS = [21,24];                  /* in cima alle alette, fuori dalla scatola */
 /* Pezzi che non occupano superficie di ripiano: incassati nelle pareti,
    nelle intercapedini o appoggiati sopra un altro componente. */
-const NOAREA  = [3,8,27,28,29,30,33];
+const NOAREA  = [3,8,25,33];
 /* Taglio del lato +Y dei ripiani 2 e 3: la fascia dello stilo e dei cavi. */
 const CUT = {y:139.5, x0:33, x1:133};
 
@@ -229,7 +205,7 @@ const S = 0.01;                            /* mm → unità di scena */
 const state = {mode:"banco", explode:0, decks:[true,true,true], pins:true, wad:true, sel:null, hover:null};
 let lang = "it", ready = false, active = false, failed = false;
 let stage, cv, renderer, scene, cam, root, ray, ndc;
-let panels = [], plates = [], groups = [], wings, vano, wad, holes, lidKit, extHW, riser = null;
+let panels = [], plates = [], groups = [], wings, wingEdges, vano, wad, holes, lidKit, extHW, riser = null;
 let az = -0.72, pol = 1.02, dist = 4.6, drag = false, lx = 0, ly = 0, pinch = 0, moved = false, lastTouch = 0;
 const tgt = {x:0, y:0.62, z:0};
 const pinEls = {};
@@ -305,17 +281,16 @@ function buildScene(){
     rib.position.copy(V(XW, sg > 0 ? INT.d + WALL + 6 : -WALL - 6, INT.h/2)); wings.add(rib);
   });
   root.add(wings);
-
-  /* Braccetto esterno */
-  const rod = new THREE.Mesh(new THREE.CylinderGeometry(3*S, 3*S, 150*S, 12),
-    new THREE.MeshStandardMaterial({color:0x4a5560, roughness:.6}));
-  rod.rotation.z = Math.PI/2; rod.position.copy(V(-WALL - 75, 100, INT.h*.62)); root.add(rod);
-  const tip = new THREE.Mesh(new THREE.BoxGeometry(14*S, 10*S, 10*S),
-    new THREE.MeshStandardMaterial({color:0xF5F7F8, roughness:.92, metalness:.02}));
-  tip.position.copy(V(-WALL - 150, 100, INT.h*.62)); root.add(tip);
-  const shield = new THREE.Mesh(new THREE.BoxGeometry(30*S, 2*S, 24*S),
-    new THREE.MeshStandardMaterial({color:0xF5F7F8, metalness:.05, roughness:.9, side:THREE.DoubleSide}));
-  shield.position.copy(V(-WALL - 140, 100, INT.h*.62 + 16)); root.add(shield);
+  /* A Banco le alette restano solo come contorno: i componenti 21 e 24
+     stanno in cima a loro, e senza quel contorno sembrerebbero sospesi. */
+  wingEdges = new THREE.Group();
+  wings.children.forEach(function(m){
+    if(m.geometry.parameters.depth !== 250*S) return;
+    const e = new THREE.LineSegments(new THREE.EdgesGeometry(m.geometry),
+      new THREE.LineBasicMaterial({color:0x8e9aa6, transparent:true, opacity:.5}));
+    e.position.copy(m.position); wingEdges.add(e);
+  });
+  root.add(wingEdges);
 
   /* Struttura interna, coibentazione, finestra UV, aperture */
   vano = new THREE.Group(); wad = new THREE.Group(); holes = new THREE.Group(); lidKit = new THREE.Group(); extHW = new THREE.Group();
@@ -340,8 +315,9 @@ function buildScene(){
     const wLid = new THREE.Mesh(new THREE.BoxGeometry(150*S, 10*S, 150*S), xps);
     wLid.position.copy(V(80, 80, 136)); lidKit.add(wLid);
     /* Ciuffi nelle intercapedini laterali: interrompono il moto convettivo
-       lungo le pareti fredde. Restano scoperti il dorso della Space Cam,
-       la zona del PMS e della staffa, e il DS18B20 al centro del volume. */
+       lungo le pareti fredde. Restano scoperti il dorso della Space Cam
+       (che deve scaldare la scatola) e la zona del PMS. Il PT1000 interno
+       (25) va invece COPERTO: deve seguire la parete, non l'aria. */
     const tuft = function(x0, x1, y0, y1, z0, z1){
       const m = new THREE.Mesh(new THREE.BoxGeometry((x1-x0)*S, (z1-z0)*S, (y1-y0)*S), fluff);
       m.position.copy(V((x0+x1)/2, (y0+y1)/2, (z0+z1)/2)); wad.add(m);
@@ -349,6 +325,7 @@ function buildScene(){
     const ZB = [[2,34],[42,74],[82,128]];
     ZB.forEach(function(b){ tuft(18, 147, 0.5, 6.5, b[0], b[1]); });                       /* parete -Y */
     ZB.forEach(function(b){ tuft(0.5, 6, 18, 48, b[0], b[1]); tuft(0.5, 6, 124, 147, b[0], b[1]); });  /* parete -X */
+    tuft(0.5, 6, 48, 124, 42, 74);                     /* fascia centrale, liberata dalla staffa */
     ZB.forEach(function(b){ tuft(160.5, 164.5, 18, 48, b[0], b[1]); });                    /* parete +X */
     tuft(160.5, 164.5, 53, 113, 2, 30); tuft(160.5, 164.5, 53, 113, 82, 128);
     ZB.slice(0,2).forEach(function(b){ tuft(160.5, 164.5, 118, 147, b[0], b[1]); });
@@ -385,39 +362,25 @@ function buildScene(){
       rise.userData.y0 = rise.position.y; riser = rise; vano.add(rise);
     }
 
-    /* Staffa esterna ancorata al blocco dei ripiani */
-    const brk = new THREE.MeshStandardMaterial({color:0x8894A0, metalness:.5, roughness:.5});
-    const plate = new THREE.Mesh(new THREE.BoxGeometry((WALL + 40)*S, 4*S, 50*S), brk);
-    plate.position.copy(V(-WALL - 10, INT.d/2, INT.h*0.62)); extHW.add(plate);
-    const anchor = new THREE.Mesh(new THREE.BoxGeometry(30*S, 4*S, 50*S), brk);
-    anchor.position.copy(V(12, INT.d/2, INT.h*0.62)); extHW.add(anchor);
-
-    /* Tubo di confronto: esterno, con curva a 90° (separatore inerziale) */
-    const tp = part(26);
-    if(tp){
-      const tm = new THREE.MeshStandardMaterial({color:0x9FB0BF, roughness:.6, metalness:.2,
-        transparent:true, opacity:.55, side:THREE.DoubleSide});
-      const yy = 55, XT = -WALL - 24, zEl = 45;
-      /* Tratto verticale di PRESA: bocca aperta in alto, scende fino al gomito */
-      const tv = new THREE.Mesh(new THREE.CylinderGeometry(6*S, 6*S, 72*S, 16), tm);
-      tv.position.copy(V(XT, yy, zEl + 36)); extHW.add(tv);
-      const elb = new THREE.Mesh(new THREE.SphereGeometry(6.5*S, 14, 12), tm);
-      elb.position.copy(V(XT, yy, zEl)); extHW.add(elb);
-      /* Tratto ORIZZONTALE: il sensore n. 26 sta qui, a valle della curva */
-      const th = new THREE.Mesh(new THREE.CylinderGeometry(6*S, 6*S, 40*S, 16), tm);
-      th.rotation.z = Math.PI/2; th.position.copy(V(XT - 20, yy, zEl)); extHW.add(th);
-      const hm3 = new THREE.MeshStandardMaterial({color:0x1a2733, roughness:.8, side:THREE.DoubleSide});
-      /* Le bocche sono aperte: si disegna l'orlo, non un tappo. */
-      const rimM = new THREE.MeshStandardMaterial({color:0x37B6C4, roughness:.5});
-      const inlet = new THREE.Mesh(new THREE.TorusGeometry(6*S, 0.9*S, 8, 24), rimM);
-      inlet.rotation.x = Math.PI/2; inlet.position.copy(V(XT, yy, zEl + 72)); holes.add(inlet);
-      const outlet = new THREE.Mesh(new THREE.TorusGeometry(6*S, 0.9*S, 8, 24), rimM);
-      outlet.rotation.y = Math.PI/2; outlet.position.copy(V(XT - 40, yy, zEl)); holes.add(outlet);
-      const drain = new THREE.Mesh(new THREE.CylinderGeometry(1.6*S, 1.6*S, 4*S, 10), hm3);
-      drain.position.copy(V(XT, yy, zEl - 7)); holes.add(drain);
-      const wire = new THREE.Mesh(new THREE.CylinderGeometry(1.5*S, 1.5*S, WALL*S, 10), hm3);
-      wire.rotation.z = Math.PI/2; wire.position.copy(V(-WALL/2, yy, zEl)); holes.add(wire);
-    }
+    /* Cavi dei due sensori esterni: corrono lungo l'aletta, entrano da un
+       foro di 3 mm sotto il coperchio (z = 125) e scendono dentro. */
+    const cavo = new THREE.MeshStandardMaterial({color:PAL.alim, roughness:.6});
+    const cable = function(pts){
+      extHW.add(new THREE.Mesh(new THREE.TubeGeometry(
+        new THREE.CatmullRomCurve3(pts.map(function(q){ return V(q[0], q[1], q[2]); })),
+        48, 1.1*S, 6, false), cavo));
+    };
+    cable([[88,436,174],[88,320,168],[88,200,160],[88,200,125],[88,190,125],[88,160,125]]);   /* PT1000, ala +Y */
+    cable([[97,-248,156],[92,-200,150],[90,-35,135],[88,-35,125],[70,-25,125],[70,5,125]]);   /* SHT45, ala -Y */
+    const passo = new THREE.MeshStandardMaterial({color:0x1a2733, roughness:.8});
+    [[88, INT.d + WALL/2], [70, -WALL/2]].forEach(function(q){
+      const h = new THREE.Mesh(new THREE.CylinderGeometry(1.6*S, 1.6*S, WALL*S, 10), passo);
+      h.rotation.x = Math.PI/2; h.position.copy(V(q[0], q[1], 125)); holes.add(h);
+    });
+    /* Tettuccio bianco sopra l'SHT45: sole e pioggia, non il filtro in PTFE */
+    const hood = new THREE.Mesh(new THREE.BoxGeometry(16*S, 1.5*S, 32*S),
+      new THREE.MeshStandardMaterial({color:0xF5F7F8, roughness:.9}));
+    hood.position.copy(V(94, -257, 169)); extHW.add(hood);
 
     /* Obiettivo della camera e passaggio del cavo */
     const camL = part(8);
@@ -480,7 +443,27 @@ function buildScene(){
   place();
 }
 
-/* ---------- Camera in orbita ---------- */
+/* ---------- Camera in orbita ----------
+   Le alette sono lunghe un quarto di metro e i due sensori esterni stanno
+   in cima a loro, a quasi mezzo metro dal centro della scatola: per
+   vederli l'inquadratura deve allargarsi parecchio. A Volo lo fa sempre,
+   perche' li' la sonda si guarda tutta intera; a Banco resta stretta sulla
+   scatola — dove servono i numeri — e si allarga solo quando si sceglie
+   uno dei due pezzi esterni, altrimenti si sceglierebbe qualcosa che
+   nemmeno si vede. */
+const DIST = {banco:4.6, fuori:9.2, volo:9.2};
+function distanza(){
+  if(state.mode === "volo") return DIST.volo;
+  return (state.sel && EXT_IDS.indexOf(state.sel.id) >= 0) ? DIST.fuori : DIST.banco;
+}
+/* Unico punto da cui passa la scelta di un componente: tiene insieme la
+   scheda, l'elenco e l'inquadratura. */
+function seleziona(p){
+  state.sel = p;
+  const d = distanza();
+  if(ready && Math.abs(dist - d) > .01){ dist = d; place(); }
+  renderDetail(); renderList();
+}
 function place(){
   pol = Math.max(.18, Math.min(Math.PI - .18, pol));
   dist = Math.max(2.2, Math.min(11, dist));
@@ -515,7 +498,7 @@ function bindPointer(){
       pinch = d;
     }
   }, {passive:true});
-  cv.addEventListener("click", e => { if(!moved){ state.sel = pick(e); renderDetail(); renderList(); } });
+  cv.addEventListener("click", e => { if(!moved) seleziona(pick(e)); });
   cv.addEventListener("pointermove", e => { if(!drag){ state.hover = pick(e); renderDetail(); } });
 }
 
@@ -581,6 +564,7 @@ function loop(){
   lidKit.position.y = ex*2.7;
   if(riser) riser.position.y = riser.userData.y0 + ex*1.8;
   wings.visible = !banco;
+  wingEdges.visible = banco;
   vano.visible  = banco;
   /* L'ovatta sparisce quando si esplode: coprirebbe i ripiani che si alzano. */
   wad.visible   = banco && state.wad && ex < .05;
@@ -598,7 +582,7 @@ function loop(){
       e = document.createElement("button");
       e.className = "pin"; e.textContent = p.id; e.style.borderColor = PAL[p.cat];
       e.setAttribute("aria-label", p.n[lang]);
-      e.onclick = () => { state.sel = p; renderDetail(); renderList(); };
+      e.onclick = () => seleziona(p);
       stage.appendChild(e); pinEls[p.id] = e;
     }
     if(!show){ if(e){ e.remove(); delete pinEls[p.id]; } return; }
@@ -615,7 +599,8 @@ function loop(){
 
 /* ---------- Interfaccia ---------- */
 const totMass = PARTS.reduce((s,p) => s + p.g, 0);
-const totArea = PARTS.filter(p => EXT_IDS.indexOf(p.id) < 0).reduce((s,p) => s + p.w*p.d, 0)/100;
+const totArea = PARTS.filter(p => EXT_IDS.indexOf(p.id) < 0 && NOAREA.indexOf(p.id) < 0)
+                     .reduce((s,p) => s + p.w*p.d, 0)/100;
 
 /* Esporta il fotogramma corrente come PNG a fondo trasparente, a
    risoluzione moltiplicata. Serve per riusare il modello nelle altre
@@ -640,10 +625,15 @@ function esportaPNG(scala){
 window.esportaPNG = esportaPNG;
 
 function renderDecks(){
+  /* La nota sulla massa sta sotto la scena e c'e' sempre; la scheda
+     «occupazione dei ripiani» solo dove la pagina la prevede. Prima
+     stavano insieme, e senza quella scheda la nota restava vuota. */
+  const mn = el("massNote");
+  if(mn) mn.textContent = T("massNote").replace("{mass}", totMass);
   const box = el("decks"); if(!box) return;
   box.innerHTML = DECKS.map(d => {
     const ps = PARTS.filter(p => p.deck === d.n && EXT_IDS.indexOf(p.id) < 0);
-    const a = ps.reduce((s,p) => s + p.w*p.d, 0)/100;
+    const a = ps.filter(p => NOAREA.indexOf(p.id) < 0).reduce((s,p) => s + p.w*p.d, 0)/100;
     const m = ps.reduce((s,p) => s + p.g, 0);
     const f = a/FLOOR;
     return '<div class="row"><span class="nm">' + T(d.key) + '</span><span class="pc">' + Math.round(f*100) + '%</span></div>' +
@@ -652,8 +642,6 @@ function renderDecks(){
   }).join("");
   const tot = el("tot");
   if(tot) tot.textContent = T("totLine").replace("{area}", totArea.toFixed(0)).replace("{mass}", totMass);
-  const mn = el("massNote");
-  if(mn) mn.textContent = T("massNote").replace("{mass}", totMass);
 }
 
 function renderLegend(){
@@ -669,9 +657,9 @@ function renderList(){
     '<button type="button" data-id="' + p.id + '" class="' + (state.sel && state.sel.id === p.id ? "on" : "") + '">' +
     '<span class="i" style="color:' + PAL[p.cat] + '">' + p.id + '</span>' +
     '<span class="n">' + p.n[lang] + '</span><span class="g">' +
-    (EXT_IDS.indexOf(p.id) >= 0 ? T("uExt") : "R" + p.deck) + ' · ' + p.g + ' g</span></button>').join("");
+    (EXT_IDS.indexOf(p.id) >= 0 ? T("uExt") : p.id === 25 ? T("uWall") : "R" + p.deck) + ' · ' + p.g + ' g</span></button>').join("");
   l.querySelectorAll("button").forEach(b => {
-    b.onclick        = () => { state.sel = PARTS.find(p => p.id == b.dataset.id); renderDetail(); renderList(); };
+    b.onclick        = () => seleziona(PARTS.find(p => p.id == b.dataset.id));
     b.onmouseenter   = () => { state.hover = PARTS.find(p => p.id == b.dataset.id); renderDetail(); };
     b.onmouseleave   = () => { state.hover = null; renderDetail(); };
   });
@@ -680,7 +668,9 @@ function renderList(){
 /* Dove sta il pezzo: fuori, incassato in una parete, a cavallo di tre
    ripiani come lo stilo del LoRa, oppure su un ripiano solo. */
 function dove(p){
-  if(EXT_IDS.indexOf(p.id) >= 0) return T("whereExt");
+  if(p.id === 24)                return T("whereWingP");
+  if(p.id === 21)                return T("whereWingM");
+  if(p.id === 25)                return T("whereWallLow");
   if(p.id === 3 || p.id === 8)   return T("whereWall");
   if(p.id === 33)                return T("whereSpan");
   return T("whereDeck") + " " + p.deck;
@@ -705,7 +695,7 @@ function setMode(m){
   el("mBanco").setAttribute("aria-pressed", m === "banco");
   el("mVolo").setAttribute("aria-pressed", m === "volo");
   stage.classList.toggle("volo", m === "volo");
-  dist = (m === "volo") ? 6.4 : 4.6;   /* a Volo servono anche le alette */
+  dist = distanza();                   /* a Volo entra tutta la sonda, alette comprese */
   if(ready) place();
   stage.style.backgroundImage = (m === "volo" && SKYIMG) ? "url(" + SKYIMG + ")" : "";
   el("ctlBanco").style.display = m === "banco" ? "flex" : "none";

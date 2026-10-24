@@ -24,7 +24,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@200;300;400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/cometa.css?v=201">
+<link rel="stylesheet" href="assets/cometa.css?v=202">
 </head>
 <body>
 <div class="sim-bar" style="position:sticky;top:0;z-index:90;background:#3a1600;border-bottom:1px solid rgba(255,184,77,.5);padding:11px 20px;font-family:var(--mono);font-size:12.5px;color:#FFB84D;display:flex;gap:16px;flex-wrap:wrap;align-items:center">
@@ -377,8 +377,8 @@
           <tbody>
             <tr><td data-i18n="mv1">Quota, velocità, traiettoria</td><td class="mono">SAM-M8Q</td><td class="ok" data-i18n="mv1v">tutto il volo</td></tr>
             <tr><td data-i18n="mv2">Pressione</td><td class="mono">MS8607</td><td class="ok">31 km</td></tr>
-            <tr><td data-i18n="mv3">Temperatura dell'aria</td><td class="mono">2 × PT1000</td><td class="ok" data-i18n="mv3v">tutto il volo</td></tr>
-            <tr><td data-i18n="mv4">Temperature interne</td><td class="mono">3 × DS18B20</td><td class="ok" data-i18n="mv4v">tutto il volo</td></tr>
+            <tr><td data-i18n="mv3">Temperatura dell'aria</td><td class="mono">PT1000</td><td class="ok" data-i18n="mv3v">tutto il volo</td></tr>
+            <tr><td data-i18n="mv4">Temperature interne</td><td class="mono">PT1000 + MS8607</td><td class="ok" data-i18n="mv4v">tutto il volo</td></tr>
             <tr><td data-i18n="mv5">Umidità relativa</td><td class="mono">SHT45</td><td class="ok">11 km</td></tr>
             <tr><td data-i18n="mv6">Anidride carbonica</td><td class="mono">SCD30</td><td class="ok">15 km</td></tr>
             <tr><td data-i18n="mv7">Particolato</td><td class="mono">PMS5003</td><td class="ok" data-i18n="mv7v">4–5 km</td></tr>
@@ -632,7 +632,7 @@
   <section class="section" style="padding-top:24px">
     <div class="wrap">
       <div class="sonda-top">
-        <p style="font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint)">KLO-01 · 160 × 160 × 130 mm · 27 <span data-i18n="uParts">pezzi</span></p>
+        <p style="font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint)">KLO-01 · 165 × 165 × 140 mm · 25 <span data-i18n="uParts">pezzi</span></p>
         <div class="seg" role="group" aria-label="Banco / Volo">
           <button id="mBanco" class="on" aria-pressed="true" type="button" data-i18n="modeBench">Banco</button>
           <button id="mVolo" aria-pressed="false" type="button" data-i18n="modeFlight">Volo</button>
@@ -661,7 +661,7 @@
             </div>
             <button class="tog on" id="togPins" aria-pressed="true" type="button" data-i18n="ctlPins">Numeri</button>
           </div>
-          <p id="ctlVolo" style="display:none;margin-top:14px;color:var(--muted);font-size:15px" data-i18n="flightNote">Sonda chiusa, con ali di stabilizzazione, braccetto esterno e tubo di confronto.</p>
+          <p id="ctlVolo" style="display:none;margin-top:14px;color:var(--muted);font-size:15px" data-i18n="flightNote">Sonda chiusa, con le alette di stabilizzazione: in cima all'ala +Y il PT1000 esterno, in cima all'ala −Y il sensore di umidità.</p>
         </div>
 
         <div>
@@ -879,7 +879,7 @@
       </div>
 
       <div class="map-frame reveal d1">
-        <iframe id="mapFrame" src="mappe/uru2000_footprint.html?v=201"
+        <iframe id="mapFrame" src="mappe/uru2000_footprint.html?v=202"
                 title="Mappa interattiva dei 600 punti di atterraggio simulati con le ellissi di dispersione"
                 loading="lazy"></iframe>
       </div>
@@ -1408,16 +1408,16 @@
   };
 })();
 </script>
-<script src="assets/i18n.js?v=201"></script>
-<script src="assets/volo.js?v=201"></script>
-<script src="assets/sonda.js?v=201"></script>
-<script src="assets/catena.js?v=201"></script>
-<script src="lora/formato/fasi.js?v=201"></script>
-<script src="assets/lora.js?v=201"></script>
-<script src="assets/profilo.js?v=201"></script>
-<script src="assets/spot.js?v=201"></script>
-<script src="assets/app.js?v=201"></script>
-<script src="assets/msis.js?v=201"></script>
-<script src="assets/traiettoria.js?v=201"></script>
+<script src="assets/i18n.js?v=202"></script>
+<script src="assets/volo.js?v=202"></script>
+<script src="assets/sonda.js?v=202"></script>
+<script src="assets/catena.js?v=202"></script>
+<script src="lora/formato/fasi.js?v=202"></script>
+<script src="assets/lora.js?v=202"></script>
+<script src="assets/profilo.js?v=202"></script>
+<script src="assets/spot.js?v=202"></script>
+<script src="assets/app.js?v=202"></script>
+<script src="assets/msis.js?v=202"></script>
+<script src="assets/traiettoria.js?v=202"></script>
 </body>
 </html>
