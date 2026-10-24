@@ -22,7 +22,7 @@ it:{
 
   /* — Diretta (bozza) — */
   dirKicker:"Il giorno del lancio",
-  dirSub:"Il video dal campo e la posizione della sonda, in tempo reale.",
+  dirSub:"Il video dal campo e la posizione della sonda, in tempo reale. Per non perdere la diretta, <a href=\"https://www.youtube.com/@cometasim\" target=\"_blank\" rel=\"noopener\">iscriviti al nostro canale YouTube, COMETASIM</a>.",
   dirWip:"Pagina in costruzione",
   dirStatusPre:"Diretta tra poco", dirStatusLive:"In diretta ora",
   dirBannerDesc:"— video dal campo e posizione GPS", dirBannerCta:"Guarda →",
@@ -493,7 +493,7 @@ es:{
 
   /* — En vivo (borrador) — */
   dirKicker:"El día del lanzamiento",
-  dirSub:"El video desde el terreno y la posición de la sonda, en tiempo real.",
+  dirSub:"El video desde el terreno y la posición de la sonda, en tiempo real. Para no perderte la transmisión, <a href=\"https://www.youtube.com/@cometasim\" target=\"_blank\" rel=\"noopener\">suscríbete a nuestro canal de YouTube, COMETASIM</a>.",
   dirWip:"Página en construcción",
   dirStatusPre:"En vivo pronto", dirStatusLive:"En vivo ahora",
   dirBannerDesc:"— video desde el terreno y posición GPS", dirBannerCta:"Mirar →",
@@ -957,7 +957,7 @@ en:{
 
   /* — Live (draft) — */
   dirKicker:"Launch day",
-  dirSub:"Footage from the field and the probe's position, in real time.",
+  dirSub:"Footage from the field and the probe's position, in real time. Not to miss the live stream, <a href=\"https://www.youtube.com/@cometasim\" target=\"_blank\" rel=\"noopener\">subscribe to our YouTube channel, COMETASIM</a>.",
   dirWip:"Page under construction",
   dirStatusPre:"Live soon", dirStatusLive:"Live now",
   dirBannerDesc:"— footage from the field and GPS position", dirBannerCta:"Watch →",
