@@ -217,9 +217,9 @@
      traiettoria prevista con lo stesso calcolo della Diretta: traiettoria.js
      (con msis.js) ricalcola salita, scoppio e discesa col meteo del giorno,
      volo.js fa la richiesta a Tawhiri. -->
-<script src="assets/volo.js?v=stazione-4"></script>
+<script src="assets/volo.js?v=stazione-5"></script>
 <script src="assets/msis.js?v=stazione-4"></script>
-<script src="assets/traiettoria.js?v=stazione-4"></script>
+<script src="assets/traiettoria.js?v=stazione-5"></script>
 <script>
 /* ==================================================================
    Il formato della riga radio: COPIA di lora/formato/formato.js.
@@ -408,7 +408,7 @@ function chiaveDoppione(dati) {
 /* Da cambiare a ogni modifica della pagina: e' scritta in Setup, e
    dice a colpo d'occhio se il telefono sta usando la pagina nuova o una
    copia vecchia rimasta in memoria. */
-const VERSIONE = "2026-10-24";
+const VERSIONE = "2026-10-24b";
 
 const WORKER_PREDEFINITO = "https://lora.cometa.gripe";
 const WORKER = (new URLSearchParams(location.search).get("worker") || WORKER_PREDEFINITO).replace(/\/+$/, "");
@@ -730,12 +730,17 @@ let mappa = null, lineaTraccia, puntoUltimo, puntoIo, vista3d = null;
 function coloreLora() { return getComputedStyle(document.documentElement).getPropertyValue("--lora").trim() || "#7b2ff2"; }
 function preparaMappa() {
   if (!window.L) return; // Leaflet non caricato (offline alla prima apertura): il resto funziona lo stesso
-  mappa = L.map("map", { zoomSnap: .25, zoomDelta: .5 }).setView([-33.25, -58.07], 9);  // a quarti di livello, come il predittore
+  /* si apre sul luogo del lancio (FLIGHT_SITE in assets/volo.js); zoom a quarti di livello, come il predittore */
+  const sito = (window.COMETA_FLIGHT && window.COMETA_FLIGHT.site) || { lat: -34.2919, lon: -55.3531 };
+  mappa = L.map("map", { zoomSnap: .25, zoomDelta: .5 }).setView([sito.lat, sito.lon], 9);
   const strade = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
     maxZoom: 18,
     attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
   }).addTo(mappa);
   L.control.scale({ imperial: false, position: "bottomright" }).addTo(mappa);
+  /* la traiettoria prevista sotto la traccia vera, in un piano suo (l'area,
+     poi le linee, poi i punti, nell'ordine in cui si aggiungono) */
+  mappa.createPane("previsione").style.zIndex = 350;
   /* Come nella Diretta: vista satellite, nuvole/pioggia, schermo intero
      sul riquadro (che contiene anche il 3D), e il pulsante 3D. Tutto
      spento all'avvio: si accende dai pulsanti sulla mappa. */
@@ -784,38 +789,97 @@ function aggiornaMappa() {
 }
 
 /* Cosa mostra il 3D: la traccia ricevuta, ogni punto alla sua quota (lo
-   stesso formato che la Diretta passa a map3d.js). */
+   stesso formato che la Diretta passa a map3d.js), e la traiettoria
+   prevista con gli stessi colori del 2D: tubo, proiezione a terra, scoppio,
+   atterraggio e area di atterraggio, grigi. */
 function scena3d() {
-  return { runs: previsione && trajOn ? [{ pts: previsione.full }] : [], main: false, col: { up: "#8FA6BC", down: "#8FA6BC" },
-    live: { pts: volo.punti3d, color: coloreLora() } };
+  const sc = { runs: [], main: false, live: { pts: volo.punti3d, color: coloreLora() } };
+  if (previsione && trajOn) {
+    sc.runs = [{ pts: previsione.full, burst: previsione.burst, end: previsione.end }];
+    sc.col = { up: GRIGIO, down: GRIGIO };
+    sc.ombra = GRIGIO;
+    sc.pin = { land: GRIGIO, burst: GRIGIO_CHIARO };
+    sc.labels = { burst: testoScoppio(), land: testoArrivo() };
+    if (areaPrevista && areaPrevista.length >= 3)
+      sc.fills = [{ ring: areaPrevista.map(function (p) { return [p[1], p[0]]; }), color: GRIGIO, opacity: .3 }];
+  }
+  return sc;
 }
 
 /* ==================================================================
-   La traiettoria prevista, come nella Diretta
+   La traiettoria prevista, come nella Diretta il giorno del lancio
 
    La stessa richiesta (COMETA_PREVISIONE in assets/volo.js) con gli
    stessi dati del volo, ricalcolati da assets/traiettoria.js col meteo
-   del giorno: la stazione e la Diretta disegnano la stessa linea. Qui e'
-   spenta all'avvio: si accende dal pulsante sulla mappa, e la scelta resta
-   nel browser. Senza rete non c'e' (Tawhiri e' un servizio esterno).
+   del giorno: la stazione e la Diretta disegnano la stessa linea. Sempre
+   come la Diretta il giorno del lancio: grigia, piena fino allo scoppio e
+   tratteggiata dopo, con scoppio e atterraggio come nel predittore ma
+   grigi. In piu' l'area di atterraggio, grigia: l'involucro degli
+   atterraggi con diametro di scoppio, salita e discesa a ±10%, come
+   l'opzione «Calcola l'intervallo» del predittore (8 voli in piu',
+   COMETA_TRAIETTORIA.incertezza e .area), ricalcolata solo quando cambia
+   la previsione. Qui e' spenta all'avvio: si accende dal pulsante sulla
+   mappa, e la scelta resta nel browser. Senza rete non c'e' (Tawhiri e'
+   un servizio esterno).
    ================================================================== */
-let previsione = null, lineaPrevista = null, trajOn = false, trajBtn = null;
+const GRIGIO = "#8FA6BC", GRIGIO_CHIARO = "#D3DDE6", INCERTEZZA = 0.10;
+let previsione = null, areaPrevista = null, gruppoPrevisto = null, trajOn = false, trajBtn = null, seqPrevisione = 0;
 try { trajOn = localStorage.getItem("cometa-stazione-traiettoria") === "on"; } catch (e) {}
 function chiediPrevisione() {
   if (!window.COMETA_PREVISIONE) return;
+  const seq = ++seqPrevisione;
   window.COMETA_PREVISIONE().then(function (pr) {
-    if (!pr) return;
+    if (!pr || seq !== seqPrevisione) return;
+    const stessa = previsione && previsione.key === pr.key && areaPrevista;
     previsione = pr;
-    if (lineaPrevista) lineaPrevista.setLatLngs(pr.pts);
-    mostraPrevisione();
+    if (stessa) return;                    // stessa corsa GFS, stessi dati: l'area e' quella di prima
+    areaPrevista = null;
+    disegnaPrevisione();
+    const T = window.COMETA_TRAIETTORIA;
+    if (!T || !T.incertezza) return;
+    const voli = T.incertezza(INCERTEZZA), fini = [];
+    let i = 0;
+    /* tre richieste alla volta, come il predittore: il servizio e' gratuito e condiviso */
+    function prossimo() {
+      if (i >= voli.length || seq !== seqPrevisione) return Promise.resolve();
+      return window.COMETA_PREVISIONE(voli[i++]).then(function (r) { if (r) fini.push(r.end); return prossimo(); });
+    }
+    Promise.all([prossimo(), prossimo(), prossimo()]).then(function () {
+      if (seq !== seqPrevisione || fini.length < 2) return;
+      areaPrevista = T.area(pr.end, fini);
+      disegnaPrevisione();
+    });
   });
+}
+function testoScoppio() { return "Burst altitude " + (previsione.burst.alt / 1000).toFixed(1) + " km"; }
+function testoArrivo() {
+  return "Landing " + new Intl.DateTimeFormat("en-GB", { timeZone: "America/Montevideo", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(previsione.end.t);
+}
+/* Ridisegna da capo (una corsa GFS nuova, o l'area appena calcolata) */
+function disegnaPrevisione() {
+  if (!mappa || !previsione) return;
+  const P = "previsione", pr = previsione, ll = function (p) { return [p.lat, p.lon]; };
+  if (gruppoPrevisto) mappa.removeLayer(gruppoPrevisto);
+  gruppoPrevisto = L.featureGroup();
+  if (areaPrevista && areaPrevista.length >= 3)
+    L.polygon(areaPrevista, { pane: P, color: GRIGIO, weight: 2, opacity: .9, fillColor: GRIGIO, fillOpacity: .18 })
+      .bindTooltip("Landing area: burst diameter, ascent and descent rate ±" + Math.round(INCERTEZZA * 100) + "%", { sticky: true }).addTo(gruppoPrevisto);
+  const su = pr.full.filter(function (p) { return p.up; }).map(ll), giu = pr.full.filter(function (p) { return !p.up; }).map(ll);
+  if (giu.length) giu.unshift(ll(pr.burst));
+  L.polyline(su, { pane: P, color: GRIGIO, weight: 3, opacity: .95, interactive: false }).addTo(gruppoPrevisto);
+  L.polyline(giu, { pane: P, color: GRIGIO, weight: 2.5, opacity: .95, dashArray: "6 7", interactive: false }).addTo(gruppoPrevisto);
+  L.circleMarker(ll(pr.burst), { pane: P, radius: 5, color: GRIGIO, weight: 2, fillColor: GRIGIO_CHIARO, fillOpacity: 1, bubblingMouseEvents: false })
+    .bindTooltip(testoScoppio()).addTo(gruppoPrevisto);
+  L.circleMarker(ll(pr.end), { pane: P, radius: 8, color: "#02060f", weight: 2, fillColor: GRIGIO, fillOpacity: 1, bubblingMouseEvents: false })
+    .bindTooltip(testoArrivo()).addTo(gruppoPrevisto);
+  mostraPrevisione();
 }
 function mostraPrevisione() {
   if (!mappa) return;
-  if (!lineaPrevista && previsione) lineaPrevista = L.polyline(previsione.pts, { color: "#6f8296", weight: 2, opacity: .9, dashArray: "5 8", interactive: false });
-  if (lineaPrevista) {
-    if (trajOn && !mappa.hasLayer(lineaPrevista)) lineaPrevista.addTo(mappa).bringToBack();
-    if (!trajOn && mappa.hasLayer(lineaPrevista)) mappa.removeLayer(lineaPrevista);
+  if (!gruppoPrevisto && previsione) { disegnaPrevisione(); return; }
+  if (gruppoPrevisto) {
+    if (trajOn && !mappa.hasLayer(gruppoPrevisto)) gruppoPrevisto.addTo(mappa);
+    if (!trajOn && mappa.hasLayer(gruppoPrevisto)) mappa.removeLayer(gruppoPrevisto);
   }
   if (trajBtn) trajBtn.classList.toggle("mk-active", trajOn);
   if (vista3d && vista3d.isOn() && vista3d.ctl()) vista3d.ctl().render(scena3d(), false);

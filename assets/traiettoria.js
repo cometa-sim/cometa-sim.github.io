@@ -44,6 +44,11 @@ const TZ_OFF = "-03:00";            /* l'Uruguay non ha ora legale dal 2015 */
    giorno puo' non essere coperto per intero: nelle ore oltre la fine della
    corsa Tawhiri risponde con un errore, e lo si mostra (twErr). */
 const GIORNI_MAX = 8;
+/* oggi e l'ultimo giorno della previsione (isoDay e addDays, piu' sotto,
+   valgono gia' qui: sono dichiarazioni di funzione) */
+const today = isoDay(new Date());
+const lastDay = addDays(today, GIORNI_MAX);
+const RAD = Math.PI/180;
 const LEAFLET = "assets/vendor/leaflet/";
 const COL = "#5FE3FF";              /* --cyan */
 const TILES = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
@@ -102,9 +107,12 @@ const URU = [[-57.65,-30.20],[-55.55,-30.90],[-53.90,-32.10],[-53.40,-33.70],
 
 const $ = function(s){ return document.querySelector(s); };
 const form = $("#twForm");
-/* Se la pagina e lo script non sono della stessa versione (una cache
-   che ne ha aggiornato uno solo) meglio non fare niente che fare danni. */
-if(!form || !$("#twWhere") || !$("#twBal")) return;
+/* Senza il modulo (la pagina della stazione LoRa, lora/stazione/, o una
+   pagina e uno script di versioni diverse, per una cache che ne ha
+   aggiornato uno solo) gira solo il calcolo del volo vero: voloDiretta e
+   COMETA_TRAIETTORIA, piu' sotto. Tutto il resto, che vive nel modulo,
+   no: meglio non fare niente che fare danni. */
+const MODULO = !!(form && $("#twWhere") && $("#twBal"));
 const elWhere = $("#twWhere"), elSugg = $("#twSugg"), elGeo = $("#twGeo"),
       elDate = $("#twDate"), elTime = $("#twTime"),
       elBal = $("#twBal"), elDiam = $("#twDiam"), elMass = $("#twMass"), elPay = $("#twPay"),
@@ -450,6 +458,10 @@ function fcWarn(r){
   const na = r && r.fc && r.fc.na;
   if(zero || na) elWarn.appendChild(el("li", "tw-fc", t(zero ? "twFcZero" : "twFcNa")));
 }
+/* Da qui in poi serve il modulo (vedi MODULO): senza, solo il volo vero.
+   Le costanti e le funzioni del calcolo stanno tutte qui sopra. */
+if(!MODULO){ voloDiretta(); esporta(); return; }
+
 /* lo scarto da UTC puo' cambiare col giorno, dove c'e' l'ora legale */
 [elDate, elTime].forEach(function(e){ e.addEventListener("input", etichettaOra); });
 [elBal, elDiam, elMass, elPay, elAsc, elCyl, elPCyl, elTGonf, elChute, elBurst, elDesc, elDate, elTime, elFcOn].forEach(function(e){
@@ -704,8 +716,6 @@ function addDays(iso, n){
   d.setUTCDate(d.getUTCDate() + n);
   return isoDay(d);
 }
-const today = isoDay(new Date());
-const lastDay = addDays(today, GIORNI_MAX);
 elDate.min = today; elDate.max = lastDay;
 if(elToDay){ elToDay.min = today; elToDay.max = lastDay; }
 (function defaults(){
@@ -733,7 +743,6 @@ function inPoly(lon, lat, poly){
   }
   return inside;
 }
-const RAD = Math.PI/180;
 function distKm(la1, lo1, la2, lo2){
   const a = Math.pow(Math.sin((la2 - la1)*RAD/2), 2) +
             Math.cos(la1*RAD)*Math.cos(la2*RAD)*Math.pow(Math.sin((lo2 - lo1)*RAD/2), 2);
@@ -1755,6 +1764,7 @@ function voloDiretta(){
     F.burstKm = (col ? quotaScoppioCol(V, pr.diam, col) : quotaScoppio(V, pr.diam))/1000;
     F.descentV0Ms = vAtterraggio(c.pay + PARA_M, PARA_D);
     F.atmo = col ? "day" : "std";
+    F.calcolo = {V:V, diam:pr.diam, col:col};       /* per l'area di atterraggio (incertezza, sotto) */
     if(window.COMETA_SPOT && window.COMETA_SPOT.refreshTrajectory) window.COMETA_SPOT.refreshTrajectory();
     /* lo stesso avviso per chi non e' la Diretta: la pagina della stazione
        LoRa (lora/stazione/) ridisegna la sua traiettoria prevista */
@@ -1762,13 +1772,46 @@ function voloDiretta(){
   });
 }
 voloDiretta();
+esporta();
 
-/* La scheda della previsione nella Diretta (assets/spot.js), uguale a
-   quella di questa pagina: dalla risposta di Tawhiri che chiede
-   window.COMETA_PREVISIONE (assets/volo.js), con la partenza e i dati del
-   volo di assets/volo.js. o: {atmo, fc: {km, age} o null}. */
+/* Quello che usano le altre pagine:
+   - scheda: la scheda della previsione nella Diretta (assets/spot.js),
+     uguale a quella di questa pagina, dalla risposta di Tawhiri che chiede
+     window.COMETA_PREVISIONE (assets/volo.js), con la partenza e i dati del
+     volo di assets/volo.js. o: {atmo, fc: {km, age} o null}. Solo dove
+     c'e' il modulo (usa i suoi testi).
+   - incertezza(s): i voli con cui disegnare l'area di atterraggio, come
+     l'opzione «Calcola l'intervallo» di questa pagina: diametro di
+     scoppio, salita e discesa a (1 ± s), tutte le combinazioni degli
+     estremi (8 voli; 4 senza la quota di scoppio, se voloDiretta non e'
+     ancora arrivato). Ogni volo e' un {ascentMs, burstKm, descentV0Ms}
+     da passare a COMETA_PREVISIONE.
+   - area(nom, fini): l'involucro convesso degli atterraggi (il nominale e
+     quelli dell'incertezza), [[lat, lon], ...]. La pagina della stazione. */
+function esporta(){
 window.COMETA_TRAIETTORIA = {
+  incertezza:function(s){
+    const F = window.COMETA_FLIGHT, k = F && F.calcolo;
+    if(!F) return [];
+    const specs = [
+      {lo:{ascentMs:F.ascentMs*(1 - s)}, hi:{ascentMs:F.ascentMs*(1 + s)}},
+      {lo:{descentV0Ms:F.descentV0Ms*(1 - s)}, hi:{descentV0Ms:F.descentV0Ms*(1 + s)}}
+    ];
+    if(k){
+      const q = function(d){ return (k.col ? quotaScoppioCol(k.V, d, k.col) : quotaScoppio(k.V, d))/1000; };
+      specs.unshift({lo:{burstKm:q(k.diam*(1 - s))}, hi:{burstKm:q(k.diam*(1 + s))}});
+    }
+    const out = [];
+    for(let m = 0; m < 1 << specs.length; m++)
+      out.push(Object.assign.apply(null, [{}].concat(specs.map(function(x, i){ return (m >> i) & 1 ? x.hi : x.lo; }))));
+    return out;
+  },
+  area:function(nom, fini){
+    const P = fini.concat([nom]).map(function(p){ return [p.lon, p.lat]; });
+    return hull(P).map(function(q){ return [q[1], q[0]]; });
+  },
   scheda:function(dest, raw, o){
+    if(!MODULO) return;
     const F = window.COMETA_FLIGHT;
     if(!dest || !raw || !F || !F.site) return;
     let r;
@@ -1779,5 +1822,6 @@ window.COMETA_TRAIETTORIA = {
     renderCard(r, dest);
   }
 };
+}
 
 })();

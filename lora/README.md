@@ -336,7 +336,15 @@ niente di segreto: la chiave si digita a mano.
   mappa: è la stessa della Diretta, con la stessa richiesta
   (`COMETA_PREVISIONE` in `assets/volo.js`) e gli stessi dati del volo,
   ricalcolati col meteo del giorno da `assets/traiettoria.js`, che la pagina
-  carica insieme a `assets/msis.js`.
+  carica insieme a `assets/msis.js` (senza il modulo del predittore lì gira
+  solo il calcolo del volo: `voloDiretta` e `COMETA_TRAIETTORIA`). Si
+  disegna come nella Diretta il giorno del lancio: grigia, piena fino allo
+  scoppio e tratteggiata dopo, scoppio e atterraggio grigi. In più l'area
+  di atterraggio, grigia: l'involucro degli atterraggi con diametro di
+  scoppio, salita e discesa a ±10%, come «Calcola l'intervallo» nel
+  predittore (`COMETA_TRAIETTORIA.incertezza` e `.area`: 8 richieste a
+  Tawhiri in più, tre alla volta, solo quando cambia la previsione). Anche
+  nel 3D. La mappa si apre sul luogo del lancio (`FLIGHT_SITE`).
 - Manda le righe al Worker, un lotto ogni 5 s. Se la rete manca le tiene in
   coda e riprova sempre più di rado (fino a un minuto); al ritorno della rete
   parte tutto. La parte locale non aspetta mai la rete.

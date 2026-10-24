@@ -86,9 +86,12 @@ window.COMETA_LORA_DATI = LORA_DATI;
       raw: la risposta di Tawhiri, per la scheda (assets/traiettoria.js)}
    oppure null se il previsore non ha una risposta (data fuori
    dall'orizzonte del GFS, previsore non pronto, rete assente). */
-window.COMETA_PREVISIONE = function(){
+window.COMETA_PREVISIONE = function(over){
   const TAWHIRI = "https://api.v2.sondehub.org/tawhiri";
-  const F = window.COMETA_FLIGHT, L0 = window.COMETA_LAUNCH;
+  const L0 = window.COMETA_LAUNCH;
+  /* over: {ascentMs, burstKm, descentV0Ms} al posto di quelli del volo
+     (l'area di atterraggio della stazione: COMETA_TRAIETTORIA.incertezza) */
+  const F = window.COMETA_FLIGHT && Object.assign({}, window.COMETA_FLIGHT, over || {});
   if(!F || !F.site || !L0) return Promise.resolve(null);
   const q = new URLSearchParams({
     profile: "standard_profile",
