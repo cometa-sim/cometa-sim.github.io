@@ -87,9 +87,9 @@ const PARTS = [
 {id:10, deck:2, cat:"pos", x:21, y:61, z:40, w:50, d:28, h:8, g:6,
  n:{it:"Feather M0 Adalogger", es:"Feather M0 Adalogger", en:"Feather M0 Adalogger"},
  note:{
-  it:"LIVELLO 2. Pile, microSD e GPS propri. Registra quota e traiettoria anche se il Teensy si blocca del tutto.",
-  es:"NIVEL 2. Pilas, microSD y GPS propios. Registra altura y trayectoria incluso si el Teensy se cuelga por completo.",
-  en:"LEVEL 2. Its own cells, microSD and GPS. Records altitude and trajectory even if the Teensy locks up completely."}},
+  it:"Livello 2. Pile, microSD e GPS propri. Registra quota e traiettoria anche se il Teensy si blocca del tutto.",
+  es:"Nivel 2. Pilas, microSD y GPS propios. Registra altura y trayectoria incluso si el Teensy se cuelga por completo.",
+  en:"Level 2. Its own cells, microSD and GPS. Records altitude and trajectory even if the Teensy locks up completely."}},
 {id:11, deck:1, cat:"atmo", x:101, y:32, z:0, w:28, d:25, h:12, g:5,
  n:{it:"MAX31865 — PT1000 esterno", es:"MAX31865 — PT1000 exterior", en:"MAX31865 — outer PT1000"},
  note:{
@@ -159,9 +159,9 @@ const PARTS = [
 {id:31, deck:1, cat:"pos", x:8, y:101, z:6, w:21, d:36, h:5, g:8,
  n:{it:"LoRa E220-900T22D", es:"LoRa E220-900T22D", en:"LoRa E220-900T22D"},
  note:{
-  it:"Collegato in UART all'Adalogger (livello 2), può trasmettere fra 868 e 928 MHz con 22 dBm.",
-  es:"Conectado por UART al Adalogger (nivel 2), puede transmitir entre 868 y 928 MHz con 22 dBm.",
-  en:"Connected over UART to the Adalogger (level 2), it can transmit between 868 and 928 MHz at 22 dBm."}},
+  it:"Collegato in UART all'Adalogger (livello 2), può trasmettere fra 850,125 e 930,125 MHz con 22 dBm.",
+  es:"Conectado por UART al Adalogger (nivel 2), puede transmitir entre 850,125 y 930,125 MHz con 22 dBm.",
+  en:"Connected over UART to the Adalogger (level 2), it can transmit between 850.125 and 930.125 MHz at 22 dBm."}},
 {id:23, deck:1, cat:"atmo", x:129.5, y:32, z:0, w:28, d:25, h:12, g:5,
  n:{it:"MAX31865 — PT1000 interno", es:"MAX31865 — PT1000 interior", en:"MAX31865 — inner PT1000"},
  note:{
