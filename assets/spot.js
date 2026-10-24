@@ -218,13 +218,13 @@ window.COMETA_SPOT = (function(){
     });
     const mapkit = window.COMETA_MAPKIT ? Promise.resolve() : new Promise(function(ok, ko){
       const s = document.createElement("script");
-      s.src = "assets/mapkit.js?v=218";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
+      s.src = "assets/mapkit.js?v=219";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
       s.onload = ok; s.onerror = ko;
       document.head.appendChild(s);
     });
     const map3d = window.COMETA_MAP3D ? Promise.resolve() : new Promise(function(ok){
       const s = document.createElement("script");
-      s.src = "assets/map3d.js?v=218";
+      s.src = "assets/map3d.js?v=219";
       s.onload = ok; s.onerror = ok;     // senza, resta il 2D e basta
       document.head.appendChild(s);
     });
@@ -417,23 +417,24 @@ window.COMETA_SPOT = (function(){
     const d = dict();
     /* dati non arrivati (rete, CORS, risposta del backend): "Network error", uguale in ogni lingua */
     if(lastErr === "3d"){ elStatus.textContent = d.mk3dFail || "3D"; return; }
-    /* Se il LoRa ha un punto buono piu' recente dello SPOT, la riga parla
-       di quello (la posizione piu' fresca); se lo SPOT tace sopra i 18 km
-       ma il LoRa trasmette, non c'e' nessun "segnale perso" da dire. */
+    /* La riga dice solo cio' che la legenda sopra non dice: stato ed eta'
+       dell'ultimo dato di LoRa e SPOT sono gia' li'. Qui l'ultima posizione,
+       la piu' fresca fra le due fonti (se lo SPOT tace sopra i 18 km ma il
+       LoRa trasmette, non c'e' nessun "segnale perso" da dire), o un
+       avviso: sonda atterrata, SPOT muto. */
+    const pos = function(p){ return (d.dirUltimaPos || "Last position") + " · " + (p ? p.lat.toFixed(4) + ", " + p.lon.toFixed(4) : "—"); };
     const lora = window.COMETA_LORA ? window.COMETA_LORA.punti() : [];
     const lp = lora[lora.length - 1];
     const spotT = lastPoints && lastPoints.length ? new Date(lastPoints[lastPoints.length - 1].time).getTime() : -Infinity;
     if(lp && lp.t >= spotT){
       const sl = window.COMETA_LORA.stato(Date.now());
-      const ago = (d.dirSpotAgo || "{t} ago").replace("{t}", formatAgo(Date.now() - lp.t));
       if(sl.fase === "atterrata"){ elStatus.textContent = (d.dirSpotLanded || "probe landed") + " · " + lp.lat.toFixed(4) + ", " + lp.lon.toFixed(4); return; }
-      elStatus.textContent = sl.stato === "perso" ? (d.dirLegLost || "signal lost") + " · " + ago
-        : lp.lat.toFixed(4) + ", " + lp.lon.toFixed(4) + " · " + ago;
+      elStatus.textContent = pos(lp);
       return;
     }
     /* L'errore di rete dello SPOT conta solo se il LoRa non ha niente da dire. */
     if(lastErr){ elStatus.textContent = "Network error"; return; }
-    if(!lastPoints || !lastPoints.length){ elStatus.textContent = d.dirSpotWaiting || "waiting…"; return; }
+    if(!lastPoints || !lastPoints.length){ elStatus.textContent = pos(null); return; }
     if(isLanded(lastPoints)){ elStatus.textContent = d.dirSpotLanded || "probe landed"; return; }
     const last = lastPoints[lastPoints.length - 1];
     const whenMs = new Date(last.time).getTime();
@@ -445,8 +446,7 @@ window.COMETA_SPOT = (function(){
       elStatus.textContent = high ? (d.dirSpotLostHigh || "GPS signal lost • > 18 km") : (d.dirSpotLost || "GPS signal lost");
       return;
     }
-    elStatus.textContent = last.lat.toFixed(4) + ", " + last.lon.toFixed(4) +
-      (elapsed != null ? " · " + (d.dirSpotAgo || "{t} ago").replace("{t}", formatAgo(elapsed)) : "");
+    elStatus.textContent = pos(last);
   }
 
   function setAltText(el, km){
