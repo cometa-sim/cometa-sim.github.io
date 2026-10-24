@@ -1141,15 +1141,17 @@ nav a.ig:hover svg{transform:translateY(-1px)}
   #page-diretta .mk-wv{font-size:18px}
   #page-diretta .mk-wl{margin-top:3px}
 }
-/* le righe sotto video e mappa: luogo e stato */
-.dir-video-info{font-family:var(--mono);font-size:10.5px;color:var(--faint);padding:10px 15px;border-top:1px solid var(--line-soft)}
+/* le righe sotto video e mappa: luogo e stato, senza linee di separazione */
+.dir-video-info{font-family:var(--mono);font-size:10.5px;color:var(--faint);padding:0 15px 12px}
 .dir-video-dot{background:var(--cyan)}
 .dir-video-dot.is-live{background:var(--live);animation:navPulse 1.8s infinite}
-/* align-items:start: il riquadro del video resta alto quanto il video, anche
-   se quello della mappa, con legenda e riga di stato sotto, e' piu' alto */
-.embeds2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:12px;align-items:start}
+.embeds2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:12px}
 @media(max-width:720px){.embeds2{grid-template-columns:1fr}}
-.ecard2{border:1px solid var(--line-soft);border-radius:16px;overflow:hidden;background:var(--panel)}
+.ecard2{border:1px solid var(--line-soft);border-radius:16px;overflow:hidden;background:var(--panel);display:flex;flex-direction:column}
+/* Video e mappa affiancati sono sempre alti uguali: se le didascalie hanno
+   righe diverse (la legenda della mappa puo' andare a capo), si allunga
+   l'ultima riga della scheda piu' corta, non il riquadro del video. */
+.ecard2 > :last-child{flex:1 0 auto}
 .ecard2 .box{aspect-ratio:16/9;background:#02060f;display:flex;align-items:center;justify-content:center;position:relative}
 .ecard2 .box iframe{width:100%;height:100%;border:0;display:block}
 /* Da telefono la mappa in 16:9 e' bassa: in 3D i pulsanti a destra (zoom,
