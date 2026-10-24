@@ -218,13 +218,13 @@ window.COMETA_SPOT = (function(){
     });
     const mapkit = window.COMETA_MAPKIT ? Promise.resolve() : new Promise(function(ok, ko){
       const s = document.createElement("script");
-      s.src = "assets/mapkit.js?v=215";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
+      s.src = "assets/mapkit.js?v=218";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
       s.onload = ok; s.onerror = ko;
       document.head.appendChild(s);
     });
     const map3d = window.COMETA_MAP3D ? Promise.resolve() : new Promise(function(ok){
       const s = document.createElement("script");
-      s.src = "assets/map3d.js?v=215";
+      s.src = "assets/map3d.js?v=218";
       s.onload = ok; s.onerror = ok;     // senza, resta il 2D e basta
       document.head.appendChild(s);
     });
@@ -899,6 +899,18 @@ window.COMETA_SPOT = (function(){
     const g = function(k){ return h[k] && h[k][i] != null ? Math.round(h[k][i]) + " %" : "—"; };
     return h.cloud_cover_low ? "low " + g("cloud_cover_low") + " · mid " + g("cloud_cover_mid") + " · high " + g("cloud_cover_high") : "";
   }
+  /* Il vento come in assets/traiettoria.js: la freccia va dove va il vento,
+     l'etichetta dice da dove viene («Vento da NE»). */
+  let ventoDa = null;
+  function freccia(deg){
+    return '<svg class="mk-wfreccia" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(' +
+      Math.round(deg + 180) + 'deg)" aria-hidden="true"><path d="M12 20V4M6 10l6-6 6 6"/></svg>';
+  }
+  function etichettaVento(){
+    const e = document.getElementById("dirWWindL"), d = dict();
+    if(!e || !d.mkPunti) return;
+    e.textContent = ventoDa == null ? d.mkWeatherWind : d.mkWeatherWindFrom.replace("{d}", d.mkPunti.split(",")[Math.round(ventoDa / 45) % 8]);
+  }
   function loadWeather(){
     const el = document.getElementById("dirWeather"), L0 = window.COMETA_LAUNCH;
     if(!el || !L0) return;
@@ -911,7 +923,7 @@ window.COMETA_SPOT = (function(){
     const key = iso + "T" + String(hh).padStart(2, "0") + ":00";
     const q = new URLSearchParams({
       latitude: site.lat.toFixed(4), longitude: site.lon.toFixed(4),
-      hourly: "temperature_2m,cloud_cover,cloud_cover_low,cloud_cover_mid,cloud_cover_high,wind_speed_10m,wind_gusts_10m,precipitation_probability",
+      hourly: "temperature_2m,cloud_cover,cloud_cover_low,cloud_cover_mid,cloud_cover_high,wind_speed_10m,wind_direction_10m,wind_gusts_10m,precipitation_probability",
       start_date: iso, end_date: iso, timezone: TZ
     });
     fetch(METEO + "?" + q.toString())
@@ -922,9 +934,13 @@ window.COMETA_SPOT = (function(){
         el.hidden = false;
         const rain = h.precipitation_probability ? h.precipitation_probability[i] : null;
         document.getElementById("dirWTemp").textContent = Math.round(h.temperature_2m[i]) + "°C";
-        document.getElementById("dirWWind").innerHTML = Math.round(h.wind_speed_10m[i]) + "<small>km/h</small>";
+        const dir = h.wind_direction_10m ? h.wind_direction_10m[i] : null;
+        ventoDa = dir;
+        document.getElementById("dirWWind").innerHTML = (dir != null ? freccia(dir) : "") + Math.round(h.wind_speed_10m[i]) + "<small>km/h</small>";
+        etichettaVento();
         const wtile = document.getElementById("dirWWind").parentNode, gust = h.wind_gusts_10m && h.wind_gusts_10m[i];
-        if(gust != null) wtile.title = "gusts " + Math.round(gust) + " km/h"; else wtile.removeAttribute("title");
+        const wtip = [gust != null ? "gusts " + Math.round(gust) + " km/h" : "", dir != null ? "from " + Math.round(dir) + "°" : ""].filter(Boolean).join(" · ");
+        if(wtip) wtile.title = wtip; else wtile.removeAttribute("title");
         const tile = document.getElementById("dirWClouds"), tip = cloudsTip(h, i);
         tile.textContent = Math.round(h.cloud_cover[i]) + "%";
         if(tip) tile.parentNode.title = tip; else tile.parentNode.removeAttribute("title");
@@ -965,7 +981,7 @@ window.COMETA_SPOT = (function(){
     /* i dati del volo sono cambiati (assets/traiettoria.js, voloDiretta) */
     refreshTrajectory: function(){ if(trajId) pollTrajectory(); },
     setLang: function(l){
-      curLang = l; renderStatus(); renderLegenda();
+      curLang = l; renderStatus(); renderLegenda(); etichettaVento();
       if(trajPr) disegnaTraiettoria(); else mostraTraiettoria();
       renderScheda();
       if(profilo) profilo.aggiorna(window.COMETA_LORA ? window.COMETA_LORA.punti() : [], testiProfilo());

@@ -553,6 +553,19 @@ function cloudsTip(h, i){
   const g = function(k){ return h[k] && h[k][i] != null ? Math.round(h[k][i]) + " %" : "—"; };
   return h.cloud_cover_low ? "low " + g("cloud_cover_low") + " · mid " + g("cloud_cover_mid") + " · high " + g("cloud_cover_high") : "";
 }
+/* Il vento: una freccia che va dove va il vento (Open-Meteo da' la
+   direzione da cui viene, in gradi: +180), e nell'etichetta da dove viene,
+   a 8 punti cardinali («Vento da NE»). Nel title anche i gradi. */
+let ventoDa = null;            /* l'ultima direzione, per ridire l'etichetta al cambio di lingua */
+function freccia(deg){
+  return '<svg class="mk-wfreccia" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="transform:rotate(' +
+    Math.round(deg + 180) + 'deg)" aria-hidden="true"><path d="M12 20V4M6 10l6-6 6 6"/></svg>';
+}
+function etichettaVento(){
+  const e = document.getElementById("twWWindL");
+  if(!e) return;
+  e.textContent = ventoDa == null ? t("mkWeatherWind") : t("mkWeatherWindFrom").replace("{d}", t("mkPunti").split(",")[Math.round(ventoDa/45) % 8]);
+}
 function loadWeather(pl){
   const el = document.getElementById("twWeather");
   if(!el || !pl || !elDate.value) return;
@@ -562,7 +575,7 @@ function loadWeather(pl){
   const seq = ++weatherSeq;
   const q = new URLSearchParams({
     latitude: pl.lat.toFixed(4), longitude: pl.lon.toFixed(4),
-    hourly: "temperature_2m,cloud_cover,cloud_cover_low,cloud_cover_mid,cloud_cover_high,wind_speed_10m,wind_gusts_10m,precipitation_probability",
+    hourly: "temperature_2m,cloud_cover,cloud_cover_low,cloud_cover_mid,cloud_cover_high,wind_speed_10m,wind_direction_10m,wind_gusts_10m,precipitation_probability",
     start_date: iso, end_date: iso, timezone: "auto"      /* ore del luogo, come giorno e ora scelti */
   });
   fetch(METEO + "?" + q.toString())
@@ -574,9 +587,13 @@ function loadWeather(pl){
       el.hidden = false;
       const rain = h.precipitation_probability ? h.precipitation_probability[i] : null;
       document.getElementById("twWTemp").textContent = Math.round(h.temperature_2m[i]) + "°C";
-      document.getElementById("twWWind").innerHTML = Math.round(h.wind_speed_10m[i]) + "<small>km/h</small>";
+      const dir = h.wind_direction_10m ? h.wind_direction_10m[i] : null;
+      ventoDa = dir;
+      document.getElementById("twWWind").innerHTML = (dir != null ? freccia(dir) : "") + Math.round(h.wind_speed_10m[i]) + "<small>km/h</small>";
+      etichettaVento();
       const wtile = document.getElementById("twWWind").parentNode, gust = h.wind_gusts_10m && h.wind_gusts_10m[i];
-      if(gust != null) wtile.title = "gusts " + Math.round(gust) + " km/h"; else wtile.removeAttribute("title");
+      const wtip = [gust != null ? "gusts " + Math.round(gust) + " km/h" : "", dir != null ? "from " + Math.round(dir) + "°" : ""].filter(Boolean).join(" · ");
+      if(wtip) wtile.title = wtip; else wtile.removeAttribute("title");
       const tile = document.getElementById("twWClouds"), tip = cloudsTip(h, i);
       tile.textContent = Math.round(h.cloud_cover[i]) + "%";
       if(tip) tile.parentNode.title = tip; else tile.parentNode.removeAttribute("title");
@@ -805,13 +822,13 @@ function loadLeaflet(){
      parallelo con leaflet.js. */
   const mapkit = window.COMETA_MAPKIT ? Promise.resolve() : new Promise(function(ok, ko){
     const s = document.createElement("script");
-    s.src = "assets/mapkit.js?v=215";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
+    s.src = "assets/mapkit.js?v=218";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
     s.onload = ok; s.onerror = ko;
     document.head.appendChild(s);
   });
   const map3d = window.COMETA_MAP3D ? Promise.resolve() : new Promise(function(ok){
     const s = document.createElement("script");
-    s.src = "assets/map3d.js?v=215";
+    s.src = "assets/map3d.js?v=218";
     s.onload = ok; s.onerror = ok;       /* senza, resta il 2D e basta */
     document.head.appendChild(s);
   });
@@ -1692,6 +1709,7 @@ function exportPng(){
 function relabel(){
   elWhere.placeholder = t("twWherePh");
   etichettaOra();
+  etichettaVento();
   renderBalloon();
   if(view) view.relabel();
   updateMulti();

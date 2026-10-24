@@ -600,6 +600,17 @@ function updateDiretta(){
     dStatus.querySelectorAll(".txt-pre").forEach(function(e){ e.style.display = live ? "none" : ""; });
     dStatus.querySelectorAll(".txt-live").forEach(function(e){ e.style.display = live ? "" : "none"; });
   }
+  /* La didascalia del video, come quella della mappa: quando comincia la
+     trasmissione (DIRETTA_START, ora di Montevideo) o "in diretta", e da
+     dove (il luogo del lancio, FLIGHT_SITE in assets/volo.js). */
+  const vs = $("#dirVideoStato"), vi = $("#dirVideoInfo"), vd = $("#dirVideoDot"), d = I18N[LANG] || I18N.it;
+  if(vs){
+    const quando = new Intl.DateTimeFormat(d.code, {timeZone:"America/Montevideo", weekday:"short", day:"numeric", month:"short",
+      hour:"2-digit", minute:"2-digit", hour12:false}).format(DIRETTA_START);
+    vs.textContent = "· " + (live ? d.dirVideoLive : d.dirVideoPre.replace("{t}", quando));
+  }
+  if(vd) vd.classList.toggle("is-live", live);
+  if(vi) vi.textContent = d.dirVideoWhere.replace("{site}", (window.COMETA_FLIGHT && window.COMETA_FLIGHT.site && window.COMETA_FLIGHT.site.name) || "");
 }
 function updateCountdown(){
   const diff = LAUNCH - Date.now();
