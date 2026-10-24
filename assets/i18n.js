@@ -493,7 +493,7 @@ es:{
 
   /* — En vivo (borrador) — */
   dirKicker:"El día del lanzamiento",
-  dirSub:"El video desde el terreno y la posición de la sonda, en tiempo real. Para no perderte la transmisión, <a href=\"https://www.youtube.com/@cometasim\" target=\"_blank\" rel=\"noopener\">suscríbete a nuestro canal de YouTube, COMETASIM</a>.",
+  dirSub:"El video desde el terreno y la posición de la sonda, en tiempo real. Para no perderte la transmisión, <a href=\"https://www.youtube.com/@cometasim\" target=\"_blank\" rel=\"noopener\">suscribite a nuestro canal de YouTube, COMETASIM</a>.",
   dirWip:"Página en construcción",
   dirStatusPre:"En vivo pronto", dirStatusLive:"En vivo ahora",
   dirBannerDesc:"— video desde el terreno y posición GPS", dirBannerCta:"Mirar →",
