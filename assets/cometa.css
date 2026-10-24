@@ -973,10 +973,16 @@ footer{border-top:1px solid var(--line-soft);padding:56px 0 66px;background:rgba
 .crest-pair .crest-cometa{width:190px;opacity:1;mix-blend-mode:screen}   /* screen: il marchio porta un campo di stelle scuro, che cosi sparisce nel fondo */
 .crest-pair .crest-sim{width:150px}
 
+/* Da telefono i due marchi stanno sulla stessa riga, COMETA a sinistra e
+   la Scuola a destra, con le STESSE misure di quando sono incolonnati:
+   affiancarli non deve ingrandire nessuno dei due. Da computer restano
+   incolonnati. */
 @media(max-width:520px){
-  .crest-pair{gap:12px}
-  .crest-pair .crest-cometa{width:162px}
-  .crest-pair .crest-sim{width:128px}
+  .crest-pair{flex-direction:row;align-items:center;justify-content:space-between;gap:12px;width:100%}
+  /* mai piu' grandi di quando sono incolonnati; sui telefoni piu' stretti
+     calano insieme, nello stesso rapporto (162 : 128) */
+  .crest-pair .crest-cometa{width:min(162px,53%)}
+  .crest-pair .crest-sim{width:min(128px,42%)}
 }
 
 /* Figure con didascalia (mappa della zona di esclusione) */
