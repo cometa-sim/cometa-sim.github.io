@@ -1,8 +1,12 @@
 {
- "aggiornato": "2026-10-24T14:05:45Z",
+ "aggiornato": "2026-10-24T14:24:59Z",
  "sito": "Mercedes (Uruguay)",
  "passo_h": 24,
  "durata_ref_min": 176.3,
+ "ritardo_gfs_h": [
+  4.53,
+  4.72
+ ],
  "classi": [
   {
    "tau": 0,
