@@ -323,8 +323,8 @@ it:{
   legalSub:"Che cosa dice la norma aeronautica, e come si applica a noi.",
   lWarnTag:"Prima di leggere",
   lWarn1:"Questa pagina è un riassunto divulgativo, scritto da noi per spiegare il quadro in cui ci muoviamo. <strong>Fa fede il testo originale del regolamento</strong>, non questa sintesi.",
-  lWarn2:"Ogni volo di pallone libero non pilotato deve essere autorizzato dalle autorità aeronautiche competenti. Nessuna informazione di questa pagina sostituisce quell'autorizzazione.",
-  lLede:"Il riferimento che ci è stato indicato dalla DINACIA — Dirección Nacional de Aviación Civil e Infraestructura Aeronáutica, l'autorità aeronautica uruguaiana — è il LAR 91, Parte I, Appendice P «Globos libres no tripulados», il regolamento aeronautico latinoamericano sui palloni liberi non pilotati. Stabilisce come si classificano, quali obblighi porta ogni categoria, e che cosa si può e non si può fare.",
+  lWarn2:"Ogni volo di pallone libero non pilotato <strong>deve essere autorizzato dalle autorità aeronautiche competenti</strong>. Nessuna informazione di questa pagina sostituisce quell'autorizzazione.",
+  lLede:"Il riferimento che ci è stato indicato dalla DINACIA — Dirección Nacional de Aviación Civil e Infraestructura Aeronáutica, l'autorità aeronautica uruguaiana — è il LAR 91, Parte I, Appendice P «Globos libres no tripulados», il regolamento aeronautico latinoamericano sui palloni liberi non pilotati. Stabilisce come si classificano, quali obblighi porta ogni categoria, e che cosa si può e non si può fare. Dopo l'autorizzazione al lancio, le autorità aeronautiche — nel nostro caso la DINACIA — emettono un <strong>NOTAM</strong> (<em>Notice to Air Missions</em>), che avvisa il traffico aereo della presenza di un pallone non pilotato.",
 
   lClassHead:"Come viene classificata la nostra sonda",
   lClassIntro:"Le categorie sono tre. <strong>Leggero</strong>: carico utile complessivo sotto i 4 kg. <strong>Medio</strong>: da 4 a 6 kg, distribuiti su due o più colli. <strong>Pesante</strong>: 6 kg o più. Ma la massa non decide da sola — tre condizioni fanno scattare la categoria «pesante» a qualunque peso, e sono le ultime tre righe della tabella. Basta che una sia soddisfatta.",
@@ -345,6 +345,7 @@ it:{
   lZoneAlt:"Mappa dell'area di esclusione attorno a Montevideo indicata dalla DINACIA, con gli aeroporti di Carrasco, Ángel Adami, Laguna del Sauce e Punta del Este.",
   lZoneCap:"Area di esclusione indicata dalla DINACIA. Immagine fornita dall'autorità aeronautica.",
   lZone2:"È la ragione per cui non lanciamo da Montevideo. Il luogo che stiamo valutando — fra Durazno e Mercedes — sta abbondantemente fuori da quest'area, e questo è il primo dei vincoli che hanno guidato lo <a href=\"#\" data-page=\"venti\">studio dei venti</a>.",
+  lZone3:"<strong>Aggiornamento ottobre 2026:</strong> la DINACIA ci ha dato indicazioni ancora più restrittive sul volo dei palloni stratosferici. Per non interferire con il traffico aereo e garantire la sicurezza in volo abbiamo spostato la zona di lancio nei pressi di Minas, Lavalleja.",
 
   lDiscTag:"Avvertenza",
   lDisc1:"Le informazioni di questa pagina sono pubblicate a scopo divulgativo e didattico. Non costituiscono consulenza tecnica o legale, e possono contenere errori o essere superate da modifiche normative successive.",
@@ -374,7 +375,7 @@ it:{
 
   msFwKicker:"La scheda che programmiamo",
   msFw1:"Il calcolatore è un <strong>Teensy 4.1</strong>, e il programma che gira sopra lo scriviamo noi: legge i sensori, li interroga ciascuno al proprio ritmo, e scrive tutto su microSD. Accanto, un secondo registratore completamente separato — <strong>Feather M0 Adalogger</strong>, con il proprio GPS, le proprie pile e la propria memoria — registra quota e traiettoria senza condividere nulla con il primo. È l'Adalogger a pilotare anche il modulo <strong>LoRa</strong>, che manda a terra quota e posizione mentre la sonda vola: è l'unico dato che ci arriva in diretta.",
-  msEngKicker:"Cinque scelte di progetto",
+  msEngKicker:"Sei scelte di progetto",
   msE1t:"Due temperature: quella dell'aria e quella della cassa",
   msE1:"Il sensore che misura l'aria sta fuori, in cima a un'aletta e sporgente oltre la punta: in salita l'aria lo raggiunge prima di aver toccato la scatola, che è più calda. È verniciato di bianco opaco, ma senza una schermatura ventilata il sole lo scalda comunque: quel bias resta, e lo dichiariamo invece di nasconderlo dietro una correzione. Sull'aletta opposta un sensore di umidità segna i minuti passati dentro una nube — ed è lì che la lettura va presa con più cautela. Un secondo elemento identico sta dentro, in basso, incollato alla parete più fredda: non misura l'aria ma la cassa. La differenza fra i due dice quanto isola davvero il polistirolo.",
   msE3t:"Una finestra di PTFE",
@@ -382,6 +383,8 @@ it:{
   msE4t:"Quattrocento volt lontani dal calcolatore",
   msE4:"Il tubo Geiger, che rivela radiazione ionizzante, lavora a circa 400 volt. Fra il suo circuito e il piedino del calcolatore che conta gli impulsi abbiamo messo un <strong>optoisolatore</strong>: il segnale passa come luce, non come corrente, e i due lati restano elettricamente separati.",
   msE5t:"Il baricentro sull'asse",
+  msE6t:"La semplificazione in fase di assemblaggio",
+  msE6:"In fase di assemblaggio abbiamo deciso di semplificare la struttura della sonda, per togliere dei vincoli geometrici e risolvere alcuni problemi di progettazione: i sensori che misurano temperatura e umidità esterne vanno direttamente sulle ali della sonda.",
   msE5:"Le masse pesanti — pacco pile e power bank — stanno sul ripiano più basso, e la disposizione di ogni componente è stata calcolata perché il centro di massa cada sull'<strong>asse di sospensione</strong>. Ottimizzare il baricentro serve a stabilizzare la sonda ed evitare rotazioni.",
   /* — Chi fa cosa: i sei gruppi — */
   orgKicker:"Chi fa cosa",
@@ -794,8 +797,8 @@ es:{
   legalSub:"Qué dice la norma aeronáutica y cómo se aplica a nosotros.",
   lWarnTag:"Antes de leer",
   lWarn1:"Esta página es un resumen divulgativo, escrito por nosotros para explicar el marco en el que trabajamos. <strong>Vale el texto original del reglamento</strong>, no esta síntesis.",
-  lWarn2:"Todo vuelo de globo libre no tripulado debe ser autorizado por las autoridades aeronáuticas competentes. Ninguna información de esta página sustituye esa autorización.",
-  lLede:"La referencia que nos indicó la DINACIA — Dirección Nacional de Aviación Civil e Infraestructura Aeronáutica, la autoridad aeronáutica uruguaya — es el LAR 91, Parte I, Apéndice P «Globos libres no tripulados», el reglamento aeronáutico latinoamericano sobre globos libres no tripulados. Establece cómo se clasifican, qué obligaciones trae cada categoría y qué se puede y qué no se puede hacer.",
+  lWarn2:"Todo vuelo de globo libre no tripulado <strong>debe ser autorizado por las autoridades aeronáuticas competentes</strong>. Ninguna información de esta página sustituye esa autorización.",
+  lLede:"La referencia que nos indicó la DINACIA — Dirección Nacional de Aviación Civil e Infraestructura Aeronáutica, la autoridad aeronáutica uruguaya — es el LAR 91, Parte I, Apéndice P «Globos libres no tripulados», el reglamento aeronáutico latinoamericano sobre globos libres no tripulados. Establece cómo se clasifican, qué obligaciones trae cada categoría y qué se puede y qué no se puede hacer. Después de la autorización de lanzamiento, las autoridades aeronáuticas — en nuestro caso la DINACIA — emiten un <strong>NOTAM</strong> (<em>Notice to Air Missions</em>), que avisa al tráfico aéreo de la presencia de un globo no tripulado.",
 
   lClassHead:"Cómo se clasifica nuestra sonda",
   lClassIntro:"Las categorías son tres. <strong>Ligero</strong>: carga útil combinada por debajo de 4 kg. <strong>Mediano</strong>: de 4 a 6 kg, repartidos en dos o más bultos. <strong>Pesado</strong>: 6 kg o más. Pero la masa no decide sola — tres condiciones hacen saltar la categoría «pesado» con cualquier peso, y son las tres últimas filas de la tabla. Basta con que se cumpla una.",
@@ -816,6 +819,7 @@ es:{
   lZoneAlt:"Mapa del área de exclusión alrededor de Montevideo indicada por la DINACIA, con los aeropuertos de Carrasco, Ángel Adami, Laguna del Sauce y Punta del Este.",
   lZoneCap:"Área de exclusión indicada por la DINACIA. Imagen proporcionada por la autoridad aeronáutica.",
   lZone2:"Es la razón por la que no lanzamos desde Montevideo. El lugar que estamos evaluando — entre Durazno y Mercedes — queda holgadamente fuera de esta área, y ésta es la primera de las restricciones que guiaron el estudio de los vientos.",
+  lZone3:"<strong>Actualización de octubre de 2026:</strong> la DINACIA nos dio indicaciones aún más restrictivas sobre el vuelo de globos estratosféricos. Para no interferir con el tráfico aéreo y garantizar la seguridad en vuelo movimos la zona de lanzamiento a las cercanías de Minas, Lavalleja.",
 
   lDiscTag:"Advertencia",
   lDisc1:"La información de esta página se publica con fines divulgativos y educativos. No constituye asesoramiento técnico ni legal, y puede contener errores o quedar superada por modificaciones normativas posteriores.",
@@ -845,7 +849,7 @@ es:{
 
   msFwKicker:"La placa que programamos",
   msFw1:"El computador es un <strong>Teensy 4.1</strong>, y el programa que corre en él lo escribimos nosotros: lee los sensores, interroga a cada uno a su propio ritmo y escribe todo en una microSD. Al lado, un segundo registrador completamente separado — <strong>Feather M0 Adalogger</strong>, con su propio GPS, sus propias pilas y su propia memoria — registra altura y trayectoria sin compartir nada con el primero. Es el Adalogger el que además maneja el módulo <strong>LoRa</strong>, que manda a tierra altura y posición mientras la sonda vuela: es el único dato que nos llega en directo.",
-  msEngKicker:"Cinco decisiones de diseño",
+  msEngKicker:"Seis decisiones de diseño",
   msE1t:"Dos temperaturas: la del aire y la de la caja",
   msE1:"El sensor que mide el aire está afuera, en la punta de una aleta y sobresaliendo más allá del extremo: en el ascenso el aire lo alcanza antes de haber tocado la caja, que está más caliente. Está pintado de blanco mate, pero sin un blindaje ventilado el sol igual lo calienta: ese sesgo queda, y lo declaramos en vez de esconderlo detrás de una corrección. En la aleta opuesta un sensor de humedad marca los minutos pasados dentro de una nube — y es ahí donde la lectura hay que tomarla con más cautela. Un segundo elemento idéntico va adentro, abajo, pegado a la pared más fría: no mide el aire sino la caja. La diferencia entre los dos dice cuánto aísla de verdad el poliestireno.",
   msE3t:"Una ventana de PTFE",
@@ -853,6 +857,8 @@ es:{
   msE4t:"Cuatrocientos voltios lejos del computador",
   msE4:"El tubo Geiger, que detecta radiación ionizante, trabaja a unos 400 voltios. Entre su circuito y el pin del computador que cuenta los pulsos pusimos un <strong>optoacoplador</strong>: la señal pasa como luz, no como corriente, y los dos lados quedan eléctricamente separados.",
   msE5t:"El centro de masa sobre el eje",
+  msE6t:"La simplificación en la etapa de armado",
+  msE6:"En la etapa de armado decidimos simplificar la estructura de la sonda, para sacar restricciones geométricas y resolver algunos problemas de diseño: los sensores que miden temperatura y humedad exteriores van directamente sobre las alas de la sonda.",
   msE5:"Las masas pesadas — el paquete de pilas y la batería externa — van en el estante más bajo, y la posición de cada componente se calculó para que el centro de masa caiga sobre el <strong>eje de suspensión</strong>. Optimizar el centro de masa sirve para estabilizar la sonda y evitar rotaciones.",
   /* — Quién hace qué: los seis equipos — */
   orgKicker:"Quién hace qué",
@@ -1265,8 +1271,8 @@ en:{
   legalSub:"What the aviation regulation says, and how it applies to us.",
   lWarnTag:"Before you read",
   lWarn1:"This page is a plain-language summary, written by us to explain the framework we work within. <strong>The original text of the regulation prevails</strong>, not this summary.",
-  lWarn2:"Every unmanned free balloon flight must be authorised by the competent aviation authorities. Nothing on this page replaces that authorisation.",
-  lLede:"The reference DINACIA — Dirección Nacional de Aviación Civil e Infraestructura Aeronáutica, the Uruguayan civil aviation authority — pointed us to is LAR 91, Part I, Appendix P «Globos libres no tripulados», the Latin American aviation regulation covering unmanned free balloons. It sets out how they are classified, what obligations each category carries, and what may and may not be done.",
+  lWarn2:"Every unmanned free balloon flight <strong>must be authorised by the competent aviation authorities</strong>. Nothing on this page replaces that authorisation.",
+  lLede:"The reference DINACIA — Dirección Nacional de Aviación Civil e Infraestructura Aeronáutica, the Uruguayan civil aviation authority — pointed us to is LAR 91, Part I, Appendix P «Globos libres no tripulados», the Latin American aviation regulation covering unmanned free balloons. It sets out how they are classified, what obligations each category carries, and what may and may not be done. Once the launch is authorised, the aviation authority — in our case DINACIA — issues a <strong>NOTAM</strong> (<em>Notice to Air Missions</em>), which tells air traffic that an unmanned balloon is up there.",
 
   lClassHead:"How our probe is classified",
   lClassIntro:"There are three categories. <strong>Light</strong>: combined payload under 4 kg. <strong>Medium</strong>: 4 to 6 kg, spread over two or more packages. <strong>Heavy</strong>: 6 kg or more. But mass does not decide on its own — three conditions trigger the «heavy» category at any weight, and they are the last three rows of the table. Meeting any one of them is enough.",
@@ -1287,6 +1293,7 @@ en:{
   lZoneAlt:"Map of the exclusion area around Montevideo indicated by DINACIA, showing Carrasco, Ángel Adami, Laguna del Sauce and Punta del Este airports.",
   lZoneCap:"Exclusion area as indicated by DINACIA. Image supplied by the aviation authority.",
   lZone2:"It is the reason we are not launching from Montevideo. The area we are considering — between Durazno and Mercedes — lies well outside this zone, and this was the first of the constraints that shaped the wind study.",
+  lZone3:"<strong>Update, October 2026:</strong> DINACIA has given us stricter guidance still on flying stratospheric balloons. To avoid interfering with air traffic and to keep the flight safe, we have moved the launch area to near Minas, Lavalleja.",
 
   lDiscTag:"Disclaimer",
   lDisc1:"The information on this page is published for educational purposes. It is not technical or legal advice, and it may contain errors or be superseded by later amendments to the regulation.",
@@ -1316,7 +1323,7 @@ en:{
 
   msFwKicker:"The board we program",
   msFw1:"The computer is a <strong>Teensy 4.1</strong>, and we write the program that runs on it: it reads the sensors, polls each one at its own rate, and writes everything to a microSD card. Alongside it, a completely separate second logger — a <strong>Feather M0 Adalogger</strong> with its own GPS, its own batteries and its own memory — records altitude and trajectory while sharing nothing with the first. The Adalogger also drives the <strong>LoRa</strong> module, which sends altitude and position down to the ground while the probe is flying: it is the only data that reaches us live.",
-  msEngKicker:"Five design decisions",
+  msEngKicker:"Six design decisions",
   msE1t:"Two temperatures: the air's and the box's",
   msE1:"The sensor that measures the air sits outside, at the top of one fin and projecting past its tip: on the way up the air reaches it before it has touched the box, which is warmer. It is painted matt white, but without a ventilated shield the sun still heats it: that bias stays, and we declare it rather than hide it behind a correction. On the opposite fin a humidity sensor marks the minutes spent inside cloud — and that is where the reading needs the most caution. A second, identical element sits inside, low down, glued to the coldest wall: it measures not the air but the shell. The difference between the two says how much the polystyrene really insulates.",
   msE3t:"A PTFE window",
@@ -1324,6 +1331,8 @@ en:{
   msE4t:"Four hundred volts, kept away from the computer",
   msE4:"The Geiger tube, which detects ionising radiation, runs at about 400 volts. Between its circuit and the computer pin that counts the pulses we placed an <strong>optoisolator</strong>: the signal crosses as light rather than as current, and the two sides stay electrically separate.",
   msE5t:"The centre of mass on the axis",
+  msE6t:"Simplifying at assembly",
+  msE6:"At assembly we decided to simplify the structure of the probe, to remove geometric constraints and solve some design problems: the sensors that measure outside temperature and humidity go directly onto the probe's fins.",
   msE5:"The heavy masses — battery pack and power bank — sit on the lowest deck, and every component's position was calculated so that the centre of mass falls on the <strong>suspension axis</strong>. Optimising the centre of mass keeps the probe steady and stops it rotating.",
   /* — Who does what: the six teams — */
   orgKicker:"Who does what",
