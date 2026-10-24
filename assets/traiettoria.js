@@ -870,7 +870,7 @@ function ensureMap(){
        scala raddoppia a ogni passo, e da 50 km si saltava a 20 */
     map = L.map(elMap, {scrollWheelZoom:false, zoomControl:true, zoomSnap:.25, zoomDelta:.5});
     const street = L.tileLayer(TILES, {
-      maxZoom:18, crossOrigin:true,      /* le stesse mattonelle servono all'esportazione */
+      maxZoom:20, maxNativeZoom:19, crossOrigin:true,      /* le stesse mattonelle servono all'esportazione; fino a zoom 20, oltre il 19 di OSM ingrandite */
       attribution:'© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'
     }).addTo(map);
     L.control.scale({imperial:false, position:"bottomright"}).addTo(map);  // sopra l'attribuzione, non accanto: da telefono l'attribuzione (lunga col satellite Esri) va su piu' righe e copriva la scala in basso a sinistra
@@ -1535,7 +1535,7 @@ function exportPng(){
   const tilesFor = function(d){ const f = Math.pow(2, d); return (Math.ceil(size.x*f/256) + 1)*(Math.ceil(size.y*f/256) + 1); };
   while(dz > 0 && tilesFor(dz) > MAX_TILES) dz--;
   /* le mattonelle esistono solo a zoom interi: lo zoom della mappa puo' essere a quarti */
-  const z = Math.min(18, Math.floor(z0 + 1e-9) + dz), k = S/Math.pow(2, z - z0);
+  const z = Math.min(19, Math.floor(z0 + 1e-9) + dz), k = S/Math.pow(2, z - z0);
   const W = Math.round(size.x*S), H = Math.round(size.y*S);
   const origin = map.project(map.containerPointToLatLng([0, 0]), z);          /* pixel alla zoom delle mattonelle */
   const P = function(lat, lon){ const p = map.project([lat, lon], z); return [(p.x - origin.x)*k, (p.y - origin.y)*k]; };
@@ -1595,7 +1595,7 @@ function exportPng(){
       return got.filter(function(q){ return !q; }).length;
     });
   }
-  tileLayer(tileUrl, sat, z, 1).then(function(missing){
+  tileLayer(tileUrl, sat, sat ? Math.min(z, 18) : z, 1).then(function(missing){     /* il satellite di Esri arriva al 18 */
     /* Nuvole/radar sopra lo sfondo; quelle che non arrivano non rendono
        l'immagine incompleta. Le nuvole sono bianche su trasparente (vedi
        "mask" in mapkit.js): qui lo sfondo e' chiaro, quindi si

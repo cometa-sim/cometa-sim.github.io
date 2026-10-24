@@ -118,10 +118,19 @@ nav.scrolled::before{opacity:0}
 .ig svg{width:20px;height:20px}
 /* Instagram, TikTok e YouTube in alto: mai schiacciati (prima, da
    telefono, diventavano puntini). Da telefono la barra stringe gli spazi
-   per farceli stare; sotto i 386 px restano solo nel menu (.menu-foot). */
+   per farceli stare; sotto i 340 px restano solo nel menu (.menu-foot). */
 nav .ig,nav .ig svg{flex:none}
 @media(max-width:520px){nav{gap:8px;padding:14px 16px}nav .ig svg{width:18px;height:18px}.lang button{padding:6px 8px}}
-@media(max-width:385px){nav > .ig{display:none}}
+/* Da telefono stretto, della lingua solo la sigla di quella scelta: un
+   tocco apre le altre (assets/app.js), e intanto le icone si fanno da
+   parte per lasciare spazio. Sotto i 340 px le icone restano nel menu. */
+@media(max-width:420px){
+  .lang:not(.aperta) button:not([aria-pressed="true"]){display:none}
+  .lang:not(.aperta) button[aria-pressed="true"]::after{content:"";display:inline-block;margin-left:5px;vertical-align:2px;
+    border:3.5px solid transparent;border-top:4px solid currentColor;border-bottom:0}
+  nav:has(.lang.aperta) > .ig{display:none}
+}
+@media(max-width:339px){nav > .ig{display:none}}
 .lang{display:inline-flex;padding:3px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid var(--line-soft);position:relative}
 .lang button{appearance:none;border:0;background:transparent;cursor:pointer;font-family:var(--mono);font-size:12px;
   font-weight:500;letter-spacing:.06em;color:var(--muted);padding:6px 11px;border-radius:999px;position:relative;z-index:2;

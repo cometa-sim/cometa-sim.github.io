@@ -734,7 +734,7 @@ function preparaMappa() {
   const sito = (window.COMETA_FLIGHT && window.COMETA_FLIGHT.site) || { lat: -34.2919, lon: -55.3531 };
   mappa = L.map("map", { zoomSnap: .25, zoomDelta: .5 }).setView([sito.lat, sito.lon], 9);
   const strade = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    maxZoom: 18,
+    maxZoom: 20, maxNativeZoom: 19,   // fino a zoom 20 (scala ~10 m), per cercare la sonda a terra
     attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
   }).addTo(mappa);
   L.control.scale({ imperial: false, position: "bottomright" }).addTo(mappa);
