@@ -218,13 +218,13 @@ window.COMETA_SPOT = (function(){
     });
     const mapkit = window.COMETA_MAPKIT ? Promise.resolve() : new Promise(function(ok, ko){
       const s = document.createElement("script");
-      s.src = "assets/mapkit.js?v=221";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
+      s.src = "assets/mapkit.js?v=223";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
       s.onload = ok; s.onerror = ko;
       document.head.appendChild(s);
     });
     const map3d = window.COMETA_MAP3D ? Promise.resolve() : new Promise(function(ok){
       const s = document.createElement("script");
-      s.src = "assets/map3d.js?v=221";
+      s.src = "assets/map3d.js?v=223";
       s.onload = ok; s.onerror = ok;     // senza, resta il 2D e basta
       document.head.appendChild(s);
     });
@@ -241,8 +241,10 @@ window.COMETA_SPOT = (function(){
     mapReady = loadLeaflet().then(function(){
       const L = window.L;
       map = L.map(elMap, {scrollWheelZoom:false, zoomControl:true, zoomSnap:.25, zoomDelta:.5});   // a quarti di livello, come il predittore (assets/traiettoria.js)
+      /* fino a zoom 20 (scala ~10 m: per cercare la sonda a terra): OSM ha
+         mattonelle fino al 19, oltre Leaflet le ingrandisce */
       const street = L.tileLayer(TILES, {
-        maxZoom:18,
+        maxZoom:20, maxNativeZoom:19,
         attribution:'© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'
       }).addTo(map);
       L.control.scale({imperial:false, position:"bottomright"}).addTo(map);  // sopra l'attribuzione, non accanto: da telefono l'attribuzione (lunga col satellite Esri) va su piu' righe e copriva la scala in basso a sinistra

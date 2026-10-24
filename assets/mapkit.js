@@ -92,7 +92,7 @@ window.COMETA_MAPKIT = (function(){
     map.createPane("mkSat");
     map.getPane("mkSat").style.zIndex = 200;
     const satLayer = L.tileLayer(ESRI_SAT, {
-      maxZoom: 18, pane: "mkSat", attribution: ESRI_ATTR
+      maxZoom: 20, maxNativeZoom: 18, pane: "mkSat", attribution: ESRI_ATTR   // come le mappe stradali, fino a 20: oltre il 18 si ingrandisce
     });
     let onSat = false, a;
     function updateTitle(){
@@ -189,7 +189,7 @@ window.COMETA_MAPKIT = (function(){
          ha colori propri, che sono una scala di intensita'. */
       specs.clouds = {kind:"clouds", url:OWM_TILES, opacity:.75, maxNativeZoom:OWM_NATIVE_ZOOM, credit:"OpenWeatherMap", mask:true};
       return L.tileLayer(OWM_TILES, {
-        pane: "mkRain", opacity: .75, maxZoom: 18, maxNativeZoom: OWM_NATIVE_ZOOM,
+        pane: "mkRain", opacity: .75, maxZoom: 20, maxNativeZoom: OWM_NATIVE_ZOOM,
         /* come le mattonelle stradali del predittore: servono anche
            all'esportazione in PNG, che le ridisegna su un canvas. Senza
            crossOrigin il browser potrebbe riusare per il canvas una copia
@@ -202,7 +202,7 @@ window.COMETA_MAPKIT = (function(){
     function rainViewerLayer(host, path){
       specs.rain = {kind:"rain", url:host + path + "/256/{z}/{x}/{y}/2/1_1.png", opacity:.55, maxNativeZoom:RAIN_NATIVE_ZOOM, credit:"RainViewer"};
       return L.tileLayer(host + path + "/256/{z}/{x}/{y}/2/1_1.png", {
-        pane: "mkRain", opacity: .55, maxZoom: 18, maxNativeZoom: RAIN_NATIVE_ZOOM, crossOrigin: true,
+        pane: "mkRain", opacity: .55, maxZoom: 20, maxNativeZoom: RAIN_NATIVE_ZOOM, crossOrigin: true,
         attribution: 'Pioggia: <a href="https://www.rainviewer.com" target="_blank" rel="noopener">RainViewer</a>'
       });
     }

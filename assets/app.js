@@ -121,9 +121,25 @@ function setLang(l, remember){
 }
 let langPainted = false;
 
+/* Da telefono stretto si vede solo la lingua scelta (vedi .lang in
+   cometa.css): un tocco la apre e mostra le altre, il secondo sceglie. */
+const LANG_STRETTA = window.matchMedia("(max-width:420px)");
+function apriLingue(on){
+  const g = $(".lang");
+  if(!g) return;
+  g.classList.toggle("aperta", on);
+  requestAnimationFrame(moveThumb);
+}
 $$(".lang button").forEach(function(b){
-  b.addEventListener("click", function(){ setLang(b.dataset.lang, true); });
+  b.addEventListener("click", function(e){
+    const g = b.closest(".lang");
+    if(LANG_STRETTA.matches && g && !g.classList.contains("aperta")){ e.stopPropagation(); apriLingue(true); return; }
+    apriLingue(false);
+    setLang(b.dataset.lang, true);
+  });
 });
+document.addEventListener("click", function(e){ if(!e.target.closest(".lang")) apriLingue(false); });
+LANG_STRETTA.addEventListener && LANG_STRETTA.addEventListener("change", function(){ apriLingue(false); });
 
 /* ==========================================================
    Navigazione a sezioni

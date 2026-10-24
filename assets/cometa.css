@@ -116,6 +116,21 @@ nav.scrolled::before{opacity:0}
 .ig{display:inline-flex;color:var(--muted);transition:color .3s}
 .ig:hover{color:var(--beacon)}
 .ig svg{width:20px;height:20px}
+/* Instagram, TikTok e YouTube in alto: mai schiacciati (prima, da
+   telefono, diventavano puntini). Da telefono la barra stringe gli spazi
+   per farceli stare; sotto i 340 px restano solo nel menu (.menu-foot). */
+nav .ig,nav .ig svg{flex:none}
+@media(max-width:520px){nav{gap:8px;padding:14px 16px}nav .ig svg{width:18px;height:18px}.lang button{padding:6px 8px}}
+/* Da telefono stretto, della lingua solo la sigla di quella scelta: un
+   tocco apre le altre (assets/app.js), e intanto le icone si fanno da
+   parte per lasciare spazio. Sotto i 340 px le icone restano nel menu. */
+@media(max-width:420px){
+  .lang:not(.aperta) button:not([aria-pressed="true"]){display:none}
+  .lang:not(.aperta) button[aria-pressed="true"]::after{content:"";display:inline-block;margin-left:5px;vertical-align:2px;
+    border:3.5px solid transparent;border-top:4px solid currentColor;border-bottom:0}
+  nav:has(.lang.aperta) > .ig{display:none}
+}
+@media(max-width:339px){nav > .ig{display:none}}
 .lang{display:inline-flex;padding:3px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid var(--line-soft);position:relative}
 .lang button{appearance:none;border:0;background:transparent;cursor:pointer;font-family:var(--mono);font-size:12px;
   font-weight:500;letter-spacing:.06em;color:var(--muted);padding:6px 11px;border-radius:999px;position:relative;z-index:2;
@@ -1000,6 +1015,7 @@ td.ok{color:var(--ice);font-variant-numeric:tabular-nums}
    che spente come il resto del testo */
 .soc-ig{color:#E1306C}
 .soc-tt{color:#25F4EE}
+.soc-yt{color:#FF0033}
 .soc-card:hover .soc-ig{color:#F77737}
 .soc-card:hover .soc-tt{color:#FE2C55}
 
@@ -1143,6 +1159,10 @@ nav a.ig:hover svg{transform:translateY(-1px)}
 }
 /* le righe sotto video e mappa: luogo e stato, senza linee di separazione */
 .dir-video-info{font-family:var(--mono);font-size:10.5px;color:var(--faint);padding:0 15px 12px}
+/* il luogo e l'invito al canale stanno su due righe vicine, come la legenda */
+.dir-video-luogo{padding-bottom:4px}
+.dir-video-info a{color:var(--cyan);text-decoration:none;border-bottom:1px solid rgba(95,227,255,.3)}
+.dir-video-info a:hover{border-bottom-color:var(--cyan)}
 .dir-video-dot{background:var(--cyan)}
 .dir-video-dot.is-live{background:var(--live);animation:navPulse 1.8s infinite}
 .embeds2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:12px}
