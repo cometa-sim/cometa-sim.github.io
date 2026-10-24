@@ -36,7 +36,14 @@ assets/vendor/three.min.js          Three.js r128, copia locale (vedi sotto)
 assets/vendor/leaflet/              Leaflet 1.9.4, copia locale, per la previsione del giorno
 
 assets/img/cometa-logo.png          marchio COMETA, fondo trasparente
-assets/img/sim-logo.png             stemma della Scuola, fondo trasparente
+assets/img/sim-140-logo.png         marchio dei 140 anni della Scuola, fondo
+                                    trasparente. Porta scritte BIANCHE: si vede
+                                    solo su fondo scuro, ed e' li' che sta (fondo
+                                    pagina). Ritagliato al contenuto, cosi' la
+                                    larghezza combacia con quella del logo COMETA
+assets/img/sim-logo.png             stemma della Scuola da solo, fondo trasparente.
+                                    Non e' piu' usato in pagina: tenuto perche' e'
+                                    il marchio senza la ricorrenza
 assets/img/catena-volo.png          schema della catena di volo
 assets/img/zona-exclusion-dinacia.jpg   area di esclusione aeronautica
 assets/img/og.png                   anteprima per social e messaggistica
@@ -80,11 +87,11 @@ Norme e autorizzazioni · Domande · Chi siamo.
 ### Dopo ogni modifica: il numero di versione
 
 In `index.html` i file di `assets/`, e la mappa, sono richiamati con un numero in
-coda — oggi `?v=207`:
+coda — oggi `?v=208`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=207">
-<script src="assets/i18n.js?v=207"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=208">
+<script src="assets/i18n.js?v=208"></script>
 ```
 
 Lo stesso numero compare anche in punti meno visibili, che vanno alzati
