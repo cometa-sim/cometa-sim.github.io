@@ -22,11 +22,11 @@ it:{
 
   /* — Diretta (bozza) — */
   dirKicker:"Il giorno del lancio",
-  dirSub:"Il video dal campo e la posizione della sonda, in tempo reale. Per non perdere la diretta, <a href=\"https://www.youtube.com/@cometasim\" target=\"_blank\" rel=\"noopener\">iscriviti al nostro canale YouTube, COMETASIM</a>.",
+  dirSub:"Il video dal campo e la posizione della sonda, in tempo reale.",
   dirWip:"Pagina in costruzione",
   dirStatusPre:"Diretta tra poco", dirStatusLive:"In diretta ora",
   dirBannerDesc:"— video dal campo e posizione GPS", dirBannerCta:"Guarda →",
-  dirYoutubePlaceholder:"[ embed YouTube quando attivo ]", dirVideoPre:"inizia {t}", dirVideoLive:"in diretta", dirVideoWhere:"Dal campo di lancio · {site}",
+  dirYoutubePlaceholder:"[ embed YouTube quando attivo ]", dirVideoPre:"inizia {t}", dirVideoLive:"in diretta", dirVideoWhere:"Dal campo di lancio · {site}", dirVideoSub:"Iscriviti al canale COMETASIM per non perdere la diretta →",
   dirNoteTag:"Nota",
   dirNote:"La sonda trasmette da due localizzatori GPS. Il LoRa (viola) è la radio della sonda: trasmette ogni 5 secondi per tutto il volo, anche oltre i 18 km. Lo SPOT (verde) passa dai satelliti e manda un punto ogni due minuti e mezzo, ma sopra i 18 km smette di trasmettere: non è un'avaria, è il suo funzionamento normale — riprenderà in discesa.",
   dirFcTip:"Errore di previsione: R = {r} km (terzo quartile; run GFS di {h} h prima del lancio). Si riduce fino a zero con l'ultimo run GFS prima del lancio.",
@@ -493,11 +493,11 @@ es:{
 
   /* — En vivo (borrador) — */
   dirKicker:"El día del lanzamiento",
-  dirSub:"El video desde el terreno y la posición de la sonda, en tiempo real. Para no perderte la transmisión, <a href=\"https://www.youtube.com/@cometasim\" target=\"_blank\" rel=\"noopener\">suscribite a nuestro canal de YouTube, COMETASIM</a>.",
+  dirSub:"El video desde el terreno y la posición de la sonda, en tiempo real.",
   dirWip:"Página en construcción",
   dirStatusPre:"En vivo pronto", dirStatusLive:"En vivo ahora",
   dirBannerDesc:"— video desde el terreno y posición GPS", dirBannerCta:"Mirar →",
-  dirYoutubePlaceholder:"[ embed de YouTube cuando esté activo ]", dirVideoPre:"empieza {t}", dirVideoLive:"en vivo", dirVideoWhere:"Desde el lugar de lanzamiento · {site}",
+  dirYoutubePlaceholder:"[ embed de YouTube cuando esté activo ]", dirVideoPre:"empieza {t}", dirVideoLive:"en vivo", dirVideoWhere:"Desde el lugar de lanzamiento · {site}", dirVideoSub:"Suscribite al canal COMETASIM para no perderte la transmisión →",
   dirNoteTag:"Nota",
   dirNote:"La sonda transmite desde dos localizadores GPS. El LoRa (violeta) es la radio de la sonda: transmite cada 5 segundos durante todo el vuelo, también por encima de los 18 km. El SPOT (verde) pasa por los satélites y envía un punto cada dos minutos y medio, pero por encima de los 18 km deja de transmitir: no es una avería, es su funcionamiento normal — se reanudará en el descenso.",
   dirFcTip:"Error de pronóstico: R = {r} km (tercer cuartil; run GFS de {h} h antes del lanzamiento). Se reduce hasta cero con el último run GFS antes del lanzamiento.",
@@ -957,11 +957,11 @@ en:{
 
   /* — Live (draft) — */
   dirKicker:"Launch day",
-  dirSub:"Footage from the field and the probe's position, in real time. Not to miss the live stream, <a href=\"https://www.youtube.com/@cometasim\" target=\"_blank\" rel=\"noopener\">subscribe to our YouTube channel, COMETASIM</a>.",
+  dirSub:"Footage from the field and the probe's position, in real time.",
   dirWip:"Page under construction",
   dirStatusPre:"Live soon", dirStatusLive:"Live now",
   dirBannerDesc:"— footage from the field and GPS position", dirBannerCta:"Watch →",
-  dirYoutubePlaceholder:"[ YouTube embed, once live ]", dirVideoPre:"starts {t}", dirVideoLive:"live", dirVideoWhere:"From the launch site · {site}",
+  dirYoutubePlaceholder:"[ YouTube embed, once live ]", dirVideoPre:"starts {t}", dirVideoLive:"live", dirVideoWhere:"From the launch site · {site}", dirVideoSub:"Subscribe to the COMETASIM channel so you don't miss the live stream →",
   dirNoteTag:"Note",
   dirNote:"The probe transmits from two GPS trackers. LoRa (purple) is the probe's own radio: it transmits every 5 seconds for the whole flight, above 18 km too. SPOT (green) goes through satellites and sends a point every two and a half minutes, but above 18 km it stops transmitting: that is not a malfunction, it is normal operation — it will resume on the way down.",
   dirFcTip:"Forecast error: R = {r} km (third quartile; GFS run {h} h before launch). It shrinks to zero with the last GFS run before launch.",
