@@ -208,6 +208,29 @@ function quotaScoppio(V, d){
 function vAtterraggio(m, d){
   return Math.sqrt(2*m*G/(RHO0*PARA_CD*Math.PI*(d/2)*(d/2)));
 }
+/* ---------- Il motore del volo ----------
+   Uno solo, per il modulo di questa pagina, la Diretta e la stazione LoRa
+   (voloDiretta, in fondo): stesse funzioni, stessi numeri.
+   c: {diam, mass, pay, asc, chute, neckG?}. Con la portanza al collo
+   misurata (neckG, g) l'elio e' fissato da quella e la salita viene di
+   conseguenza; senza, l'elio e' quello che da' la salita voluta.
+   Restituisce {V, asc, burst (ISA, m), neck (g), desc (al suolo, m/s)},
+   o null se il pallone non sale (troppo pesante). */
+function motorePallone(c){
+  let V, asc;
+  if(c.neckG > 0){ V = (c.neckG/1000 + c.mass)/DRATIO; asc = ascRate(V, c.mass, c.pay); }
+  else { V = volumePerSalita(c.mass, c.pay, c.asc); asc = c.asc; }
+  if(!V || !(asc > 0)) return null;
+  return {V:V, asc:asc, burst:quotaScoppio(V, c.diam), neck:(V*DRATIO - c.mass)*1000, desc:vAtterraggio(c.pay + PARA_M, c.chute)};
+}
+/* La quota di scoppio (m) con la colonna d'aria del giorno, o ISA se non c'e' */
+function scoppioA(V, d, col){ return col ? quotaScoppioCol(V, d, col) : quotaScoppio(V, d); }
+/* La quota di scoppio del giorno: h, le ore di Open-Meteo per il luogo
+   (fetchHourly); {m, day, isa, col}, con day=false se tutta ISA */
+function scoppioDelGiorno(V, diam, h, iso, hhmm, lat){
+  const col = h ? dayColumn(h, iso, hhmm, lat) : null;
+  return {m:scoppioA(V, diam, col), day:!!col, isa:!col || !window.COMETA_MSIS, col:col};
+}
 function diamPerDiscesa(m, v){      /* l'inversa: il paracadute che da' v al suolo */
   return Math.sqrt(8*m*G/(RHO0*PARA_CD*Math.PI*v*v));
 }
@@ -353,7 +376,7 @@ function loadAtmo(pl){
    Si applicano anche a una quota imposta a mano. */
 function burstSpread(b, iso, hhmm, s){
   const col = launch && atmo.key === atmoKey(launch) ? dayColumn(atmo.h, iso, hhmm, launch.lat) : null;
-  const q = function(d){ return col ? quotaScoppioCol(b.V, d, col) : quotaScoppio(b.V, d); };
+  const q = function(d){ return scoppioA(b.V, d, col); };
   const h0 = q(b.diam);
   return {lo:q(b.diam*(1 - s)) - h0, hi:q(b.diam*(1 + s)) - h0};
 }
@@ -370,8 +393,8 @@ function groundAt(iso, hhmm){
 /* Quota di scoppio per un giorno e un'ora: {m, day, isa} con day=false se tutta ISA;
    isa=true se il giorno e' reale ma sopra l'ultimo livello manca NRLMSIS (ripiego su ISA) */
 function burstFor(b, iso, hhmm){
-  const col = launch && atmo.key === atmoKey(launch) ? dayColumn(atmo.h, iso, hhmm, launch.lat) : null;
-  return col ? {m:quotaScoppioCol(b.V, b.diam, col), day:true, isa:!window.COMETA_MSIS} : {m:b.burst, day:false, isa:true};
+  const h = launch && atmo.key === atmoKey(launch) ? atmo.h : null;
+  return scoppioDelGiorno(b.V, b.diam, h, iso, hhmm, launch && launch.lat);
 }
 
 function readBalloon(){
@@ -395,11 +418,9 @@ function readBalloon(){
        && b.tGonf > -40 && b.tGonf < 60)){
     b.warn.push(t("twWBad")); return b;
   }
-  b.V = volumePerSalita(b.mass, b.pay, b.asc);
-  if(!b.V){ b.warn.push(t("twWHeavy")); return b; }
-  b.burst = quotaScoppio(b.V, b.diam);
-  b.neck = (b.V*DRATIO - b.mass)*1000;
-  b.desc = vAtterraggio(b.pay + PARA_M, b.chute);
+  const m = motorePallone(b);                     /* lo stesso motore della Diretta e della stazione */
+  if(!m){ b.warn.push(t("twWHeavy")); return b; }
+  b.V = m.V; b.burst = m.burst; b.neck = m.neck; b.desc = m.desc;
   /* Elio: le moli necessarie non dipendono dalla temperatura (V e' a 15 °C
      e 1 atm; a parita' di portanza al collo la massa d'elio e' la stessa,
      come in volume_a_T dello script). Cambia il volume da caricare, e la
@@ -1747,24 +1768,19 @@ function voloDiretta(){
   const F = window.COMETA_FLIGHT, L0 = window.COMETA_LAUNCH;
   if(!F || !F.cfg || !F.site || !L0) return;
   const c = F.cfg, pr = PRESET[c.bal] || PRESET["2000"];
-  let V, asc;
-  if(c.neckG > 0){                                   /* portanza misurata: fissa l'elio */
-    V = (c.neckG/1000 + pr.mass)/DRATIO;
-    asc = ascRate(V, pr.mass, c.pay);
-  } else {
-    V = volumePerSalita(pr.mass, c.pay, c.asc);
-    asc = c.asc;
-  }
-  if(!V || !(asc > 0)) return;                       /* dati impossibili: restano quelli di riserva */
+  /* il pallone come lo legge il modulo con i valori proposti: diametro e
+     massa del modello, paracadute del kit */
+  const m = motorePallone({diam:pr.diam, mass:pr.mass, pay:c.pay, asc:c.asc, chute:PARA_D, neckG:c.neckG});
+  if(!m) return;                                     /* dati impossibili: restano quelli di riserva */
   const iso = isoDay(L0);
   const hhmm = new Intl.DateTimeFormat("en-GB", {timeZone:TZ, hour:"2-digit", minute:"2-digit", hour12:false}).format(L0);
   fetchHourly(F.site, TZ).then(function(h){
-    const col = dayColumn(h, iso, hhmm, F.site.lat);
-    F.ascentMs = asc;
-    F.burstKm = (col ? quotaScoppioCol(V, pr.diam, col) : quotaScoppio(V, pr.diam))/1000;
-    F.descentV0Ms = vAtterraggio(c.pay + PARA_M, PARA_D);
-    F.atmo = col ? "day" : "std";
-    F.calcolo = {V:V, diam:pr.diam, col:col};       /* per l'area di atterraggio (incertezza, sotto) */
+    const bd = scoppioDelGiorno(m.V, pr.diam, h, iso, hhmm, F.site.lat);   /* come burstFor nel modulo */
+    F.ascentMs = m.asc;
+    F.burstKm = bd.m/1000;
+    F.descentV0Ms = m.desc;
+    F.atmo = !bd.day ? "std" : bd.isa ? "dayIsa" : "day";
+    F.calcolo = {V:m.V, diam:pr.diam, col:bd.col};  /* per l'area di atterraggio (incertezza, sotto) */
     if(window.COMETA_SPOT && window.COMETA_SPOT.refreshTrajectory) window.COMETA_SPOT.refreshTrajectory();
     /* lo stesso avviso per chi non e' la Diretta: la pagina della stazione
        LoRa (lora/stazione/) ridisegna la sua traiettoria prevista */
@@ -1798,7 +1814,7 @@ window.COMETA_TRAIETTORIA = {
       {lo:{descentV0Ms:F.descentV0Ms*(1 - s)}, hi:{descentV0Ms:F.descentV0Ms*(1 + s)}}
     ];
     if(k){
-      const q = function(d){ return (k.col ? quotaScoppioCol(k.V, d, k.col) : quotaScoppio(k.V, d))/1000; };
+      const q = function(d){ return scoppioA(k.V, d, k.col)/1000; };     /* come burstSpread nel modulo */
       specs.unshift({lo:{burstKm:q(k.diam*(1 - s))}, hi:{burstKm:q(k.diam*(1 + s))}});
     }
     const out = [];
