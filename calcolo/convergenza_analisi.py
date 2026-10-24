@@ -56,6 +56,7 @@ Uso:  git fetch origin dati && git archive origin/dati | tar -x -C dati/
       python3 calcolo/convergenza_analisi.py dati/convergenza.csv [--out tabella.csv]
       python3 calcolo/convergenza_analisi.py dati/convergenza*.csv
       python3 calcolo/convergenza_analisi.py dati/convergenza.csv --json curva.json
+      python3 calcolo/convergenza_analisi.py dati/convergenza_lacalera.csv --passo 6
 """
 import argparse, csv, json, math, os, statistics, sys
 from datetime import datetime, timezone
@@ -96,10 +97,17 @@ def _num(x):
     except (TypeError, ValueError): return None
 
 
-def analizza(path, calendario=False):
-    """Statistiche di e(tau) per un CSV: {tau: dict}, piu' i conteggi."""
+def analizza(path, calendario=False, passo=24):
+    """Statistiche di e(tau) per un CSV: {tau: dict}, piu' i conteggi.
+
+    passo: ampiezza delle classi di anticipo [h]. Con 24 (il default) il
+    riferimento e' la classe 0, eta' in [0, 24). Con un passo piu' corto
+    (6: una classe per corsa GFS, per i siti raccolti a ogni corsa) il
+    riferimento di ogni bersaglio e' la corsa piu' recente prima del lancio,
+    se ha meno di 24 h, e prende l'etichetta 0; le altre righe vanno nella
+    classe floor(eta'/passo)."""
     # (bersaglio, tau) -> la riga con il dataset piu' recente
-    prev, scartate = {}, 0
+    prev, scartate, righe = {}, 0, {}
     with open(path, newline="") as f:
         for r in csv.DictReader(f):
             if calendario:
@@ -107,8 +115,17 @@ def analizza(path, calendario=False):
             else:
                 h = eta_h(r)
                 if h < 0: scartate += 1; continue      # corsa successiva al lancio
+                if passo < 24:
+                    righe.setdefault(r["bersaglio"], []).append(r); continue
                 tau = int(h//24)
             k = (r["bersaglio"], tau)
+            if k not in prev or r["dataset"] > prev[k]["dataset"]:
+                prev[k] = r
+    for b, rr in righe.items():                        # solo con passo < 24
+        rr.sort(key=eta_h)
+        if eta_h(rr[0]) < 24: prev[(b, 0)] = rr[0]; rr = rr[1:]
+        for r in rr:
+            k = (b, max(1, int(eta_h(r)//passo)))
             if k not in prev or r["dataset"] > prev[k]["dataset"]:
                 prev[k] = r
 
@@ -139,14 +156,14 @@ def analizza(path, calendario=False):
     return stat, len(rif), senza, scartate, stat_durata
 
 
-def stampa(path, stat, nrif, senza, scartate, calendario):
+def stampa(path, stat, nrif, senza, scartate, calendario, passo=24):
     print(f"== {path}")
     print("Anticipo: " + ("giorni di calendario fra emissione e bersaglio" if calendario
-                          else "eta' della corsa GFS al lancio, a passo di 24 h"))
+                          else f"eta' della corsa GFS al lancio, a passo di {passo} h"))
     if scartate: print(f"Righe su corse successive al lancio: {scartate}, escluse")
     print(f"Bersagli con riferimento: {nrif} (senza: {senza}, esclusi)\n")
     norm = any("sv" in x for x in stat.values())
-    print(f"{'tau [g]':>7} {'n':>4} {'eta [h]':>8} {'Q1 [km]':>8} {'mediana':>8} {'Q3 [km]':>8} {'RMS [km]':>9}"
+    print(f"{'tau [g]' if passo >= 24 else 'cl.' + str(passo) + 'h':>7} {'n':>4} {'eta [h]':>8} {'Q1 [km]':>8} {'mediana':>8} {'Q3 [km]':>8} {'RMS [km]':>9}"
           + (f" {'RMS e/T [m/s]':>14} {'med e/L [%]':>12}" if norm else ""))
     for tau, x in stat.items():
         riga = f"{tau:>7} {x['n']:>4} {x['eta']:>8.0f} {x['q1']:>8.1f} {x['me']:>8.1f} {x['q3']:>8.1f} {x['rms']:>9.1f}"
@@ -165,12 +182,18 @@ def main():
     ap.add_argument("--calendario", action="store_true",
                     help="anticipo = lead_giorni (giorni fra emissione e bersaglio)")
     ap.add_argument("--json", help="salva la curva per la pagina La traiettoria (con un solo file)")
+    ap.add_argument("--passo", type=int, default=24,
+                    help="ampiezza delle classi di anticipo in ore (6: una per corsa GFS)")
+    ap.add_argument("--nome", default="Mercedes (Uruguay)", help="il sito, nel JSON")
+    ap.add_argument("--min-n", type=int, default=0,
+                    help="con --json: se meno di 3 classi hanno almeno questi campioni, "
+                         "non scrive il file ed esce con 3 (il workflow ripiega su un altro sito)")
     a = ap.parse_args()
 
     tutti, durata = {}, None
     for path in a.csv:
-        stat, nrif, senza, scartate, durata = analizza(path, a.calendario)
-        stampa(path, stat, nrif, senza, scartate, a.calendario)
+        stat, nrif, senza, scartate, durata = analizza(path, a.calendario, a.passo)
+        stampa(path, stat, nrif, senza, scartate, a.calendario, a.passo)
         tutti[path] = stat
 
     if len(tutti) > 1:
@@ -198,8 +221,11 @@ def main():
         # classe; la pagina interpola Q3 sull'eta' della corsa e lo scala con
         # la durata del volo (durata_ref_min e' quella del volo misurato)
         stat = next(iter(tutti.values()))
+        if a.min_n and sum(1 for x in stat.values() if x["n"] >= a.min_n) < 3:
+            print(f"\nCurva non scritta: meno di 3 classi con almeno {a.min_n} campioni")
+            return 3
         out = {"aggiornato": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-               "sito": "Mercedes (Uruguay)", "durata_ref_min": round(durata or 176.0, 1),
+               "sito": a.nome, "passo_h": a.passo, "durata_ref_min": round(durata or 176.0, 1),
                "classi": [{"tau": tau, "n": x["n"], "eta_h": round(x["eta"], 1),
                            "q1_km": round(x["q1"], 2), "mediana_km": round(x["me"], 2),
                            "q3_km": round(x["q3"], 2), "rms_km": round(x["rms"], 2)}

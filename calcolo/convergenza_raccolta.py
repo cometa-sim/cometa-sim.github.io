@@ -40,6 +40,12 @@ cuiaba       Mato Grosso, tropici: venti deboli
 bologna      medie latitudini dell'emisfero nord, in un'altra stagione
 mercedes_22km  come mercedes ma scoppio a 22 km: profilo diverso, per
              verificare la scala con la durata del volo
+lacalera     il sito del lancio: aerodromo La Calera (SUCL) vicino a Minas,
+             consigliato dalla DINACIA perche' e' quello con meno traffico
+             aereo. Dal 24/10/2026 si raccoglie a ogni corsa GFS (il
+             workflow gira quattro volte al giorno, `--sito lacalera`), per
+             misurare la curva a passo di 6 h; la pagina usa questa curva
+             appena ha abbastanza campioni.
 
 Quota di scoppio e discesa sono FISSE (atmosfera ISA, stesso modello di
 cometa_venti.py), non quelle dell'atmosfera del giorno: cosi' fra una
@@ -73,6 +79,8 @@ SITI = {
     "cuiaba":        ("Cuiaba",             -15.601,  -56.097,  "America/Cuiaba", None),
     "bologna":       ("Bologna",             44.494,   11.343,  "Europe/Rome", None),
     "mercedes_22km": ("Mercedes, scoppio 22 km", -33.2486, -58.0736, "America/Montevideo", 22000.0),
+    # SUCL, punto di riferimento dell'aerodromo da confermare con l'AIP della DINACIA
+    "lacalera":      ("La Calera (Minas)",  -34.2905, -55.3552,  "America/Montevideo", None),
 }
 
 COLONNE = ["dataset", "emissione", "bersaglio", "lead_giorni", "lat", "lon",
