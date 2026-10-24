@@ -822,13 +822,13 @@ function loadLeaflet(){
      parallelo con leaflet.js. */
   const mapkit = window.COMETA_MAPKIT ? Promise.resolve() : new Promise(function(ok, ko){
     const s = document.createElement("script");
-    s.src = "assets/mapkit.js?v=220";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
+    s.src = "assets/mapkit.js?v=221";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
     s.onload = ok; s.onerror = ko;
     document.head.appendChild(s);
   });
   const map3d = window.COMETA_MAP3D ? Promise.resolve() : new Promise(function(ok){
     const s = document.createElement("script");
-    s.src = "assets/map3d.js?v=220";
+    s.src = "assets/map3d.js?v=221";
     s.onload = ok; s.onerror = ok;       /* senza, resta il 2D e basta */
     document.head.appendChild(s);
   });
@@ -857,7 +857,9 @@ function ensureMap(){
   if(mapReady) return mapReady;
   mapReady = loadLeaflet().then(function(){
     const L = window.L;
-    map = L.map(elMap, {scrollWheelZoom:false, zoomControl:true});
+    /* zoom a quarti di livello (i pulsanti a mezzi): a livelli interi la
+       scala raddoppia a ogni passo, e da 50 km si saltava a 20 */
+    map = L.map(elMap, {scrollWheelZoom:false, zoomControl:true, zoomSnap:.25, zoomDelta:.5});
     const street = L.tileLayer(TILES, {
       maxZoom:18, crossOrigin:true,      /* le stesse mattonelle servono all'esportazione */
       attribution:'© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'
@@ -1523,7 +1525,8 @@ function exportPng(){
   let dz = Math.max(0, Math.min(3, Math.floor(Math.log2(S) + 1e-9)));
   const tilesFor = function(d){ const f = Math.pow(2, d); return (Math.ceil(size.x*f/256) + 1)*(Math.ceil(size.y*f/256) + 1); };
   while(dz > 0 && tilesFor(dz) > MAX_TILES) dz--;
-  const z = Math.min(18, z0 + dz), k = S/Math.pow(2, z - z0);
+  /* le mattonelle esistono solo a zoom interi: lo zoom della mappa puo' essere a quarti */
+  const z = Math.min(18, Math.floor(z0 + 1e-9) + dz), k = S/Math.pow(2, z - z0);
   const W = Math.round(size.x*S), H = Math.round(size.y*S);
   const origin = map.project(map.containerPointToLatLng([0, 0]), z);          /* pixel alla zoom delle mattonelle */
   const P = function(lat, lon){ const p = map.project([lat, lon], z); return [(p.x - origin.x)*k, (p.y - origin.y)*k]; };

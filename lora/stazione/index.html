@@ -408,7 +408,7 @@ function chiaveDoppione(dati) {
 /* Da cambiare a ogni modifica della pagina: e' scritta in Setup, e
    dice a colpo d'occhio se il telefono sta usando la pagina nuova o una
    copia vecchia rimasta in memoria. */
-const VERSIONE = "2026-10-22b";
+const VERSIONE = "2026-10-24";
 
 const WORKER_PREDEFINITO = "https://lora.cometa.gripe";
 const WORKER = (new URLSearchParams(location.search).get("worker") || WORKER_PREDEFINITO).replace(/\/+$/, "");
@@ -730,7 +730,7 @@ let mappa = null, lineaTraccia, puntoUltimo, puntoIo, vista3d = null;
 function coloreLora() { return getComputedStyle(document.documentElement).getPropertyValue("--lora").trim() || "#7b2ff2"; }
 function preparaMappa() {
   if (!window.L) return; // Leaflet non caricato (offline alla prima apertura): il resto funziona lo stesso
-  mappa = L.map("map").setView([-33.25, -58.07], 9);
+  mappa = L.map("map", { zoomSnap: .25, zoomDelta: .5 }).setView([-33.25, -58.07], 9);  // a quarti di livello, come il predittore
   const strade = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
     maxZoom: 18,
     attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
