@@ -87,11 +87,11 @@ Norme e autorizzazioni · Domande · Chi siamo.
 ### Dopo ogni modifica: il numero di versione
 
 In `index.html` i file di `assets/`, e la mappa, sono richiamati con un numero in
-coda — oggi `?v=213`:
+coda — oggi `?v=214`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=213">
-<script src="assets/i18n.js?v=213"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=214">
+<script src="assets/i18n.js?v=214"></script>
 ```
 
 Lo stesso numero compare anche in punti meno visibili, che vanno alzati
@@ -448,8 +448,12 @@ GFS — 00, 06, 12 e 18 UTC, cioè 21, 03, 09 e 15 in Uruguay, disponibili in
 Tawhiri qualche ora dopo — e l'analisi raggruppa l'anticipo a passo di 6 h
 (`--passo 6`): la curva si misura corsa per corsa invece che interpolata
 fra un giorno e l'altro. Il riferimento di ogni bersaglio è la corsa più
-recente prima del lancio. Le coordinate (−34,2905, −55,3552) vanno
-confermate con l'AIP della DINACIA.
+recente prima del lancio. Il punto (−34,2919, −55,3531) è quello di lancio
+sul prato, lo stesso di `FLIGHT_SITE` in `assets/volo.js` e della pagina
+Traiettoria; il punto di riferimento ufficiale dell'aerodromo (AIP DINACIA,
+−34,2905, −55,3552, il centro delle piste) è a circa 250 m, una differenza
+irrilevante per la statistica. Se il punto di lancio cambia, va cambiato nei
+tre posti.
 
 La pagina usa la curva di La Calera a passo di 6 h appena ha almeno tre
 classi con 8 campioni (circa una settimana di raccolta), fino ad allora
@@ -464,9 +468,18 @@ vento trasla tutti i voli dell'area: gli spigoli dell'area diventano archi
 di cerchio (contorno a 180 punti per vertice, disegnato senza
 semplificazione e senza arrotondare i vertici al pixel, con lo stesso
 `smoothPolygon` usato prima per l'ellisse: altrimenti i punti, più fitti di
-un pixel, fanno un bordo a scalini). Il giorno stesso del lancio vale zero per definizione:
-con la casella attiva e il giorno di oggi, l'avviso compare subito, fra
-quelli del pallone sotto le tessere. Le classi con meno di 8 campioni non
+un pixel, fanno un bordo a scalini). Vale zero per definizione solo con
+l'ultima corsa GFS che arriva prima del lancio: le corse sono ogni 6 h
+(00, 06, 12, 18 UTC), la corsa usata è quella che Tawhiri dichiara nella
+risposta, e lo zero scatta quando la successiva arriverebbe dopo il lancio
+(`ultimaCorsa()` in `assets/traiettoria.js`; il giorno del lancio, la
+mattina, può ancora arrivarne una più recente). Il ritardo con cui le corse
+arrivano in Tawhiri non è supposto: l'analisi lo misura ogni giorno dai giri
+di tutti i siti (ogni giro dice quale corsa c'era e quale non ancora) e lo
+scrive nella curva come `ritardo_gfs_h` = [min, max]; a fine ottobre 2026
+era fra 4,5 e 4,7 h. Si usa il minimo: lo zero vale solo quando la corsa
+successiva arriva di sicuro dopo il lancio. L'avviso compare dopo il
+calcolo, fra quelli del pallone sotto le tessere. Le classi con meno di 8 campioni non
 si usano. Se il file non si carica, lo dice un avviso nello stesso posto e
 l'area resta quella del pallone. Accanto alla casella la pagina scrive solo
 «Terzo quartile. Per ora affidabile solo in Uruguay» (`twFcHint` in
@@ -644,8 +657,9 @@ previsione, con la stessa curva dell'opzione della pagina Traiettoria
 (`convergenza_curva.json` sul branch `dati`, terzo quartile interpolato
 sull'età della corsa GFS e scalato con la durata del volo). Compare quando la
 data del lancio entra nell'orizzonte del previsore, circa una settimana
-prima, si restringe giorno per giorno a ogni nuova corsa e sparisce il
-giorno del lancio, quando vale zero per definizione. In 2D è un `L.circle`
+prima, si restringe a ogni nuova corsa e sparisce con l'ultima corsa GFS
+che arriva prima del lancio, quando vale zero per definizione (stessa regola
+della pagina Traiettoria). In 2D è un `L.circle`
 (il tooltip dice raggio ed età della corsa), in 3D un cerchio steso sul
 terreno.
 

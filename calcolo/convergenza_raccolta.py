@@ -79,8 +79,10 @@ SITI = {
     "cuiaba":        ("Cuiaba",             -15.601,  -56.097,  "America/Cuiaba", None),
     "bologna":       ("Bologna",             44.494,   11.343,  "Europe/Rome", None),
     "mercedes_22km": ("Mercedes, scoppio 22 km", -33.2486, -58.0736, "America/Montevideo", 22000.0),
-    # SUCL, punto di riferimento dell'aerodromo da confermare con l'AIP della DINACIA
-    "lacalera":      ("La Calera (Minas)",  -34.2905, -55.3552,  "America/Montevideo", None),
+    # il punto di lancio sul prato, lo stesso FLIGHT_SITE di assets/volo.js e
+    # della pagina Traiettoria; il punto di riferimento ufficiale di SUCL
+    # (AIP DINACIA: -34.2905, -55.3552, il centro delle piste) e' a ~250 m
+    "lacalera":      ("La Calera (Minas)",  -34.2919, -55.3531,  "America/Montevideo", None),
 }
 
 COLONNE = ["dataset", "emissione", "bersaglio", "lead_giorni", "lat", "lon",

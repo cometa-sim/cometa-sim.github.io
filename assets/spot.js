@@ -218,13 +218,13 @@ window.COMETA_SPOT = (function(){
     });
     const mapkit = window.COMETA_MAPKIT ? Promise.resolve() : new Promise(function(ok, ko){
       const s = document.createElement("script");
-      s.src = "assets/mapkit.js?v=213";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
+      s.src = "assets/mapkit.js?v=214";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
       s.onload = ok; s.onerror = ko;
       document.head.appendChild(s);
     });
     const map3d = window.COMETA_MAP3D ? Promise.resolve() : new Promise(function(ok){
       const s = document.createElement("script");
-      s.src = "assets/map3d.js?v=213";
+      s.src = "assets/map3d.js?v=214";
       s.onload = ok; s.onerror = ok;     // senza, resta il 2D e basta
       document.head.appendChild(s);
     });
@@ -839,7 +839,12 @@ window.COMETA_SPOT = (function(){
     return curva;
   }
   function fcRadiusKm(d, run, L0, durMin){
-    if(!d || !run || dayUy(L0) <= dayUy(new Date())) return null;   // giorno del lancio: zero
+    /* zero solo con l'ultima corsa GFS che arriva prima del lancio: la
+       successiva (6 h dopo) arriverebbe dopo, con il ritardo misurato dai
+       giri della raccolta (ritardo_gfs_h); stessa regola di ultimaCorsa()
+       in assets/traiettoria.js */
+    const rit = d && d.ritardo_gfs_h ? d.ritardo_gfs_h[0] : 4.5;
+    if(!d || !run || run.getTime() + (6 + rit)*36e5 > L0.getTime()) return null;
     const age = (L0 - run) / 36e5;
     const C = d.classi.filter(function(c){ return c.n >= CURVA_NMIN; })
       .sort(function(a, b){ return a.eta_h - b.eta_h; });
