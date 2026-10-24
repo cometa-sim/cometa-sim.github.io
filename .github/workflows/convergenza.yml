@@ -22,6 +22,12 @@ on:
     # quando in Uruguay e' ancora il giorno prima; non al minuto 0, dove
     # le schedule si accodano di piu'.
     - cron: "37 3 * * *"
+    # Altri tre giri, uno per ciascuna delle altre corse GFS (00, 06, 12,
+    # 18 UTC: 21, 03, 09, 15 in Uruguay), solo per La Calera, il sito del
+    # lancio: la sua curva si misura a passo di 6 h. Con i ritardi delle
+    # schedule due giri possono trovare la stessa corsa: il secondo non
+    # aggiunge righe (deduplica su dataset e bersaglio).
+    - cron: "37 9,15,21 * * *"
   workflow_dispatch:
 
 permissions:
@@ -56,13 +62,24 @@ jobs:
           python-version: "3.12"
 
       - name: Otto previsioni per sito
-        run: python3 calcolo/convergenza_raccolta.py --dir ${{ runner.temp }}/dati
+        run: |
+          if [ "${{ github.event.schedule }}" = "37 9,15,21 * * *" ]; then
+            python3 calcolo/convergenza_raccolta.py --dir ${{ runner.temp }}/dati --sito lacalera
+          else
+            python3 calcolo/convergenza_raccolta.py --dir ${{ runner.temp }}/dati
+          fi
 
       - name: Curva per la pagina La traiettoria
         # la legge assets/traiettoria.js (opzione «Errore di previsione»);
         # se fallisce, i dati raccolti si salvano comunque
         continue-on-error: true
-        run: python3 calcolo/convergenza_analisi.py ${{ runner.temp }}/dati/convergenza.csv --json ${{ runner.temp }}/dati/convergenza_curva.json
+        # La Calera a passo di 6 h appena ha almeno 3 classi con 8 campioni;
+        # fino ad allora Mercedes, a passo di 24 h
+        run: |
+          D=${{ runner.temp }}/dati
+          python3 calcolo/convergenza_analisi.py $D/convergenza_lacalera.csv --passo 6 --min-n 8 \
+                  --nome "La Calera, Minas (Uruguay)" --json $D/convergenza_curva.json \
+            || python3 calcolo/convergenza_analisi.py $D/convergenza.csv --json $D/convergenza_curva.json
 
       - name: Commit sul branch dati
         working-directory: ${{ runner.temp }}/dati

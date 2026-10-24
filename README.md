@@ -439,7 +439,21 @@ efficace e/T e l'errore relativo e/L, e con più file li confronta fra i
 siti. Se le curve di e/T coincidono, scalare con la durata del volo regge.
 L'elenco dei siti è `SITI` in `calcolo/convergenza_raccolta.py`.
 
-La pagina usa la curva di Mercedes nell'opzione «Errore di previsione»
+Dal 24 ottobre 2026 c'è anche **La Calera** (SUCL), l'aerodromo vicino a
+Minas da cui si lancerà: lo consiglia la DINACIA perché è il punto con meno
+traffico aereo, quindi è anche quello che si userà di più in Uruguay. Per
+questo sito il workflow gira **quattro volte al giorno** (03:37, 09:37,
+15:37 e 21:37 UTC; gli altri siti solo alle 03:37), una per ciascuna corsa
+GFS — 00, 06, 12 e 18 UTC, cioè 21, 03, 09 e 15 in Uruguay, disponibili in
+Tawhiri qualche ora dopo — e l'analisi raggruppa l'anticipo a passo di 6 h
+(`--passo 6`): la curva si misura corsa per corsa invece che interpolata
+fra un giorno e l'altro. Il riferimento di ogni bersaglio è la corsa più
+recente prima del lancio. Le coordinate (−34,2905, −55,3552) vanno
+confermate con l'AIP della DINACIA.
+
+La pagina usa la curva di La Calera a passo di 6 h appena ha almeno tre
+classi con 8 campioni (circa una settimana di raccolta), fino ad allora
+quella di Mercedes a passo di 24 h, nell'opzione «Errore di previsione»
 delle impostazioni avanzate. Ogni giorno il workflow scrive anche
 `convergenza_curva.json` sul branch `dati` (età mediana e quartili per
 classe di anticipo); `assets/traiettoria.js` lo legge da
