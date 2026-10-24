@@ -80,11 +80,11 @@ Norme e autorizzazioni · Domande · Chi siamo.
 ### Dopo ogni modifica: il numero di versione
 
 In `index.html` i file di `assets/`, e la mappa, sono richiamati con un numero in
-coda — oggi `?v=203`:
+coda — oggi `?v=207`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=203">
-<script src="assets/i18n.js?v=203"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=207">
+<script src="assets/i18n.js?v=207"></script>
 ```
 
 Lo stesso numero compare anche in punti meno visibili, che vanno alzati
@@ -177,10 +177,9 @@ ma l'attributo `data-jump`, che `jumpTo()` in `assets/app.js` risolve
 in uno scorrimento morbido.
 
 L'indice ha quattro voci — in sintesi, cosa misuriamo e come, chi fa
-cosa, a che punto siamo — e non una per sezione: le sezioni sono nove,
-ma non sono tutte dello stesso livello, e un elenco che mette «la
-scheda che programmiamo» accanto a «a che punto siamo» non aiuta a
-orientarsi. Ogni voce porta all'inizio del blocco che la riguarda.
+cosa, a che punto siamo — e non una per sezione: le sezioni sono sei,
+ma non sono tutte dello stesso livello, e un elenco che mette «scelte
+tecniche» accanto a «a che punto siamo» non aiuta a orientarsi. Ogni voce porta all'inizio del blocco che la riguarda.
 
 Le sezioni hanno tutte il loro `id="m-qualcosa"`, anche quelle che
 l'indice non nomina: servono se un giorno si vuole rimandare lì da
@@ -312,12 +311,19 @@ chi guarda, senza server nostri:
    impongono quota di scoppio e discesa: vuoti, valgono quelli del
    modello e quelli calcolati.
 2. **La partenza.** Si scrive una località (suggerimenti mentre si
-   scrive: prima l'aerodromo di Mercedes, poi i due siti dello studio,
-   Mercedes e Durazno, poi il geocoder di Open-Meteo),
+   scrive: prima La Calera (Minas) e l'aerodromo di Mercedes, poi i due
+   siti dello studio, Mercedes e Durazno, poi il geocoder di Open-Meteo),
    oppure le coordinate, oppure si tocca la mappa o si usa la posizione
    del telefono. La stella sulla mappa si può trascinare. Chi arriva
-   trova l'aerodromo di Mercedes (SUME, dove c'è la stazione INUMET); l'ultimo luogo scelto dal visitatore resta nel
+   trova La Calera, vicino a Minas, dove la DINACIA ci chiede di lanciare; l'ultimo luogo scelto dal visitatore resta nel
    `localStorage` del dispositivo (chiave `cometa-partenza-v2`).
+   **Giorno e ora sono quelli del luogo di partenza**, non del browser:
+   le 11 a Mercedes sono le 11 di Mercedes per chiunque guardi. Il fuso
+   lo dà Open-Meteo (`timezone=auto`) con l'atmosfera del luogo, e
+   l'etichetta dell'ora dice lo scarto da UTC («ora locale, UTC−3»);
+   finché non arriva vale Montevideo. Anche gli orari dei risultati
+   (tocca terra alle, corsa GFS, tabella dei giorni) sono nell'ora del
+   luogo. La Diretta resta in ora di Montevideo, come `LAUNCH`.
 3. **La traiettoria.** La chiede a **Tawhiri**, il predittore di
    [SondeHub](https://sondehub.org/), sui venti dell'ultima corsa del
    modello **GFS** della NOAA. La quota di partenza non la passiamo:
@@ -666,7 +672,7 @@ approvare la propria richiesta di modifica.
   resta, e magari la pagina usa la curva solo per partenze in Uruguay.
 
 - **La data definitiva del lancio**, quando la DINACIA autorizza. Oggi la
-  costante `LAUNCH` in `assets/volo.js` vale `2026-10-28T11:00:00-03:00`: è
+  costante `LAUNCH` in `assets/volo.js` vale `2026-10-29T09:00:00-03:00`: è
   provvisoria, e il conto alla rovescia la mostra come se fosse certa.
   È anche il via vero: il lancio **è** la scadenza di `LAUNCH`, non un
   segnale a parte — se il giorno stesso il lancio slitta rispetto all'ora
@@ -721,7 +727,7 @@ approvare la propria richiesta di modifica.
   `FLIGHT_SITE` (sempre in `assets/volo.js`, con il nome che compare in
   testa alla scheda) è il punto di partenza della traiettoria prevista,
   disegnata sulla mappa della pagina Diretta accanto alle tracce vere:
-  oggi è il centro dell'aerodromo di Mercedes, lo stesso sito proposto di
+  oggi è La Calera, vicino a Minas, lo stesso sito proposto di
   default nella pagina Traiettoria. **Il giorno del lancio** va sostituito
   con la posizione esatta presa sul posto (un commit): la traiettoria si
   ricalcola da sola, al caricamento e ogni 20 minuti. `assets/spot.js` interroga Tawhiri (lo stesso
@@ -742,7 +748,7 @@ approvare la propria richiesta di modifica.
   "diretta tra poco" al rosso "in diretta". Sono due date separate in
   `assets/app.js`: `DIRETTA_WINDOW` (oggi 25 ottobre, qualche giorno prima
   del lancio — da quel momento la voce appare in nav, in grigio/ciano) e
-  `DIRETTA_START` (oggi 28 ottobre alle 10:00, un'ora prima del lancio — da li' in poi
+  `DIRETTA_START` (oggi 29 ottobre alle 8:00, un'ora prima del lancio — da li' in poi
   diventa rossa e compare il banner sotto la nav). A differenza del via
   alla quota, questo passaggio non ha bisogno di un file da pushare
   nell'istante: la diretta la si accende quando si vuole, quindi basta

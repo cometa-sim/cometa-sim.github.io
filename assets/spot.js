@@ -94,11 +94,11 @@ window.COMETA_SPOT = (function(){
      cosi' c'e' un solo posto dove aggiornarli il giorno del lancio.
      descentV0Ms e' la velocita' del paracadute AL SUOLO: piu' in alto
      scende molto piu' veloce (vedi densityISA sotto). site e' il punto di
-     partenza previsto per la traiettoria grigia: lo stesso di default
-     della pagina Traiettoria (aerodromo di Mercedes), non quello che un
+     partenza previsto per la traiettoria prevista: lo stesso di default
+     della pagina Traiettoria (La Calera, Minas), non quello che un
      visitatore potrebbe aver cambiato giocando col modulo di quella pagina. */
   function flightCfg(){
-    return window.COMETA_FLIGHT || {burstKm:37.9, ascentMs:5, descentV0Ms:4.6, site:{lat:-33.2486, lon:-58.0736}};
+    return window.COMETA_FLIGHT || {burstKm:37.9, ascentMs:5, descentV0Ms:4.6, site:{name:"La Calera · Minas", lat:-34.2919, lon:-55.3531}};
   }
 
   /* Atmosfera standard (ISA) — stessa formula di densitaISA() in
@@ -218,13 +218,13 @@ window.COMETA_SPOT = (function(){
     });
     const mapkit = window.COMETA_MAPKIT ? Promise.resolve() : new Promise(function(ok, ko){
       const s = document.createElement("script");
-      s.src = "assets/mapkit.js?v=203";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
+      s.src = "assets/mapkit.js?v=207";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
       s.onload = ok; s.onerror = ko;
       document.head.appendChild(s);
     });
     const map3d = window.COMETA_MAP3D ? Promise.resolve() : new Promise(function(ok){
       const s = document.createElement("script");
-      s.src = "assets/map3d.js?v=203";
+      s.src = "assets/map3d.js?v=207";
       s.onload = ok; s.onerror = ok;     // senza, resta il 2D e basta
       document.head.appendChild(s);
     });
@@ -329,7 +329,8 @@ window.COMETA_SPOT = (function(){
       if(legenda) legenda.innerHTML =
         '<span class="leg-row"><i class="leg-dot" style="background:' + VIOLET + '"></i><b>LoRa</b> <span class="leg-lora"></span></span>' +
         '<span class="leg-row"><i class="leg-dot" style="background:' + GREEN + '"></i><b>SPOT</b> <span class="leg-spot"></span></span>' +
-        '<span class="leg-row leg-traj"><i class="leg-dash"></i><span class="leg-traj-t"></span></span>';
+        '<span class="leg-row leg-traj"><i class="leg-dash"></i><span class="leg-traj-t"></span></span>' +
+        '<span class="leg-row leg-fc" hidden><i class="leg-area"></i><span class="leg-fc-t"></span></span>';
       mostraTraiettoria();
       /* 2D / 3D: nel 3D si segue il volo con la quota vera. La traiettoria
          prevista ha i colori del 2D (stileTraj). */
@@ -661,6 +662,7 @@ window.COMETA_SPOT = (function(){
     }
     legenda.querySelector(".leg-spot").textContent = "· " + ts;
     legenda.querySelector(".leg-traj-t").textContent = d.dirLegTraj || "Predicted trajectory";
+    legenda.querySelector(".leg-fc-t").textContent = d.dirLegFc || "Forecast error";
   }
 
   /* La risposta del backend (worker/, GET /track.json) e' gia' pulita e
@@ -791,6 +793,12 @@ window.COMETA_SPOT = (function(){
     if(lt){
       lt.style.opacity = trajOn ? 1 : .45;
       lt.querySelector(".leg-dash").style.borderTopColor = stileTraj().linea;
+    }
+    /* l'area arancione dell'errore di previsione: in legenda solo quando c'e' */
+    const lf = legenda && legenda.querySelector(".leg-fc");
+    if(lf){
+      lf.hidden = !(trajGroup && fcLast && !stileTraj().giorno);
+      lf.style.opacity = trajOn ? 1 : .45;
     }
     redraw3d(false);
   }
