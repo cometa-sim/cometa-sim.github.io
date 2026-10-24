@@ -80,11 +80,11 @@ Norme e autorizzazioni · Domande · Chi siamo.
 ### Dopo ogni modifica: il numero di versione
 
 In `index.html` i file di `assets/`, e la mappa, sono richiamati con un numero in
-coda — oggi `?v=205`:
+coda — oggi `?v=206`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=205">
-<script src="assets/i18n.js?v=205"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=206">
+<script src="assets/i18n.js?v=206"></script>
 ```
 
 Lo stesso numero compare anche in punti meno visibili, che vanno alzati
@@ -177,10 +177,9 @@ ma l'attributo `data-jump`, che `jumpTo()` in `assets/app.js` risolve
 in uno scorrimento morbido.
 
 L'indice ha quattro voci — in sintesi, cosa misuriamo e come, chi fa
-cosa, a che punto siamo — e non una per sezione: le sezioni sono nove,
-ma non sono tutte dello stesso livello, e un elenco che mette «la
-scheda che programmiamo» accanto a «a che punto siamo» non aiuta a
-orientarsi. Ogni voce porta all'inizio del blocco che la riguarda.
+cosa, a che punto siamo — e non una per sezione: le sezioni sono sei,
+ma non sono tutte dello stesso livello, e un elenco che mette «scelte
+tecniche» accanto a «a che punto siamo» non aiuta a orientarsi. Ogni voce porta all'inizio del blocco che la riguarda.
 
 Le sezioni hanno tutte il loro `id="m-qualcosa"`, anche quelle che
 l'indice non nomina: servono se un giorno si vuole rimandare lì da
