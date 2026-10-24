@@ -1122,14 +1122,16 @@ nav a.ig:hover svg{transform:translateY(-1px)}
 /* Il conto alla rovescia della Diretta: non i riquadri della home (quelli
    seguono il cielo, e di giorno sono chiari con le cifre scure: sul fondo
    della Diretta stonavano), ma una striscia come quella del meteo, bassa,
-   cosi' non pesa piu' di video e mappa. I titoli delle sezioni hanno il
+   cosi' non pesa piu' di video e mappa; larga al massimo 420 px, allineata
+   al titolo (da telefono prende tutta la riga). I titoli delle sezioni hanno il
    colore del testo secondario, non quello del cielo della home. */
 #page-diretta .count-head{color:var(--muted)}
-#page-diretta .count{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;margin-top:12px;
+#page-diretta .count{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;margin-top:12px;max-width:420px;
   border:1px solid var(--line-soft);border-radius:14px;overflow:hidden;background:var(--line-soft)}
 #page-diretta .ctile{min-width:0;padding:10px 6px;border:0;border-radius:0;background:var(--panel);backdrop-filter:none}
 #page-diretta .ctile .cn{font-size:clamp(20px,2.6vw,26px);font-weight:500;color:var(--ink)}
 #page-diretta .count.zero .ctile .cn{color:var(--live)}
+#page-diretta .count + .embeds2{margin-top:18px}
 #page-diretta .ctile .cl{font-size:9px;margin-top:5px;color:var(--faint)}
 /* da computer il meteo e' basso come il conto alla rovescia; da telefono
    resta com'e' (vedi .mk-wtile sopra) */
