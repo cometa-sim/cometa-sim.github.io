@@ -156,6 +156,25 @@ def analizza(path, calendario=False, passo=24):
     return stat, len(rif), senza, scartate, stat_durata
 
 
+def ritardo_gfs(paths):
+    """Ritardo con cui le corse GFS arrivano in Tawhiri [h], misurato dai giri.
+
+    Ogni giro (un'emissione) ha trovato una corsa d: d era disponibile entro
+    l'emissione e (limite superiore e - d) e la corsa successiva, d + 6 h, non
+    ancora (limite inferiore e - d - 6). Restituisce (min, max): il piu'
+    grande dei limiti inferiori e il piu' piccolo dei superiori."""
+    giri = {}
+    for path in paths:
+        with open(path, newline="") as f:
+            for r in csv.DictReader(f):
+                e, d = _t(r["emissione"]).replace(second=0), _t(r["dataset"])
+                if e not in giri or d > giri[e]: giri[e] = d
+    if not giri: return None
+    su = min((e - d).total_seconds()/3600 for e, d in giri.items())
+    giu = max((e - d).total_seconds()/3600 - 6 for e, d in giri.items())
+    return (round(max(0.0, giu), 2), round(su, 2)) if giu <= su else None
+
+
 def stampa(path, stat, nrif, senza, scartate, calendario, passo=24):
     print(f"== {path}")
     print("Anticipo: " + ("giorni di calendario fra emissione e bersaglio" if calendario
@@ -182,6 +201,9 @@ def main():
     ap.add_argument("--calendario", action="store_true",
                     help="anticipo = lead_giorni (giorni fra emissione e bersaglio)")
     ap.add_argument("--json", help="salva la curva per la pagina La traiettoria (con un solo file)")
+    ap.add_argument("--disponibilita", nargs="*", default=[],
+                    help="con --json: i CSV da cui misurare il ritardo con cui le corse GFS "
+                         "arrivano in Tawhiri (tutti i siti: piu' giri, misura piu' stretta)")
     ap.add_argument("--passo", type=int, default=24,
                     help="ampiezza delle classi di anticipo in ore (6: una per corsa GFS)")
     ap.add_argument("--nome", default="Mercedes (Uruguay)", help="il sito, nel JSON")
@@ -226,6 +248,7 @@ def main():
             return 3
         out = {"aggiornato": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
                "sito": a.nome, "passo_h": a.passo, "durata_ref_min": round(durata or 176.0, 1),
+               "ritardo_gfs_h": ritardo_gfs(a.disponibilita or a.csv),
                "classi": [{"tau": tau, "n": x["n"], "eta_h": round(x["eta"], 1),
                            "q1_km": round(x["q1"], 2), "mediana_km": round(x["me"], 2),
                            "q3_km": round(x["q3"], 2), "rms_km": round(x["rms"], 2)}

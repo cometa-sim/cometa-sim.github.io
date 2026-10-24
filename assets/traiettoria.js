@@ -53,17 +53,18 @@ const TILES = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
    previsto rispetto alla previsione del giorno stesso, a Mercedes. */
 const CURVA = "https://raw.githubusercontent.com/cometa-sim/cometa-sim.github.io/dati/convergenza_curva.json";
 const CURVA_NMIN = 8;               /* classi con meno campioni non si usano */
-/* Il GFS esce ogni 6 h (00, 06, 12, 18 UTC) e arriva in Tawhiri circa 5 h
-   dopo l'ora nominale. L'errore di previsione e' zero solo con l'ultima
-   corsa che arriva prima del lancio: se la successiva arriva dopo. */
-const GFS_PASSO_H = 6, GFS_RITARDO_H = 5;
-function ultimaCorsa(run, lancio){
-  return run.getTime() + (GFS_PASSO_H + GFS_RITARDO_H)*36e5 > lancio.getTime();
-}
-/* la corsa che Tawhiri ha adesso, stimata dall'orologio (prima del calcolo) */
-function corsaStimata(){
-  const p = GFS_PASSO_H*36e5;
-  return new Date(Math.floor((Date.now() - GFS_RITARDO_H*36e5)/p)*p);
+/* Il GFS esce ogni 6 h (00, 06, 12, 18 UTC). L'errore di previsione e' zero
+   solo con l'ultima corsa che arriva in Tawhiri prima del lancio: la corsa
+   usata e' quella che Tawhiri dichiara nella risposta, e la successiva
+   (6 h dopo) arriverebbe dopo il lancio. Il ritardo con cui le corse
+   arrivano in Tawhiri non e' supposto: lo misura ogni giorno l'analisi dai
+   giri della raccolta (ritardo_gfs_h nella curva, [min, max] in ore); si usa
+   il minimo, cosi' lo zero vale solo quando la corsa successiva arriva di
+   sicuro dopo il lancio. */
+const GFS_PASSO_H = 6;
+function ultimaCorsa(run, lancio, d){
+  const rit = d && d.ritardo_gfs_h ? d.ritardo_gfs_h[0] : 4.5;
+  return run.getTime() + (GFS_PASSO_H + rit)*36e5 > lancio.getTime();
 }
 /* v2: la prima versione salvava anche la partenza predefinita (Durazno)
    come se l'avesse scelta il visitatore; con una chiave nuova si riparte */
@@ -445,8 +446,7 @@ function fcWarn(r){
   const old = elWarn.querySelector(".tw-fc");
   if(old) old.remove();
   if(!elFcOn || !elFcOn.checked) return;
-  const zero = r && r.fc ? r.fc.zero
-    : !!(elDate.value && elTime.value) && ultimaCorsa(corsaStimata(), launchAt(elDate.value, elTime.value));
+  const zero = !!(r && r.fc && r.fc.zero);      /* solo dopo il calcolo: serve la corsa vera */
   const na = r && r.fc && r.fc.na;
   if(zero || na) elWarn.appendChild(el("li", "tw-fc", t(zero ? "twFcZero" : "twFcNa")));
 }
@@ -1060,8 +1060,8 @@ function loadCurva(){
   return curva;
 }
 function fcRadius(d, r, iso){
-  if(r.run && ultimaCorsa(r.run, r.pts[0].t)) return {km:0, zero:true};
   if(!d || !r.run) return {km:0, na:true};
+  if(ultimaCorsa(r.run, r.pts[0].t, d)) return {km:0, zero:true};
   const age = (r.pts[0].t - r.run)/36e5;                       /* eta' della corsa al lancio, h */
   const C = d.classi.filter(function(c){ return c.n >= CURVA_NMIN; })
     .sort(function(a, b){ return a.eta_h - b.eta_h; });
@@ -1260,7 +1260,10 @@ function renderCard(r, dest){
      const k = {B:"twBurstRange", A:"twAscRange", D:"twDescRange"}[x.k], u = x.k === "B" ? " km" : " m/s", d = x.k === "B" ? 1 : 2;
      return [t(k), num(x.lov, d) + "–" + num(x.hiv, d) + u];
    }) : [])
-   .concat(r.fc && r.fc.km > 0 ? [[t("twFcRow"), "R = " + num(r.fc.km, 0) + " km"], [t("twFcTime"), fcTempo(r.fc.age)]] : [])
+   /* non l'ultima corsa ma raggio sotto il km (con la curva a passo di 24 h,
+      prima del riferimento): si dice, invece di tacere */
+   .concat(r.fc && !r.fc.zero && !r.fc.na ? [[t("twFcRow"), "R " + (r.fc.km >= 0.5 ? "= " + num(r.fc.km, 0) : "< 1") + " km"],
+     [t("twFcTime"), fcTempo(r.fc.age)]] : [])
    .forEach(function(row){ dl.appendChild(el("dt", null, row[0])); dl.appendChild(el("dd", null, row[1])); });
   card.appendChild(dl);
   if(r.atmo) card.appendChild(el("p", "tw-hint tw-card-note",

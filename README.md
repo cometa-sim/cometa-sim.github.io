@@ -470,12 +470,16 @@ semplificazione e senza arrotondare i vertici al pixel, con lo stesso
 `smoothPolygon` usato prima per l'ellisse: altrimenti i punti, più fitti di
 un pixel, fanno un bordo a scalini). Vale zero per definizione solo con
 l'ultima corsa GFS che arriva prima del lancio: le corse sono ogni 6 h
-(00, 06, 12, 18 UTC) e arrivano in Tawhiri circa 5 h dopo l'ora nominale,
-quindi lo zero scatta quando la corsa successiva a quella usata arriverebbe
-dopo il lancio (`ultimaCorsa()` in `assets/traiettoria.js`; il giorno del
-lancio, la mattina, può ancora arrivarne una più recente). Con la casella
-attiva l'avviso compare subito, prima del calcolo (con la corsa stimata
-dall'orologio), fra quelli del pallone sotto le tessere. Le classi con meno di 8 campioni non
+(00, 06, 12, 18 UTC), la corsa usata è quella che Tawhiri dichiara nella
+risposta, e lo zero scatta quando la successiva arriverebbe dopo il lancio
+(`ultimaCorsa()` in `assets/traiettoria.js`; il giorno del lancio, la
+mattina, può ancora arrivarne una più recente). Il ritardo con cui le corse
+arrivano in Tawhiri non è supposto: l'analisi lo misura ogni giorno dai giri
+di tutti i siti (ogni giro dice quale corsa c'era e quale non ancora) e lo
+scrive nella curva come `ritardo_gfs_h` = [min, max]; a fine ottobre 2026
+era fra 4,5 e 4,7 h. Si usa il minimo: lo zero vale solo quando la corsa
+successiva arriva di sicuro dopo il lancio. L'avviso compare dopo il
+calcolo, fra quelli del pallone sotto le tessere. Le classi con meno di 8 campioni non
 si usano. Se il file non si carica, lo dice un avviso nello stesso posto e
 l'area resta quella del pallone. Accanto alla casella la pagina scrive solo
 «Terzo quartile. Per ora affidabile solo in Uruguay» (`twFcHint` in

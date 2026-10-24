@@ -840,9 +840,11 @@ window.COMETA_SPOT = (function(){
   }
   function fcRadiusKm(d, run, L0, durMin){
     /* zero solo con l'ultima corsa GFS che arriva prima del lancio: la
-       successiva (6 h dopo) arriva in Tawhiri circa 5 h dopo l'ora
-       nominale; stessa regola di ultimaCorsa() in assets/traiettoria.js */
-    if(!d || !run || run.getTime() + 11*36e5 > L0.getTime()) return null;
+       successiva (6 h dopo) arriverebbe dopo, con il ritardo misurato dai
+       giri della raccolta (ritardo_gfs_h); stessa regola di ultimaCorsa()
+       in assets/traiettoria.js */
+    const rit = d && d.ritardo_gfs_h ? d.ritardo_gfs_h[0] : 4.5;
+    if(!d || !run || run.getTime() + (6 + rit)*36e5 > L0.getTime()) return null;
     const age = (L0 - run) / 36e5;
     const C = d.classi.filter(function(c){ return c.n >= CURVA_NMIN; })
       .sort(function(a, b){ return a.eta_h - b.eta_h; });
