@@ -777,6 +777,8 @@ td.mercedes{color:var(--mercedes)}
 .mk-wtile.mk-wicon{display:flex;align-items:center;justify-content:center;color:var(--cyan)}
 .mk-wv{font-family:var(--disp);font-size:20px;font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums}
 .mk-wv small{font-size:.5em;font-weight:400;margin-left:2px;opacity:.7}
+.mk-wunc{margin-top:3px;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--beacon)}  /* nuvole: modelli in disaccordo, assets/spot.js */
+.mk-wunc[hidden]{display:none}
 .mk-wfreccia{display:inline-block;width:.8em;height:.8em;margin-right:4px;vertical-align:-.06em;color:var(--cyan)}
 .mk-wl{margin-top:5px;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
 /* Fumetto al tocco (assets/app.js): solo su dispositivi senza mouse. Il
@@ -790,7 +792,7 @@ td.mercedes{color:var(--mercedes)}
 @media(max-width:480px){
   .mk-wtile{padding:10px 3px}
   .mk-wv{font-size:14px}
-  .mk-wl{font-size:7.5px;letter-spacing:.04em}
+  .mk-wl,.mk-wunc{font-size:7.5px;letter-spacing:.04em}
   .mk-wicon svg{width:18px;height:18px}
 }
 
