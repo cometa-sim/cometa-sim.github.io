@@ -1522,7 +1522,7 @@ elWeekBtn.addEventListener("click", function(){
 
    Con il livello nuvole/radar accesso finisce nell'immagine anche il
    meteo (vedi ov/ovTiles dentro exportPng). */
-const MAX_TILES = 200, OUT_W = 3200;
+const MAX_TILES = 300, OUT_W = 3200;
 const LIGHT = {track:"#0B6FA4", band:"#0B6FA4", land:"#E08E0B", asc:"#6C4FD1",
                excl:"#C0392B", ink:"#0E1620", muted:"#4A5B6C", paper:"#FFFFFF",
                cloud:"#41505E"};   /* nuvole: ardesia, vedi tinta() */
@@ -1552,10 +1552,11 @@ function exportPng(){
   const ovTiles = !!(ov && elDate.value === isoDay(new Date(), fuso()));
   const size = map.getSize(), z0 = map.getZoom();
   /* Immagine sempre larga almeno OUT_W pixel (fattore S rispetto allo
-     schermo). Le mattonelle salgono di zoom quanto basta, ma senza
+     schermo). Le mattonelle salgono di zoom fino a non doverle
+     ingrandire (k <= 1: si rimpiccioliscono, e restano nitide), ma senza
      superare MAX_TILES: oltre, si ingrandiscono (k > 1). */
   const S = Math.max(2, OUT_W/size.x);
-  let dz = Math.max(0, Math.min(3, Math.floor(Math.log2(S) + 1e-9)));
+  let dz = Math.max(0, Math.min(3, Math.ceil(Math.log2(S) - 1e-9)));
   const tilesFor = function(d){ const f = Math.pow(2, d); return (Math.ceil(size.x*f/256) + 1)*(Math.ceil(size.y*f/256) + 1); };
   while(dz > 0 && tilesFor(dz) > MAX_TILES) dz--;
   /* le mattonelle esistono solo a zoom interi: lo zoom della mappa puo' essere a quarti */
