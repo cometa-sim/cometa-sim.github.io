@@ -54,11 +54,12 @@ window.COMETA_NUVOLE = (function(){
   function nextDay(iso){ return new Date(Date.parse(iso + "T12:00:00Z") + 864e5).toISOString().slice(0, 10); }
   function col(h, v, m){ return h[v + "_" + m] || []; }
   /* Primo temporale (codici WMO 95-99) di un modello nella finestra: {code, at} o null */
-  /* Un modello prevede un temporale (codici WMO 95-99) nella finestra? */
+  /* Il codice di temporale (WMO 95-99) piu' alto di un modello nella finestra, o 0 */
   function storm(h, m, i0, i1){
     const wc = col(h, "weather_code", m);
-    for(let j = i0; j <= i1; j++) if(wc[j] != null && wc[j] >= 95) return true;
-    return false;
+    let c = 0;
+    for(let j = i0; j <= i1; j++) if(wc[j] != null && wc[j] >= 95 && wc[j] > c) c = wc[j];
+    return c;
   }
   function ask(lat, lon, iso, tz){
     const q = new URLSearchParams({
@@ -70,19 +71,21 @@ window.COMETA_NUVOLE = (function(){
       .then(function(r){ return r.ok ? r.json() : null; })
       .catch(function(){ return null; });
   }
-  /* Temporali in una finestra [i0, i1] di un punto: se best_match ne
-     prevede uno (o CAPE alto con pioggia), quali altri modelli ne prevedono
-     uno, CAPE massimo. L'ora esatta non conta: per sicurezza si guarda
-     tutta la finestra. */
+  /* Temporali in una finestra [i0, i1] di un punto, secondo best_match:
+     code (codice di temporale, o 0), wet (CAPE alto con pioggia nella
+     stessa ora), si (l'uno o l'altro); poi quali altri modelli prevedono
+     un temporale e il CAPE massimo. L'ora esatta non conta: per sicurezza
+     si guarda tutta la finestra. */
   function temporali(h, i0, i1){
     i0 = Math.max(0, i0); i1 = Math.min(h.time.length - 1, i1);
-    const out = {si: storm(h, "best_match", i0, i1), altri: [], cape: null};
+    const out = {code: storm(h, "best_match", i0, i1), wet: false, altri: [], cape: null};
     const cape = col(h, "cape", "best_match"), bp = col(h, "precipitation", "best_match");
     for(let j = i0; j <= i1; j++){
       if(cape[j] == null) continue;
       if(out.cape == null || cape[j] > out.cape) out.cape = cape[j];
-      if(cape[j] >= CAPE_MIN && bp[j] != null && bp[j] >= DRY_MM) out.si = true;
+      if(cape[j] >= CAPE_MIN && bp[j] != null && bp[j] >= DRY_MM) out.wet = true;
     }
+    out.si = !!out.code || out.wet;
     out.altri = MODELS.filter(function(m){ return storm(h, m[0], i0, i1); }).map(function(m){ return m[1]; });
     return out;
   }
@@ -125,6 +128,10 @@ window.COMETA_NUVOLE = (function(){
         const tLand = il >= 0 ? temporali(dl.hourly, il - LAND_H, il + LAND_H) : null;
         /* dove: partenza, atterraggio o tutti e due */
         const sTip = tLaunch.si && tLand && tLand.si ? "both" : tLaunch.si ? "launch" : tLand && tLand.si ? "landing" : "";
+        /* e perche': il codice di temporale, il CAPE alto con pioggia o tutti e due */
+        const pt = [tLaunch].concat(tLand ? [tLand] : []).filter(function(t){ return t.si; });
+        const code = Math.max.apply(null, pt.map(function(t){ return t.code; }).concat(0));
+        const perche = [code ? "weather code " + code : "", pt.some(function(t){ return t.wet; }) ? "CAPE > " + CAPE_MIN + " J/kg with rain" : ""].filter(Boolean);
         const altri = tLaunch.altri.concat(tLand ? tLand.altri : []).filter(function(x, k, a){ return a.indexOf(x) === k; });
 
         const why = [];
@@ -146,7 +153,7 @@ window.COMETA_NUVOLE = (function(){
         if(sTip && o.storm){
           o.storm.hidden = false;
           o.icon.innerHTML = ICON_STORM;
-          setTip(iTile, ["thunderstorm: " + sTip]);
+          setTip(iTile, [["thunderstorm: " + sTip].concat(perche).join(" · ")]);
         } else if(why.length){
           o.unc.hidden = false;
           setTip(iTile, ["models disagree: " + why.join(", ")]);
