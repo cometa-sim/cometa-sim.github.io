@@ -268,37 +268,59 @@ window.COMETA_MAPKIT = (function(){
      Se l'icona non si carica si salta la sua cella e il resto si disegna
      comunque.
 
-     o: {x, y, u, head, align, paper, ink, muted, accent}. x,y e'
+     o: {x, y, u, head, align, paper, ink, muted, accent, warn}. x,y e'
      l'angolo in alto a sinistra, o in alto a destra con align:"right".
      Risolve con {w, h} del riquadro disegnato, o null se non c'era
      niente da disegnare. */
+  /* La freccia del vento (lo stesso disegno di freccia() in
+     assets/traiettoria.js: M12 20V4 M6 10l6-6 6 6, su 24) centrata in
+     x,y, lato a, ruotata di deg come nella pagina. */
+  function freccia(g, x, y, deg, a, color){
+    const k = a/24;
+    g.save();
+    g.translate(x, y); g.rotate(deg*Math.PI/180); g.scale(k, k); g.translate(-12, -12);
+    g.strokeStyle = color; g.lineWidth = 2.4; g.lineCap = "round"; g.lineJoin = "round";
+    g.beginPath(); g.moveTo(12, 20); g.lineTo(12, 4); g.moveTo(6, 10); g.lineTo(12, 4); g.lineTo(18, 10); g.stroke();
+    g.restore();
+  }
   function drawWeather(g, box, o){
     if(!box || box.hidden) return Promise.resolve(null);
     const u = o.u || 1;
     const paper = o.paper || "rgba(255,255,255,.93)", ink = o.ink || "#0E1620";
-    const muted = o.muted || "#4A5B6C", accent = o.accent || "#0B6FA4";
+    const muted = o.muted || "#4A5B6C", accent = o.accent || "#0B6FA4", warn = o.warn || "#C26A00";
+    const AR = 13*u;   /* lato della freccia del vento */
     const FV = "600 " + 17*u + "px 'Space Grotesk', Inter, system-ui, sans-serif";
     const FU = 9*u + "px Inter, system-ui, sans-serif";
     const FL = 8.5*u + "px 'JetBrains Mono', ui-monospace, monospace";
     const FH = 10*u + "px Inter, system-ui, sans-serif";
-    /* Celle lette dal riquadro: quella dell'icona contiene un <svg>, le
-       altre un valore (col pezzetto di unita' in <small>) e un'etichetta. */
+    /* Celle lette dal riquadro: quella dell'icona (.mk-wicon) ha un <svg>
+       e sotto, se c'e', la scritta «incerta»/«temporali» (.mk-wunc); le
+       altre un valore (col pezzetto di unita' in <small>) e un'etichetta.
+       Il vento ha anche un <svg>, la freccia: e' un valore, non l'icona,
+       e la freccia si ridisegna col suo angolo. */
     const cells = [];
     Array.prototype.forEach.call(box.querySelectorAll(".mk-wtile"), function(tile){
       const v = tile.querySelector(".mk-wv"), l = tile.querySelector(".mk-wl");
       if(!v) return;
       const svg = v.querySelector("svg");
-      if(svg){ cells.push({svg: svg}); return; }
+      if(tile.classList.contains("mk-wicon")){
+        if(!svg) return;
+        const n = tile.querySelector(".mk-wunc:not([hidden])");
+        cells.push({svg: svg, note: n ? n.textContent.trim().toUpperCase() : ""});
+        return;
+      }
       const small = v.querySelector("small");
+      const rot = svg && /rotate\((-?[\d.]+)deg\)/.exec(svg.style.transform || "");
       cells.push({v: (small ? v.textContent.replace(small.textContent, "") : v.textContent).trim(),
-                  unit: small ? small.textContent : "", l: l ? l.textContent.trim() : ""});
+                  unit: small ? small.textContent : "", l: l ? l.textContent.trim() : "",
+                  arrow: rot ? parseFloat(rot[1]) : null});
     });
     if(!cells.length) return Promise.resolve(null);
     /* misure: ogni cella larga quanto il suo contenuto, con un minimo */
     g.save();
     const widths = cells.map(function(c){
-      if(c.svg) return 34*u;
-      g.font = FV; let w = g.measureText(c.v).width;
+      if(c.svg){ g.font = FL; return Math.max(34*u, c.note ? g.measureText(c.note).width + c.note.length*u + 16*u : 0); }
+      g.font = FV; let w = g.measureText(c.v).width + (c.arrow != null ? AR + 3*u : 0);
       if(c.unit){ g.font = FU; w += g.measureText(c.unit).width + 2*u; }
       g.font = FL; w = Math.max(w, g.measureText(c.l).width);
       return Math.max(46*u, w + 16*u);
@@ -325,15 +347,23 @@ window.COMETA_MAPKIT = (function(){
         g.globalAlpha = .12; g.strokeStyle = ink; g.lineWidth = 1*u;
         g.beginPath(); g.moveTo(cx, y0 + PAD + HEAD); g.lineTo(cx, y0 + H - PAD*.6); g.stroke(); g.globalAlpha = 1;
       }
-      if(c.svg){ icon = {svg: c.svg, x: mid, y: (yV + yL)/2 - 11*u}; cx += w; return; }
+      if(c.svg){
+        icon = {svg: c.svg, x: mid, y: c.note ? yV - 19*u : (yV + yL)/2 - 11*u};
+        if(c.note){   /* «incerta» / «temporali», come sotto l'icona nella pagina */
+          g.textAlign = "center"; g.fillStyle = warn; g.font = FL; g.letterSpacing = "1px";
+          g.fillText(c.note, mid, yL); g.letterSpacing = "0px";
+        }
+        cx += w; return;
+      }
       g.textAlign = "center"; g.fillStyle = ink; g.font = FV;
-      if(c.unit){
-        /* valore e unita' affiancati, come il <small> nella pagina */
-        const wv = g.measureText(c.v).width;
-        g.font = FU; const wu = g.measureText(c.unit).width;
-        const left = mid - (wv + 2*u + wu)/2;
-        g.textAlign = "left"; g.font = FV; g.fillText(c.v, left, yV);
-        g.font = FU; g.globalAlpha = .7; g.fillText(c.unit, left + wv + 2*u, yV); g.globalAlpha = 1;
+      if(c.unit || c.arrow != null){
+        /* freccia, valore e unita' affiancati, come nella pagina */
+        const wa = c.arrow != null ? AR + 3*u : 0, wv = g.measureText(c.v).width;
+        g.font = FU; const wu = c.unit ? g.measureText(c.unit).width + 2*u : 0;
+        const left = mid - (wa + wv + wu)/2;
+        if(c.arrow != null) freccia(g, left + AR/2, yV - 6*u, c.arrow, AR, accent);
+        g.textAlign = "left"; g.font = FV; g.fillStyle = ink; g.fillText(c.v, left + wa, yV);
+        if(c.unit){ g.font = FU; g.globalAlpha = .7; g.fillText(c.unit, left + wa + wv + 2*u, yV); g.globalAlpha = 1; }
         g.textAlign = "center";
       } else g.fillText(c.v, mid, yV);
       g.fillStyle = muted; g.font = FL; g.letterSpacing = "1px";
@@ -347,8 +377,12 @@ window.COMETA_MAPKIT = (function(){
       const im = new Image();
       im.onload = function(){ try { g.drawImage(im, icon.x - 11*u, icon.y, 22*u, 22*u); } catch(e){} ok({w: W, h: H}); };
       im.onerror = function(){ ok({w: W, h: H}); };
+      /* rasterizzato gia' alla misura finale (22*u), non a 22 px e poi ingrandito */
+      const px = Math.round(22*u);
       im.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(
-        icon.svg.outerHTML.replace(/currentColor/g, accent).replace("<svg", '<svg xmlns="http://www.w3.org/2000/svg"'));
+        icon.svg.outerHTML.replace(/currentColor/g, accent)
+          .replace(/ width="[\d.]+" height="[\d.]+"/, ' width="' + px + '" height="' + px + '"')
+          .replace("<svg", '<svg xmlns="http://www.w3.org/2000/svg"'));
     });
   }
 
