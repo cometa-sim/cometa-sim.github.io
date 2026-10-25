@@ -940,7 +940,7 @@ window.COMETA_SPOT = (function(){
         if(wtip) wtile.title = wtip; else wtile.removeAttribute("title");
         window.COMETA_NUVOLE.aggiorna({lat:site.lat, lon:site.lon, iso:iso, key:key, tz:TZ, h:h, i:i,
           clouds:document.getElementById("dirWClouds"), rain:document.getElementById("dirWRain"),
-          icon:document.getElementById("dirWIcon"), unc:document.getElementById("dirWUnc")});
+          icon:document.getElementById("dirWIcon"), unc:document.getElementById("dirWUnc"), storm:document.getElementById("dirWStorm")});
         document.getElementById("dirWRain").textContent = rain == null ? "—" : Math.round(rain) + "%";
         document.getElementById("dirWIcon").innerHTML = weatherIcon(h.cloud_cover[i], rain || 0, h.wind_speed_10m[i]);
       })

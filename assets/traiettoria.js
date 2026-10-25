@@ -623,7 +623,7 @@ function loadWeather(pl){
       if(wtip) wtile.title = wtip; else wtile.removeAttribute("title");
       window.COMETA_NUVOLE.aggiorna({lat:pl.lat, lon:pl.lon, iso:iso, key:key, tz:"auto", h:h, i:i,
         clouds:document.getElementById("twWClouds"), rain:document.getElementById("twWRain"),
-        icon:document.getElementById("twWIcon"), unc:document.getElementById("twWUnc"),
+        icon:document.getElementById("twWIcon"), unc:document.getElementById("twWUnc"), storm:document.getElementById("twWStorm"),
         current:function(){ return seq === weatherSeq; }});
       document.getElementById("twWRain").textContent = rain == null ? "—" : Math.round(rain) + "%";
       document.getElementById("twWIcon").innerHTML = weatherIcon(h.cloud_cover[i], rain || 0, h.wind_speed_10m[i]);
