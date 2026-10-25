@@ -777,6 +777,7 @@ td.mercedes{color:var(--mercedes)}
 .mk-wtile.mk-wicon{display:flex;align-items:center;justify-content:center;color:var(--cyan)}
 .mk-wv{font-family:var(--disp);font-size:20px;font-weight:500;color:var(--ink);font-variant-numeric:tabular-nums}
 .mk-wv small{font-size:.5em;font-weight:400;margin-left:2px;opacity:.7}
+.mk-wv small.mk-wunc{margin-left:4px;color:var(--beacon);opacity:1}  /* nuvole: modelli in disaccordo, assets/spot.js */
 .mk-wfreccia{display:inline-block;width:.8em;height:.8em;margin-right:4px;vertical-align:-.06em;color:var(--cyan)}
 .mk-wl{margin-top:5px;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
 /* Fumetto al tocco (assets/app.js): solo su dispositivi senza mouse. Il

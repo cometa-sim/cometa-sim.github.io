@@ -954,12 +954,14 @@ window.COMETA_SPOT = (function(){
   }
 
   /* La copertura nuvolosa e' la grandezza piu' incerta del riquadro: la
-     stessa ora chiesta a tre modelli globali diversi. Se non sono d'accordo
-     il riquadro mostra l'intervallo (es. "20–70%") al posto del valore
-     singolo; i valori dei singoli modelli vanno nel title. Se la richiesta
-     fallisce resta il valore singolo gia' scritto da loadWeather. */
+     stessa ora chiesta anche a tre modelli globali diversi. Il valore
+     mostrato resta quello di Open-Meteo (best_match, lo stesso dell'icona);
+     se i modelli sono molto lontani fra loro accanto compare "±N", meta'
+     della distanza fra il piu' basso e il piu' alto. I valori dei singoli
+     modelli vanno nel title. Se la richiesta fallisce il riquadro resta
+     com'era. */
   const CLOUD_MODELS = [["ecmwf_ifs025", "ECMWF"], ["gfs_seamless", "GFS"], ["icon_seamless", "ICON"]];
-  const CLOUD_SPREAD_MIN = 15;  // sotto questa differenza (punti %) i modelli sono "d'accordo"
+  const CLOUD_SPREAD_MIN = 30;  // distanza (punti %) da cui la previsione si segnala incerta
   function loadCloudSpread(site, iso, key, best, tip){
     const q = new URLSearchParams({
       latitude: site.lat.toFixed(4), longitude: site.lon.toFixed(4), hourly: "cloud_cover",
@@ -978,9 +980,15 @@ window.COMETA_SPOT = (function(){
         });
         if(vals.length < 2) return;
         const nums = vals.map(function(v){ return v[1]; });
-        const lo = Math.min.apply(null, nums.concat(best)), hi = Math.max.apply(null, nums.concat(best));
+        const spread = Math.max.apply(null, nums) - Math.min.apply(null, nums);
         const tile = document.getElementById("dirWClouds");
-        if(hi - lo >= CLOUD_SPREAD_MIN) tile.textContent = lo + "–" + hi + "%";
+        tile.textContent = best + "%";
+        if(spread >= CLOUD_SPREAD_MIN){
+          const u = document.createElement("small");
+          u.className = "mk-wunc";
+          u.textContent = "±" + Math.round(spread / 2);
+          tile.appendChild(u);
+        }
         const models = vals.map(function(v){ return v[0] + " " + v[1] + " %"; }).join(" · ");
         tile.parentNode.title = models + (tip ? "\n" + tip : "");
       })
