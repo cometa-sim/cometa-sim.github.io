@@ -794,6 +794,7 @@ td.mercedes{color:var(--mercedes)}
   .mk-wv{font-size:14px}
   .mk-wl,.mk-wunc{font-size:7.5px;letter-spacing:.04em}
   .mk-wicon svg{width:18px;height:18px}
+  .mk-wtip{font-size:11px}   /* «models: ...» con quattro modelli su una riga */
 }
 
 /* Il lampeggio arancione del puntino GPS sulla mappa: scatto immediato
