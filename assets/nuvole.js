@@ -29,8 +29,8 @@
    vento sono calcolati sul punto di lancio.
 
    Title, in inglese come gli altri: nuvole «models: ...» e sotto
-   «layers: ...»; pioggia i mm dei modelli e il CAPE massimo nelle
-   finestre; icona il motivo della scritta. Se la richiesta fallisce
+   «layers: ...»; pioggia i mm dei modelli e il CAPE (il massimo di
+   ogni finestra) alla partenza e all'atterraggio; icona il motivo della scritta. Se la richiesta fallisce
    restano gli strati e nessuna scritta. */
 window.COMETA_NUVOLE = (function(){
   const METEO = "https://api.open-meteo.com/v1/forecast";
@@ -72,7 +72,7 @@ window.COMETA_NUVOLE = (function(){
   }
   /* Temporali in una finestra [i0, i1] di un punto: cosa dice best_match
      (testi per il title), quali altri modelli ne prevedono uno, CAPE massimo. */
-  function temporali(h, i0, i1, dove){
+  function temporali(h, i0, i1){
     i0 = Math.max(0, i0); i1 = Math.min(h.time.length - 1, i1);
     const out = {tip: [], altri: [], cape: null};
     const s = storm(h, "best_match", i0, i1), cape = col(h, "cape", "best_match"), bp = col(h, "precipitation", "best_match");
@@ -82,8 +82,8 @@ window.COMETA_NUVOLE = (function(){
       if(out.cape == null || cape[j] > out.cape) out.cape = cape[j];
       if(!wet && cape[j] >= CAPE_MIN && bp[j] != null && bp[j] >= DRY_MM) wet = {cape: cape[j], at: h.time[j].slice(11)};
     }
-    if(s) out.tip.push((s.code > 95 ? "thunderstorm with hail" : "thunderstorm") + " at " + s.at + dove);
-    if(wet) out.tip.push("CAPE " + Math.round(wet.cape) + " J/kg with rain at " + wet.at + dove);
+    if(s) out.tip.push((s.code > 95 ? "thunderstorm with hail" : "thunderstorm") + " at " + s.at);
+    if(wet) out.tip.push("CAPE " + Math.round(wet.cape) + " J/kg with rain at " + wet.at);
     out.altri = MODELS.filter(function(m){ return storm(h, m[0], i0, i1); }).map(function(m){ return m[1]; });
     return out;
   }
@@ -122,9 +122,12 @@ window.COMETA_NUVOLE = (function(){
 
         /* temporali: partenza, e atterraggio se c'e' la traiettoria */
         const dl = rr[1], il = dl && dl.hourly && dl.hourly.time ? oraDi(dl, land.t) : -1;
-        const tLaunch = temporali(h, i, i + (il >= 0 ? UP_H : STORM_H), il >= 0 ? " (launch)" : "");
-        const tLand = il >= 0 ? temporali(dl.hourly, il - LAND_H, il + LAND_H, " (landing)") : null;
-        const sTip = tLaunch.tip.concat(tLand ? tLand.tip : []);
+        const tLaunch = temporali(h, i, i + (il >= 0 ? UP_H : STORM_H));
+        const tLand = il >= 0 ? temporali(dl.hourly, il - LAND_H, il + LAND_H) : null;
+        /* dove, solo se il temporale e' in uno solo dei due punti */
+        const due = tLand && tLaunch.tip.length && tLand.tip.length;
+        const dove = function(t, w){ return t.tip.map(function(x){ return x + (tLand && !due ? " (" + w + ")" : ""); }); };
+        const sTip = dove(tLaunch, "launch").concat(tLand ? dove(tLand, "landing") : []);
         const altri = tLaunch.altri.concat(tLand ? tLand.altri : []).filter(function(x, k, a){ return a.indexOf(x) === k; });
 
         const why = [];
@@ -138,8 +141,8 @@ window.COMETA_NUVOLE = (function(){
           if(Math.max.apply(null, n) >= RAIN_MM && Math.min.apply(null, n) < DRY_MM) why.push("rain");
         }
         const capeTip = tLand
-          ? "CAPE max: launch " + (tLaunch.cape != null ? Math.round(tLaunch.cape) : "—") + " · landing " + (tLand.cape != null ? Math.round(tLand.cape) : "—") + " J/kg"
-          : (tLaunch.cape != null ? "CAPE " + Math.round(tLaunch.cape) + " J/kg (max in " + STORM_H + " h)" : "");
+          ? "CAPE: launch " + (tLaunch.cape != null ? Math.round(tLaunch.cape) + " J/kg" : "—") + " · landing " + (tLand.cape != null ? Math.round(tLand.cape) + " J/kg" : "—")
+          : (tLaunch.cape != null ? "CAPE: launch " + Math.round(tLaunch.cape) + " J/kg" : "");
         setTip(rTile, [pr.length ? "models: " + pr.map(function(v){ return v[0] + " " + v[1].toFixed(1) + " mm"; }).join(" · ") : "", capeTip]);
         if(!sTip.length && altri.length) why.push("thunderstorms (" + altri.join(", ") + ")");
 
