@@ -786,7 +786,7 @@ td.mercedes{color:var(--mercedes)}
    div; senza mouse non si vede, e il lampo del tocco e' tolto. */
 .mk-wtip{position:fixed;z-index:1000;max-width:calc(100vw - 16px);padding:7px 11px;border-radius:9px;
   background:rgba(5,14,28,.96);border:1px solid var(--line);color:var(--ink);
-  font-family:var(--mono);font-size:12px;line-height:1.4;pointer-events:none;
+  font-family:var(--mono);font-size:12px;line-height:1.4;pointer-events:none;white-space:pre-line;
   box-shadow:0 6px 20px rgba(0,0,0,.4)}
 @media(hover:none){.mk-wtile[title]{cursor:pointer;-webkit-tap-highlight-color:transparent}}
 @media(max-width:480px){
@@ -794,6 +794,7 @@ td.mercedes{color:var(--mercedes)}
   .mk-wv{font-size:14px}
   .mk-wl,.mk-wunc{font-size:7.5px;letter-spacing:.04em}
   .mk-wicon svg{width:18px;height:18px}
+  .mk-wtip{font-size:11px}   /* «models: ...» con quattro modelli su una riga */
 }
 
 /* Il lampeggio arancione del puntino GPS sulla mappa: scatto immediato

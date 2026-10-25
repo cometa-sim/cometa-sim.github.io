@@ -580,12 +580,6 @@ function weatherIcon(cloudPct, rainPct, windKmh){
    risposta arrivata dopo quella di una richiesta piu' recente (cambi
    rapidi di data o di ora). */
 let weatherSeq = 0;
-/* Title del riquadro nuvole: i tre strati, sempre in inglese (low/mid/high)
-   in tutte le lingue; il numero e l'icona restano la copertura totale. */
-function cloudsTip(h, i){
-  const g = function(k){ return h[k] && h[k][i] != null ? Math.round(h[k][i]) + " %" : "—"; };
-  return h.cloud_cover_low ? "low " + g("cloud_cover_low") + " · mid " + g("cloud_cover_mid") + " · high " + g("cloud_cover_high") : "";
-}
 /* Il vento: una freccia che va dove va il vento (Open-Meteo da' la
    direzione da cui viene, in gradi: +180), e nell'etichetta da dove viene,
    a 8 punti cardinali («Vento da NE»). Nel title anche i gradi. */
@@ -627,9 +621,9 @@ function loadWeather(pl){
       const wtile = document.getElementById("twWWind").parentNode, gust = h.wind_gusts_10m && h.wind_gusts_10m[i];
       const wtip = [gust != null ? "gusts " + Math.round(gust) + " km/h" : "", dir != null ? "from " + Math.round(dir) + "°" : ""].filter(Boolean).join(" · ");
       if(wtip) wtile.title = wtip; else wtile.removeAttribute("title");
-      const tile = document.getElementById("twWClouds"), tip = cloudsTip(h, i);
-      tile.textContent = Math.round(h.cloud_cover[i]) + "%";
-      if(tip) tile.parentNode.title = tip; else tile.parentNode.removeAttribute("title");
+      window.COMETA_NUVOLE.aggiorna({lat:pl.lat, lon:pl.lon, iso:iso, key:key, tz:"auto", h:h, i:i,
+        value:document.getElementById("twWClouds"), unc:document.getElementById("twWCloudsUnc"),
+        current:function(){ return seq === weatherSeq; }});
       document.getElementById("twWRain").textContent = rain == null ? "—" : Math.round(rain) + "%";
       document.getElementById("twWIcon").innerHTML = weatherIcon(h.cloud_cover[i], rain || 0, h.wind_speed_10m[i]);
     })
