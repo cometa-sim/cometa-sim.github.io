@@ -54,12 +54,12 @@ window.COMETA_NUVOLE = (function(){
   function nextDay(iso){ return new Date(Date.parse(iso + "T12:00:00Z") + 864e5).toISOString().slice(0, 10); }
   function col(h, v, m){ return h[v + "_" + m] || []; }
   /* Primo temporale (codici WMO 95-99) di un modello nella finestra: {code, at} o null */
+  /* Un modello prevede un temporale (codici WMO 95-99) nella finestra? */
   function storm(h, m, i0, i1){
     const wc = col(h, "weather_code", m);
-    for(let j = i0; j <= i1; j++) if(wc[j] != null && wc[j] >= 95) return {code: wc[j], at: h.time[j].slice(11)};
-    return null;
+    for(let j = i0; j <= i1; j++) if(wc[j] != null && wc[j] >= 95) return true;
+    return false;
   }
-
   function ask(lat, lon, iso, tz){
     const q = new URLSearchParams({
       latitude: lat.toFixed(4), longitude: lon.toFixed(4), hourly: "cloud_cover,precipitation,weather_code,cape",
@@ -70,20 +70,19 @@ window.COMETA_NUVOLE = (function(){
       .then(function(r){ return r.ok ? r.json() : null; })
       .catch(function(){ return null; });
   }
-  /* Temporali in una finestra [i0, i1] di un punto: cosa dice best_match
-     (testi per il title), quali altri modelli ne prevedono uno, CAPE massimo. */
+  /* Temporali in una finestra [i0, i1] di un punto: se best_match ne
+     prevede uno (o CAPE alto con pioggia), quali altri modelli ne prevedono
+     uno, CAPE massimo. L'ora esatta non conta: per sicurezza si guarda
+     tutta la finestra. */
   function temporali(h, i0, i1){
     i0 = Math.max(0, i0); i1 = Math.min(h.time.length - 1, i1);
-    const out = {tip: [], altri: [], cape: null};
-    const s = storm(h, "best_match", i0, i1), cape = col(h, "cape", "best_match"), bp = col(h, "precipitation", "best_match");
-    let wet = null;
+    const out = {si: storm(h, "best_match", i0, i1), altri: [], cape: null};
+    const cape = col(h, "cape", "best_match"), bp = col(h, "precipitation", "best_match");
     for(let j = i0; j <= i1; j++){
       if(cape[j] == null) continue;
       if(out.cape == null || cape[j] > out.cape) out.cape = cape[j];
-      if(!wet && cape[j] >= CAPE_MIN && bp[j] != null && bp[j] >= DRY_MM) wet = {cape: cape[j], at: h.time[j].slice(11)};
+      if(cape[j] >= CAPE_MIN && bp[j] != null && bp[j] >= DRY_MM) out.si = true;
     }
-    if(s) out.tip.push((s.code > 95 ? "thunderstorm with hail" : "thunderstorm") + " at " + s.at);
-    if(wet) out.tip.push("CAPE " + Math.round(wet.cape) + " J/kg with rain at " + wet.at);
     out.altri = MODELS.filter(function(m){ return storm(h, m[0], i0, i1); }).map(function(m){ return m[1]; });
     return out;
   }
@@ -124,10 +123,8 @@ window.COMETA_NUVOLE = (function(){
         const dl = rr[1], il = dl && dl.hourly && dl.hourly.time ? oraDi(dl, land.t) : -1;
         const tLaunch = temporali(h, i, i + (il >= 0 ? UP_H : STORM_H));
         const tLand = il >= 0 ? temporali(dl.hourly, il - LAND_H, il + LAND_H) : null;
-        /* dove, solo se il temporale e' in uno solo dei due punti */
-        const due = tLand && tLaunch.tip.length && tLand.tip.length;
-        const dove = function(t, w){ return t.tip.map(function(x){ return x + (tLand && !due ? " (" + w + ")" : ""); }); };
-        const sTip = dove(tLaunch, "launch").concat(tLand ? dove(tLand, "landing") : []);
+        /* dove: partenza, atterraggio o tutti e due */
+        const sTip = tLaunch.si && tLand && tLand.si ? "both" : tLaunch.si ? "launch" : tLand && tLand.si ? "landing" : "";
         const altri = tLaunch.altri.concat(tLand ? tLand.altri : []).filter(function(x, k, a){ return a.indexOf(x) === k; });
 
         const why = [];
@@ -144,12 +141,12 @@ window.COMETA_NUVOLE = (function(){
           ? "CAPE: launch " + (tLaunch.cape != null ? Math.round(tLaunch.cape) + " J/kg" : "—") + " · landing " + (tLand.cape != null ? Math.round(tLand.cape) + " J/kg" : "—")
           : (tLaunch.cape != null ? "CAPE: launch " + Math.round(tLaunch.cape) + " J/kg" : "");
         setTip(rTile, [pr.length ? "models: " + pr.map(function(v){ return v[0] + " " + v[1].toFixed(1) + " mm"; }).join(" · ") : "", capeTip]);
-        if(!sTip.length && altri.length) why.push("thunderstorms (" + altri.join(", ") + ")");
+        if(!sTip && altri.length) why.push("thunderstorms (" + altri.join(", ") + ")");
 
-        if(sTip.length && o.storm){
+        if(sTip && o.storm){
           o.storm.hidden = false;
           o.icon.innerHTML = ICON_STORM;
-          setTip(iTile, [sTip.join(" · ") + (tLand ? "" : " (launch + " + STORM_H + " h)")]);
+          setTip(iTile, ["thunderstorm: " + sTip]);
         } else if(why.length){
           o.unc.hidden = false;
           setTip(iTile, ["models disagree: " + why.join(", ")]);
