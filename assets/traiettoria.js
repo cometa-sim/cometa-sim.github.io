@@ -593,6 +593,13 @@ function etichettaVento(){
   if(!e) return;
   e.textContent = ventoDa == null ? t("mkWeatherWind") : t("mkWeatherWindFrom").replace("{d}", t("mkPunti").split(",")[Math.round(ventoDa/45) % 8]);
 }
+/* L'atterraggio previsto dall'ultimo calcolo, se e' proprio questo volo
+   (stesso luogo, stesso giorno e ora): ai temporali serve anche li'. */
+function atterraggio(pl, iso, hhmm){
+  const r = last;
+  if(!r || r.band || !r.ok || !r.end || r.from.lat !== pl.lat || r.from.lon !== pl.lon) return null;
+  return Math.abs(r.pts[0].t - launchAt(iso, hhmm, pl)) < 6e4 ? r.end : null;
+}
 function loadWeather(pl){
   const el = document.getElementById("twWeather");
   if(!el || !pl || !elDate.value) return;
@@ -623,8 +630,8 @@ function loadWeather(pl){
       if(wtip) wtile.title = wtip; else wtile.removeAttribute("title");
       window.COMETA_NUVOLE.aggiorna({lat:pl.lat, lon:pl.lon, iso:iso, key:key, tz:"auto", h:h, i:i,
         clouds:document.getElementById("twWClouds"), rain:document.getElementById("twWRain"),
-        icon:document.getElementById("twWIcon"), unc:document.getElementById("twWUnc"),
-        current:function(){ return seq === weatherSeq; }});
+        icon:document.getElementById("twWIcon"), unc:document.getElementById("twWUnc"), storm:document.getElementById("twWStorm"),
+        land:atterraggio(pl, iso, hhmm)});
       document.getElementById("twWRain").textContent = rain == null ? "—" : Math.round(rain) + "%";
       document.getElementById("twWIcon").innerHTML = weatherIcon(h.cloud_cover[i], rain || 0, h.wind_speed_10m[i]);
     })
@@ -1419,6 +1426,7 @@ form.addEventListener("submit", function(e){
     .then(function(res){
       last = res[1];
       show(last);
+      if(last.ok) loadWeather(launch);     /* i temporali guardano anche l'atterraggio previsto */
     }, function(){ setStatus(t("twErr").replace("{msg}", "Leaflet"), true); });
 });
 
