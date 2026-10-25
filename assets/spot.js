@@ -939,7 +939,8 @@ window.COMETA_SPOT = (function(){
         const wtip = [gust != null ? "gusts " + Math.round(gust) + " km/h" : "", dir != null ? "from " + Math.round(dir) + "°" : ""].filter(Boolean).join(" · ");
         if(wtip) wtile.title = wtip; else wtile.removeAttribute("title");
         window.COMETA_NUVOLE.aggiorna({lat:site.lat, lon:site.lon, iso:iso, key:key, tz:TZ, h:h, i:i,
-          value:document.getElementById("dirWClouds"), unc:document.getElementById("dirWCloudsUnc")});
+          clouds:document.getElementById("dirWClouds"), rain:document.getElementById("dirWRain"),
+          icon:document.getElementById("dirWIcon"), unc:document.getElementById("dirWUnc")});
         document.getElementById("dirWRain").textContent = rain == null ? "—" : Math.round(rain) + "%";
         document.getElementById("dirWIcon").innerHTML = weatherIcon(h.cloud_cover[i], rain || 0, h.wind_speed_10m[i]);
       })
