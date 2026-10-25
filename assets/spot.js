@@ -948,7 +948,7 @@ window.COMETA_SPOT = (function(){
         if(tip) tile.parentNode.title = tip; else tile.parentNode.removeAttribute("title");
         document.getElementById("dirWRain").textContent = rain == null ? "—" : Math.round(rain) + "%";
         document.getElementById("dirWIcon").innerHTML = weatherIcon(h.cloud_cover[i], rain || 0, h.wind_speed_10m[i]);
-        loadCloudSpread(site, iso, key, Math.round(h.cloud_cover[i]), tip);
+        loadCloudSpread(site, iso, key, tip);
       })
       .catch(function(){ el.hidden = true; });
   }
@@ -956,13 +956,12 @@ window.COMETA_SPOT = (function(){
   /* La copertura nuvolosa e' la grandezza piu' incerta del riquadro: la
      stessa ora chiesta anche a tre modelli globali diversi. Il valore
      mostrato resta quello di Open-Meteo (best_match, lo stesso dell'icona);
-     se i modelli sono molto lontani fra loro accanto compare "±N", meta'
-     della distanza fra il piu' basso e il piu' alto. I valori dei singoli
-     modelli vanno nel title. Se la richiesta fallisce il riquadro resta
-     com'era. */
+     se i modelli sono molto lontani fra loro sotto compare "incerta"
+     (#dirWCloudsUnc). I valori dei singoli modelli vanno nel title. Se la
+     richiesta fallisce il riquadro resta com'era. */
   const CLOUD_MODELS = [["ecmwf_ifs025", "ECMWF"], ["gfs_seamless", "GFS"], ["icon_seamless", "ICON"]];
   const CLOUD_SPREAD_MIN = 30;  // distanza (punti %) da cui la previsione si segnala incerta
-  function loadCloudSpread(site, iso, key, best, tip){
+  function loadCloudSpread(site, iso, key, tip){
     const q = new URLSearchParams({
       latitude: site.lat.toFixed(4), longitude: site.lon.toFixed(4), hourly: "cloud_cover",
       models: CLOUD_MODELS.map(function(m){ return m[0]; }).join(","),
@@ -981,14 +980,8 @@ window.COMETA_SPOT = (function(){
         if(vals.length < 2) return;
         const nums = vals.map(function(v){ return v[1]; });
         const spread = Math.max.apply(null, nums) - Math.min.apply(null, nums);
-        const tile = document.getElementById("dirWClouds");
-        tile.textContent = best + "%";
-        if(spread >= CLOUD_SPREAD_MIN){
-          const u = document.createElement("small");
-          u.className = "mk-wunc";
-          u.textContent = "±" + Math.round(spread / 2);
-          tile.appendChild(u);
-        }
+        const tile = document.getElementById("dirWClouds"), unc = document.getElementById("dirWCloudsUnc");
+        if(unc) unc.hidden = spread < CLOUD_SPREAD_MIN;
         const models = vals.map(function(v){ return v[0] + " " + v[1] + " %"; }).join(" · ");
         tile.parentNode.title = models + (tip ? "\n" + tip : "");
       })
