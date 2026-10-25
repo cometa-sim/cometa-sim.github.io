@@ -1,20 +1,27 @@
 /* ==========================================================
-   Nuvole: quanto e' incerta la previsione
+   Meteo: quanto e' incerta la previsione
    ==========================================================
-   La copertura nuvolosa e' la grandezza piu' incerta dei riquadri meteo
-   (Diretta in assets/spot.js, predittore in assets/traiettoria.js). Il
-   valore mostrato e' quello di Open-Meteo (best_match, lo stesso
-   dell'icona), che in Uruguay e' ECMWF IFS a 9 km. La stessa ora si
-   chiede anche a ECMWF e a tre modelli di altri centri (GFS, ICON, UKMO):
-   non ecmwf_ifs025, che e' lo stesso ECMWF a 25 km e non un parere in
-   piu'. Se fra il piu' basso e il piu' alto (valore mostrato compreso)
-   ci sono SPREAD_MIN punti o piu', sotto l'etichetta compare «incerta». Il title ha due righe, in inglese come gli altri: i modelli
-   e, sotto, i tre strati. Se la richiesta fallisce resta solo la riga
-   degli strati. */
+   Nuvole e pioggia sono le grandezze piu' incerte dei riquadri meteo
+   (Diretta in assets/spot.js, predittore in assets/traiettoria.js). I
+   valori mostrati sono quelli di Open-Meteo (best_match, che in Uruguay
+   e' ECMWF IFS a 9 km); la stessa ora si chiede anche a ECMWF e a tre
+   modelli di altri centri (GFS, ICON, UKMO). Sotto l'icona compare
+   «incerta» se:
+   - nuvole: fra il valore piu' basso e il piu' alto (quello mostrato
+     compreso) ci sono SPREAD_MIN punti o piu';
+   - pioggia: un modello da' almeno RAIN_MM mm in quell'ora e un altro
+     meno di DRY_MM (piove o no?).
+   La probabilita' di pioggia non entra nel confronto: viene dagli
+   ensemble ed e' gia' lei una misura dell'incertezza. Il vento nemmeno:
+   a pochi giorni i modelli lo prevedono molto meglio.
+   Title, in inglese come gli altri: nuvole «models: ...» e sotto
+   «layers: ...»; pioggia i mm dei modelli; icona il motivo dell'avviso.
+   Se la richiesta fallisce restano gli strati e niente avviso. */
 window.COMETA_NUVOLE = (function(){
   const METEO = "https://api.open-meteo.com/v1/forecast";
   const MODELS = [["ecmwf_ifs", "ECMWF"], ["gfs_seamless", "GFS"], ["icon_seamless", "ICON"], ["ukmo_seamless", "UKMO"]];
   const SPREAD_MIN = 30;
+  const RAIN_MM = 0.5, DRY_MM = 0.1;
 
   function layersTip(h, i){
     const g = function(k){ return h[k] && h[k][i] != null ? Math.round(h[k][i]) + "%" : "—"; };
@@ -24,18 +31,21 @@ window.COMETA_NUVOLE = (function(){
     const t = lines.filter(Boolean).join("\n");
     if(t) tile.title = t; else tile.removeAttribute("title");
   }
+  function mm(x){ return x.toFixed(1) + " mm"; }
 
-  /* o: {lat, lon, iso, key, tz, h, i, value, unc, current}
+  /* o: {lat, lon, iso, key, tz, h, i, clouds, rain, icon, unc, current}
      h, i: la risposta oraria gia' arrivata e l'indice dell'ora;
-     value: l'elemento .mk-wv; unc: l'elemento «incerta»;
+     clouds, rain, icon: gli elementi .mk-wv dei tre riquadri;
+     unc: «incerta» sotto l'icona;
      current(): false se nel frattempo e' partita un'altra richiesta. */
   function aggiorna(o){
-    const tile = o.value.parentNode, best = Math.round(o.h.cloud_cover[o.i]), layers = layersTip(o.h, o.i);
-    o.value.textContent = best + "%";
-    if(o.unc) o.unc.hidden = true;
-    setTip(tile, [layers]);
+    const best = Math.round(o.h.cloud_cover[o.i]), layers = layersTip(o.h, o.i);
+    const cTile = o.clouds.parentNode, rTile = o.rain.parentNode, iTile = o.icon.parentNode;
+    o.clouds.textContent = best + "%";
+    o.unc.hidden = true;
+    setTip(cTile, [layers]); setTip(rTile, []); setTip(iTile, []);
     const q = new URLSearchParams({
-      latitude: o.lat.toFixed(4), longitude: o.lon.toFixed(4), hourly: "cloud_cover",
+      latitude: o.lat.toFixed(4), longitude: o.lon.toFixed(4), hourly: "cloud_cover,precipitation",
       models: MODELS.map(function(m){ return m[0]; }).join(","),
       start_date: o.iso, end_date: o.iso, timezone: o.tz
     });
@@ -45,15 +55,25 @@ window.COMETA_NUVOLE = (function(){
         if(o.current && !o.current()) return;
         const h = d && d.hourly, i = h && h.time ? h.time.indexOf(o.key) : -1;
         if(i < 0) return;
-        const vals = [];
+        const cl = [], pr = [];
         MODELS.forEach(function(m){
-          const a = h["cloud_cover_" + m[0]];
-          if(a && a[i] != null) vals.push([m[1], Math.round(a[i])]);
+          const c = h["cloud_cover_" + m[0]], p = h["precipitation_" + m[0]];
+          if(c && c[i] != null) cl.push([m[1], Math.round(c[i])]);
+          if(p && p[i] != null) pr.push([m[1], p[i]]);
         });
-        if(vals.length < 2) return;
-        const nums = vals.map(function(v){ return v[1]; }).concat(best);
-        if(o.unc) o.unc.hidden = Math.max.apply(null, nums) - Math.min.apply(null, nums) < SPREAD_MIN;
-        setTip(tile, ["models: " + vals.map(function(v){ return v[0] + " " + v[1] + "%"; }).join(" · "), layers]);
+        const why = [];
+        if(cl.length >= 2){
+          const n = cl.map(function(v){ return v[1]; }).concat(best);
+          if(Math.max.apply(null, n) - Math.min.apply(null, n) >= SPREAD_MIN) why.push("clouds");
+          setTip(cTile, ["models: " + cl.map(function(v){ return v[0] + " " + v[1] + "%"; }).join(" · "), layers]);
+        }
+        if(pr.length >= 2){
+          const n = pr.map(function(v){ return v[1]; });
+          if(Math.max.apply(null, n) >= RAIN_MM && Math.min.apply(null, n) < DRY_MM) why.push("rain");
+          setTip(rTile, ["models: " + pr.map(function(v){ return v[0] + " " + mm(v[1]); }).join(" · ")]);
+        }
+        o.unc.hidden = !why.length;
+        if(why.length) setTip(iTile, ["models disagree: " + why.join(", ")]);
       })
       .catch(function(){});
   }
