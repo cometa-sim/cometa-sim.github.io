@@ -43,9 +43,19 @@ window.COMETA_NUVOLE = (function(){
   const CAPE_MIN = 1000;
   const ICON_STORM = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 14H8a4 4 0 1 1 1.3-7.8 5 5 0 0 1 9.6 2A3.5 3.5 0 0 1 17.5 14Z"/><path d="M13 14.5l-2.5 3.5h3.5l-2.5 3.5"/></svg>';
 
+  /* Gli strati, con un "?" in fondo se uno supera il totale di piu' di
+     LAYER_TOL punti: non puo' essere (il totale e' almeno lo strato piu'
+     coperto), eppure con ECMWF 9 km da Open-Meteo succede, forse strati e
+     totale di due corse diverse. Non e' incertezza della previsione e non
+     fa comparire «incerta»: si segnala solo che quel dato non torna. */
+  const LAYER_TOL = 5;
   function layersTip(h, i){
-    const g = function(k){ return h[k] && h[k][i] != null ? Math.round(h[k][i]) + "%" : "—"; };
-    return h.cloud_cover_low ? "layers: low " + g("cloud_cover_low") + " · mid " + g("cloud_cover_mid") + " · high " + g("cloud_cover_high") : "";
+    if(!h.cloud_cover_low) return "";
+    const v = function(k){ return h[k] && h[k][i] != null ? Math.round(h[k][i]) : null; };
+    const g = function(k){ const x = v(k); return x != null ? x + "%" : "—"; };
+    const tot = v("cloud_cover");
+    const noTorna = tot != null && ["cloud_cover_low", "cloud_cover_mid", "cloud_cover_high"].some(function(k){ return v(k) != null && v(k) > tot + LAYER_TOL; });
+    return "layers: low " + g("cloud_cover_low") + " · mid " + g("cloud_cover_mid") + " · high " + g("cloud_cover_high") + (noTorna ? " ?" : "");
   }
   function setTip(tile, lines){
     const t = lines.filter(Boolean).join("\n");
