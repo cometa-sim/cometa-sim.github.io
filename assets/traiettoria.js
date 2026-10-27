@@ -1032,7 +1032,15 @@ function draw(r, noFit){
     /* smoothFactor 0: Leaflet non semplifica il contorno; smoothPolygon:
        non arrotonda i vertici al pixel. Cosi' gli archi della somma con il
        cerchio dell'errore di previsione restano lisci. */
-    if(g.poly) new (smoothPolygon())(g.poly, {pane:"twLandZ", color:VI, weight:3, opacity:1, fillColor:VI, fillOpacity:.35,
+    if(g.strati){       /* errore di previsione: sfumatura, poi il bordo */
+      g.strati.forEach(function(s){
+        new (smoothPolygon())(s.poly, {pane:"twLandZ", stroke:false, fillColor:VI, fillOpacity:s.a,
+          smoothFactor:0, interactive:false}).addTo(layer);
+      });
+      new (smoothPolygon())(g.poly, {pane:"twLandZ", color:VI, weight:3, opacity:1, fill:false,
+        lineJoin:"round", smoothFactor:0, interactive:false}).addTo(layer);
+    }
+    else if(g.poly) new (smoothPolygon())(g.poly, {pane:"twLandZ", color:VI, weight:3, opacity:1, fillColor:VI, fillOpacity:.35,
       lineJoin:"round", smoothFactor:0, interactive:false}).addTo(layer);
     else L.polyline(g.line, {pane:"twLandZ", color:VI, weight:6, opacity:1, lineCap:"round", interactive:false}).addTo(layer);
     (g.poly || g.line).forEach(function(ll){ bb.extend(ll); });
@@ -1117,16 +1125,23 @@ function fcRadius(d, r, iso){
   const C = d.classi.filter(function(c){ return c.n >= CURVA_NMIN; })
     .sort(function(a, b){ return a.eta_h - b.eta_h; });
   if(C.length < 2 || age > C[C.length - 1].eta_h + 12) return {km:0, na:true, age:age};
-  let q = 0;
-  if(age >= C[C.length - 1].eta_h) q = C[C.length - 1].q3_km;
+  let q = 0, rms = 0;
+  if(age >= C[C.length - 1].eta_h){ q = C[C.length - 1].q3_km; rms = C[C.length - 1].rms_km; }
   else if(age > C[0].eta_h){
     for(let i = 0; i < C.length - 1; i++){
       const a = C[i], b = C[i + 1];
-      if(age <= b.eta_h){ q = a.q3_km + (age - a.eta_h)/(b.eta_h - a.eta_h)*(b.q3_km - a.q3_km); break; }
+      if(age <= b.eta_h){
+        const f = (age - a.eta_h)/(b.eta_h - a.eta_h);
+        q = a.q3_km + f*(b.q3_km - a.q3_km); rms = a.rms_km + f*(b.rms_km - a.rms_km); break;
+      }
     }
   }
   const k = d.durata_ref_min > 0 ? r.dur/d.durata_ref_min : 1;
-  return {km:q*k, age:age, q:q, k:k, toLaunch:(r.pts[0].t - Date.now())/36e5};
+  /* sigma della gaussiana 2D isotropa: RMS^2 = 2 sigma^2 (gli spostamenti
+     seguono bene la distribuzione di Rayleigh: entro Q3 il 75% dei casi, sia
+     nei dati sia nel modello); per la sfumatura dell'area */
+  const sigma = rms > 0 ? rms*k/Math.SQRT2 : 0.6*q*k;
+  return {km:q*k, sigma:sigma, age:age, q:q, k:k, toLaunch:(r.pts[0].t - Date.now())/36e5};
 }
 /* Un intervallo in ore (eta' della corsa, tempo al lancio): in giorni, sotto le 72 h in ore */
 function fcTempo(h){
@@ -1137,17 +1152,41 @@ function fcTempo(h){
    atterraggio nominale) si sposta di un vettore qualunque lungo al piu'
    r. Lo stesso errore di vento trasla tutti i voli dell'area, che
    attraversano gli stessi venti: la somma e' lineare, non in quadratura. */
-function addForecast(r, g, fc){
-  const base = g ? (g.poly || g.line) : [[r.end.lat, r.end.lon]];
-  const N = 180, k = Math.cos(r.end.lat*RAD), pts = [];
+function grow(base, km, lat, N){
+  const k = Math.cos(lat*RAD), pts = [];
   base.forEach(function(q){
     for(let i = 0; i < N; i++){
       const u = 2*Math.PI*i/N;
-      pts.push([q[1] + fc.km*Math.cos(u)/(111.32*k), q[0] + fc.km*Math.sin(u)/110.57]);
+      pts.push([q[1] + km*Math.cos(u)/(111.32*k), q[0] + km*Math.sin(u)/110.57]);
     }
   });
+  return hull(pts).map(function(q){ return [q[1], q[0]]; });
+}
+/* Sfumatura dell'area: la densita' cala dal bordo dell'area del pallone
+   verso fuori come exp(-d^2/2 sigma^2), d la distanza. Si disegnano N
+   fasce annidate (la i-esima arriva fino a i/N di R) senza contorno; le
+   loro opacita' a_i sono scelte perche', sovrapposte, diano in ogni fascia
+   T = A0 exp(-d^2/2 sigma^2) con d il suo bordo interno: 1 - T_i =
+   prodotto_{j>=i} (1 - a_j). A0 e' l'opacita' di prima, che resta al
+   centro; il bordo a R si disegna a parte. */
+const SFUMA_N = 14;
+function fcStrati(R, sigma, A0){
+  const T = [], out = [];
+  for(let i = 1; i <= SFUMA_N; i++){ const d = (i - 1)/SFUMA_N*R; T.push(A0*Math.exp(-d*d/(2*sigma*sigma))); }
+  for(let i = 0; i < SFUMA_N; i++){
+    const piu = i + 1 < SFUMA_N ? T[i + 1] : 0;
+    out.push({r:(i + 1)/SFUMA_N*R, a:1 - (1 - T[i])/(1 - piu)});
+  }
+  return out;
+}
+function addForecast(r, g, fc){
+  const base = g ? (g.poly || g.line) : [[r.end.lat, r.end.lon]];
   const out = g ? Object.assign({}, g) : {n:0, specs:[]};
-  out.poly = hull(pts).map(function(q){ return [q[1], q[0]]; });
+  out.poly = grow(base, fc.km, r.end.lat, 180);
+  /* le fasce, dalla piu' esterna: poligoni piu' leggeri (90 punti) */
+  out.strati = fcStrati(fc.km, fc.sigma || 0.6*fc.km, .35).map(function(s){
+    return {poly:grow(base, s.r, r.end.lat, 90), a:s.a};
+  }).reverse();
   delete out.line;
   out.fc = fc;
   out.extent = 0;
@@ -1675,7 +1714,12 @@ function exportPng(){
       g.setLineDash([6*u, 7*u]); path(down); g.lineWidth = 2.5*u; g.stroke(); g.setLineDash([]);
       if(r.spread){
         const s = r.spread;
-        if(s.poly){ path(s.poly, true); g.globalAlpha = .3; g.fillStyle = LIGHT.asc; g.fill();
+        if(s.strati){       /* sfumatura: le stesse fasce, scalate da .35 a .3 */
+          g.fillStyle = LIGHT.asc;
+          s.strati.forEach(function(st){ path(st.poly, true); g.globalAlpha = st.a*.3/.35; g.fill(); });
+          path(s.poly, true); g.globalAlpha = .85; g.lineWidth = 3*u; g.strokeStyle = LIGHT.asc; g.stroke(); g.globalAlpha = 1;
+        }
+        else if(s.poly){ path(s.poly, true); g.globalAlpha = .3; g.fillStyle = LIGHT.asc; g.fill();
                     g.globalAlpha = .85; g.lineWidth = 3*u; g.strokeStyle = LIGHT.asc; g.stroke(); g.globalAlpha = 1; }
         else { path(s.line); g.lineWidth = 6*u; g.strokeStyle = LIGHT.asc; g.globalAlpha = .85; g.stroke(); g.globalAlpha = 1; }
       }
