@@ -596,7 +596,7 @@ const DIRETTA_START  = new Date("2026-10-29T08:00:00-03:00");
 /* false = la pagina Diretta c'e' ed e' raggiungibile solo da chi conosce
    il link (#diretta), per le prove: niente voce in nav e niente banner,
    qualunque siano le due date sopra. true quando la si vuole pubblica. */
-const DIRETTA_PUBLIC = false;
+const DIRETTA_PUBLIC = true;
 
 function updateDiretta(){
   const now = Date.now();

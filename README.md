@@ -79,7 +79,7 @@ Norme e autorizzazioni · Domande · Chi siamo.
 | Quota di scoppio, velocità di salita/discesa e sito di lancio attesi (pagina Diretta) | `FLIGHT_BURST_KM`, `FLIGHT_ASCENT_MS`, `FLIGHT_DESCENT_V0_MS`, `FLIGHT_SITE` in `assets/volo.js` |
 | Payload pesato e portanza al collo misurata (pagina Diretta) | `FLIGHT_PAYLOAD_KG`, `FLIGHT_NECK_LIFT_G` in `assets/volo.js` |
 | Indirizzo del backend che interroga SPOT (pagina Diretta) | la costante `TRACK_URL` in `assets/app.js` |
-| Se la Diretta compare in nav (oggi no: si raggiunge solo col link `#diretta`) | `DIRETTA_PUBLIC` in `assets/app.js` |
+| Se la Diretta compare in nav (oggi sì, dal 25 ottobre) | `DIRETTA_PUBLIC` in `assets/app.js` |
 | Quando compare "Diretta" in nav e quando diventa rossa, se pubblica | `DIRETTA_WINDOW` e `DIRETTA_START` in `assets/app.js` |
 | Numeri delle quattro schede della pagina iniziale | direttamente in `index.html` |
 | Stato di una tappa del progetto | la classe `done`, `wip` o `todo` della riga in `index.html` |
@@ -593,14 +593,14 @@ YouTube (il video `9xdbjGzU-Zk`, nell'iframe del primo riquadro), la mappa
 GPS, la quota stimata e il meteo sul punto di lancio (la previsione per il giorno e l'ora di `LAUNCH`, che compare solo quando
 mancano al massimo 16 giorni).
 
-Per ora non è pubblica: con `DIRETTA_PUBLIC = false` in `assets/app.js` non
-compaiono né la voce in nav né il banner rosso, qualunque sia la data, e in
-cima alla pagina c'è l'avviso «Pagina in costruzione». La pagina funziona
-comunque per intero, ma ci arriva solo chi conosce il link `…/#diretta` — è
-quella che si usa per le prove (non c'è più una copia a parte).
+È pubblica: con `DIRETTA_PUBLIC = true` in `assets/app.js` voce in nav e
+banner rosso seguono `DIRETTA_WINDOW` e `DIRETTA_START`, e l'avviso
+«Pagina in costruzione» non compare.
 
-Per renderla pubblica basta mettere `true`: l'avviso sparisce, e da lì in poi
-voce e banner seguono `DIRETTA_WINDOW` e `DIRETTA_START`.
+Rimettendo `false` la pagina torna nascosta: niente voce in nav né banner,
+qualunque sia la data, e in cima l'avviso «Pagina in costruzione». Funziona
+comunque per intero, ma ci arriva solo chi conosce il link `…/#diretta` — è
+il modo di usarla per le prove (non c'è più una copia a parte).
 
 **Da dove arrivano i punti GPS.** Il browser non chiama mai SPOT: lo fa il
 Worker di Cloudflare in `worker/`, che conserva la traccia e la espone in
@@ -785,9 +785,8 @@ approvare la propria richiesta di modifica.
   più avanti, senza bisogno di intervenire. Se si sposta `LAUNCH`, va
   spostata anche `REAL_LAUNCH_MS` in `simulazione-diretta.html`.
 
-- **Rendere pubblica la Diretta** (`DIRETTA_PUBLIC = true` in
-  `assets/app.js`), quando si decide. Finché resta `false` le date qui sotto
-  non hanno effetto.
+- **Diretta pubblica o nascosta** (`DIRETTA_PUBLIC` in `assets/app.js`):
+  oggi `true`. Con `false` le date qui sotto non hanno effetto.
 
 - **Quando compare la voce "Diretta"**, e quando passa dal ciano
   "diretta tra poco" al rosso "in diretta". Sono due date separate in
