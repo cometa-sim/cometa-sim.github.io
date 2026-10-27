@@ -592,7 +592,7 @@ window.COMETA_TRACK_URL = TRACK_URL;
    non il lancio del pallone: la diretta parte prima). Date
    provvisorie, da confermare insieme al resto. */
 const DIRETTA_WINDOW = new Date("2026-10-25T00:00:00-03:00");
-const DIRETTA_START  = new Date("2026-10-29T08:00:00-03:00");
+const DIRETTA_START  = new Date("2026-10-29T08:30:00-03:00");
 /* false = la pagina Diretta c'e' ed e' raggiungibile solo da chi conosce
    il link (#diretta), per le prove: niente voce in nav e niente banner,
    qualunque siano le due date sopra. true quando la si vuole pubblica. */

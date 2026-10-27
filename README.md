@@ -792,7 +792,7 @@ approvare la propria richiesta di modifica.
   "diretta tra poco" al rosso "in diretta". Sono due date separate in
   `assets/app.js`: `DIRETTA_WINDOW` (oggi 25 ottobre, qualche giorno prima
   del lancio — da quel momento la voce appare in nav, in grigio/ciano) e
-  `DIRETTA_START` (oggi 29 ottobre alle 8:00, un'ora prima del lancio — da li' in poi
+  `DIRETTA_START` (oggi 29 ottobre alle 8:30, quando parte la diretta YouTube, mezz'ora prima del lancio — da li' in poi
   diventa rossa e compare il banner sotto la nav). A differenza del via
   alla quota, questo passaggio non ha bisogno di un file da pushare
   nell'istante: la diretta la si accende quando si vuole, quindi basta
