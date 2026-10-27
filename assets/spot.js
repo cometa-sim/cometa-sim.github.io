@@ -768,9 +768,19 @@ window.COMETA_SPOT = (function(){
     const giu = pr.full.filter(function(p){ return !p.up; }).map(ll);
     if(giu.length) giu.unshift(ll(pr.burst));
     if(fcLast && !st.giorno){
-      /* L.circle: un arco SVG vero, liscio a ogni zoom */
-      L.circle(ll(pr.end), {pane:P, radius:fcLast.km * 1000, color:ORANGE, weight:3, opacity:1,
-        fillColor:ORANGE, fillOpacity:.35, bubblingMouseEvents:true}).bindTooltip(fcTip(), {sticky:true}).addTo(trajGroup);
+      /* L.circle: un arco SVG vero, liscio a ogni zoom. Sfumatura: cerchi
+         concentrici senza contorno, opacita' che sovrapposte danno .35 al
+         centro e poi .35 exp(-r^2/2 sigma^2) (stessa costruzione di
+         fcStrati() in assets/traiettoria.js); il bordo a R a parte. */
+      const N = 14, R = fcLast.km, sg = fcLast.sigma, T = [];
+      for(let i = 1; i <= N; i++){ const r = (i - 1) / N * R; T.push(.35 * Math.exp(-r * r / (2 * sg * sg))); }
+      for(let i = N - 1; i >= 0; i--){
+        const a = 1 - (1 - T[i]) / (1 - (i + 1 < N ? T[i + 1] : 0));
+        L.circle(ll(pr.end), {pane:P, radius:(i + 1) / N * R * 1000, stroke:false,
+          fillColor:ORANGE, fillOpacity:a, interactive:false}).addTo(trajGroup);
+      }
+      L.circle(ll(pr.end), {pane:P, radius:R * 1000, color:ORANGE, weight:3, opacity:1, fill:true,
+        fillOpacity:0, bubblingMouseEvents:true}).bindTooltip(fcTip(), {sticky:true}).addTo(trajGroup);
     }
     L.polyline(su, {pane:P, color:st.linea, weight:3, opacity:.95, interactive:false}).addTo(trajGroup);
     L.polyline(giu, {pane:P, color:st.linea, weight:2.5, opacity:.95, dashArray:"6 7", interactive:false}).addTo(trajGroup);
@@ -852,16 +862,20 @@ window.COMETA_SPOT = (function(){
     const C = d.classi.filter(function(c){ return c.n >= CURVA_NMIN; })
       .sort(function(a, b){ return a.eta_h - b.eta_h; });
     if(C.length < 2 || age > C[C.length - 1].eta_h + 12) return null;
-    let q = 0;
-    if(age >= C[C.length - 1].eta_h) q = C[C.length - 1].q3_km;
+    let q = 0, rms = 0;
+    if(age >= C[C.length - 1].eta_h){ q = C[C.length - 1].q3_km; rms = C[C.length - 1].rms_km; }
     else if(age > C[0].eta_h){
       for(let i = 0; i < C.length - 1; i++){
         const a = C[i], b = C[i + 1];
-        if(age <= b.eta_h){ q = a.q3_km + (age - a.eta_h) / (b.eta_h - a.eta_h) * (b.q3_km - a.q3_km); break; }
+        if(age <= b.eta_h){
+          const f = (age - a.eta_h) / (b.eta_h - a.eta_h);
+          q = a.q3_km + f * (b.q3_km - a.q3_km); rms = a.rms_km + f * (b.rms_km - a.rms_km); break;
+        }
       }
     }
-    const km = q * (d.durata_ref_min > 0 ? durMin / d.durata_ref_min : 1);
-    return km > 0 ? {km:km, age:age} : null;
+    const k = d.durata_ref_min > 0 ? durMin / d.durata_ref_min : 1, km = q * k;
+    /* sigma della gaussiana 2D (RMS^2 = 2 sigma^2), per la sfumatura */
+    return km > 0 ? {km:km, age:age, sigma:rms > 0 ? rms * k / Math.SQRT2 : 0.6 * km} : null;
   }
   function fcTip(){
     return (dict().dirFcTip || "R = {r} km").replace("{r}", Math.round(fcLast.km)).replace("{h}", Math.round(fcLast.age));

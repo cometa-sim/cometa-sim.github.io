@@ -363,6 +363,16 @@ chi guarda, senza server nostri:
    raggio, che si vede già sulla mappa: così si capisce che l'errore
    dipende da quanto manca. Con il solo errore di previsione la scheda non
    riporta l'estensione massima, che sarebbe solo il diametro.
+   L'area dell'errore di previsione è **sfumata**: al centro (e dentro
+   l'area del pallone) ha l'opacità di sempre, verso il bordo cala come
+   exp(−d²/2σ²), con σ = RMS/√2 interpolato dalla curva come Q3. Gli
+   spostamenti misurati seguono bene la distribuzione di Rayleigh di una
+   gaussiana 2D isotropa (entro Q3 il 75% dei casi, entro 1,5 Q3 circa il
+   95%), quindi al bordo R la densità è circa ¼ di quella al centro. Si
+   disegnano 14 fasce annidate senza contorno, con opacità scelte perché
+   sovrapposte diano quel profilo (`fcStrati()` in `assets/traiettoria.js`,
+   la stessa costruzione con cerchi concentrici nella Diretta); il bordo a
+   R resta disegnato a parte. La vista 3D della Diretta resta a tinta unita.
 
 Sotto la mappa, il riquadro meteo (icona, temperatura, vento, nuvole,
 probabilità di pioggia) è la previsione oraria di Open-Meteo per il punto, il
