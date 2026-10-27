@@ -589,7 +589,7 @@ sovrappongono alla mappa.
 ### La pagina Diretta
 
 Sta in `index.html` (sezione `#diretta`) e in `assets/spot.js`: la diretta
-YouTube (il video `3oAHfYVzBAI`, nell'iframe del primo riquadro), la mappa
+YouTube (il video `9xdbjGzU-Zk`, nell'iframe del primo riquadro), la mappa
 GPS, la quota stimata e il meteo sul punto di lancio (la previsione per il giorno e l'ora di `LAUNCH`, che compare solo quando
 mancano al massimo 16 giorni).
 
