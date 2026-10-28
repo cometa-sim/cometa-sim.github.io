@@ -45,6 +45,7 @@
   .big > div{border:1px solid var(--line);border-radius:10px;padding:10px 12px}
   .big .v{font-size:30px;font-weight:650;font-variant-numeric:tabular-nums;line-height:1.15;overflow-wrap:anywhere}
   .big .v small{font-size:15px;font-weight:500;color:var(--muted);margin-left:3px}
+  .big .s{font-size:13px;color:var(--muted);min-height:1.3em}
   .big .l{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
   .phase{font-size:22px;font-weight:650;margin:12px 0 0}
   .old{color:var(--bad)}
@@ -147,6 +148,20 @@
     <p class="note" id="vNav"></p>
   </section>
 
+  <section id="discesa">
+    <h2>Predicted landing</h2>
+    <div class="big">
+      <div><div class="l">From here</div><div class="v" id="dDist">—</div><div class="s" id="dDistS"></div></div>
+      <div><div class="l">Landing at</div><div class="v" id="dOra">—</div><div class="s" id="dOraS"></div></div>
+      <div><div class="l">Parachute at ground</div><div class="v" id="dV0">—</div><div class="s" id="dV0S"></div></div>
+    </div>
+    <p class="note" id="dStato">Starts after the burst.</p>
+    <p class="note" id="dNav"></p>
+    <p class="note">After the burst the descent is recomputed with Tawhiri every minute (every 30 s below 3 km)
+      from the last good position, no older than 30 s, with the parachute speed measured in the last minute.
+      Needs internet. On the map: dashed orange, with the earlier predictions as small dots.</p>
+  </section>
+
   <section class="wide">
     <h2>Map</h2>
     <div id="mapFrame"><div id="map"></div></div>
@@ -213,6 +228,11 @@
 <script src="assets/map3d.js?v=stazione-5"></script>
 <!-- Le fasi del volo: la stessa regola della Diretta (vedi il file). -->
 <script src="lora/formato/fasi.js?v=stazione-4"></script>
+<!-- La discesa prevista dall'ultima posizione (vedi il file), e i punti
+     del server (assets/lora.js, lo stesso codice della Diretta): la
+     stazione con la rete usa anche quelli ricevuti dall'altra. -->
+<script src="lora/formato/discesa.js?v=stazione-1"></script>
+<script src="assets/lora.js?v=stazione-1"></script>
 <!-- L'ora del lancio e i dati del volo, gli stessi del sito (volo.js); la
      traiettoria prevista con lo stesso calcolo della Diretta: traiettoria.js
      (con msis.js) ricalcola salita, scoppio e discesa col meteo del giorno,
@@ -408,7 +428,7 @@ function chiaveDoppione(dati) {
 /* Da cambiare a ogni modifica della pagina: e' scritta in Setup, e
    dice a colpo d'occhio se il telefono sta usando la pagina nuova o una
    copia vecchia rimasta in memoria. */
-const VERSIONE = "2026-10-28";
+const VERSIONE = "2026-10-28b";
 
 const WORKER_PREDEFINITO = "https://lora.cometa.gripe";
 const WORKER = (new URLSearchParams(location.search).get("worker") || WORKER_PREDEFINITO).replace(/\/+$/, "");
@@ -589,6 +609,8 @@ function registra(dati, tMs) {
        incoerenti: si deve vedere quello che succede davvero. E' la
        Diretta che li filtra. */
     if (fasi) COMETA_FASI.aggiungi(fasi, { t: tMs, lat: dati.lat, lon: dati.lon, alt: dati.alt_m, vz: dati.vz_ms });
+    /* la discesa prevista invece parte solo da punti coerenti (vedi sotto) */
+    if (filtroLocale) COMETA_FASI.filtra(filtroLocale, { t: tMs, lat: dati.lat, lon: dati.lon, alt: dati.alt_m, vz: dati.vz_ms, sats: dati.sats, fix: dati.fix });
     if (dati.alt_m !== null && (volo.quotaMax === null || dati.alt_m > volo.quotaMax)) volo.quotaMax = dati.alt_m;
   }
 }
@@ -741,6 +763,7 @@ function preparaMappa() {
   /* la traiettoria prevista sotto la traccia vera, in un piano suo (l'area,
      poi le linee, poi i punti, nell'ordine in cui si aggiungono) */
   mappa.createPane("previsione").style.zIndex = 350;
+  mappa.createPane("discesa").style.zIndex = 380;   // sopra la prevista, sotto la traccia vera
   /* Come nella Diretta: vista satellite, nuvole/pioggia, schermo intero
      sul riquadro (che contiene anche il 3D), e il pulsante 3D. Tutto
      spento all'avvio: si accende dai pulsanti sulla mappa. */
@@ -883,6 +906,110 @@ function mostraPrevisione() {
   }
   if (trajBtn) trajBtn.classList.toggle("mk-active", trajOn);
   if (vista3d && vista3d.isOn() && vista3d.ctl()) vista3d.ctl().render(scena3d(), false);
+}
+
+/* ==================================================================
+   La discesa prevista dall'ultima posizione (lora/formato/discesa.js)
+
+   Dopo lo scoppio, a intervalli regolari, Tawhiri ricalcola la discesa
+   dall'ultimo punto buono, con la velocita' del paracadute misurata.
+   I punti vengono dalla radio di questa stazione, passati per lo stesso
+   filtro della Diretta (la mappa qui mostra tutto, ma la previsione parte
+   solo da punti coerenti), e, con la rete, dal server: cosi' la stazione
+   che ha internet usa anche i punti dell'altra, quando l'altra riesce a
+   mandarli. Arancione sulla mappa: la linea dall'ultimo punto
+   all'atterraggio, e i puntini degli atterraggi calcolati prima, per
+   vedere la previsione che si assesta. Senza rete resta l'ultima, con
+   l'ora in cui e' stata calcolata.
+   ================================================================== */
+const TAWHIRI = "https://api.v2.sondehub.org/tawhiri", ARANCIO = "#f76707";
+const LEGGI_SERVER = WORKER === WORKER_PREDEFINITO;   // con un Worker di prova, niente dati pubblici
+const D = window.COMETA_DISCESA;
+let filtroLocale = null;
+const discesa = { da: null, ultima: null, storia: [], inCorso: false, errore: null, riprovaMs: 0, gruppo: null };
+
+function puntiDiscesa() {
+  const loc = filtroLocale ? filtroLocale.buoni : [];
+  const srv = LEGGI_SERVER && window.COMETA_LORA ? COMETA_LORA.punti() : [];
+  return srv.length ? loc.concat(srv).sort(function (a, b) { return a.t - b.t; }) : loc;
+}
+function statoServer() { return LEGGI_SERVER && window.COMETA_LORA ? COMETA_LORA.stato(Date.now()) : null; }
+function dopoScoppio() { const s = statoServer(); return !!((fasi && fasi.scoppio) || (s && s.scoppio)); }
+function giaAtterrata() { const s = statoServer(); return !!((fasi && fasi.atterrata) || (s && s.fase === "atterrata")); }
+
+function controllaDiscesa() {
+  const adesso = Date.now();
+  if (D && !discesa.inCorso && adesso >= discesa.riprovaMs && dopoScoppio() && !giaAtterrata()) {
+    const punti = puntiDiscesa(), p = D.partenza(punti, adesso);
+    if (p && D.daRifare(discesa.da, p)) chiediDiscesa(p, D.v0Misurata(punti));
+  }
+  mostraDiscesa();
+}
+
+function chiediDiscesa(p, misurata) {
+  const v0 = misurata || (window.COMETA_FLIGHT && window.COMETA_FLIGHT.descentV0Ms) || 4.6;
+  const ac = new AbortController(), timer = setTimeout(function () { ac.abort(); }, 15000);
+  discesa.inCorso = true;
+  fetch(TAWHIRI + "?" + new URLSearchParams(D.parametri(p, v0)).toString(), { signal: ac.signal })
+    .then(function (r) { return r.json(); })
+    .then(function (d) {
+      const pr = D.leggi(d);
+      if (!pr) throw new Error((d && d.error && d.error.description) || "no prediction in the answer");
+      if (discesa.ultima) discesa.storia.push({ lat: discesa.ultima.end.lat, lon: discesa.ultima.end.lon, da: discesa.ultima.da });
+      discesa.ultima = { da: p, v0: v0, misurata: !!misurata, pts: pr.pts, end: pr.end, calcolataMs: Date.now() };
+      discesa.da = p;
+      discesa.errore = null;
+      disegnaDiscesa();
+    })
+    .catch(function (e) {
+      discesa.errore = navigator.onLine === false ? "no network" : e.name === "AbortError" ? "Tawhiri did not answer" : e.message;
+      discesa.riprovaMs = Date.now() + 15000;   // il servizio e' gratuito e condiviso: dopo un errore si aspetta un po'
+    })
+    .then(function () { clearTimeout(timer); discesa.inCorso = false; mostraDiscesa(); });
+}
+
+function mostraDiscesa() {
+  const u = discesa.ultima, stato = $("dStato");
+  if (!u) {
+    stato.className = "note" + (discesa.errore ? " old" : "");
+    stato.textContent = !dopoScoppio() ? "Starts after the burst." :
+      discesa.errore ? "Could not compute: " + discesa.errore + ". Retrying." : "Waiting for a good position, no older than 30 s…";
+    return;
+  }
+  const e = u.end, vecchia = Date.now() - u.calcolataMs;
+  if (io) {
+    const g = geodetica(io, e);
+    $("dDist").innerHTML = g.d < 10000 ? Math.round(g.d) + "<small>m</small>" : (g.d / 1000).toFixed(1) + "<small>km</small>";
+    $("dDistS").textContent = Math.round(g.rotta) + "° " + ROSA[Math.round(g.rotta / 22.5) % 16];
+  }
+  $("dOra").textContent = new Date(e.t).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false });
+  $("dOraS").textContent = e.t > Date.now() ? "in " + Math.round((e.t - Date.now()) / 60000) + " min" : "";
+  $("dV0").innerHTML = u.v0.toFixed(1) + "<small>m/s</small>";
+  $("dV0S").textContent = u.misurata ? "measured" : "as planned";
+  stato.className = "note" + (vecchia > 3 * 60000 && !giaAtterrata() ? " old" : "");
+  stato.textContent = "Computed at " + ora(u.calcolataMs) + " (" + eta(vecchia) + " ago) from " + (u.da.alt / 1000).toFixed(2) +
+    " km, position of " + ora(u.da.t) + ". Landing " + e.lat.toFixed(5) + ", " + e.lon.toFixed(5) + "." +
+    (u.misurata ? "" : " Parachute speed as planned: not enough descending points in the last minute.") +
+    (giaAtterrata() ? " Landed: no more updates." : discesa.errore ? " Last attempt failed: " + discesa.errore + "." : "");
+  $("dNav").innerHTML = 'Navigate: <a target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=' +
+    e.lat.toFixed(6) + "," + e.lon.toFixed(6) + '">Google Maps</a> · <a target="_blank" rel="noopener" href="geo:' +
+    e.lat.toFixed(6) + "," + e.lon.toFixed(6) + '">other app</a>';
+}
+
+function disegnaDiscesa() {
+  if (!mappa || !discesa.ultima) return;
+  const P = "discesa", u = discesa.ultima, ll = function (p) { return [p.lat, p.lon]; };
+  if (discesa.gruppo) mappa.removeLayer(discesa.gruppo);
+  discesa.gruppo = L.featureGroup();
+  discesa.storia.forEach(function (s) {
+    L.circleMarker(ll(s), { pane: P, radius: 3.5, color: ARANCIO, weight: 1, opacity: .8, fillColor: ARANCIO, fillOpacity: .45, bubblingMouseEvents: false })
+      .bindTooltip("Earlier prediction, from " + (s.da.alt / 1000).toFixed(1) + " km at " + ora(s.da.t)).addTo(discesa.gruppo);
+  });
+  L.polyline([ll(u.da)].concat(u.pts.map(ll)), { pane: P, color: ARANCIO, weight: 3, opacity: .95, dashArray: "6 7", interactive: false }).addTo(discesa.gruppo);
+  L.circleMarker(ll(u.end), { pane: P, radius: 9, color: "#fff", weight: 2.5, fillColor: ARANCIO, fillOpacity: 1, bubblingMouseEvents: false })
+    .bindTooltip("Predicted landing " + new Date(u.end.t).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false }) +
+      ", from " + (u.da.alt / 1000).toFixed(1) + " km").addTo(discesa.gruppo);
+  discesa.gruppo.addTo(mappa);
 }
 
 /* ==================================================================
@@ -1226,6 +1353,7 @@ async function avvio() {
   lancioMs = window.COMETA_LAUNCH ? window.COMETA_LAUNCH.getTime() : null;
   const v0 = (window.COMETA_FLIGHT && window.COMETA_FLIGHT.descentV0Ms) || 4.6;
   fasi = COMETA_FASI.nuovo(lancioMs, v0);
+  filtroLocale = COMETA_FASI.nuovoFiltro();
   $("vLaunch").textContent = lancioMs === null ? "Launch time: unknown (the site could not be read)" :
     "Launch time (from the site): " + new Date(lancioMs).toLocaleString([], { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit", hour12: false });
 
@@ -1297,6 +1425,9 @@ async function avvio() {
 
   setInterval(aggiornaEta, 1000);
   setInterval(invia, 1000);
+
+  if (LEGGI_SERVER && window.COMETA_LORA) COMETA_LORA.start();
+  setInterval(controllaDiscesa, 5000);
 
   if ("serviceWorker" in navigator) navigator.serviceWorker.register("lora/stazione/sw.js").catch(function () {});
 }
