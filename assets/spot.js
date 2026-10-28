@@ -80,7 +80,7 @@ window.COMETA_SPOT = (function(){
   let loraTrail = null, loraMarker = null, loraHit = null, loraUltimaT = null, legenda = null, profilo = null,
       trajBtn = null, trajOn = true, spotAltPt = null;
   try { trajOn = localStorage.getItem("cometa-traiettoria") !== "off"; } catch(e){}
-  let map, trail, ptsLayer, marker, markerHit, trajRun, mapReady, pollId, tickId, trajId,
+  let map, trail, ptsLayer, marker, markerHit, trajRun, mapReady, btnRicontrolla = null, pollId, tickId, trajId,
       elMap, elStatus, elAltEst, elAltGps, elRecenter,
       lastPoints, lastErr, curLang = "it", lastEstKm = null,
       /* L'ancora: "al tempo reale anchorT (ms) il modello e' al proprio
@@ -288,6 +288,21 @@ window.COMETA_SPOT = (function(){
         }
       });
       new Recenter().addTo(map);
+      /* ↻: ricontrolla subito i dati (LoRa e SPOT), senza aspettare il
+         prossimo giro e senza ricaricare la pagina */
+      const Ricontrolla = L.Control.extend({
+        options:{position:"topright"},
+        onAdd:function(){
+          const div = L.DomUtil.create("div", "leaflet-bar spot-ricontrolla");
+          const a = btnRicontrolla = L.DomUtil.create("a", "", div);
+          a.href = "#";
+          a.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg>';
+          a.title = dict().dirRicontrolla || "Check again";
+          L.DomEvent.on(a, "click", L.DomEvent.stop).on(a, "click", ricontrolla);
+          return div;
+        }
+      });
+      new Ricontrolla().addTo(map);
 
       /* La traccia LoRa, sopra quella dello SPOT: e' piu' fitta e arriva
          ogni 5 s. Come per lo SPOT, il pallino visibile non risponde al
@@ -405,6 +420,7 @@ window.COMETA_SPOT = (function(){
 
   function renderStatus(){
     if(elRecenter) elRecenter.title = dict().dirSpotRecenter || "recenter";
+    if(btnRicontrolla) btnRicontrolla.title = dict().dirRicontrolla || "Check again";
     if(!elStatus) return;
     const d = dict();
     /* dati non arrivati (rete, CORS, risposta del backend): "Network error", uguale in ogni lingua */
@@ -696,11 +712,28 @@ window.COMETA_SPOT = (function(){
        vuota in assets/app.js) niente chiamate a vuoto: solo lo stato
        "in attesa del segnale", come se la sonda non avesse ancora
        trasmesso. */
-    if(!url){ lastErr = null; renderStatus(); return; }
-    fetch(url, {cache:"no-store"})
+    if(!url){ lastErr = null; renderStatus(); return Promise.resolve(); }
+    /* tempo massimo, come in assets/lora.js: una richiesta appesa (cambio
+       di rete da telefono) non deve lasciare la pagina ferma */
+    const ac = window.AbortController ? new AbortController() : null;
+    const timer = ac ? setTimeout(function(){ ac.abort(); }, 12000) : null;
+    return fetch(url, ac ? {cache:"no-store", signal:ac.signal} : {cache:"no-store"})
+      .finally(function(){ clearTimeout(timer); })
       .then(function(res){ if(!res.ok) throw new Error("HTTP " + res.status); return res.json(); })
       .then(function(data){ render(parse(data)); })
       .catch(function(err){ lastErr = err.message; renderStatus(); });
+  }
+  /* Tornando sulla pagina, o quando torna la rete, lo SPOT si rilegge
+     subito (assets/lora.js fa lo stesso per il LoRa). */
+  function subito(){ if(pollId && document.visibilityState !== "hidden") poll(); }
+  document.addEventListener("visibilitychange", subito);
+  window.addEventListener("online", subito);
+  window.addEventListener("pageshow", subito);
+  /* Il pulsante ↻: rilegge da capo LoRa e SPOT, e intanto gira */
+  function ricontrolla(){
+    if(btnRicontrolla) btnRicontrolla.classList.add("mk-gira");
+    Promise.all([poll(), window.COMETA_LORA ? window.COMETA_LORA.ricarica() : null])
+      .then(function(){ setTimeout(function(){ if(btnRicontrolla) btnRicontrolla.classList.remove("mk-gira"); }, 400); });
   }
 
   /* La traiettoria prevista: lo stesso previsore (Tawhiri/SondeHub) e i
