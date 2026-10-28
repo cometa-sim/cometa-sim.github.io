@@ -24,7 +24,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@200;300;400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/cometa.css?v=234">
+<link rel="stylesheet" href="assets/cometa.css?v=235">
 </head>
 <body>
 <div class="sim-bar" style="position:sticky;top:0;z-index:90;background:#3a1600;border-bottom:1px solid rgba(255,184,77,.5);padding:11px 20px;font-family:var(--mono);font-size:12.5px;color:#FFB84D;display:flex;gap:16px;flex-wrap:wrap;align-items:center">
@@ -751,6 +751,14 @@
             <label class="tw-f"><span data-i18n="twDesc">Discesa al suolo · m/s</span><input type="number" id="twDesc" min="1" max="15" step="0.1" inputmode="decimal"></label>
           </div>
           <p class="tw-hint" data-i18n="twManHint">Se restano vuoti valgono i dati del modello scelto e i valori calcolati.</p>
+          <!-- Elio nel pallone: al posto della salita, quello che si e' fatto
+               davvero al gonfiaggio. La salita allora si calcola. -->
+          <p class="tw-man-h" data-i18n="twFillH">Elio nel pallone</p>
+          <div class="tw-man-f">
+            <label class="tw-f"><span data-i18n="twBarIn">Elio caricato · bar</span><input type="number" id="twBarIn" min="1" max="300" step="1" inputmode="decimal"></label>
+            <label class="tw-f"><span data-i18n="twNeckIn">Portanza misurata · g</span><input type="number" id="twNeckIn" min="1" max="20000" step="10" inputmode="decimal"></label>
+          </div>
+          <p class="tw-hint" data-i18n="twFillHint">Al posto della salita: quanti bar sono scesi nella bombola, oppure la portanza pesata al collo del pallone chiuso. La salita allora si calcola; se ci sono tutti e due vale la portanza.</p>
           <!-- Più partenze: dal giorno e dall'ora scelti sopra fino a questi,
                disegnate sulla mappa come un'unica fascia. -->
           <p class="tw-man-h" data-i18n="twMulti">Più partenze</p>
@@ -869,7 +877,7 @@
       </div>
 
       <div class="map-frame reveal d1">
-        <iframe id="mapFrame" src="mappe/uru2000_footprint.html?v=234"
+        <iframe id="mapFrame" src="mappe/uru2000_footprint.html?v=235"
                 title="Mappa interattiva dei 600 punti di atterraggio simulati con le ellissi di dispersione"
                 loading="lazy"></iframe>
       </div>
@@ -1403,17 +1411,17 @@
   };
 })();
 </script>
-<script src="assets/i18n.js?v=234"></script>
-<script src="assets/volo.js?v=234"></script>
-<script src="assets/sonda.js?v=234"></script>
-<script src="assets/catena.js?v=234"></script>
-<script src="lora/formato/fasi.js?v=234"></script>
-<script src="assets/lora.js?v=234"></script>
-<script src="assets/profilo.js?v=234"></script>
-<script src="assets/nuvole.js?v=234"></script>
-<script src="assets/spot.js?v=234"></script>
-<script src="assets/app.js?v=234"></script>
-<script src="assets/msis.js?v=234"></script>
-<script src="assets/traiettoria.js?v=234"></script>
+<script src="assets/i18n.js?v=235"></script>
+<script src="assets/volo.js?v=235"></script>
+<script src="assets/sonda.js?v=235"></script>
+<script src="assets/catena.js?v=235"></script>
+<script src="lora/formato/fasi.js?v=235"></script>
+<script src="assets/lora.js?v=235"></script>
+<script src="assets/profilo.js?v=235"></script>
+<script src="assets/nuvole.js?v=235"></script>
+<script src="assets/spot.js?v=235"></script>
+<script src="assets/app.js?v=235"></script>
+<script src="assets/msis.js?v=235"></script>
+<script src="assets/traiettoria.js?v=235"></script>
 </body>
 </html>
