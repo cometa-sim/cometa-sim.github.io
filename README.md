@@ -640,6 +640,12 @@ dice «segnale perso». La regola, e le fasi del volo che compaiono in legenda
 all'ora di `LAUNCH`), stanno in `lora/formato/fasi.js`, la stessa della
 pagina della stazione, che però mostra tutto.
 
+Ogni lettura (LoRa e SPOT) ha un tempo massimo di 12 s: da telefono,
+cambiando rete, una richiesta può restare appesa, e prima la Diretta
+smetteva di aggiornarsi. Tornando sulla pagina (telefono sbloccato, scheda
+di nuovo in primo piano) o quando torna la rete i dati si rileggono
+subito, e il pulsante ↻ sulla mappa li rilegge da capo quando si vuole.
+
 La **legenda**, sotto la mappa, dà per LoRa e SPOT da quanto è arrivato l'ultimo
 dato: una posizione vecchia non deve sembrare attuale. La mappa segue l'ultimo
 dato solo se è il più recente fra le due fonti, e solo quando ne arriva uno

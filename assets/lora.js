@@ -67,8 +67,14 @@ window.COMETA_LORA = (function(){
 
   function avvisa(){ ascoltatori.forEach(function(fn){ try { fn(); } catch(e){ console.error(e); } }); }
 
+  /* Ogni lettura ha un tempo massimo: da telefono, cambiando rete (Wi-Fi,
+     4G) una richiesta puo' restare appesa senza mai finire, e con inCorso
+     (sotto) la Diretta smetteva di aggiornarsi del tutto. */
+  const ATTESA_MS = 12000;
   function leggi(nome){
-    return fetch(base() + "/" + nome).then(function(r){
+    const ac = window.AbortController ? new AbortController() : null;
+    const timer = ac ? setTimeout(function(){ ac.abort(); }, ATTESA_MS) : null;
+    return fetch(base() + "/" + nome, ac ? {signal:ac.signal} : {}).finally(function(){ clearTimeout(timer); }).then(function(r){
       if(r.status === 404) return null;          // il primo pacchetto non e' ancora arrivato
       if(!r.ok) throw new Error("HTTP " + r.status);
       return r.json();
@@ -116,10 +122,26 @@ window.COMETA_LORA = (function(){
     caricaTraccia().catch(function(e){ errore = e.message; avvisa(); });
     pollId = setInterval(aggiorna, POLL_MS);
   }
+  /* Rilegge tutto da capo, subito: il pulsante ↻ della mappa (spot.js).
+     Se una lettura e' ancora in corso si aspetta quella. */
+  function ricarica(){
+    return Promise.resolve(inCorso).then(function(){
+      inCorso = caricaTraccia().catch(function(e){ errore = e.message; avvisa(); }).then(function(){ inCorso = null; });
+      return inCorso;
+    });
+  }
+  /* Quando si torna sulla pagina (telefono sbloccato, scheda di nuovo in
+     primo piano) o torna la rete, si controlla subito invece di aspettare
+     il prossimo giro: in secondo piano il browser rallenta o sospende i
+     timer. */
+  function subito(){ if(pollId && document.visibilityState !== "hidden") aggiorna(); }
+  document.addEventListener("visibilitychange", subito);
+  window.addEventListener("online", subito);
+  window.addEventListener("pageshow", subito);
   function stop(){ if(pollId){ clearInterval(pollId); pollId = null; } }
 
   return {
-    start:start, stop:stop,
+    start:start, stop:stop, aggiorna:aggiorna, ricarica:ricarica,
     onUpdate:function(fn){ ascoltatori.push(fn); },
     /* i punti buoni, in ordine: {t, lat, lon, alt, vz, sats, fix} */
     punti:function(){ return filtro ? filtro.buoni : []; },

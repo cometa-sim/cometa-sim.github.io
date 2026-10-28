@@ -1217,6 +1217,8 @@ nav a.ig:hover svg{transform:translateY(-1px)}
 .spot-legenda .leg-area{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:6px;vertical-align:-2px;
   border:1.5px solid #FFB84D;background:rgba(255,184,77,.35)}
 .spot-legenda .leg-row[hidden]{display:none}
+.spot-ricontrolla a.mk-gira svg{animation:mkGira .8s linear infinite}
+@keyframes mkGira{to{transform:rotate(360deg)}}
 .spot-legenda .leg-perso{color:#FF7A5C}
 .spot-traj.mk-active a{background:#0f3a5c!important;color:#5FE3FF!important}
 /* Il profilo di quota: griglia e assi recessivi, la linea e' l'unica cosa
