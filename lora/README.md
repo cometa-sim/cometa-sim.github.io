@@ -19,6 +19,7 @@ lora/stazione/index.html    la pagina della stazione di terra: legge il ricevito
 lora/stazione/sw.js         la fa riaprire anche senza rete
 lora/formato/sincronizza.js copia il formato dentro la pagina della stazione
 lora/formato/fasi.js        le fasi del volo, una regola sola per stazione e Diretta
+lora/formato/discesa.js     la discesa prevista dall'ultima posizione, dopo lo scoppio (stazione)
 ```
 
 Nel sito, la Diretta legge i dati LoRa con `assets/lora.js` e li disegna con
@@ -345,6 +346,25 @@ niente di segreto: la chiave si digita a mano.
   predittore (`COMETA_TRAIETTORIA.incertezza` e `.area`: 8 richieste a
   Tawhiri in più, tre alla volta, solo quando cambia la previsione). Anche
   nel 3D. La mappa si apre sul luogo del lancio (`FLIGHT_SITE`).
+- **Predicted landing**: dopo lo scoppio la stazione ricalcola la discesa
+  con Tawhiri dall'ultima posizione, ogni minuto (ogni 30 s sotto i 3 km),
+  finché la sonda non è atterrata (`lora/formato/discesa.js`). Parte solo da
+  un punto che ha passato il filtro della Diretta e che non ha più di 30 s;
+  lo scoppio si mette 1 m sopra la quota di partenza, così Tawhiri calcola
+  solo la discesa (come fa SondeHub). La velocità del paracadute al suolo
+  non è quella ipotizzata: si misura dalla `vz` dell'ultimo minuto, riportata
+  al suolo con la densità dell'aria (la mediana; senza almeno 3 punti in
+  discesa si usa quella del volo). I punti sono quelli della radio di questa
+  stazione e, con la rete, quelli del server (`assets/lora.js`, lo stesso
+  codice della Diretta): la stazione che ha internet usa anche i punti
+  dell'altra, quando l'altra riesce a mandarli. Con `?worker=` (le prove) il
+  server pubblico non si legge. Il riquadro dice distanza e direzione
+  dell'atterraggio da qui, l'ora prevista, la velocità del paracadute, da
+  quale quota e a che ora è stato fatto il calcolo, e porta i link per il
+  navigatore; sulla mappa la discesa è arancione tratteggiata, con gli
+  atterraggi calcolati prima come puntini, per vedere la previsione che si
+  assesta. Senza rete resta l'ultima, e dopo 3 minuti l'ora del calcolo
+  diventa rossa.
 - Manda le righe al Worker, un lotto ogni 5 s. Se la rete manca le tiene in
   coda e riprova sempre più di rado (fino a un minuto); al ritorno della rete
   parte tutto. La parte locale non aspetta mai la rete.
