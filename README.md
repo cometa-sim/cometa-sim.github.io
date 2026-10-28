@@ -593,6 +593,11 @@ YouTube (il video `9xdbjGzU-Zk`, nell'iframe del primo riquadro), la mappa
 GPS, la quota stimata e il meteo sul punto di lancio (la previsione per il giorno e l'ora di `LAUNCH`, che compare solo quando
 mancano al massimo 16 giorni).
 
+L'iframe di YouTube ha `sandbox` senza `allow-top-navigation`: il player
+non può portare via la pagina e aprire YouTube al posto del sito (capitava,
+a volte, aprendo la Diretta). «Guarda su YouTube» e simili si aprono in una
+nuova scheda (`allow-popups`).
+
 È pubblica: con `DIRETTA_PUBLIC = true` in `assets/app.js` voce in nav e
 banner rosso seguono `DIRETTA_WINDOW` e `DIRETTA_START`, e l'avviso
 «Pagina in costruzione» non compare.
