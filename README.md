@@ -87,11 +87,11 @@ Norme e autorizzazioni · Domande · Chi siamo.
 ### Dopo ogni modifica: il numero di versione
 
 In `index.html` i file di `assets/`, e la mappa, sono richiamati con un numero in
-coda — oggi `?v=235`:
+coda — oggi `?v=236`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=235">
-<script src="assets/i18n.js?v=235"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=236">
+<script src="assets/i18n.js?v=236"></script>
 ```
 
 Lo stesso numero compare anche in punti meno visibili, che vanno alzati
@@ -304,19 +304,19 @@ chi guarda, senza server nostri:
    previste all'ora del lancio (come `--temp-gonfiaggio auto` dello
    script), altrimenti 15 °C e 1 atm. La temperatura cambia il volume da
    caricare e i bar, non la massa d'elio né la quota di scoppio.
-   Il giorno del lancio si può fare il conto al contrario, dalle
-   «Impostazioni avanzate» (gruppo «Elio nel pallone»): si scrivono i
-   **bar scesi nella bombola**, oppure la **portanza pesata** con la
-   bilancia al collo del pallone chiuso, e la salita non si sceglie più,
-   si calcola. Il campo «Salita» si blocca e la mostra con due decimali,
-   così si vede quanto pesa un bar in più o in meno; svuotati i due campi
-   torna il valore scritto prima. Dai bar si risale alle moli entrate con
-   la stessa equazione della bombola (stessa pressione iniziale, stessa
-   temperatura di gonfiaggio), poi al volume a 15 °C e 1 atm e alla
-   portanza al collo; da lì il motore del volo è quello di sempre
-   (`motorePallone` con `neckG`, lo stesso della Diretta). Se ci sono
-   tutti e due vale la portanza: è una misura, i bar sul manometro si
-   leggono male.
+   Salita, bar caricati e portanza al collo non sono indipendenti:
+   fissata una, le altre due seguono. Per questo si sceglie quale
+   scrivere con il **selettore che fa da etichetta al campo della
+   salita** (`#twAscMode`): «Salita · m/s», di solito; il giorno del
+   lancio «Elio · bar», i bar scesi nella bombola, e poi «Portanza · g»,
+   quella pesata con la bilancia al collo del pallone chiuso. Le altre
+   due compaiono nelle tessere sotto (la salita con due decimali, per
+   vedere quanto pesa un bar), e passando da una grandezza all'altra il
+   campo parte dall'equivalente di quella di prima. Dai bar si risale
+   alle moli entrate con la stessa equazione della bombola (stessa
+   pressione iniziale, stessa temperatura di gonfiaggio), poi al volume a
+   15 °C e 1 atm e alla portanza al collo; da lì il motore del volo è
+   quello di sempre (`motorePallone` con `neckG`, lo stesso della Diretta).
    È il porting delle funzioni di `cometa_venti.py`, e dà gli stessi
    numeri. La quota di scoppio usa l'atmosfera prevista per il luogo, il
    giorno e l'ora (Forecast API di Open-Meteo fino a 30 hPa, ~24 km) e
