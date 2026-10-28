@@ -283,12 +283,7 @@ window.COMETA_SPOT = (function(){
           a.href = "#";
           a.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="7"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>';
           a.title = dict().dirSpotRecenter || "recenter";
-          L.DomEvent.on(a, "click", L.DomEvent.stop).on(a, "click", function(){
-            if(lastPoints && lastPoints.length){
-              const last = lastPoints[lastPoints.length - 1];
-              map.setView([last.lat, last.lon], Math.max(map.getZoom(), 10));
-            }
-          });
+          L.DomEvent.on(a, "click", L.DomEvent.stop).on(a, "click", inquadra);
           return div;
         }
       });
@@ -340,12 +335,7 @@ window.COMETA_SPOT = (function(){
         L:L, map:map, elMap:elMap, el3Style:"position:absolute;inset:0",
         create:{color:GREEN, colorDown:GREEN},
         onEnter:function(c){ c.render(scene3d(), true); },
-        onLeave:function(){
-          if(lastPoints && lastPoints.length){
-            const last = lastPoints[lastPoints.length - 1];
-            map.setView([last.lat, last.lon], Math.max(map.getZoom(), 10));
-          }
-        },
+        onLeave:inquadra,
         onFail:function(){ lastErr = "3d"; renderStatus(); }
       });
     });
@@ -595,7 +585,18 @@ window.COMETA_SPOT = (function(){
   function segui(lat, lon, t){
     if(t < seguiT) return;
     seguiT = t;
+    if(!giornoLancio()) return;     // prima del giorno del lancio la mappa sta sulla traiettoria prevista (inquadra)
     if(!(view && view.isOn())) map.setView([lat, lon], Math.max(map.getZoom(), SEGUI_ZOOM));   // il 2D nascosto non ha misura
+  }
+  /* Dove riportare la mappa (pulsante «ricentra», ritorno dal 3D): fino al
+     giorno del lancio la traiettoria prevista, intera (i punti di prima
+     sono prove, come quella a scuola), poi l'ultimo punto vero. */
+  function inquadra(){
+    if(!giornoLancio() && trajGroup){ map.fitBounds(trajGroup.getBounds(), {padding:[24, 24]}); return; }
+    if(lastPoints && lastPoints.length){
+      const last = lastPoints[lastPoints.length - 1];
+      map.setView([last.lat, last.lon], Math.max(map.getZoom(), 10));
+    }
   }
 
   /* "Ultimo punto GPS": la quota piu' recente fra le due fonti (sono
@@ -789,7 +790,11 @@ window.COMETA_SPOT = (function(){
     L.circleMarker(ll(pr.end), {pane:P, radius:8, color:"#02060f", weight:2, fillColor:st.arrivo, fillOpacity:1, bubblingMouseEvents:false})
       .bindTooltip(testoArrivo(d)).addTo(trajGroup);
     mostraTraiettoria();
+    /* prima del giorno del lancio la mappa si apre sulla traiettoria
+       prevista: una volta sola, poi chi guarda la sposta come vuole */
+    if(!st.giorno && !trajInquadrata && !(view && view.isOn())){ trajInquadrata = true; inquadra(); }
   }
+  let trajInquadrata = false;
 
   /* Accende o spegne la traiettoria prevista (con scoppio, atterraggio e
      area di atterraggio) sulla mappa 2D e nel 3D. */
