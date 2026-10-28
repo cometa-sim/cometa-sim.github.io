@@ -620,6 +620,16 @@ td.mercedes{color:var(--mercedes)}
   background:rgba(2,6,15,.6);color:var(--ink);font-family:var(--mono);font-size:15px;letter-spacing:0;
   text-transform:none;color-scheme:dark}
 .tw-f select{appearance:auto}
+/* Il selettore della salita (salita · bar · portanza) sta al posto
+   dell'etichetta e ne prende l'aspetto: stessa scritta piccola, niente
+   riquadro, solo la freccia a dire che si puo' cambiare. */
+.tw-f select.tw-mode{align-self:flex-start;width:auto;max-width:100%;padding:0 2px 0 0;border:0;border-radius:0;background:none;
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--faint);cursor:pointer}
+.tw-f select.tw-mode:hover,.tw-f select.tw-mode:focus{color:var(--ink);border:0}
+.tw-f select.tw-mode option{text-transform:none;letter-spacing:0;background:#0b1422;color:var(--ink)}
+/* un selettore non va a capo come un'etichetta: sui telefoni piu' stretti
+   la scritta si stringe, o "Sustentación · g" uscirebbe dalla colonna */
+@media(max-width:360px){.tw-f select.tw-mode{font-size:9px;letter-spacing:0}}
 .tw-f input:hover,.tw-f select:hover{border-color:rgba(255,255,255,.22)}
 .tw-f input:focus,.tw-f select:focus{border-color:var(--cyan)}
 .tw-f input::placeholder{color:var(--faint);opacity:.75}

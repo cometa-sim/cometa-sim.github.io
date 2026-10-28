@@ -87,6 +87,12 @@ function applyTexts(){
     const k = el.getAttribute("data-i18n-alt");
     if(d[k] !== undefined) el.setAttribute("alt", d[k]);
   });
+  /* lo stesso per aria-label, dove l'etichetta visibile non basta (il
+     selettore della salita fa da etichetta a se stesso) */
+  $$("[data-i18n-aria]").forEach(function(el){
+    const k = el.getAttribute("data-i18n-aria");
+    if(d[k] !== undefined) el.setAttribute("aria-label", d[k]);
+  });
   $$(".scr").forEach(function(el){ delete el.dataset.final; });
   document.documentElement.lang = d.code;
   document.title = d.title;
