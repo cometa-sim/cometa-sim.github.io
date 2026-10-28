@@ -589,14 +589,18 @@ sovrappongono alla mappa.
 ### La pagina Diretta
 
 Sta in `index.html` (sezione `#diretta`) e in `assets/spot.js`: la diretta
-YouTube (il video `9xdbjGzU-Zk`, nell'iframe del primo riquadro), la mappa
+YouTube (il video `9xdbjGzU-Zk`, nel primo riquadro), la mappa
 GPS, la quota stimata e il meteo sul punto di lancio (la previsione per il giorno e l'ora di `LAUNCH`, che compare solo quando
 mancano al massimo 16 giorni).
 
-L'iframe di YouTube ha `sandbox` senza `allow-top-navigation`: il player
-non può portare via la pagina e aprire YouTube al posto del sito (capitava,
-a volte, aprendo la Diretta). «Guarda su YouTube» e simili si aprono in una
-nuova scheda (`allow-popups`).
+Il video non è un iframe fisso: nella pagina c'è solo l'anteprima
+(`.yt-facade`, con l'ID del video in `data-yt`), e il player di YouTube
+nasce quando si preme play (`assets/app.js`). Caricato insieme alla pagina,
+da telefono a volte apriva YouTube al posto del sito, anche con il solo
+`sandbox`. L'iframe creato al tocco ha comunque `sandbox` senza
+`allow-top-navigation`; «Guarda su YouTube» si apre in una nuova scheda
+(`allow-popups`). Per cambiare video basta cambiare l'ID in `data-yt` e
+nell'indirizzo dell'anteprima, in `index.html` e `simulazione-diretta.html`.
 
 È pubblica: con `DIRETTA_PUBLIC = true` in `assets/app.js` voce in nav e
 banner rosso seguono `DIRETTA_WINDOW` e `DIRETTA_START`, e l'avviso

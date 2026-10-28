@@ -200,6 +200,24 @@ document.addEventListener("keydown", function(e){
   e.preventDefault(); go(el.dataset.page);
 });
 
+/* Diretta: il player di YouTube nasce solo quando si preme play.
+   Caricato insieme alla pagina, da telefono a volte apriva YouTube al
+   posto del sito; finche' non lo si chiede c'e' solo l'anteprima. Il
+   sandbox, senza allow-top-navigation, gli impedisce comunque di
+   portare via la pagina. */
+document.addEventListener("click", function(e){
+  const b = e.target.closest(".yt-facade");
+  if(!b) return;
+  const f = document.createElement("iframe");
+  f.src = "https://www.youtube.com/embed/" + b.dataset.yt + "?autoplay=1&playsinline=1&rel=0";
+  f.title = "COMETA · YouTube";
+  f.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
+  f.referrerPolicy = "strict-origin-when-cross-origin";
+  f.setAttribute("sandbox", "allow-scripts allow-same-origin allow-presentation allow-popups allow-popups-to-escape-sandbox");
+  f.allowFullscreen = true;
+  b.replaceWith(f);
+});
+
 /* Indice della pagina Missione: salta a una sezione senza passare per
    l'indirizzo, che qui seleziona la pagina e non un punto dentro. */
 function jumpTo(el){

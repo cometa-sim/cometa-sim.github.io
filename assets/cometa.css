@@ -1183,6 +1183,15 @@ nav a.ig:hover svg{transform:translateY(-1px)}
 .ecard2 > :last-child{flex:1 0 auto}
 .ecard2 .box{aspect-ratio:16/9;background:#02060f;display:flex;align-items:center;justify-content:center;position:relative}
 .ecard2 .box iframe{width:100%;height:100%;border:0;display:block}
+/* Il video di YouTube e' solo un'anteprima finche' non si preme play
+   (assets/app.js): il player vero, caricato all'apertura della pagina,
+   a volte da telefono apriva YouTube al posto del sito. */
+.yt-facade{position:absolute;inset:0;width:100%;height:100%;padding:0;border:0;background:#02060f;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff}
+.yt-facade img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.85;transition:opacity .2s}
+.yt-facade:hover img,.yt-facade:focus-visible img{opacity:1}
+.yt-play{position:relative;width:68px;height:48px;filter:drop-shadow(0 2px 8px rgba(0,0,0,.5))}
+.yt-play svg{width:100%;height:100%;display:block}
+.yt-label{position:absolute;left:0;right:0;bottom:0;padding:18px 14px 10px;font-family:var(--mono);font-size:12px;text-align:left;background:linear-gradient(transparent,rgba(0,0,0,.7))}
 /* Da telefono la mappa in 16:9 e' bassa: in 3D i pulsanti a destra (zoom,
    inclinazione, satellite, nuvole, 2D/3D) non ci stavano e finivano sopra
    scala e attribuzione. Quadrata, ci stanno; il video resta 16:9. */
