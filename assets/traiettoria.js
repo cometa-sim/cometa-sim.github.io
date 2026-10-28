@@ -117,6 +117,7 @@ const elWhere = $("#twWhere"), elSugg = $("#twSugg"), elGeo = $("#twGeo"),
       elDate = $("#twDate"), elTime = $("#twTime"),
       elBal = $("#twBal"), elDiam = $("#twDiam"), elMass = $("#twMass"), elPay = $("#twPay"),
       elAsc = $("#twAsc"), elChute = $("#twChute"), elCyl = $("#twCyl"), elPCyl = $("#twPCyl"), elTGonf = $("#twTGonf"),
+      elBarIn = $("#twBarIn"), elNeckIn = $("#twNeckIn"),
       elBurst = $("#twBurst"), elDesc = $("#twDesc"), elWarn = $("#twWarn"),
       elStatus = $("#twStatus"), elRes = $("#twRes"), elMap = $("#twMap"),
       elWeekBtn = $("#twWeekBtn"), elWeekBox = $("#twWeekBox"), elWeekBody = $("#twWeekBody"),
@@ -402,7 +403,7 @@ function readBalloon(){
   const b = {
     diam: elDiam.value !== "" ? parseFloat(elDiam.value) : pr.diam,     /* a mano, o del modello */
     mass: elMass.value !== "" ? parseFloat(elMass.value) : pr.mass,
-    pay: parseFloat(elPay.value), asc: parseFloat(elAsc.value),
+    pay: parseFloat(elPay.value), asc: parseFloat(elAsc.disabled ? ascUser : elAsc.value),
     chute: elChute.value !== "" ? parseFloat(elChute.value) : PARA_D,   /* a mano, o quello del kit */
     cyl: parseFloat(elCyl.value)/1000,
     pCyl: elPCyl.value !== "" ? parseFloat(elPCyl.value)*1e5 : P_BOMB, pr: pr, warn: []
@@ -412,20 +413,38 @@ function readBalloon(){
   b.tGonfAuto = gr ? gr.T : null;
   b.tGonf = elTGonf.value !== "" ? parseFloat(elTGonf.value) : (gr ? gr.T : T_RIF - 273.15);
   b.pGonf = gr ? gr.p : P_STD;
-  /* Avvisi solo per cio' che compromette il volo: parametri mancanti o
-     incompatibili, peso eccessivo, salita troppo lenta, discesa troppo veloce. */
-  if(!(b.diam > 0 && b.mass > 0 && b.pay > 0 && b.asc >= 1 && b.asc <= 10 && b.chute > 0 && b.pCyl >= 20e5 && b.pCyl <= 300e5
+  /* Da dove viene l'elio (impostazioni avanzate, «Elio nel pallone").
+     Di solito dalla salita voluta. Ma il giorno del lancio si parte da cio'
+     che si e' fatto: i bar scesi nella bombola, e poi la portanza pesata con
+     la bilancia al collo del pallone chiuso. La portanza misurata vale piu'
+     dei bar, che sul manometro si leggono male; con l'una o gli altri la
+     salita non si sceglie piu', si calcola, e la si vede nel suo campo. */
+  b.src = elNeckIn.value !== "" ? "neck" : elBarIn.value !== "" ? "bar" : "asc";
+  const okAsc = b.src !== "asc" || (b.asc >= 1 && b.asc <= 10);
+  if(!(b.diam > 0 && b.mass > 0 && b.pay > 0 && okAsc && b.chute > 0 && b.pCyl >= 20e5 && b.pCyl <= 300e5
        && b.tGonf > -40 && b.tGonf < 60)){
     b.warn.push(t("twWBad")); return b;
   }
+  const TK = b.tGonf + 273.15;
+  if(b.src === "neck"){
+    b.neckG = parseFloat(elNeckIn.value);
+    if(!(b.neckG > 0 && b.neckG < 20000)){ b.warn.push(t("twWBad")); return b; }
+  } else if(b.src === "bar"){
+    /* bar scesi nella bombola -> moli entrate -> volume a 15 °C e 1 atm
+       (lo stesso riferimento di V qui sotto) -> portanza al collo */
+    const dP = parseFloat(elBarIn.value)*1e5;
+    if(!(dP > 0 && dP < b.pCyl)){ b.warn.push(t("twWBarIn").replace("{p}", num(b.pCyl/1e5, 0))); return b; }
+    const n = moliBombola(b.cyl, b.pCyl, TK) - moliBombola(b.cyl, b.pCyl - dP, TK);
+    b.neckG = (n*R_GAS*T_RIF/P_STD*DRATIO - b.mass)*1000;
+    if(!(b.neckG > 0)){ b.warn.push(t("twWHeavy")); return b; }
+  }
   const m = motorePallone(b);                     /* lo stesso motore della Diretta e della stazione */
   if(!m){ b.warn.push(t("twWHeavy")); return b; }
-  b.V = m.V; b.burst = m.burst; b.neck = m.neck; b.desc = m.desc;
+  b.V = m.V; b.burst = m.burst; b.neck = m.neck; b.desc = m.desc; b.asc = m.asc;
   /* Elio: le moli necessarie non dipendono dalla temperatura (V e' a 15 °C
      e 1 atm; a parita' di portanza al collo la massa d'elio e' la stessa,
      come in volume_a_T dello script). Cambia il volume da caricare, e la
      bombola, che sta alla temperatura del gonfiaggio, dove si legge il manometro. */
-  const TK = b.tGonf + 273.15;
   const nNec = P_STD*b.V/(R_GAS*T_RIF), nTot = moliBombola(b.cyl, b.pCyl, TK);
   b.Vg = nNec*R_GAS*TK/b.pGonf;                                 /* m³ nel pallone al gonfiaggio */
   b.pRest = nNec < nTot ? pressioneBombola(b.cyl, nTot - nNec, TK) : null;
@@ -445,6 +464,17 @@ function renderBalloon(){
   elPCyl.placeholder = P_BOMB/1e5;
   const b = readBalloon();
   const set = function(id, v){ $(id).textContent = v; };
+  /* Con l'elio fissato dai bar o dalla portanza la salita e' un risultato:
+     il campo si blocca e la mostra con due decimali, per vedere quanto
+     cambia spostando i bar di uno. Svuotati quei campi torna il valore
+     scritto prima. */
+  if(b.src !== "asc"){
+    elAsc.disabled = true;
+    elAsc.value = b.V ? b.asc.toFixed(2) : "";
+  } else if(elAsc.disabled){
+    elAsc.disabled = false;
+    elAsc.value = ascUser;
+  }
   elWarn.innerHTML = "";
   if(!b.V){
     ["#twCHe","#twCNeck","#twCBurst","#twCDesc","#twCBurstSrc","#twCDescSrc","#twCHeSrc"].forEach(function(id){ set(id, /Src$/.test(id) ? "" : "—"); });
@@ -454,7 +484,7 @@ function renderBalloon(){
   elTGonf.placeholder = (b.tGonfAuto !== null ? b.tGonfAuto : T_RIF - 273.15).toFixed(0);
   set("#twCHe", num(b.Vg, 2) + " m³" + (b.pRest !== null ? " · " + num((b.pCyl - b.pRest)/1e5, 0) + " bar" : ""));
   set("#twCHeSrc", t("twGonfAt").replace("{t}", num(b.tGonf, 0)).replace("{p}", String(Math.round(b.pGonf/100))));
-  set("#twCNeck", num(b.neck, 0) + " g");
+  set("#twCNeck", num(b.neck, 0) + " g" + (b.src === "neck" ? " · " + t("twMeasured") : ""));
   /* le tessere mostrano i valori che userà il calcolo: quelli a mano, se ci sono */
   const mb = parseFloat(elBurst.value), md = parseFloat(elDesc.value);
   const hand = " · " + t("twHand");
@@ -485,7 +515,9 @@ if(!MODULO){ voloDiretta(); esporta(); return; }
 
 /* lo scarto da UTC puo' cambiare col giorno, dove c'e' l'ora legale */
 [elDate, elTime].forEach(function(e){ e.addEventListener("input", etichettaOra); });
-[elBal, elDiam, elMass, elPay, elAsc, elCyl, elPCyl, elTGonf, elChute, elBurst, elDesc, elDate, elTime, elFcOn].forEach(function(e){
+let ascUser = elAsc.value;     /* la salita scritta a mano, da rimettere quando il campo si sblocca */
+elAsc.addEventListener("input", function(){ ascUser = elAsc.value; });
+[elBal, elDiam, elMass, elPay, elAsc, elCyl, elPCyl, elTGonf, elChute, elBurst, elDesc, elDate, elTime, elFcOn, elBarIn, elNeckIn].forEach(function(e){
   if(e) e.addEventListener("input", renderBalloon);
 });
 
@@ -854,13 +886,13 @@ function loadLeaflet(){
      parallelo con leaflet.js. */
   const mapkit = window.COMETA_MAPKIT ? Promise.resolve() : new Promise(function(ok, ko){
     const s = document.createElement("script");
-    s.src = "assets/mapkit.js?v=224";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
+    s.src = "assets/mapkit.js?v=235";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
     s.onload = ok; s.onerror = ko;
     document.head.appendChild(s);
   });
   const map3d = window.COMETA_MAP3D ? Promise.resolve() : new Promise(function(ok){
     const s = document.createElement("script");
-    s.src = "assets/map3d.js?v=224";
+    s.src = "assets/map3d.js?v=235";
     s.onload = ok; s.onerror = ok;       /* senza, resta il 2D e basta */
     document.head.appendChild(s);
   });
