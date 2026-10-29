@@ -87,11 +87,11 @@ Norme e autorizzazioni · Domande · Chi siamo.
 ### Dopo ogni modifica: il numero di versione
 
 In `index.html` i file di `assets/`, e la mappa, sono richiamati con un numero in
-coda — oggi `?v=248`:
+coda — oggi `?v=249`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=248">
-<script src="assets/i18n.js?v=248"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=249">
+<script src="assets/i18n.js?v=249"></script>
 ```
 
 Lo stesso numero compare anche in punti meno visibili, che vanno alzati
@@ -674,7 +674,8 @@ giorno, mese, anno e ora. La quota dello SPOT non si usa (il giorno del lancio d
 assurde: `parse()` in `assets/spot.js` la scarta), dello SPOT resta solo la
 posizione: «Ultimo punto GPS» è l'ultima quota LoRa, e la stessa riancora la
 quota stimata. Nel 3D la traccia è quella LoRa
-quando c'è (ha la quota a ogni punto), se no quella dello SPOT. Sotto la quota,
+quando c'è (ha la quota a ogni punto), se no quella dello SPOT: un cubetto per
+fix, senza proiezione a terra (sotto i cubetti non si leggeva). Sotto la quota,
 il **grafico** della quota nel tempo dai dati LoRa (`assets/profilo.js`).
 Quota e grafico compaiono solo dal giorno del lancio (ora di Montevideo).
 
