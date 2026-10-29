@@ -46,12 +46,12 @@ const FLIGHT_ASCENT_MS = 5;
 const FLIGHT_DESCENT_V0_MS = 4.6;
 /* Il punto di partenza: La Calera, vicino a Minas, dove la DINACIA ci
    chiede di lanciare (prima era l'aerodromo di Mercedes, -33.2486,
-   -58.0736). Il giorno del lancio si sostituisce
-   con la posizione esatta presa sul posto, con un commit: la traiettoria
+   -58.0736). E' la posizione esatta presa sul posto il giorno del
+   lancio: l'ultima posizione LoRa della sonda sulla rampa. La traiettoria
    prevista della Diretta e della stazione si ricalcola da sola, al
    caricamento e ogni 20 minuti. Il nome compare in testa alla scheda
    della previsione, sotto il meteo della Diretta. */
-const FLIGHT_SITE = {name: "La Calera · Minas", lat: -34.2919, lon: -55.3531};
+const FLIGHT_SITE = {name: "La Calera · Minas", lat: -34.292548, lon: -55.352924};
 /* I dati del volo vero, da aggiornare con un commit quando si misurano:
    il payload si pesa prima del lancio, la portanza al collo si legge
    durante il gonfiaggio (in grammi; null finche' non c'e', e allora vale

@@ -87,11 +87,11 @@ Norme e autorizzazioni · Domande · Chi siamo.
 ### Dopo ogni modifica: il numero di versione
 
 In `index.html` i file di `assets/`, e la mappa, sono richiamati con un numero in
-coda — oggi `?v=239`:
+coda — oggi `?v=240`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=239">
-<script src="assets/i18n.js?v=239"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=240">
+<script src="assets/i18n.js?v=240"></script>
 ```
 
 Lo stesso numero compare anche in punti meno visibili, che vanno alzati
@@ -800,9 +800,10 @@ approvare la propria richiesta di modifica.
   `FLIGHT_SITE` (sempre in `assets/volo.js`, con il nome che compare in
   testa alla scheda) è il punto di partenza della traiettoria prevista,
   disegnata sulla mappa della pagina Diretta accanto alle tracce vere:
-  oggi è La Calera, vicino a Minas, lo stesso sito proposto di
-  default nella pagina Traiettoria. **Il giorno del lancio** va sostituito
-  con la posizione esatta presa sul posto (un commit): la traiettoria si
+  La Calera, vicino a Minas, lo stesso sito proposto di default nella
+  pagina Traiettoria. Dal 29 ottobre è la posizione esatta presa sul
+  posto, l'ultima posizione LoRa della sonda sulla rampa (-34.292548,
+  -55.352924); se cambia, basta un commit: la traiettoria si
   ricalcola da sola, al caricamento e ogni 20 minuti. `assets/spot.js` interroga Tawhiri (lo stesso
   previsore usato lì) in background, in silenzio, con questi parametri —
   non quelli che un visitatore potrebbe aver cambiato giocando col modulo
