@@ -17,7 +17,7 @@
    ========================================================== */
 /* Ora locale di Montevideo (UTC-3). Scritta cosi', il conto alla rovescia
    e' identico per un visitatore di Montevideo, di Roma o di Malargue. */
-const LAUNCH = new Date("2026-10-29T09:00:00-03:00");
+const LAUNCH = new Date("2026-10-29T09:15:00-03:00");
 /* La previsione del giorno (assets/traiettoria.js) propone questo giorno
    e quest'ora, quando cadono dentro la settimana coperta dal GFS. */
 window.COMETA_LAUNCH = LAUNCH;

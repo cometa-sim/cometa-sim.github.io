@@ -87,11 +87,11 @@ Norme e autorizzazioni · Domande · Chi siamo.
 ### Dopo ogni modifica: il numero di versione
 
 In `index.html` i file di `assets/`, e la mappa, sono richiamati con un numero in
-coda — oggi `?v=236`:
+coda — oggi `?v=237`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=236">
-<script src="assets/i18n.js?v=236"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=237">
+<script src="assets/i18n.js?v=237"></script>
 ```
 
 Lo stesso numero compare anche in punti meno visibili, che vanno alzati
@@ -745,7 +745,7 @@ approvare la propria richiesta di modifica.
   resta, e magari la pagina usa la curva solo per partenze in Uruguay.
 
 - **La data definitiva del lancio**, quando la DINACIA autorizza. Oggi la
-  costante `LAUNCH` in `assets/volo.js` vale `2026-10-29T09:00:00-03:00`: è
+  costante `LAUNCH` in `assets/volo.js` vale `2026-10-29T09:15:00-03:00`: è
   provvisoria, e il conto alla rovescia la mostra come se fosse certa.
   È anche il via vero: il lancio **è** la scadenza di `LAUNCH`, non un
   segnale a parte — se il giorno stesso il lancio slitta rispetto all'ora
@@ -820,7 +820,7 @@ approvare la propria richiesta di modifica.
   "diretta tra poco" al rosso "in diretta". Sono due date separate in
   `assets/app.js`: `DIRETTA_WINDOW` (oggi 25 ottobre, qualche giorno prima
   del lancio — da quel momento la voce appare in nav, in grigio/ciano) e
-  `DIRETTA_START` (oggi 29 ottobre alle 8:30, quando parte la diretta YouTube, mezz'ora prima del lancio — da li' in poi
+  `DIRETTA_START` (oggi 29 ottobre alle 8:30, quando parte la diretta YouTube, tre quarti d'ora prima del lancio — da li' in poi
   diventa rossa e compare il banner sotto la nav). A differenza del via
   alla quota, questo passaggio non ha bisogno di un file da pushare
   nell'istante: la diretta la si accende quando si vuole, quindi basta
