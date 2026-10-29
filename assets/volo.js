@@ -28,7 +28,7 @@ window.COMETA_LAUNCH = LAUNCH;
 /* Numeri provvisori. Quota di scoppio e salita sono gli stessi gia'
    scritti su Missione (37,9 km, 5 m/s); la discesa non e' un numero
    fisso — e' la velocita' del paracadute del kit (1,2 m, Cd 1,0) con
-   la massa di oggi (≈1,25 kg), calcolata come in assets/traiettoria.js
+   la massa pesata il giorno del lancio (1,30 kg), calcolata come in assets/traiettoria.js
    (vAtterraggio). assets/spot.js la usa solo come velocita' AL SUOLO:
    piu' in alto, dove l'aria e' rada, la stessa sonda scende molto piu'
    veloce, e rallenta scendendo — lo stesso motivo per cui qui e' "al
@@ -62,7 +62,7 @@ const FLIGHT_SITE = {name: "La Calera · Minas", lat: -34.292548, lon: -55.35292
    qui sopra restano solo come valori di riserva, finche' quel calcolo
    non arriva. */
 const FLIGHT_BALLOON = "2000";       /* Strato 2000, come i preset della pagina Traiettoria */
-const FLIGHT_PAYLOAD_KG = 1.25;     /* stima del 28 ottobre; si ripesa la mattina del lancio */
+const FLIGHT_PAYLOAD_KG = 1.30;     /* pesato la mattina del lancio, 29 ottobre */
 const FLIGHT_NECK_LIFT_G = 1900;   /* letta al gonfiaggio, 29 ottobre */
 window.COMETA_FLIGHT = {burstKm: FLIGHT_BURST_KM, ascentMs: FLIGHT_ASCENT_MS, descentV0Ms: FLIGHT_DESCENT_V0_MS, site: FLIGHT_SITE,
   cfg: {bal: FLIGHT_BALLOON, pay: FLIGHT_PAYLOAD_KG, asc: FLIGHT_ASCENT_MS, neckG: FLIGHT_NECK_LIFT_G}};
