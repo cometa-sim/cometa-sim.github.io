@@ -170,8 +170,7 @@ window.COMETA_MAP3D = (function(){
         dem:DEM, hill:DEM,
         excl:{type:"geojson", data:o.excl ? {type:"Feature", properties:{}, geometry:{type:"Polygon", coordinates:[o.excl.concat([o.excl[0]])]}} : empty()},
         fills:{type:"geojson", data:empty()}, band:{type:"geojson", data:empty()},
-        lines:{type:"geojson", data:empty()}, shadow:{type:"geojson", data:empty()}, tube:{type:"geojson", data:empty()},
-        livepts:{type:"geojson", data:empty()}
+        lines:{type:"geojson", data:empty()}, shadow:{type:"geojson", data:empty()}, tube:{type:"geojson", data:empty()}
       },
       layers:[
         {id:"bg", type:"background", paint:{"background-color":"#02060f"}},
@@ -187,9 +186,6 @@ window.COMETA_MAP3D = (function(){
         /* proiezione a terra: piena in salita, tratteggiata in discesa, come nel 2D */
         {id:"shadow", type:"line", source:"shadow", filter:["==",["get","d"],0], paint:{"line-color":["get","c"], "line-width":1.8, "line-opacity":.85}},
         {id:"shadowd", type:"line", source:"shadow", filter:["==",["get","d"],1], paint:{"line-color":["get","c"], "line-width":1.8, "line-opacity":.85, "line-dasharray":[3,3]}},
-        /* Diretta: proiezione a terra di ogni fix GPS */
-        {id:"livepts", type:"circle", source:"livepts", paint:{"circle-radius":3.5, "circle-color":["get","c"],
-          "circle-stroke-color":"#02060f", "circle-stroke-width":1, "circle-pitch-alignment":"map"}},
         /* fascia di piu' partenze: prismi alti quanto l'escursione di quota dei voli in quell'istante;
            l'opacita' si applica all'insieme (come il pannello trasparente del 2D), le sovrapposizioni non si sommano */
         {id:"band", type:"fill-extrusion", source:"band", paint:{"fill-extrusion-color":["get","c"], "fill-extrusion-height":["get","h"], "fill-extrusion-base":["get","b"], "fill-extrusion-opacity":.38, "fill-extrusion-vertical-gradient":false}},
@@ -475,10 +471,8 @@ window.COMETA_MAP3D = (function(){
         return {type:"Feature", properties:{c:f.color, w:f.width}, geometry:{type:"LineString", coordinates:f.coords}};
       })});
       const ground = runs.map(function(r){ return r.pts; });     /* solo le traiettorie: i fix GPS restano punti */
-      const lc = sc && sc.live && sc.live.color || "#4ADE9B";
-      map.getSource("livepts").setData({type:"FeatureCollection", features:(sc && sc.live && sc.live.pts || []).map(function(p){
-        return {type:"Feature", properties:{c:lc}, geometry:{type:"Point", coordinates:[p.lon, p.lat]}};
-      })});
+      /* i fix GPS veri (sc.live) non hanno proiezione a terra: sotto i
+         cubetti in quota non si leggevano */
       /* la proiezione a terra e' bianca, salvo sc.ombra (la Diretta il
          giorno del lancio: grigia, come in 2D) */
       const gl = [], oc = sc && sc.ombra || "#ffffff";
