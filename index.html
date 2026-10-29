@@ -23,7 +23,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@200;300;400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/cometa.css?v=245">
+<link rel="stylesheet" href="assets/cometa.css?v=246">
 </head>
 <body>
 
@@ -260,24 +260,15 @@
         <div class="ecard2">
           <div class="box tw-map"><div id="spotMap" style="position:absolute;inset:0"></div></div>
           <div class="spot-legenda" id="spotLegenda"></div>
-          <p class="dir-video-info" id="spotStatus"></p>
+          <!-- data-recuperata: la sonda e' stata recuperata (29 ottobre); sotto la mappa si scrive questo al posto dell'ultima posizione -->
+          <p class="dir-video-info" id="spotStatus" data-recuperata></p>
         </div>
       </div>
 
-      <!-- Quota e quota nel tempo: solo dal giorno del lancio (assets/spot.js, aggiornaGiorno) -->
+      <!-- Quota nel tempo: solo dal giorno del lancio (assets/spot.js, aggiornaGiorno). Le
+           tessere della quota in tempo reale (altEst, altGps) sono tolte dopo il volo: spot.js
+           le aggiorna solo se ci sono. -->
       <div id="dirQuote" hidden>
-      <div class="count-head" style="margin-top:26px" data-i18n="dirAltHead">Quota</div>
-      <div class="alt-pair">
-        <div class="alt-tile" id="altEstRow">
-          <div class="alt-n"><span id="altEst">—</span><small>km</small></div>
-          <div class="alt-l" data-i18n="dirAltEstLabel">Stimata</div>
-        </div>
-        <div class="alt-tile" id="altGpsRow">
-          <div class="alt-n"><span id="altGps">—</span><small>km</small></div>
-          <div class="alt-l" data-i18n="dirAltGpsLabel">Ultimo punto GPS</div>
-        </div>
-      </div>
-
       <div class="count-head" style="margin-top:26px" data-i18n="dirProfHead">Quota nel tempo · telemetria LoRa</div>
       <div class="prof" id="loraProfilo"></div>
       </div>
@@ -887,7 +878,7 @@
       </div>
 
       <div class="map-frame reveal d1">
-        <iframe id="mapFrame" src="mappe/uru2000_footprint.html?v=245"
+        <iframe id="mapFrame" src="mappe/uru2000_footprint.html?v=246"
                 title="Mappa interattiva dei 600 punti di atterraggio simulati con le ellissi di dispersione"
                 loading="lazy"></iframe>
       </div>
@@ -1251,17 +1242,17 @@
 
 </div>
 
-<script src="assets/i18n.js?v=245"></script>
-<script src="assets/volo.js?v=245"></script>
-<script src="assets/sonda.js?v=245"></script>
-<script src="assets/catena.js?v=245"></script>
-<script src="lora/formato/fasi.js?v=245"></script>
-<script src="assets/lora.js?v=245"></script>
-<script src="assets/profilo.js?v=245"></script>
-<script src="assets/nuvole.js?v=245"></script>
-<script src="assets/spot.js?v=245"></script>
-<script src="assets/app.js?v=245"></script>
-<script src="assets/msis.js?v=245"></script>
-<script src="assets/traiettoria.js?v=245"></script>
+<script src="assets/i18n.js?v=246"></script>
+<script src="assets/volo.js?v=246"></script>
+<script src="assets/sonda.js?v=246"></script>
+<script src="assets/catena.js?v=246"></script>
+<script src="lora/formato/fasi.js?v=246"></script>
+<script src="assets/lora.js?v=246"></script>
+<script src="assets/profilo.js?v=246"></script>
+<script src="assets/nuvole.js?v=246"></script>
+<script src="assets/spot.js?v=246"></script>
+<script src="assets/app.js?v=246"></script>
+<script src="assets/msis.js?v=246"></script>
+<script src="assets/traiettoria.js?v=246"></script>
 </body>
 </html>
