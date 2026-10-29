@@ -52,7 +52,6 @@ window.COMETA_SPOT = (function(){
   const TICK_MS = 1000;
   const T_SMOOTH_S = 5;       // decadimento del salto da riancoraggio: pochi secondi, non un intervallo SPOT intero
   const LOST_MS = 3 * 60000;  // SPOT manda un punto ogni ~2,5 min: 3 min e' un margine ragionevole
-  const HIGH_KM = 18;         // sopra qui il GPS smette di trasmettere per natura sua, non per un guasto
   const LANDED_TOL_DEG = 0.0003;  // ~30 m: fix fermi allo stesso punto, segno che la sonda e' a terra
   const GREEN = "#4ADE9B", ORANGE = "#FFB84D", GREY = "#8FA6BC";   // punto reale, lampeggio e atterraggio previsto, traiettoria prevista il giorno del lancio
   /* La telemetria LoRa (assets/lora.js): viola, ben distinto dal verde
@@ -218,13 +217,13 @@ window.COMETA_SPOT = (function(){
     });
     const mapkit = window.COMETA_MAPKIT ? Promise.resolve() : new Promise(function(ok, ko){
       const s = document.createElement("script");
-      s.src = "assets/mapkit.js?v=247";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
+      s.src = "assets/mapkit.js?v=248";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
       s.onload = ok; s.onerror = ko;
       document.head.appendChild(s);
     });
     const map3d = window.COMETA_MAP3D ? Promise.resolve() : new Promise(function(ok){
       const s = document.createElement("script");
-      s.src = "assets/map3d.js?v=247";
+      s.src = "assets/map3d.js?v=248";
       s.onload = ok; s.onerror = ok;     // senza, resta il 2D e basta
       document.head.appendChild(s);
     });
@@ -433,8 +432,8 @@ window.COMETA_SPOT = (function(){
     }
     /* La riga dice solo cio' che la legenda sopra non dice: stato ed eta'
        dell'ultimo dato di LoRa e SPOT sono gia' li'. Qui l'ultima posizione,
-       la piu' fresca fra le due fonti (se lo SPOT tace sopra i 18 km ma il
-       LoRa trasmette, non c'e' nessun "segnale perso" da dire), o un
+       la piu' fresca fra le due fonti (se lo SPOT tace ma il LoRa
+       trasmette, non c'e' nessun "segnale perso" da dire), o un
        avviso: sonda atterrata, SPOT muto. */
     const pos = function(p){ return (d.dirUltimaPos || "Last position") + " · " + (p ? p.lat.toFixed(4) + ", " + p.lon.toFixed(4) : "—"); };
     const lora = window.COMETA_LORA ? window.COMETA_LORA.punti() : [];
@@ -454,10 +453,7 @@ window.COMETA_SPOT = (function(){
     const whenMs = new Date(last.time).getTime();
     const elapsed = isNaN(whenMs) ? null : Date.now() - whenMs;
     if(elapsed != null && elapsed > LOST_MS){
-      /* La quota STIMATA (non l'ultimo fix, ormai vecchio) dice se il
-         silenzio e' quello normale sopra i 18 km o no. */
-      const high = lastEstKm != null && lastEstKm > HIGH_KM;
-      elStatus.textContent = high ? (d.dirSpotLostHigh || "GPS signal lost • > 18 km") : (d.dirSpotLost || "GPS signal lost");
+      elStatus.textContent = d.dirSpotLost || "GPS signal lost";
       return;
     }
     elStatus.textContent = pos(last);
