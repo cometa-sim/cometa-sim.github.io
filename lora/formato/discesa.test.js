@@ -100,3 +100,28 @@ test("dalla risposta di Tawhiri si prende la discesa", () => {
   assert.equal(D.leggi({ prediction: [{ stage: "ascent", trajectory: [] }] }), null);
   assert.equal(D.leggi(null), null);
 });
+
+test("prima dello scoppio: la salita misurata, fino allo scoppio previsto", () => {
+  const punti = puntiBuoni(4.6);
+  const salita = punti.filter((p) => p.alt > 10000 && p.vz > 1).slice(0, 30);
+  const v = D.vSalita(salita);
+  assert.ok(v !== null && Math.abs(v - 5) < 0.5, String(v));
+  assert.equal(D.vSalita(salita.slice(-2)), null);
+  const q = D.parametri({ t: T0, lat: -34, lon: -55, alt: 27100 }, 4.6, { asc: 3.7, burstM: 38900 });
+  assert.equal(q.launch_altitude, "27100");
+  assert.equal(q.ascent_rate, "3.70");
+  assert.equal(q.burst_altitude, "38900");
+  /* gia' sopra lo scoppio previsto (e non ancora scoppiato): solo la discesa */
+  assert.equal(D.parametri({ t: T0, lat: -34, lon: -55, alt: 39500 }, 4.6, { asc: 3.7, burstM: 38900 }).burst_altitude, "39501");
+});
+
+test("dalla risposta di Tawhiri, prima dello scoppio: salita, scoppio e discesa", () => {
+  const punto = (m, alt) => ({ datetime: new Date(T0 + m * 60000).toISOString(), latitude: -34, longitude: 304.6 + m / 1000, altitude: alt });
+  const r = D.leggi({ prediction: [
+    { stage: "ascent", trajectory: [punto(0, 27100), punto(30, 33700), punto(53, 38900)] },
+    { stage: "descent", trajectory: [punto(53, 38900), punto(80, 9000), punto(105, 100)] }
+  ] });
+  assert.equal(r.pts.length, 5);
+  assert.equal(r.burst.alt, 38900);
+  assert.equal(r.end.alt, 100);
+});

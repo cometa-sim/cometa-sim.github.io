@@ -157,8 +157,9 @@
     </div>
     <p class="note" id="dStato">Starts after the burst.</p>
     <p class="note" id="dNav"></p>
-    <p class="note">After the burst the descent is recomputed with Tawhiri every minute (every 30 s below 3 km)
-      from the last good position, no older than 30 s, with the parachute speed measured in the last minute.
+    <p class="note">From launch time it is recomputed with Tawhiri every minute (every 30 s below 3 km)
+      from the last good position, no older than 30 s. Before the burst: the measured ascent rate up to the
+      planned burst altitude, then the planned parachute. After the burst: the parachute speed measured in the last minute.
       Needs internet. On the map: dashed orange, with the earlier predictions as small dots.</p>
   </section>
 
@@ -231,7 +232,7 @@
 <!-- La discesa prevista dall'ultima posizione (vedi il file), e i punti
      del server (assets/lora.js, lo stesso codice della Diretta): la
      stazione con la rete usa anche quelli ricevuti dall'altra. -->
-<script src="lora/formato/discesa.js?v=stazione-1"></script>
+<script src="lora/formato/discesa.js?v=stazione-2"></script>
 <script src="assets/lora.js?v=stazione-1"></script>
 <!-- L'ora del lancio e i dati del volo, gli stessi del sito (volo.js); la
      traiettoria prevista con lo stesso calcolo della Diretta: traiettoria.js
@@ -428,7 +429,7 @@ function chiaveDoppione(dati) {
 /* Da cambiare a ogni modifica della pagina: e' scritta in Setup, e
    dice a colpo d'occhio se il telefono sta usando la pagina nuova o una
    copia vecchia rimasta in memoria. */
-const VERSIONE = "2026-10-29h";
+const VERSIONE = "2026-10-29i";
 
 const WORKER_PREDEFINITO = "https://lora.cometa.gripe";
 const WORKER = (new URLSearchParams(location.search).get("worker") || WORKER_PREDEFINITO).replace(/\/+$/, "");
@@ -926,7 +927,7 @@ const TAWHIRI = "https://api.v2.sondehub.org/tawhiri", ARANCIO = "#f76707";
 const LEGGI_SERVER = WORKER === WORKER_PREDEFINITO;   // con un Worker di prova, niente dati pubblici
 const D = window.COMETA_DISCESA;
 let filtroLocale = null;
-const discesa = { da: null, ultima: null, storia: [], inCorso: false, errore: null, riprovaMs: 0, gruppo: null };
+const discesa = { da: null, ultima: null, storia: [], inCorso: false, scoppiata: false, errore: null, riprovaMs: 0, gruppo: null };
 
 function puntiDiscesa() {
   const loc = filtroLocale ? filtroLocale.buoni : [];
@@ -935,29 +936,39 @@ function puntiDiscesa() {
 }
 function statoServer() { return LEGGI_SERVER && window.COMETA_LORA ? COMETA_LORA.stato(Date.now()) : null; }
 function dopoScoppio() { const s = statoServer(); return !!((fasi && fasi.scoppio) || (s && s.scoppio)); }
+/* dall'ora del lancio in poi: prima dello scoppio la previsione comprende
+   la salita che resta (vedi discesa.js) */
+function dopoLancio() { return dopoScoppio() || (lancioMs !== null && Date.now() >= lancioMs); }
 function giaAtterrata() { const s = statoServer(); return !!((fasi && fasi.atterrata) || (s && s.fase === "atterrata")); }
 
 function controllaDiscesa() {
   const adesso = Date.now();
-  if (D && !discesa.inCorso && adesso >= discesa.riprovaMs && dopoScoppio() && !giaAtterrata()) {
-    const punti = puntiDiscesa(), p = D.partenza(punti, adesso);
-    if (p && D.daRifare(discesa.da, p)) chiediDiscesa(p, D.v0Misurata(punti));
+  if (D && !discesa.inCorso && adesso >= discesa.riprovaMs && dopoLancio() && !giaAtterrata()) {
+    const punti = puntiDiscesa(), p = D.partenza(punti, adesso), scoppiata = dopoScoppio();
+    /* allo scoppio si ricalcola subito, senza aspettare il minuto */
+    if (p && (D.daRifare(discesa.da, p) || discesa.scoppiata !== scoppiata)) {
+      const F = window.COMETA_FLIGHT || {};
+      const salita = scoppiata ? null : { asc: D.vSalita(punti) || F.ascentMs || 5, burstM: (F.burstKm || 37.9) * 1000, misurata: !!D.vSalita(punti) };
+      chiediDiscesa(p, scoppiata ? D.v0Misurata(punti) : null, salita);
+    }
   }
   mostraDiscesa();
 }
 
-function chiediDiscesa(p, misurata) {
+function chiediDiscesa(p, misurata, salita) {
   const v0 = misurata || (window.COMETA_FLIGHT && window.COMETA_FLIGHT.descentV0Ms) || 4.6;
   const ac = new AbortController(), timer = setTimeout(function () { ac.abort(); }, 15000);
   discesa.inCorso = true;
-  fetch(TAWHIRI + "?" + new URLSearchParams(D.parametri(p, v0)).toString(), { signal: ac.signal })
+  const scoppiata = !salita;
+  fetch(TAWHIRI + "?" + new URLSearchParams(D.parametri(p, v0, salita)).toString(), { signal: ac.signal })
     .then(function (r) { return r.json(); })
     .then(function (d) {
       const pr = D.leggi(d);
       if (!pr) throw new Error((d && d.error && d.error.description) || "no prediction in the answer");
       if (discesa.ultima) discesa.storia.push({ lat: discesa.ultima.end.lat, lon: discesa.ultima.end.lon, da: discesa.ultima.da });
-      discesa.ultima = { da: p, v0: v0, misurata: !!misurata, pts: pr.pts, end: pr.end, calcolataMs: Date.now() };
+      discesa.ultima = { da: p, v0: v0, misurata: !!misurata, salita: salita, pts: pr.pts, burst: pr.burst, end: pr.end, calcolataMs: Date.now() };
       discesa.da = p;
+      discesa.scoppiata = scoppiata;
       discesa.errore = null;
       disegnaDiscesa();
     })
@@ -972,7 +983,7 @@ function mostraDiscesa() {
   const u = discesa.ultima, stato = $("dStato");
   if (!u) {
     stato.className = "note" + (discesa.errore ? " old" : "");
-    stato.textContent = !dopoScoppio() ? "Starts after the burst." :
+    stato.textContent = !dopoLancio() ? "Starts at launch time." :
       discesa.errore ? "Could not compute: " + discesa.errore + ". Retrying." : "Waiting for a good position, no older than 30 s…";
     return;
   }
@@ -985,11 +996,14 @@ function mostraDiscesa() {
   $("dOra").textContent = new Date(e.t).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false });
   $("dOraS").textContent = e.t > Date.now() ? "in " + Math.round((e.t - Date.now()) / 60000) + " min" : "";
   $("dV0").innerHTML = u.v0.toFixed(1) + "<small>m/s</small>";
-  $("dV0S").textContent = u.misurata ? "measured" : "as planned";
+  $("dV0S").textContent = u.misurata ? "measured" : u.salita ? "planned (measured after burst)" : "as planned";
   stato.className = "note" + (vecchia > 3 * 60000 && !giaAtterrata() ? " old" : "");
   stato.textContent = "Computed at " + ora(u.calcolataMs) + " (" + eta(vecchia) + " ago) from " + (u.da.alt / 1000).toFixed(2) +
     " km, position of " + ora(u.da.t) + ". Landing " + e.lat.toFixed(5) + ", " + e.lon.toFixed(5) + "." +
-    (u.misurata ? "" : " Parachute speed as planned: not enough descending points in the last minute.") +
+    (u.salita ? " Still ascending: at " + u.salita.asc.toFixed(2) + " m/s " + (u.salita.misurata ? "(measured, last minute)" : "(planned)") +
+      " up to the planned burst at " + (u.salita.burstM / 1000).toFixed(1) + " km" +
+      (u.burst ? ", around " + new Date(u.burst.t).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false }) : "") + "." :
+      u.misurata ? "" : " Parachute speed as planned: not enough descending points in the last minute.") +
     (giaAtterrata() ? " Landed: no more updates." : discesa.errore ? " Last attempt failed: " + discesa.errore + "." : "");
   $("dNav").innerHTML = 'Navigate: <a target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=' +
     e.lat.toFixed(6) + "," + e.lon.toFixed(6) + '">Google Maps</a> · <a target="_blank" rel="noopener" href="geo:' +
@@ -1006,6 +1020,8 @@ function disegnaDiscesa() {
       .bindTooltip("Earlier prediction, from " + (s.da.alt / 1000).toFixed(1) + " km at " + ora(s.da.t)).addTo(discesa.gruppo);
   });
   L.polyline([ll(u.da)].concat(u.pts.map(ll)), { pane: P, color: ARANCIO, weight: 3, opacity: .95, dashArray: "6 7", interactive: false }).addTo(discesa.gruppo);
+  if (u.burst) L.circleMarker(ll(u.burst), { pane: P, radius: 5, color: ARANCIO, weight: 2, fillColor: "#fff", fillOpacity: 1, bubblingMouseEvents: false })
+    .bindTooltip("Predicted burst " + (u.burst.alt / 1000).toFixed(1) + " km, " + new Date(u.burst.t).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false })).addTo(discesa.gruppo);
   L.circleMarker(ll(u.end), { pane: P, radius: 9, color: "#fff", weight: 2.5, fillColor: ARANCIO, fillOpacity: 1, bubblingMouseEvents: false })
     .bindTooltip("Predicted landing " + new Date(u.end.t).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false }) +
       ", from " + (u.da.alt / 1000).toFixed(1) + " km").addTo(discesa.gruppo);

@@ -346,9 +346,12 @@ niente di segreto: la chiave si digita a mano.
   predittore (`COMETA_TRAIETTORIA.incertezza` e `.area`: 8 richieste a
   Tawhiri in più, tre alla volta, solo quando cambia la previsione). Anche
   nel 3D. La mappa si apre sul luogo del lancio (`FLIGHT_SITE`).
-- **Predicted landing**: dopo lo scoppio la stazione ricalcola la discesa
-  con Tawhiri dall'ultima posizione, ogni minuto (ogni 30 s sotto i 3 km),
-  finché la sonda non è atterrata (`lora/formato/discesa.js`). Parte solo da
+- **Predicted landing**: dall'ora del lancio la stazione ricalcola con
+  Tawhiri il resto del volo dall'ultima posizione, ogni minuto (ogni 30 s
+  sotto i 3 km), finché la sonda non è atterrata (`lora/formato/discesa.js`).
+  Prima dello scoppio: la salita misurata (mediana della `vz` dell'ultimo
+  minuto) fino alla quota di scoppio prevista, poi il paracadute previsto;
+  allo scoppio si ricalcola subito, e da lì solo la discesa. Parte solo da
   un punto che ha passato il filtro della Diretta e che non ha più di 30 s;
   lo scoppio si mette 1 m sopra la quota di partenza, così Tawhiri calcola
   solo la discesa (come fa SondeHub). La velocità del paracadute al suolo
