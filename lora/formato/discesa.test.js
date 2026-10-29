@@ -125,3 +125,13 @@ test("dalla risposta di Tawhiri, prima dello scoppio: salita, scoppio e discesa"
   assert.equal(r.burst.alt, 38900);
   assert.equal(r.end.alt, 100);
 });
+
+test("quota ferma sopra i 10 km per 3 minuti: galleggia", () => {
+  const p = (s, alt) => ({ t: T0 + s * 1000, alt });
+  const ferma = [0, 30, 60, 90, 120, 150, 180].map((s, i) => p(s, 35000 + (i % 2) * 20));
+  assert.equal(D.galleggia(ferma), true);
+  assert.equal(D.galleggia(ferma.map((x, i) => ({ ...x, alt: 35000 + i * 0.8 * 30 }))), true);    // 0,8 m/s
+  assert.equal(D.galleggia(ferma.map((x, i) => ({ ...x, alt: 30000 + i * 3.7 * 30 }))), false);   // sale davvero
+  assert.equal(D.galleggia(ferma.map((x) => ({ ...x, alt: 300 }))), false);                        // a terra: e' l'attesa
+  assert.equal(D.galleggia(ferma.slice(-3)), false);                                                // un minuto solo non basta
+});

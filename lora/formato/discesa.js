@@ -75,6 +75,20 @@
     return m >= 0.5 && m <= 15 ? m : null;
   }
 
+  /* Il pallone galleggia: prima dello scoppio, negli ultimi 3 minuti la
+     quota e' salita meno di 1,5 m/s in media (o e' scesa), sopra i 10 km.
+     Si guarda la quota e non la vz, che oscilla. Allora la salita fino
+     allo scoppio previsto non ha senso: si mostra dove atterrerebbe se
+     scoppiasse adesso. (Il 29 ottobre e' rimasto a lungo sui 35 km.) */
+  function galleggia(punti) {
+    const u = punti[punti.length - 1];
+    if (!u || u.alt === null || u.alt < 10000) return false;
+    let a = null;
+    for (let i = punti.length - 1; i >= 0 && punti[i].t >= u.t - 180000; i--) { if (punti[i].alt !== null) a = punti[i]; }
+    if (!a || u.t - a.t < 120000) return false;
+    return (u.alt - a.alt) / ((u.t - a.t) / 1000) < 1.5;
+  }
+
   /* Il punto da cui partire: l'ultimo punto buono con la quota, se e'
      fresco; altrimenti null. */
   function partenza(punti, adessoMs) {
@@ -127,6 +141,6 @@
     return { pts: pts, burst: sale ? giu[0] : null, end: pts[pts.length - 1] };
   }
 
-  g.COMETA_DISCESA = { DISCESA: DISCESA, v0Misurata: v0Misurata, vSalita: vSalita, partenza: partenza, daRifare: daRifare,
+  g.COMETA_DISCESA = { DISCESA: DISCESA, v0Misurata: v0Misurata, vSalita: vSalita, galleggia: galleggia, partenza: partenza, daRifare: daRifare,
     parametri: parametri, leggi: leggi };
 })(typeof window !== "undefined" ? window : globalThis);
