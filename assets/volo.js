@@ -63,7 +63,7 @@ const FLIGHT_SITE = {name: "La Calera · Minas", lat: -34.292548, lon: -55.35292
    non arriva. */
 const FLIGHT_BALLOON = "2000";       /* Strato 2000, come i preset della pagina Traiettoria */
 const FLIGHT_PAYLOAD_KG = 1.25;     /* stima del 28 ottobre; si ripesa la mattina del lancio */
-const FLIGHT_NECK_LIFT_G = null;
+const FLIGHT_NECK_LIFT_G = 1900;   /* letta al gonfiaggio, 29 ottobre */
 window.COMETA_FLIGHT = {burstKm: FLIGHT_BURST_KM, ascentMs: FLIGHT_ASCENT_MS, descentV0Ms: FLIGHT_DESCENT_V0_MS, site: FLIGHT_SITE,
   cfg: {bal: FLIGHT_BALLOON, pay: FLIGHT_PAYLOAD_KG, asc: FLIGHT_ASCENT_MS, neckG: FLIGHT_NECK_LIFT_G}};
 
