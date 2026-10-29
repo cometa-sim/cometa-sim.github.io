@@ -218,13 +218,13 @@ window.COMETA_SPOT = (function(){
     });
     const mapkit = window.COMETA_MAPKIT ? Promise.resolve() : new Promise(function(ok, ko){
       const s = document.createElement("script");
-      s.src = "assets/mapkit.js?v=244";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
+      s.src = "assets/mapkit.js?v=245";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
       s.onload = ok; s.onerror = ko;
       document.head.appendChild(s);
     });
     const map3d = window.COMETA_MAP3D ? Promise.resolve() : new Promise(function(ok){
       const s = document.createElement("script");
-      s.src = "assets/map3d.js?v=244";
+      s.src = "assets/map3d.js?v=245";
       s.onload = ok; s.onerror = ok;     // senza, resta il 2D e basta
       document.head.appendChild(s);
     });
@@ -697,9 +697,10 @@ window.COMETA_SPOT = (function(){
         return {
           lat: +p.lat,
           lon: +p.lon,
-          /* Metri, quota ellissoidica GPS: vicino al suolo puo' essere
-             negativa di suo (rumore tipico del GPS li', non un errore). */
-          alt: p.altitude != null ? +p.altitude : null,
+          /* La quota dello SPOT non si usa: il giorno del lancio dava
+             quote assurde. Resta solo la posizione; la quota (numero GPS,
+             stima, 3D) viene sempre dall'ultimo punto LoRa. */
+          alt: null,
           time: p.time * 1000
         };
       })
