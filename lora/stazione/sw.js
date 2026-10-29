@@ -10,12 +10,12 @@
      con la rete, la rende disponibile anche offline.
    - Il Worker (lora.cometa.gripe) non passa mai di qui: le richieste
      verso altri domini che non siano le mattonelle si lasciano stare. */
-const CACHE = "cometa-stazione-v11";
+const CACHE = "cometa-stazione-v12";
 const MATTONELLE = "cometa-stazione-mattonelle";
 const GUSCIO = ["./", "../../assets/vendor/leaflet/leaflet.js", "../../assets/vendor/leaflet/leaflet.css",
   "../../assets/i18n.js?v=stazione-2", "../../assets/mapkit.js?v=stazione-2", "../../assets/map3d.js?v=stazione-5",
   "../formato/fasi.js?v=stazione-4", "../formato/discesa.js?v=stazione-1", "../../assets/lora.js?v=stazione-1",
-  "../../assets/volo.js?v=stazione-8", "../../assets/msis.js?v=stazione-4",
+  "../../assets/volo.js?v=stazione-9", "../../assets/msis.js?v=stazione-4",
   "../../assets/traiettoria.js?v=stazione-5"];
 
 self.addEventListener("install", function (e) {
