@@ -351,7 +351,11 @@ niente di segreto: la chiave si digita a mano.
   sotto i 3 km), finché la sonda non è atterrata (`lora/formato/discesa.js`).
   Prima dello scoppio: la salita misurata (mediana della `vz` dell'ultimo
   minuto) fino alla quota di scoppio prevista, poi il paracadute previsto;
-  allo scoppio si ricalcola subito, e da lì solo la discesa. Parte solo da
+  allo scoppio si ricalcola subito, e da lì solo la discesa. Se il pallone
+  **galleggia** (negli ultimi 3 minuti la quota sale meno di 1,5 m/s, sopra i
+  10 km: il 29 ottobre è rimasto a lungo sui 35 km) la salita fino allo
+  scoppio previsto non ha senso: si mostra dove atterrerebbe se scoppiasse
+  adesso, col paracadute previsto. Parte solo da
   un punto che ha passato il filtro della Diretta e che non ha più di 30 s;
   lo scoppio si mette 1 m sopra la quota di partenza, così Tawhiri calcola
   solo la discesa (come fa SondeHub). La velocità del paracadute al suolo
