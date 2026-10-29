@@ -22,6 +22,11 @@
      non frena come dovrebbe: si usa quello che fa davvero.
    - Si ricalcola ogni 60 s, ogni 30 s sotto i 3 km (gli ultimi 10 minuti
      di discesa, quando ogni correzione conta di piu').
+   - Anche prima dello scoppio, dal lancio in poi: dall'ultima posizione,
+     con la salita misurata (vSalita, la mediana della vz dell'ultimo
+     minuto) fino alla quota di scoppio prevista, poi la discesa con la
+     velocita' del paracadute prevista. Il vento gia' attraversato non
+     conta piu': da dove si parte e' vero, non previsto.
    ============================================================ */
 (function (g) {
   "use strict";
@@ -55,6 +60,21 @@
     return m >= DISCESA.v0Min && m <= DISCESA.v0Max ? m : null;
   }
 
+  /* La velocita' di salita misurata: la mediana della vz dell'ultimo
+     minuto, dei punti che salgono. null se non bastano. */
+  function vSalita(punti) {
+    const u = punti[punti.length - 1];
+    if (!u) return null;
+    const v = [];
+    for (let i = punti.length - 1; i >= 0 && punti[i].t >= u.t - DISCESA.finestraS * 1000; i--) {
+      if (punti[i].vz !== null && punti[i].vz > 0.5) v.push(punti[i].vz);
+    }
+    if (v.length < DISCESA.minPunti) return null;
+    v.sort(function (a, b) { return a - b; });
+    const m = v.length % 2 ? v[(v.length - 1) / 2] : (v[v.length / 2 - 1] + v[v.length / 2]) / 2;
+    return m >= 0.5 && m <= 15 ? m : null;
+  }
+
   /* Il punto da cui partire: l'ultimo punto buono con la quota, se e'
      fresco; altrimenti null. */
   function partenza(punti, adessoMs) {
@@ -72,33 +92,41 @@
     return p.t - prec.t >= ogni * 1000;
   }
 
-  /* I parametri della richiesta a Tawhiri. */
-  function parametri(p, v0) {
+  /* I parametri della richiesta a Tawhiri. salita (prima dello scoppio):
+     {asc (m/s), burstM (m)}; senza, solo la discesa. */
+  function parametri(p, v0, salita) {
     const alt = Math.max(0, Math.round(p.alt));
+    const sale = salita && salita.burstM > alt + 1;
     return {
       profile: "standard_profile",
       launch_latitude: p.lat.toFixed(5),
       launch_longitude: (((p.lon % 360) + 360) % 360).toFixed(5),   // Tawhiri vuole 0-360
       launch_altitude: String(alt),
       launch_datetime: new Date(p.t).toISOString().replace(/\.\d+Z$/, "Z"),
-      ascent_rate: "5.00",
-      burst_altitude: String(alt + 1),
+      ascent_rate: sale ? salita.asc.toFixed(2) : "5.00",
+      burst_altitude: String(sale ? Math.round(salita.burstM) : alt + 1),
       descent_rate: v0.toFixed(2)
     };
   }
 
-  /* La risposta di Tawhiri: la discesa, [{t, lat, lon, alt}], e l'arrivo.
-     null se non c'e'. */
+  /* La risposta di Tawhiri: la traiettoria, [{t, lat, lon, alt}] (la
+     salita solo se c'e' davvero, prima dello scoppio), lo scoppio e
+     l'arrivo. null se non c'e' la discesa. */
   function leggi(d) {
     if (!d || d.error || !Array.isArray(d.prediction)) return null;
-    const st = d.prediction.filter(function (s) { return s.stage === "descent"; })[0];
-    if (!st || !st.trajectory || st.trajectory.length < 2) return null;
-    const pts = st.trajectory.map(function (p) {
+    const fase = function (nome) { return d.prediction.filter(function (s) { return s.stage === nome; })[0]; };
+    const punto = function (p) {
       return { t: new Date(p.datetime).getTime(), lat: p.latitude, lon: p.longitude >= 180 ? p.longitude - 360 : p.longitude, alt: p.altitude };
-    });
-    return { pts: pts, end: pts[pts.length - 1] };
+    };
+    const st = fase("descent");
+    if (!st || !st.trajectory || st.trajectory.length < 2) return null;
+    const giu = st.trajectory.map(punto);
+    const sa = fase("ascent"), su = sa && sa.trajectory ? sa.trajectory.map(punto) : [];
+    const sale = su.length >= 2 && su[su.length - 1].alt - su[0].alt > 10;
+    const pts = sale ? su.concat(giu.slice(1)) : giu;
+    return { pts: pts, burst: sale ? giu[0] : null, end: pts[pts.length - 1] };
   }
 
-  g.COMETA_DISCESA = { DISCESA: DISCESA, v0Misurata: v0Misurata, partenza: partenza, daRifare: daRifare,
+  g.COMETA_DISCESA = { DISCESA: DISCESA, v0Misurata: v0Misurata, vSalita: vSalita, partenza: partenza, daRifare: daRifare,
     parametri: parametri, leggi: leggi };
 })(typeof window !== "undefined" ? window : globalThis);
