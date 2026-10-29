@@ -237,9 +237,9 @@
      traiettoria prevista con lo stesso calcolo della Diretta: traiettoria.js
      (con msis.js) ricalcola salita, scoppio e discesa col meteo del giorno,
      volo.js fa la richiesta a Tawhiri. -->
-<script src="assets/volo.js?v=stazione-9"></script>
+<script src="assets/volo.js?v=stazione-10"></script>
 <script src="assets/msis.js?v=stazione-4"></script>
-<script src="assets/traiettoria.js?v=stazione-5"></script>
+<script src="assets/traiettoria.js?v=stazione-6"></script>
 <script>
 /* ==================================================================
    Il formato della riga radio: COPIA di lora/formato/formato.js.
@@ -428,7 +428,7 @@ function chiaveDoppione(dati) {
 /* Da cambiare a ogni modifica della pagina: e' scritta in Setup, e
    dice a colpo d'occhio se il telefono sta usando la pagina nuova o una
    copia vecchia rimasta in memoria. */
-const VERSIONE = "2026-10-29c";
+const VERSIONE = "2026-10-29d";
 
 const WORKER_PREDEFINITO = "https://lora.cometa.gripe";
 const WORKER = (new URLSearchParams(location.search).get("worker") || WORKER_PREDEFINITO).replace(/\/+$/, "");
@@ -753,7 +753,7 @@ function coloreLora() { return getComputedStyle(document.documentElement).getPro
 function preparaMappa() {
   if (!window.L) return; // Leaflet non caricato (offline alla prima apertura): il resto funziona lo stesso
   /* si apre sul luogo del lancio (FLIGHT_SITE in assets/volo.js); zoom a quarti di livello, come il predittore */
-  const sito = (window.COMETA_FLIGHT && window.COMETA_FLIGHT.site) || { lat: -34.2919, lon: -55.3531 };
+  const sito = (window.COMETA_FLIGHT && window.COMETA_FLIGHT.site) || { lat: -34.292548, lon: -55.352924 };
   mappa = L.map("map", { zoomSnap: .25, zoomDelta: .5 }).setView([sito.lat, sito.lon], 9);
   const strade = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
     maxZoom: 20, maxNativeZoom: 19,   // fino a zoom 20 (scala ~10 m), per cercare la sonda a terra
