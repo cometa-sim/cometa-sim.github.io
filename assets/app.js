@@ -617,6 +617,9 @@ window.COMETA_TRACK_URL = TRACK_URL;
    provvisorie, da confermare insieme al resto. */
 const DIRETTA_WINDOW = new Date("2026-10-25T00:00:00-03:00");
 const DIRETTA_START  = new Date("2026-10-29T08:30:00-03:00");
+/* Da qui la diretta e' conclusa (la sonda recuperata): voce in nav, banner
+   e stato in blu, "Diretta conclusa". */
+const DIRETTA_END    = new Date("2026-10-29T16:20:00-03:00");
 /* false = la pagina Diretta c'e' ed e' raggiungibile solo da chi conosce
    il link (#diretta), per le prove: niente voce in nav e niente banner,
    qualunque siano le due date sopra. true quando la si vuole pubblica. */
@@ -624,8 +627,8 @@ const DIRETTA_PUBLIC = true;
 
 function updateDiretta(){
   const now = Date.now();
-  const state = now < DIRETTA_WINDOW.getTime() ? "off" : now < DIRETTA_START.getTime() ? "pre" : "live";
-  const live = state === "live";
+  const state = now < DIRETTA_WINDOW.getTime() ? "off" : now < DIRETTA_START.getTime() ? "pre" : now < DIRETTA_END.getTime() ? "live" : "end";
+  const live = state === "live", fine = state === "end";
   const navD = $("#navDiretta"), navDM = $("#navDirettaM"),
         banner = $("#direttaBanner"), dStatus = $("#dStatus"), wip = $("#dirWip");
   if(wip) wip.hidden = DIRETTA_PUBLIC;
@@ -633,12 +636,20 @@ function updateDiretta(){
     if(!el) return;
     el.style.display = DIRETTA_PUBLIC && state !== "off" ? "flex" : "none";
     el.classList.toggle("is-live", live);
+    el.classList.toggle("is-end", fine);
   });
-  if(banner) banner.classList.toggle("show", DIRETTA_PUBLIC && live);
+  if(banner){
+    banner.classList.toggle("show", DIRETTA_PUBLIC && (live || fine));
+    banner.classList.toggle("is-end", fine);
+    banner.querySelectorAll(".txt-live").forEach(function(e){ e.style.display = fine ? "none" : ""; });
+    banner.querySelectorAll(".txt-end").forEach(function(e){ e.style.display = fine ? "" : "none"; });
+  }
   if(dStatus){
     dStatus.classList.toggle("is-live", live);
-    dStatus.querySelectorAll(".txt-pre").forEach(function(e){ e.style.display = live ? "none" : ""; });
+    dStatus.classList.toggle("is-end", fine);
+    dStatus.querySelectorAll(".txt-pre").forEach(function(e){ e.style.display = live || fine ? "none" : ""; });
     dStatus.querySelectorAll(".txt-live").forEach(function(e){ e.style.display = live ? "" : "none"; });
+    dStatus.querySelectorAll(".txt-end").forEach(function(e){ e.style.display = fine ? "" : "none"; });
   }
   /* La didascalia del video, come quella della mappa: quando comincia la
      trasmissione (DIRETTA_START, ora di Montevideo) o "in diretta", e da
@@ -647,10 +658,32 @@ function updateDiretta(){
   if(vs){
     const quando = new Intl.DateTimeFormat(d.code, {timeZone:"America/Montevideo", weekday:"short", day:"numeric", month:"short",
       hour:"2-digit", minute:"2-digit", hour12:false}).format(DIRETTA_START);
-    vs.textContent = "· " + (live ? d.dirVideoLive : d.dirVideoPre.replace("{t}", quando));
+    vs.textContent = "· " + (fine ? d.dirVideoEnd : live ? d.dirVideoLive : d.dirVideoPre.replace("{t}", quando));
   }
   if(vd) vd.classList.toggle("is-live", live);
   if(vi) vi.textContent = d.dirVideoWhere.replace("{site}", (window.COMETA_FLIGHT && window.COMETA_FLIGHT.site && window.COMETA_FLIGHT.site.name) || "");
+}
+/* Dopo il lancio il conto alla rovescia diventa la data: "Lancio
+   effettuato il" e, nei quattro riquadri, giorno, mese, anno e ora (di
+   Montevideo). Le chiavi dei testi si cambiano sugli elementi, cosi'
+   anche il cambio di lingua (applyTexts) usa quelle nuove. */
+function partiLancio(){
+  const d = I18N[LANG] || I18N.it, tz = "America/Montevideo";
+  const f = function(o){ return new Intl.DateTimeFormat(d.code || "it", Object.assign({timeZone:tz}, o)).format(LAUNCH); };
+  return [f({day:"numeric"}), f({month:"short"}).replace(/\.$/, ""), f({year:"numeric"}),
+    new Intl.DateTimeFormat("en-GB", {timeZone:tz, hour:"2-digit", minute:"2-digit", hourCycle:"h23"}).format(LAUNCH)];
+}
+function lancioFatto(count){
+  const d = I18N[LANG] || I18N.it, v = partiLancio(), k = ["cDay", "cMonth", "cYear", "cTime"];
+  count.classList.remove("zero");
+  count.classList.add("fatto");
+  count.querySelectorAll(".ctile").forEach(function(t, i){
+    const n = t.querySelector(".cn"), l = t.querySelector(".cl");
+    if(n) n.textContent = v[i];
+    if(l){ l.setAttribute("data-i18n", k[i]); l.textContent = d[k[i]]; }
+  });
+  const head = count.previousElementSibling;
+  if(head && head.classList.contains("count-head")){ head.setAttribute("data-i18n", "countDone"); head.textContent = d.countDone; }
 }
 function updateCountdown(){
   const diff = LAUNCH - Date.now();
@@ -660,10 +693,8 @@ function updateCountdown(){
   ["", "2"].forEach(function(suffix){
     const d = $("#cd" + suffix), h = $("#ch" + suffix), m = $("#cm" + suffix), s = $("#cs" + suffix);
     const count = d && d.closest(".count");
-    if(count) count.classList.toggle("zero", diff <= 0);
     if(diff <= 0){
-      if(d) d.textContent = "0";
-      [h,m,s].forEach(function(e){ if(e) e.textContent = "00"; });
+      if(count) lancioFatto(count);
       return;
     }
     const dd = Math.floor(diff/864e5), hh = Math.floor(diff/36e5) % 24,
@@ -673,7 +704,7 @@ function updateCountdown(){
     if(m) m.textContent = String(mm).padStart(2, "0");
     if(s) s.textContent = String(ss).padStart(2, "0");
   });
-  if(diff <= 0){ if(cb) cb.textContent = "● LIVE"; return; }
+  if(diff <= 0){ if(cb) cb.textContent = "✓ " + partiLancio().join(" ").replace(/ \d{4} /, " · "); return; }
   if(cb) cb.textContent = "T– " + Math.floor(diff/864e5) + I18N[LANG].cUnit;
 }
 

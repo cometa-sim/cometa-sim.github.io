@@ -218,13 +218,13 @@ window.COMETA_SPOT = (function(){
     });
     const mapkit = window.COMETA_MAPKIT ? Promise.resolve() : new Promise(function(ok, ko){
       const s = document.createElement("script");
-      s.src = "assets/mapkit.js?v=246";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
+      s.src = "assets/mapkit.js?v=247";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
       s.onload = ok; s.onerror = ko;
       document.head.appendChild(s);
     });
     const map3d = window.COMETA_MAP3D ? Promise.resolve() : new Promise(function(ok){
       const s = document.createElement("script");
-      s.src = "assets/map3d.js?v=246";
+      s.src = "assets/map3d.js?v=247";
       s.onload = ok; s.onerror = ok;     // senza, resta il 2D e basta
       document.head.appendChild(s);
     });
@@ -426,7 +426,11 @@ window.COMETA_SPOT = (function(){
     /* dati non arrivati (rete, CORS, risposta del backend): "Network error", uguale in ogni lingua */
     if(lastErr === "3d"){ elStatus.textContent = d.mk3dFail || "3D"; return; }
     /* Dopo il recupero (data-recuperata sulla riga, in index.html) si dice solo quello. */
-    if(elStatus.hasAttribute("data-recuperata")){ elStatus.textContent = d.dirRecuperata || "Probe recovered"; return; }
+    if(elStatus.hasAttribute("data-recuperata")){
+      elStatus.textContent = (d.dirRecuperata || "Probe recovered · {t} (UTC −3)").replace("{t}", elStatus.getAttribute("data-recuperata"));
+      elStatus.classList.add("spot-avviso");
+      return;
+    }
     /* La riga dice solo cio' che la legenda sopra non dice: stato ed eta'
        dell'ultimo dato di LoRa e SPOT sono gia' li'. Qui l'ultima posizione,
        la piu' fresca fra le due fonti (se lo SPOT tace sopra i 18 km ma il
@@ -674,13 +678,17 @@ window.COMETA_SPOT = (function(){
       tl = sl.stato === "perso" ? (d.dirLegLost || "signal lost") + " · " + ago
         : ((sl.fase && d["dirFase_" + sl.fase]) ? d["dirFase_" + sl.fase] + " · " : "") + ago;
     }
+    /* dopo il recupero (data-recuperata, vedi renderStatus) il volo e' finito per tutte e due */
+    const finito = !!(elStatus && elStatus.hasAttribute("data-recuperata"));
+    if(finito) tl = d.dirLegEnd || "flight ended";
     legenda.querySelector(".leg-lora").textContent = "· " + tl;
-    legenda.querySelector(".leg-lora").classList.toggle("leg-perso", sl.stato === "perso");
+    legenda.querySelector(".leg-lora").classList.toggle("leg-perso", sl.stato === "perso" && !finito);
     let ts = d.dirLegWait || "waiting";
     if(lastPoints && lastPoints.length){
       const t = new Date(lastPoints[lastPoints.length - 1].time).getTime();
       if(!isNaN(t)) ts = (d.dirSpotAgo || "{t} ago").replace("{t}", formatAgo(now - t));
     }
+    if(finito) ts = d.dirLegEnd || "flight ended";
     legenda.querySelector(".leg-spot").textContent = "· " + ts;
     legenda.querySelector(".leg-traj-t").textContent = d.dirLegTraj || "Predicted trajectory";
     legenda.querySelector(".leg-fc-t").textContent = d.dirLegFc || "Forecast error";
@@ -693,8 +701,11 @@ window.COMETA_SPOT = (function(){
      resta su "in attesa del segnale", niente di rotto. */
   function parse(data){
     if(!data || !Array.isArray(data.points)) throw new Error("risposta del backend non valida");
+    /* data-spot-fino su #spotMap (index.html): i punti dopo quell'ora non
+       fanno parte del volo (la sonda recuperata, in macchina) */
+    const m = document.getElementById("spotMap"), fino = m && m.getAttribute("data-spot-fino") ? Date.parse(m.getAttribute("data-spot-fino")) : Infinity;
     return data.points
-      .filter(function(p){ return p.lat != null && p.lon != null && p.time != null; })
+      .filter(function(p){ return p.lat != null && p.lon != null && p.time != null && p.time * 1000 <= fino; })
       .map(function(p){
         return {
           lat: +p.lat,
