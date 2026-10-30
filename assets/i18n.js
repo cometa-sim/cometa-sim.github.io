@@ -15,7 +15,7 @@ window.I18N = {
    ========================================================== */
 it:{
   code:"it", title:"COMETA · Sonda Klo-01 — Scuola Italiana di Montevideo",
-  metaDesc:"COMETA è un programma di palloni stratosferici della Scuola Italiana di Montevideo: misure atmosferiche fino a più di 37 km di quota, progettate e realizzate dagli studenti.",
+  metaDesc:"COMETA è un programma di palloni stratosferici della Scuola Italiana di Montevideo: misure atmosferiche fino a quasi 36 km di quota, progettate e realizzate dagli studenti.",
 
   navHome:"Inizio", navMission:"Missione", navPhysics:"La fisica", navProbe:"La sonda", navWinds:"La traiettoria", navAbout:"Chi siamo", navContact:"Contatti",
   navDiretta:"Il volo",
@@ -44,7 +44,7 @@ it:{
   /* — Inizio — */
   heroSchool:"Scuola Italiana di Montevideo",
   heroClasses:"2EMS · IIIS · 3EMS · IVL · IVS",
-  introSub:"Sonda Klo-01 · un pallone stratosferico a più di 37 chilometri di quota.",
+  introSub:"Sonda Klo-01 · un pallone stratosferico a quasi 36 chilometri di quota.",
   launchBtn:"Simula il decollo", scrollCue:"Scorri per salire",
   countHead:"Lancio tra", cDays:"Giorni", cHours:"Ore", cMins:"Minuti", cSecs:"Secondi",
   countDone:"Lancio effettuato il", cDay:"Giorno", cMonth:"Mese", cYear:"Anno", cTime:"Ora",
@@ -65,13 +65,12 @@ it:{
   /* — Missione — */
   pKicker:"Fase 1 · Profilo di volo", missionTitle:"Missione",
   missionSub:"Cosa studiamo, come, e a che punto siamo.",
-  mBody:"Il progetto COMETA invia la sonda Klo-01 oltre i 37 km di quota per studiare la stratosfera attraverso misure dirette, in una regione dell'atmosfera che gli aerei non raggiungono e i satelliti sorvolano.",
+  mBody:"Il progetto COMETA ha inviato la sonda Klo-01 a quasi 36 km di quota per studiare la stratosfera attraverso misure dirette, in una regione dell'atmosfera che gli aerei non raggiungono e i satelliti sorvolano.",
 
   pHead2:"Dati del progetto",
   pAlt:"Quota prevista", pTemp:"Temperatura esterna minima", pPress:"Pressione atmosferica minima", pPressU:"del livello del mare",
   pGas:"Gas di riempimento", pGasMain:"Elio", pVel:"Velocità di salita", pDur:"Durata del volo",
   pHe:"Elio necessario", pMass:"Massa del payload", bKicker:"Il pallone", bHead:"Pallone 2000",
-  bBody:"La missione utilizza il pallone da 2000 g. Riempito con circa 4,5 m³ di elio, raggiunge una quota di scoppio oltre i 37 km. Il diametro a cui il lattice cede è la variabile che decide dove si arriva, ed è quella su cui abbiamo meno controllo.",
   specDiam:"Diametro iniziale", specBurst:"Quota di scoppio", specHe:"Elio necessario",
   specMass:"Massa del payload",
 
@@ -486,7 +485,7 @@ it:{
    ========================================================== */
 es:{
   code:"es", title:"COMETA · Sonda Klo-01 — Scuola Italiana di Montevideo",
-  metaDesc:"COMETA es un programa de globos estratosféricos de la Scuola Italiana di Montevideo: mediciones atmosféricas hasta más de 37 km de altura, diseñadas y construidas por los estudiantes.",
+  metaDesc:"COMETA es un programa de globos estratosféricos de la Scuola Italiana di Montevideo: mediciones atmosféricas hasta casi 36 km de altura, diseñadas y construidas por los estudiantes.",
 
   navHome:"Inicio", navMission:"Misión", navPhysics:"La física", navProbe:"La sonda", navWinds:"La trayectoria", navAbout:"Quiénes somos", navContact:"Contacto",
   navDiretta:"El vuelo",
@@ -515,7 +514,7 @@ es:{
   heroSchool:"Scuola Italiana di Montevideo",
 
   heroClasses:"2EMS · IIIS · 3EMS · IVL · IVS",
-  introSub:"Sonda Klo-01 · un globo estratosférico a más de 37 kilómetros de altura.",
+  introSub:"Sonda Klo-01 · un globo estratosférico a casi 36 kilómetros de altura.",
   launchBtn:"Simular el despegue", scrollCue:"Desplazate para subir",
   countHead:"Lanzamiento en", cDays:"Días", cHours:"Horas", cMins:"Minutos", cSecs:"Segundos",
   countDone:"Lanzamiento realizado el", cDay:"Día", cMonth:"Mes", cYear:"Año", cTime:"Hora",
@@ -535,13 +534,12 @@ es:{
 
   pKicker:"Fase 1 · Perfil de vuelo", missionTitle:"Misión",
   missionSub:"Qué estudiamos, cómo, y en qué punto estamos.",
-  mBody:"El proyecto COMETA envía la sonda Klo-01 más allá de los 37 km de altura para estudiar la estratósfera mediante mediciones directas, en una región de la atmósfera que los aviones no alcanzan y los satélites sobrevuelan.",
+  mBody:"El proyecto COMETA envió la sonda Klo-01 a casi 36 km de altura para estudiar la estratósfera mediante mediciones directas, en una región de la atmósfera que los aviones no alcanzan y los satélites sobrevuelan.",
 
   pHead2:"Datos del proyecto",
   pAlt:"Altura prevista", pTemp:"Temperatura exterior mínima", pPress:"Presión atmosférica mínima", pPressU:"del nivel del mar",
   pGas:"Gas de llenado", pGasMain:"Helio", pVel:"Velocidad de ascenso", pDur:"Duración del vuelo",
   pHe:"Helio necesario", pMass:"Masa de la carga útil", bKicker:"El globo", bHead:"Globo 2000",
-  bBody:"La misión usa el globo de 2000 g. Lleno con unos 4,5 m³ de helio, alcanza una altura de reventado por encima de los 37 km. El diámetro al que el látex cede es la variable que decide hasta dónde se llega, y es aquella sobre la que tenemos menos control.",
   specDiam:"Diámetro inicial", specBurst:"Altura de reventado", specHe:"Helio necesario",
   specMass:"Masa del payload",
 
@@ -950,7 +948,7 @@ es:{
    ========================================================== */
 en:{
   code:"en", title:"COMETA · Klo-01 Probe — Scuola Italiana di Montevideo",
-  metaDesc:"COMETA is a stratospheric balloon programme at the Scuola Italiana di Montevideo: atmospheric measurements up to over 37 km, designed and built by students.",
+  metaDesc:"COMETA is a stratospheric balloon programme at the Scuola Italiana di Montevideo: atmospheric measurements up to nearly 36 km, designed and built by students.",
 
   navHome:"Home", navMission:"Mission", navPhysics:"The physics", navProbe:"The probe", navWinds:"The trajectory", navAbout:"About us", navContact:"Contact",
   navDiretta:"The flight",
@@ -979,7 +977,7 @@ en:{
   heroSchool:"Scuola Italiana di Montevideo",
 
   heroClasses:"2EMS · IIIS · 3EMS · IVL · IVS",
-  introSub:"Klo-01 probe · a stratospheric balloon more than 37 kilometres up.",
+  introSub:"Klo-01 probe · a stratospheric balloon nearly 36 kilometres up.",
   launchBtn:"Simulate the launch", scrollCue:"Scroll to ascend",
   countHead:"Launch in", cDays:"Days", cHours:"Hours", cMins:"Minutes", cSecs:"Seconds",
   countDone:"Launched on", cDay:"Day", cMonth:"Month", cYear:"Year", cTime:"Time",
@@ -999,13 +997,12 @@ en:{
 
   pKicker:"Phase 1 · Flight profile", missionTitle:"Mission",
   missionSub:"What we study, how, and where we are.",
-  mBody:"Project COMETA sends the Klo-01 probe beyond 37 km to study the stratosphere through direct measurements, in a region of the atmosphere that aircraft do not reach and satellites fly over.",
+  mBody:"Project COMETA sent the Klo-01 probe to nearly 36 km to study the stratosphere through direct measurements, in a region of the atmosphere that aircraft do not reach and satellites fly over.",
 
   pHead2:"Project data",
   pAlt:"Target altitude", pTemp:"Minimum external temperature", pPress:"Minimum atmospheric pressure", pPressU:"of sea level",
   pGas:"Fill gas", pGasMain:"Helium", pVel:"Ascent rate", pDur:"Flight duration",
   pHe:"Helium required", pMass:"Payload mass", bKicker:"The balloon", bHead:"Balloon 2000",
-  bBody:"The mission uses the 2000 g balloon. Filled with about 4.5 m³ of helium, it reaches a burst altitude above 37 km. The diameter at which the latex gives way is the variable that decides how high it gets, and it is the one we control least.",
   specDiam:"Initial diameter", specBurst:"Burst altitude", specHe:"Helium required",
   specMass:"Payload mass",
 
