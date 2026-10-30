@@ -87,11 +87,11 @@ Norme e autorizzazioni · Domande · Chi siamo.
 ### Dopo ogni modifica: il numero di versione
 
 In `index.html` i file di `assets/`, e la mappa, sono richiamati con un numero in
-coda — oggi `?v=251`:
+coda — oggi `?v=252`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=251">
-<script src="assets/i18n.js?v=251"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=252">
+<script src="assets/i18n.js?v=252"></script>
 ```
 
 Lo stesso numero compare anche in punti meno visibili, che vanno alzati
@@ -667,7 +667,7 @@ subito, e il pulsante ↻ sulla mappa li rilegge da capo quando si vuole.
 La **legenda**, sotto la mappa, dà per LoRa e SPOT da quanto è arrivato l'ultimo
 dato: una posizione vecchia non deve sembrare attuale. La mappa segue l'ultimo
 dato solo se è il più recente fra le due fonti, e solo quando ne arriva uno
-nuovo. Dopo il recupero (29 ottobre) la riga sotto la mappa è un avviso,
+nuovo. Dopo il recupero (29 ottobre) la riga sotto la mappa è in blu,
 «Sonda recuperata · 16:20 (UTC −3)» (`data-recuperata="16:20"` su `#spotStatus`
 in `index.html`, testo `dirRecuperata`), la legenda dice «volo concluso» per
 LoRa e SPOT, i punti SPOT dopo il recupero non si disegnano (`data-spot-fino`
