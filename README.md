@@ -87,11 +87,11 @@ Norme e autorizzazioni · Domande · Chi siamo.
 ### Dopo ogni modifica: il numero di versione
 
 In `index.html` i file di `assets/`, e la mappa, sono richiamati con un numero in
-coda — oggi `?v=252`:
+coda — oggi `?v=253`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=252">
-<script src="assets/i18n.js?v=252"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=253">
+<script src="assets/i18n.js?v=253"></script>
 ```
 
 Lo stesso numero compare anche in punti meno visibili, che vanno alzati
@@ -242,9 +242,10 @@ I **valori esatti stanno solo nello studio dei venti**, dove c'è la
 discussione che li giustifica: la chiave `wParP2` per i parametri della
 simulazione, e le chiavi `wA4P`…`wA4P4` per il bilancio d'incertezza.
 
-Nelle due animazioni con la scala — la pagina iniziale e la fisica — il
-punto di scoppio è un numero tondo, **38 km**, nella costante `SCALA_KM`
-di `assets/app.js`. È un fondo scala, non una dichiarazione, e non
+Nella scala della fisica il punto di scoppio è un numero tondo, **38 km**,
+nella costante `SCALA_KM` di `assets/app.js`. L'animazione della pagina
+iniziale invece segue il volo vero, come il testo che dice «quasi 36 km»:
+arriva a **36 km** (`HOME_KM`). È un fondo scala, non una dichiarazione, e non
 compare in nessuna etichetta: il contatore che segue la salita mostra i
 decimali fino a 37 e poi si ferma su `37+`, con la funzione
 `quotaLetta()`. La cifra grande in fondo a Missione fa la stessa cosa —
