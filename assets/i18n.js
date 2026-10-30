@@ -408,8 +408,8 @@ it:{
   pg10t:"Racconto del progetto", pg10:"Questo sito, i video e i social: il progetto raccontato mentre succede, non dopo.",
   pg11t:"Lancio e recupero", pg11:"Il giorno del volo, e l'inseguimento della sonda fino al punto in cui atterra.",
   pg12t:"Analisi dei dati", pg12:"I file recuperati diventano profili verticali dell'atmosfera, da leggere e da confrontare con i modelli.",
-  msWipTag:"In lavorazione",
-  msWip:"La lista dei componenti <strong>non è definitiva</strong>. Il progetto è ancora in corso, e cambierà sia prima delle prove a terra sia dopo.",
+  msWipTag:"Lista definitiva",
+  msWip:"Quella che segue è la <strong>lista definitiva</strong> del progetto della sonda. Eventuali variazioni o difformità dovute a imprevisti si riportano nell'analisi dei dati e nella relazione tecnica.",
 
   /* — Domande — */
   navQA:"Q&A", qKicker:"Fase 1 · Domande", qaTitle:"Domande (non così) frequenti",
@@ -871,8 +871,8 @@ es:{
   pg10t:"Relato del proyecto", pg10:"Este sitio, los videos y las redes: el proyecto contado mientras pasa, no después.",
   pg11t:"Lanzamiento y recuperación", pg11:"El día del vuelo, y la persecución de la sonda hasta el punto donde aterriza.",
   pg12t:"Análisis de los datos", pg12:"Los archivos recuperados se vuelven perfiles verticales de la atmósfera, para leer y comparar con los modelos.",
-  msWipTag:"En proceso",
-  msWip:"La lista de componentes <strong>no es definitiva</strong>. El proyecto sigue en curso y cambiará tanto antes de los ensayos en tierra como después.",
+  msWipTag:"Lista definitiva",
+  msWip:"La que sigue es la <strong>lista definitiva</strong> del proyecto de la sonda. Las eventuales variaciones o diferencias debidas a imprevistos se informan en el análisis de los datos y en el informe técnico.",
 
   /* — Preguntas — */
   navQA:"Q&A", qKicker:"Fase 1 · Preguntas", qaTitle:"Preguntas (no tan) frecuentes",
@@ -1334,8 +1334,8 @@ en:{
   pg10t:"Telling the project", pg10:"This site, the videos and social media: the project told as it happens, not afterwards.",
   pg11t:"Launch and recovery", pg11:"The day of the flight, and the chase after the probe to the point where it lands.",
   pg12t:"Data analysis", pg12:"The recovered files become vertical profiles of the atmosphere, to read and compare with the models.",
-  msWipTag:"Work in progress",
-  msWip:"The component list is <strong>not final</strong>. The project is still under way, and it will change both before the ground tests and after them.",
+  msWipTag:"Final list",
+  msWip:"What follows is the <strong>final list</strong> of the probe design. Any changes or discrepancies due to unforeseen events are reported in the data analysis and in the technical report.",
 
   /* — Questions — */
   navQA:"Q&A", qKicker:"Phase 1 · Questions", qaTitle:"(Not so) frequently asked questions",
