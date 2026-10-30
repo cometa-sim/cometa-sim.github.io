@@ -250,6 +250,9 @@ document.addEventListener("keydown", function(e){
    c'e' la discussione che la giustifica (chiavi wParP e wA4P in
    i18n.js). Nei testi si dice "piu' di 37 km" o "la quota di scoppio". */
 const SCALA_KM = 38;
+/* La pagina iniziale invece segue il volo vero: dice "quasi 36 km" (lo
+   scoppio del 29 ottobre e' a 35,7), e la sua animazione arriva a 36. */
+const HOME_KM = 36;
 
 /* La cifra grande in fondo a Missione sale con i decimali fino a 37 e poi
    resta "37+": la quota vera cambia giorno per giorno, e un numero che si
@@ -476,7 +479,7 @@ function skyAt(a){
   return ["rgb(" + top.join(",") + ")", "rgb(" + bot.join(",") + ")"];
 }
 /* Quota (km) in funzione dell'avanzamento dello scorrimento */
-const ALT = [[0,0],[0.10,2],[0.22,5],[0.36,11],[0.55,20],[0.75,28],[1,38]];
+const ALT = [[0,0],[0.10,2],[0.22,5],[0.36,11],[0.55,20],[0.75,28],[1,HOME_KM]];
 function altFromP(p){
   let i = 0; while(i < ALT.length - 1 && p > ALT[i + 1][0]) i++;
   const A = ALT[i], B = ALT[Math.min(i + 1, ALT.length - 1)];
@@ -497,7 +500,7 @@ function updateFlight(){
   const c = skyAt(alt);
   sky.style.background = "linear-gradient(180deg," + c[0] + " 0%," + c[0] + " 6%," + c[1] + " 68%," + c[1] + " 100%)";
   sf.style.opacity  = Math.max(nightMix*0.85, smooth(alt, 20, 32));
-  arc.style.opacity = smooth(alt, 26, 37)*0.9;
+  arc.style.opacity = smooth(alt, 26, HOME_KM)*0.9;
 
   const k = 0.2*innerHeight;
   layers.forEach(function(L){
@@ -541,7 +544,7 @@ function updateFlight(){
   if(hCord)  hCord.style.opacity  = scoppiato ? "0" : "1";
 }
 
-const BURST_KM = SCALA_KM;
+const BURST_KM = HOME_KM;
 function homeFlash(){
   if(!homeBurst || reduced) return;
   homeBurst.style.transition = "none";
