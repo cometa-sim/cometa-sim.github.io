@@ -1,7 +1,7 @@
 # cometa-sim.github.io
 
 Sito del **Progetto COMETA** — Scuola Italiana di Montevideo.
-Un pallone stratosferico oltre i 37 km di quota, progettato, costruito e
+Un pallone stratosferico a quasi 36 km di quota, progettato, costruito e
 programmato dagli studenti di 2EMS, IIIS, 3EMS, IVL e IVS.
 
 🌐 https://cometa.scuolaitaliana.edu.uy
@@ -87,11 +87,11 @@ Norme e autorizzazioni · Domande · Chi siamo.
 ### Dopo ogni modifica: il numero di versione
 
 In `index.html` i file di `assets/`, e la mappa, sono richiamati con un numero in
-coda — oggi `?v=250`:
+coda — oggi `?v=251`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=250">
-<script src="assets/i18n.js?v=250"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=251">
+<script src="assets/i18n.js?v=251"></script>
 ```
 
 Lo stesso numero compare anche in punti meno visibili, che vanno alzati
@@ -232,6 +232,11 @@ velocità di salita, che si decide anche in base al meteo del giorno.
 Per questo il sito li usa a due livelli. Nei testi la quota **non compare
 mai come cifra precisa**: si scrive «più di 37 km», «oltre 37 km», «37+»,
 «la quota di scoppio». Così restano veri anche quando il calcolo cambia.
+Dopo il volo del 29 ottobre (scoppio a 35,7 km) la home, la descrizione per
+la condivisione (`metaDesc`) e l'apertura della Missione (`mBody`) dicono
+la quota raggiunta, «quasi 36 km»; le tabelle e il numero grande della
+Missione restano sulla quota *prevista*, e le spiegazioni di fisica e lo
+studio dei venti non cambiano.
 
 I **valori esatti stanno solo nello studio dei venti**, dove c'è la
 discussione che li giustifica: la chiave `wParP2` per i parametri della
