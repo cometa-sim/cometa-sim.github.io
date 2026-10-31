@@ -64,6 +64,18 @@ const FLIGHT_SITE = {name: "La Calera · Minas", lat: -34.292548, lon: -55.35292
 const FLIGHT_BALLOON = "2000";       /* Strato 2000, come i preset della pagina Traiettoria */
 const FLIGHT_PAYLOAD_KG = 1.30;     /* pesato la mattina del lancio, 29 ottobre */
 const FLIGHT_NECK_LIFT_G = 1900;   /* letta al gonfiaggio, 29 ottobre */
+/* Il meteo previsto per il lancio, fissato: la previsione di Open-Meteo
+   per un giorno passato prima o poi non c'e' piu', e questo e' quello che
+   il riquadro della Diretta mostrava (screenshot del 30 ottobre). Con
+   questo dato assets/spot.js non chiede piu' niente a Open-Meteo. */
+window.COMETA_METEO_LANCIO = {
+  tempC: 16, ventoKmh: 8, ventoDa: 35, raffiche: 17, nuvole: 90, pioggia: 0,
+  modelliNuvole: [["ECMWF", 90], ["GFS", 100], ["ICON", 79], ["UKMO", 53]],
+  strati: {low: 0, mid: 90, high: 0},
+  modelliPioggia: [["ECMWF", 0], ["GFS", 0], ["ICON", 0], ["UKMO", 0]],
+  cape: 40,
+  incerta: "clouds"
+};
 window.COMETA_FLIGHT = {burstKm: FLIGHT_BURST_KM, ascentMs: FLIGHT_ASCENT_MS, descentV0Ms: FLIGHT_DESCENT_V0_MS, site: FLIGHT_SITE,
   cfg: {bal: FLIGHT_BALLOON, pay: FLIGHT_PAYLOAD_KG, asc: FLIGHT_ASCENT_MS, neckG: FLIGHT_NECK_LIFT_G}};
 
