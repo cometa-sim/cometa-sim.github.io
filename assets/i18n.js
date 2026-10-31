@@ -346,11 +346,15 @@ it:{
   lZone2:"È la ragione per cui non lanciamo da Montevideo. Il luogo che stiamo valutando — fra Durazno e Mercedes — sta abbondantemente fuori da quest'area, e questo è il primo dei vincoli che hanno guidato lo <a href=\"#\" data-page=\"venti\">studio dei venti</a>.",
   lZone3:"<strong>Aggiornamento ottobre 2026:</strong> la DINACIA ci ha dato indicazioni ancora più restrittive sul volo dei palloni stratosferici. Per non interferire con il traffico aereo e garantire la sicurezza in volo abbiamo spostato la zona di lancio nei pressi di Minas, Lavalleja.",
 
+  lNotamHead:"Il NOTAM",
+  lNotam1:"Un <strong>NOTAM</strong> (<em>Notice to Air Missions</em>) è l'avviso con cui l'autorità aeronautica informa piloti e controllori di un'attività che riguarda lo spazio aereo. Per il nostro lancio la DINACIA ha emesso il NOTAM <strong>C1728/26</strong>: valido il 29 ottobre 2026 dalle 12:00 alle 15:00 UTC, cioè dalle 9:00 alle 12:00 in Uruguay, segnala il lancio di un pallone sonda di categoria leggera da La Calera (Lavalleja), con uno spostamento orizzontale di 50 miglia nautiche (circa 93 km) verso est, dal suolo e senza limite di quota.",
+  lNotam2:"Qui sotto il testo originale, come è stato emesso.",
   lDiscTag:"Avvertenza",
   lDisc1:"Le informazioni di questa pagina sono pubblicate a scopo divulgativo e didattico. Non costituiscono consulenza tecnica o legale, e possono contenere errori o essere superate da modifiche normative successive.",
   lDisc2:"Chi volesse organizzare un proprio lancio in Uruguay deve rivolgersi direttamente alla DINACIA e attenersi al testo vigente del regolamento. Non ci assumiamo alcuna responsabilità per l'uso che altri facciano delle informazioni pubblicate qui.",
   lSrc1:"<strong>Norma:</strong> LAR 91 — Reglas de vuelo y operación general, Parte I, Apéndice P «Globos libres no tripulados». Seconda edizione, Emendamento 16, febbraio 2025 (il testo dell'Appendice P risale all'Emendamento 11).",
   lSrc2:"<strong>Autorità:</strong> <a href=\"https://www.dinacia.gub.uy/\" target=\"_blank\" rel=\"noopener\">DINACIA</a> — Dirección Nacional de Aviación Civil e Infraestructura Aeronáutica, Uruguay.",
+  lSrc3:"<strong>NOTAM:</strong> C1728/26, emesso dalla DINACIA per il 29 ottobre 2026.",
 
   /* — Missione: misure, scelte, limiti — */
   msKicker:"Cosa misuriamo", msHead:"Dieci sensori e i loro limiti",
@@ -809,11 +813,15 @@ es:{
   lZone2:"Es la razón por la que no lanzamos desde Montevideo. El lugar que estamos evaluando — entre Durazno y Mercedes — queda holgadamente fuera de esta área, y ésta es la primera de las restricciones que guiaron el estudio de los vientos.",
   lZone3:"<strong>Actualización de octubre de 2026:</strong> la DINACIA nos dio indicaciones aún más restrictivas sobre el vuelo de globos estratosféricos. Para no interferir con el tráfico aéreo y garantizar la seguridad en vuelo movimos la zona de lanzamiento a las cercanías de Minas, Lavalleja.",
 
+  lNotamHead:"El NOTAM",
+  lNotam1:"Un <strong>NOTAM</strong> (<em>Notice to Air Missions</em>) es el aviso con el que la autoridad aeronáutica informa a pilotos y controladores de una actividad que afecta el espacio aéreo. Para nuestro lanzamiento la DINACIA emitió el NOTAM <strong>C1728/26</strong>: válido el 29 de octubre de 2026 de 12:00 a 15:00 UTC, es decir de 9:00 a 12:00 en Uruguay, avisa del lanzamiento de un globo sonda de categoría ligera desde La Calera (Lavalleja), con un desplazamiento horizontal de 50 millas náuticas (unos 93 km) hacia el este, desde el suelo y sin límite de altura.",
+  lNotam2:"Abajo, el texto original tal como fue emitido.",
   lDiscTag:"Advertencia",
   lDisc1:"La información de esta página se publica con fines divulgativos y educativos. No constituye asesoramiento técnico ni legal, y puede contener errores o quedar superada por modificaciones normativas posteriores.",
   lDisc2:"Quien quiera organizar su propio lanzamiento en Uruguay debe dirigirse directamente a la DINACIA y atenerse al texto vigente del reglamento. No asumimos ninguna responsabilidad por el uso que terceros hagan de la información publicada aquí.",
   lSrc1:"<strong>Norma:</strong> LAR 91 — Reglas de vuelo y operación general, Parte I, Apéndice P «Globos libres no tripulados». Segunda edición, Enmienda 16, febrero 2025 (el texto del Apéndice P corresponde a la Enmienda 11).",
   lSrc2:"<strong>Autoridad:</strong> <a href=\"https://www.dinacia.gub.uy/\" target=\"_blank\" rel=\"noopener\">DINACIA</a> — Dirección Nacional de Aviación Civil e Infraestructura Aeronáutica, Uruguay.",
+  lSrc3:"<strong>NOTAM:</strong> C1728/26, emitido por la DINACIA para el 29 de octubre de 2026.",
 
   /* — Misión: medidas, decisiones, límites — */
   msKicker:"Qué medimos", msHead:"Diez sensores y sus límites",
@@ -1272,11 +1280,15 @@ en:{
   lZone2:"It is the reason we are not launching from Montevideo. The area we are considering — between Durazno and Mercedes — lies well outside this zone, and this was the first of the constraints that shaped the wind study.",
   lZone3:"<strong>Update, October 2026:</strong> DINACIA has given us stricter guidance still on flying stratospheric balloons. To avoid interfering with air traffic and to keep the flight safe, we have moved the launch area to near Minas, Lavalleja.",
 
+  lNotamHead:"The NOTAM",
+  lNotam1:"A <strong>NOTAM</strong> (<em>Notice to Air Missions</em>) is the notice with which the aviation authority informs pilots and controllers of an activity that affects the airspace. For our launch DINACIA issued NOTAM <strong>C1728/26</strong>: valid on 29 October 2026 from 12:00 to 15:00 UTC, that is from 9:00 to 12:00 in Uruguay, it announces the launch of a light-category sounding balloon from La Calera (Lavalleja), with a horizontal displacement of 50 nautical miles (about 93 km) to the east, from the ground with no upper altitude limit.",
+  lNotam2:"Below, the original text as it was issued.",
   lDiscTag:"Disclaimer",
   lDisc1:"The information on this page is published for educational purposes. It is not technical or legal advice, and it may contain errors or be superseded by later amendments to the regulation.",
   lDisc2:"Anyone planning their own launch in Uruguay must contact DINACIA directly and follow the regulation as currently in force. We accept no responsibility for any use others make of the information published here.",
   lSrc1:"<strong>Regulation:</strong> LAR 91 — Reglas de vuelo y operación general, Part I, Appendix P «Globos libres no tripulados». Second edition, Amendment 16, February 2025 (the Appendix P text dates from Amendment 11).",
   lSrc2:"<strong>Authority:</strong> <a href=\"https://www.dinacia.gub.uy/\" target=\"_blank\" rel=\"noopener\">DINACIA</a> — Dirección Nacional de Aviación Civil e Infraestructura Aeronáutica, Uruguay.",
+  lSrc3:"<strong>NOTAM:</strong> C1728/26, issued by DINACIA for 29 October 2026.",
 
   /* — Mission: measurements, decisions, limits — */
   msKicker:"What we measure", msHead:"Ten sensors and their limits",
