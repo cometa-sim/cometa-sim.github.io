@@ -87,11 +87,11 @@ Norme e autorizzazioni · Domande · Chi siamo.
 ### Dopo ogni modifica: il numero di versione
 
 In `index.html` i file di `assets/`, e la mappa, sono richiamati con un numero in
-coda — oggi `?v=257`:
+coda — oggi `?v=258`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=257">
-<script src="assets/i18n.js?v=257"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=258">
+<script src="assets/i18n.js?v=258"></script>
 ```
 
 Lo stesso numero compare anche in punti meno visibili, che vanno alzati
