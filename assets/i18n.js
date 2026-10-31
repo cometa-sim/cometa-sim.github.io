@@ -39,7 +39,7 @@ it:{
   dirFase_attesa:"in attesa del lancio", dirFase_salita:"in salita", dirFase_caduta:"in caduta",
   dirFase_paracadute:"discesa col paracadute", dirFase_atterrata:"atterrata",
   dirAltHead:"Quota", dirAltEstLabel:"Stimata", dirAltGpsLabel:"Ultimo punto GPS",
-  dirWeatherHead:"Previsione meteo lancio",
+  dirWeatherHead:"Meteo lancio",
 
   /* — Inizio — */
   heroSchool:"Scuola Italiana di Montevideo",
@@ -513,7 +513,7 @@ es:{
   dirFase_attesa:"esperando el lanzamiento", dirFase_salita:"en ascenso", dirFase_caduta:"en caída",
   dirFase_paracadute:"descenso con paracaídas", dirFase_atterrata:"aterrizada",
   dirAltHead:"Altitud", dirAltEstLabel:"Estimada", dirAltGpsLabel:"Último punto GPS",
-  dirWeatherHead:"Previsión meteorológica del lanzamiento",
+  dirWeatherHead:"Clima del lanzamiento",
 
   heroSchool:"Scuola Italiana di Montevideo",
 
@@ -980,7 +980,7 @@ en:{
   dirFase_attesa:"waiting for launch", dirFase_salita:"ascending", dirFase_caduta:"falling",
   dirFase_paracadute:"descending under parachute", dirFase_atterrata:"landed",
   dirAltHead:"Altitude", dirAltEstLabel:"Estimated", dirAltGpsLabel:"Latest GPS fix",
-  dirWeatherHead:"Launch weather forecast",
+  dirWeatherHead:"Launch weather",
 
   heroSchool:"Scuola Italiana di Montevideo",
 
