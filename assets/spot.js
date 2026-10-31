@@ -217,13 +217,13 @@ window.COMETA_SPOT = (function(){
     });
     const mapkit = window.COMETA_MAPKIT ? Promise.resolve() : new Promise(function(ok, ko){
       const s = document.createElement("script");
-      s.src = "assets/mapkit.js?v=256";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
+      s.src = "assets/mapkit.js?v=257";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
       s.onload = ok; s.onerror = ko;
       document.head.appendChild(s);
     });
     const map3d = window.COMETA_MAP3D ? Promise.resolve() : new Promise(function(ok){
       const s = document.createElement("script");
-      s.src = "assets/map3d.js?v=256";
+      s.src = "assets/map3d.js?v=257";
       s.onload = ok; s.onerror = ok;     // senza, resta il 2D e basta
       document.head.appendChild(s);
     });
@@ -971,9 +971,32 @@ window.COMETA_SPOT = (function(){
     if(!e || !d.mkPunti) return;
     e.textContent = ventoDa == null ? d.mkWeatherWind : d.mkWeatherWindFrom.replace("{d}", d.mkPunti.split(",")[Math.round(ventoDa / 45) % 8]);
   }
+  /* Il meteo fissato dopo il lancio (COMETA_METEO_LANCIO in assets/volo.js):
+     gli stessi numeri e gli stessi title di prima, senza chiedere niente. */
+  function meteoFisso(el, m){
+    const $i = function(id){ return document.getElementById(id); };
+    const tip = function(e, t){ if(e && t) e.parentNode.title = t; };
+    el.hidden = false;
+    $i("dirWTemp").textContent = m.tempC + "°C";
+    ventoDa = m.ventoDa;
+    $i("dirWWind").innerHTML = freccia(m.ventoDa) + m.ventoKmh + "<small>km/h</small>";
+    etichettaVento();
+    tip($i("dirWWind"), "gusts " + m.raffiche + " km/h · from " + m.ventoDa + "°");
+    $i("dirWClouds").textContent = m.nuvole + "%";
+    tip($i("dirWClouds"), "models: " + m.modelliNuvole.map(function(v){ return v[0] + " " + v[1] + "%"; }).join(" · ") +
+      "\nlayers: low " + m.strati.low + "% · mid " + m.strati.mid + "% · high " + m.strati.high + "%");
+    $i("dirWRain").textContent = m.pioggia + "%";
+    tip($i("dirWRain"), "models: " + m.modelliPioggia.map(function(v){ return v[0] + " " + v[1].toFixed(1) + " mm"; }).join(" · ") +
+      "\nCAPE: launch " + m.cape + " J/kg");
+    $i("dirWIcon").innerHTML = weatherIcon(m.nuvole, m.pioggia, m.ventoKmh);
+    const unc = $i("dirWUnc");
+    if(unc) unc.hidden = !m.incerta;
+    tip($i("dirWIcon"), m.incerta ? "models disagree: " + m.incerta : "");
+  }
   function loadWeather(){
     const el = document.getElementById("dirWeather"), L0 = window.COMETA_LAUNCH;
     if(!el || !L0) return;
+    if(window.COMETA_METEO_LANCIO){ meteoFisso(el, window.COMETA_METEO_LANCIO); return; }
     const site = (window.COMETA_FLIGHT && window.COMETA_FLIGHT.site) || FALLBACK;
     const p = {};
     new Intl.DateTimeFormat("en-CA", {timeZone:TZ, year:"numeric", month:"2-digit", day:"2-digit",
