@@ -217,13 +217,13 @@ window.COMETA_SPOT = (function(){
     });
     const mapkit = window.COMETA_MAPKIT ? Promise.resolve() : new Promise(function(ok, ko){
       const s = document.createElement("script");
-      s.src = "assets/mapkit.js?v=259";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
+      s.src = "assets/mapkit.js?v=260";  // niente cache-bust qui finora: una correzione poteva restare invisibile a chi l'aveva gia' caricato
       s.onload = ok; s.onerror = ko;
       document.head.appendChild(s);
     });
     const map3d = window.COMETA_MAP3D ? Promise.resolve() : new Promise(function(ok){
       const s = document.createElement("script");
-      s.src = "assets/map3d.js?v=259";
+      s.src = "assets/map3d.js?v=260";
       s.onload = ok; s.onerror = ok;     // senza, resta il 2D e basta
       document.head.appendChild(s);
     });
@@ -686,8 +686,7 @@ window.COMETA_SPOT = (function(){
     }
     if(finito) ts = d.dirLegEnd || "flight ended";
     legenda.querySelector(".leg-spot").textContent = "· " + ts;
-    legenda.querySelector(".leg-traj-t").textContent = trajPr && trajPr.ricostruita
-      ? (d.dirLegTrajRic || "Predicted trajectory (reconstructed)") : (d.dirLegTraj || "Predicted trajectory");
+    legenda.querySelector(".leg-traj-t").textContent = d.dirLegTraj || "Predicted trajectory";
     legenda.querySelector(".leg-fc-t").textContent = d.dirLegFc || "Forecast error";
   }
 
@@ -756,7 +755,7 @@ window.COMETA_SPOT = (function(){
      si riprova al giro dopo. */
   /* Dopo il volo Tawhiri non calcola piu' quel giorno: se la mappa ha
      data-traiettoria (index.html), la traiettoria prevista e' quella
-     ricostruita in quel file (vedi la sua "nota"), e non si chiede altro. */
+     salvata in quel file (vedi la sua "nota"), e non si chiede altro. */
   function traiettoriaFissa(url){
     if(trajRun === url) return;
     trajRun = url;
@@ -766,7 +765,7 @@ window.COMETA_SPOT = (function(){
       const su = full.filter(function(p){ return p.up; });
       return ensureMap().then(function(){
         trajPr = {pts:full.map(function(p){ return [p.lat, p.lon]; }), full:full, burst:su.length ? su[su.length - 1] : full[0],
-          end:full[full.length - 1], run:null, key:url, durMin:(full[full.length - 1].t - full[0].t) / 6e4, ricostruita:true};
+          end:full[full.length - 1], run:null, key:url, durMin:(full[full.length - 1].t - full[0].t) / 6e4, salvata:true};
         fcLast = null;
         disegnaTraiettoria();
         renderScheda();
@@ -893,8 +892,8 @@ window.COMETA_SPOT = (function(){
   function renderScheda(){
     const el = document.getElementById("dirScheda");
     if(!el || !window.COMETA_TRAIETTORIA) return;
-    el.hidden = !trajPr || !!trajPr.ricostruita;      // la scheda vuole la risposta di Tawhiri
-    if(trajPr && !trajPr.ricostruita) window.COMETA_TRAIETTORIA.scheda(el, trajPr.raw, {atmo:flightCfg().atmo, fc:fcLast});
+    el.hidden = !trajPr || !!trajPr.salvata;      // la scheda vuole la risposta di Tawhiri
+    if(trajPr && !trajPr.salvata) window.COMETA_TRAIETTORIA.scheda(el, trajPr.raw, {atmo:flightCfg().atmo, fc:fcLast});
   }
 
   /* Quota e quota nel tempo compaiono solo dal giorno del lancio; e a
