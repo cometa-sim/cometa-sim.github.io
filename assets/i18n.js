@@ -246,8 +246,8 @@ it:{
   twAnd:"e",
   twLegWind:"Venti da previsione.",
   twFcOn:"Errore di previsione",
-  /* da aggiornare quando la raccolta su piu' siti dira' dove vale la curva (README, «Da completare») */
-  twFcHint:"Terzo quartile. Per ora affidabile solo in Uruguay.",
+  /* dove vale la curva: dal confronto fra i siti del 1/11/2026 (README, «Quanto ci si può fidare della previsione») */
+  twFcHint:"Terzo quartile. Affidabile in Uruguay, per voli con scoppio intorno ai 35–38 km.",
   twFcZero:"L'errore di previsione è zero: ultimo run prima del lancio.",
   twFcNa:"Errore di previsione non disponibile: la curva non si è caricata o non copre questo anticipo.",
   twFcRow:"Errore di previsione",
@@ -716,7 +716,7 @@ es:{
   twAnd:"y",
   twLegWind:"Vientos del pronóstico.",
   twFcOn:"Error de pronóstico",
-  twFcHint:"Tercer cuartil. Por ahora confiable solo en Uruguay.",
+  twFcHint:"Tercer cuartil. Confiable en Uruguay, para vuelos con estallido alrededor de los 35–38 km.",
   twFcZero:"El error de pronóstico es cero: último run antes del lanzamiento.",
   twFcNa:"Error de pronóstico no disponible: la curva no se cargó o no cubre esta anticipación.",
   twFcRow:"Error de pronóstico",
@@ -1183,7 +1183,7 @@ en:{
   twAnd:"and",
   twLegWind:"Winds from the forecast.",
   twFcOn:"Forecast error",
-  twFcHint:"Third quartile. For now reliable only in Uruguay.",
+  twFcHint:"Third quartile. Reliable in Uruguay, for flights bursting around 35–38 km.",
   twFcZero:"The forecast error is zero: last run before launch.",
   twFcNa:"Forecast error not available: the curve did not load or does not cover this lead time.",
   twFcRow:"Forecast error",
