@@ -207,6 +207,9 @@ def main():
     ap.add_argument("--passo", type=int, default=24,
                     help="ampiezza delle classi di anticipo in ore (6: una per corsa GFS)")
     ap.add_argument("--nome", default="Mercedes (Uruguay)", help="il sito, nel JSON")
+    ap.add_argument("--copertura-h", type=float, default=0,
+                    help="con --min-n: le classi con abbastanza campioni devono arrivare almeno a "
+                         "quest'eta' della corsa [h], altrimenti la curva non copre la settimana")
     ap.add_argument("--min-n", type=int, default=0,
                     help="con --json: se meno di 3 classi hanno almeno questi campioni, "
                          "non scrive il file ed esce con 3 (il workflow ripiega su un altro sito)")
@@ -243,8 +246,11 @@ def main():
         # classe; la pagina interpola Q3 sull'eta' della corsa e lo scala con
         # la durata del volo (durata_ref_min e' quella del volo misurato)
         stat = next(iter(tutti.values()))
-        if a.min_n and sum(1 for x in stat.values() if x["n"] >= a.min_n) < 3:
-            print(f"\nCurva non scritta: meno di 3 classi con almeno {a.min_n} campioni")
+        piene = [x for x in stat.values() if x["n"] >= a.min_n] if a.min_n else list(stat.values())
+        if a.min_n and (len(piene) < 3 or max(x["eta"] for x in piene) < a.copertura_h):
+            print(f"\nCurva non scritta: le classi con almeno {a.min_n} campioni sono {len(piene)}"
+                  + (f" e arrivano a {max(x['eta'] for x in piene):.0f} h" if piene else "")
+                  + (f", ne servono fino a {a.copertura_h:.0f} h" if a.copertura_h else ""))
             return 3
         out = {"aggiornato": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
                "sito": a.nome, "passo_h": a.passo, "durata_ref_min": round(durata or 176.0, 1),

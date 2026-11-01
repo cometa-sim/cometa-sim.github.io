@@ -484,8 +484,9 @@ Traiettoria; il punto di riferimento ufficiale dell'aerodromo (AIP DINACIA,
 irrilevante per la statistica. Se il punto di lancio cambia, va cambiato nei
 tre posti.
 
-La pagina usa la curva di La Calera a passo di 6 h appena ha almeno tre
-classi con 8 campioni (circa una settimana di raccolta), fino ad allora
+La pagina usa la curva di La Calera a passo di 6 h appena le classi con
+almeno 8 campioni coprono tutta la settimana (fino a 144 h di età della
+corsa: servono alcune settimane di raccolta), fino ad allora
 quella di Mercedes a passo di 24 h, nell'opzione «Errore di previsione»
 delle impostazioni avanzate. Ogni giorno il workflow scrive anche
 `convergenza_curva.json` sul branch `dati` (età mediana e quartili per
