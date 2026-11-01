@@ -87,11 +87,11 @@ Norme e autorizzazioni · Domande · Chi siamo.
 ### Dopo ogni modifica: il numero di versione
 
 In `index.html` i file di `assets/`, e la mappa, sono richiamati con un numero in
-coda — oggi `?v=259`:
+coda — oggi `?v=260`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=259">
-<script src="assets/i18n.js?v=259"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=260">
+<script src="assets/i18n.js?v=260"></script>
 ```
 
 Lo stesso numero compare anche in punti meno visibili, che vanno alzati
@@ -675,11 +675,12 @@ LoRa e SPOT, i punti SPOT dopo il recupero non si disegnano (`data-spot-fino`
 su `#spotMap`), le tessere della quota in tempo reale e la nota sono tolte:
 resta il grafico. Tawhiri non calcola i giorni passati, e la traiettoria
 prevista del 29 non era stata salvata: quella sulla mappa (`data-traiettoria`
-su `#spotMap`) è ricostruita in `assets/traiettoria-prevista.json`, con i venti
-GFS 0,5° della corsa delle 06 UTC del 29 (archivio NOAA su AWS, fino a 1 hPa)
-e i dati del volo come li calcolava il sito quella mattina (salita 3,65 m/s,
-scoppio 39,5 km, paracadute 4,42 m/s); la legenda dice «(ricostruita)» e la
-scheda della previsione non c'è. Da `DIRETTA_END` (`assets/app.js`, 16:20) voce in nav,
+su `#spotMap`) è in `assets/traiettoria-prevista.json`, calcolata dopo con gli
+stessi dati di quella mattina — i venti GFS 0,5° della corsa delle 06 UTC del
+29, quella che Tawhiri usava (archivio NOAA su AWS, fino a 1 hPa), e i dati del
+volo come li calcolava il sito (salita 3,65 m/s, scoppio 39,5 km, paracadute
+4,42 m/s). La scheda della previsione, che vuole la risposta di Tawhiri, non
+c'è. Da `DIRETTA_END` (`assets/app.js`, 16:20) voce in nav,
 banner e stato sono blu, «Diretta conclusa»; la voce si chiama «Il volo»; e
 dopo `LAUNCH` il conto alla rovescia diventa «Lancio effettuato il» con
 giorno, mese, anno e ora. La quota dello SPOT non si usa (il giorno del lancio dava quote
