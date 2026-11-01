@@ -87,11 +87,11 @@ Norme e autorizzazioni · Domande · Chi siamo.
 ### Dopo ogni modifica: il numero di versione
 
 In `index.html` i file di `assets/`, e la mappa, sono richiamati con un numero in
-coda — oggi `?v=260`:
+coda — oggi `?v=261`:
 
 ```html
-<link rel="stylesheet" href="assets/cometa.css?v=260">
-<script src="assets/i18n.js?v=260"></script>
+<link rel="stylesheet" href="assets/cometa.css?v=261">
+<script src="assets/i18n.js?v=261"></script>
 ```
 
 Lo stesso numero compare anche in punti meno visibili, che vanno alzati
@@ -468,6 +468,22 @@ efficace e/T e l'errore relativo e/L, e con più file li confronta fra i
 siti. Se le curve di e/T coincidono, scalare con la durata del volo regge.
 L'elenco dei siti è `SITI` in `calcolo/convergenza_raccolta.py`.
 
+Il confronto del 1° novembre 2026, dopo tre settimane di dati:
+
+- i siti dell'Uruguay (Mercedes, Durazno, Rivera, Rocha) hanno la stessa
+  curva di e/T entro il 10–15%;
+- Comodoro Rivadavia coincide fino a 5 giorni di anticipo;
+- a Cuiabá l'errore è circa la metà, a Bologna fino al doppio oltre i
+  3 giorni;
+- con lo scoppio a 22 km è 1,3–1,5 volte più grande: la scala con la
+  durata del volo non basta a trasferire la curva a un profilo diverso;
+- e/L non avvicina le curve più di e/T.
+
+Per questo accanto all'opzione «Errore di previsione» la pagina scrive
+«Terzo quartile. Affidabile in Uruguay, per voli con scoppio intorno ai
+35–38 km» (`twFcHint` in `assets/i18n.js`, nelle tre lingue, e il testo di
+riserva in `index.html` e `simulazione-diretta.html`).
+
 Dal 24 ottobre 2026 c'è anche **La Calera** (SUCL), l'aerodromo vicino a
 Minas da cui si lancerà: lo consiglia la DINACIA perché è il punto con meno
 traffico aereo, quindi è anche quello che si userà di più in Uruguay. Per
@@ -484,8 +500,9 @@ Traiettoria; il punto di riferimento ufficiale dell'aerodromo (AIP DINACIA,
 irrilevante per la statistica. Se il punto di lancio cambia, va cambiato nei
 tre posti.
 
-La pagina usa la curva di La Calera a passo di 6 h appena ha almeno tre
-classi con 8 campioni (circa una settimana di raccolta), fino ad allora
+La pagina usa la curva di La Calera a passo di 6 h appena le classi con
+almeno 8 campioni coprono tutta la settimana (fino a 144 h di età della
+corsa: servono alcune settimane di raccolta), fino ad allora
 quella di Mercedes a passo di 24 h, nell'opzione «Errore di previsione»
 delle impostazioni avanzate. Ogni giorno il workflow scrive anche
 `convergenza_curva.json` sul branch `dati` (età mediana e quartili per
@@ -511,9 +528,9 @@ successiva arriva di sicuro dopo il lancio. L'avviso compare dopo il
 calcolo, fra quelli del pallone sotto le tessere. Le classi con meno di 8 campioni non
 si usano. Se il file non si carica, lo dice un avviso nello stesso posto e
 l'area resta quella del pallone. Accanto alla casella la pagina scrive solo
-«Terzo quartile. Per ora affidabile solo in Uruguay» (`twFcHint` in
-`assets/i18n.js`): va aggiornato quando la raccolta su più siti dirà dove
-la curva vale (vedi «Da completare»).
+«Terzo quartile. Affidabile in Uruguay, per voli con scoppio intorno ai
+35–38 km» (`twFcHint` in `assets/i18n.js`), dal confronto fra i siti
+descritto sopra.
 
 L'analisi si fa a mano:
 
@@ -758,15 +775,6 @@ L'unica cosa che GitHub impedisce sempre, anche senza regole, è
 approvare la propria richiesta di modifica.
 
 ## Da completare
-
-- **«Per ora affidabile solo in Uruguay»**, accanto all'opzione «Errore di
-  previsione» (`twFcHint` in `assets/i18n.js`, nelle tre lingue, e il
-  testo di riserva in `index.html` e `simulazione-diretta.html`). Dalla
-  fine di ottobre 2026 la raccolta su più siti (`convergenza_*.csv` sul
-  branch `dati`) basta a dire se la curva di e/T vale anche altrove:
-  `python3 calcolo/convergenza_analisi.py dati/convergenza*.csv`. Se le
-  curve dei siti coincidono, la frase si allarga o si toglie; se no,
-  resta, e magari la pagina usa la curva solo per partenze in Uruguay.
 
 - **La data definitiva del lancio**, quando la DINACIA autorizza. Oggi la
   costante `LAUNCH` in `assets/volo.js` vale `2026-10-29T09:39:00-03:00`: è

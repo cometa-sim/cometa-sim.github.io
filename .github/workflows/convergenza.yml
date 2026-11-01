@@ -73,12 +73,13 @@ jobs:
         # la legge assets/traiettoria.js (opzione «Errore di previsione»);
         # se fallisce, i dati raccolti si salvano comunque
         continue-on-error: true
-        # La Calera a passo di 6 h appena ha almeno 3 classi con 8 campioni;
+        # La Calera a passo di 6 h appena le classi con almeno 8 campioni
+        # coprono tutta la settimana (fino a 144 h di eta' della corsa);
         # fino ad allora Mercedes, a passo di 24 h
         run: |
           D=${{ runner.temp }}/dati
           # ritardo delle corse GFS in Tawhiri, misurato da tutti i giri di tutti i siti
-          python3 calcolo/convergenza_analisi.py $D/convergenza_lacalera.csv --passo 6 --min-n 8 \
+          python3 calcolo/convergenza_analisi.py $D/convergenza_lacalera.csv --passo 6 --min-n 8 --copertura-h 144 \
                   --nome "La Calera, Minas (Uruguay)" --json $D/convergenza_curva.json \
                   --disponibilita $D/convergenza*.csv \
             || python3 calcolo/convergenza_analisi.py $D/convergenza.csv --json $D/convergenza_curva.json \
